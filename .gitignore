@@ -1,0 +1,33 @@
+# ── Build outputs ────────────────────────────────────────────────────────
+dist/
+dist-ssr/
+*.local
+
+# ── Dependencies ─────────────────────────────────────────────────────────
+node_modules/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# ── Environment files ────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ── Editor / OS ──────────────────────────────────────────────────────────
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# ── Go build artifacts ───────────────────────────────────────────────────
+backend/*.exe
+backend/tmp/
+
+# ── Logs ─────────────────────────────────────────────────────────────────
+*.log
+npm-debug.log*

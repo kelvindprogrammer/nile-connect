@@ -1,0 +1,349 @@
+:root {
+    --nile-blue: #1E499D;
+    --nile-green: #6CBB56;
+    --nile-white: #FFFFFE;
+    --nile-black: #000000;
+    --brutalist-border: 2px;
+    --brutalist-shadow-sm: 3px;
+    --brutalist-shadow-lg: 6px;
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 24px;
+    --radius-full: 9999px;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* === Base Refinement === */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    cursor: default;
+}
+
+html {
+    scroll-behavior: smooth;
+    font-size: 14px; /* Reduced from 16px */
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--nile-white);
+    color: var(--nile-black);
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.01em;
+}
+
+/* === Custom Cursor === */
+a,
+button,
+input,
+textarea,
+select,
+[role="button"] {
+    cursor: auto !important;
+}
+
+button,
+[role="button"] {
+    cursor: pointer !important;
+}
+
+/* === Ripple Effect on Buttons === */
+.ripple-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple-btn::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.35);
+    width: 0;
+    height: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease, opacity 0.4s ease;
+    opacity: 0;
+}
+
+.ripple-btn:active::after {
+    width: 300px;
+    height: 300px;
+    opacity: 1;
+    transition: 0s;
+}
+
+/* === Page Transition Base === */
+.anime-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+.anime-slide-up {
+    animation: slideUp 0.6s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* === Card Hover Lift === */
+.card-hover {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 8px 12px 0px 0px rgba(0, 0, 0, 1);
+}
+
+.shadow-brutalist-blue {
+    box-shadow: 8px 8px 0px 0px #1E499D;
+}
+
+.shadow-brutalist-green {
+    box-shadow: 8px 8px 0px 0px #6CBB56;
+}
+
+.shadow-brutalist-sm-blue {
+    box-shadow: 4px 4px 0px 0px #1E499D;
+}
+
+.shadow-brutalist-sm-green {
+    box-shadow: 4px 4px 0px 0px #6CBB56;
+}
+
+.transition-perfect {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* === Animated Underline Links === */
+.link-underline {
+    position: relative;
+    text-decoration: none;
+}
+
+.link-underline::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 0;
+    height: 2px;
+    background: #1E499D;
+    transition: width 0.3s ease;
+}
+
+.link-underline:hover::after {
+    width: 100%;
+}
+
+/* === Shimmer / Skeleton === */
+.shimmer {
+    background: linear-gradient(90deg, #FFFFFE 25%, #f4f4f4 50%, #FFFFFE 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* === Brutalist Press Effect === */
+.btn-press {
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.btn-press:active {
+    transform: translate(4px, 4px) !important;
+    box-shadow: none !important;
+}
+
+/* === Sidebar Nav Pill Slide === */
+.sidebar-item {
+    position: relative;
+    transition: color 0.2s ease;
+}
+
+.sidebar-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 0;
+    background: #6CBB56;
+    border-radius: 0 4px 4px 0;
+    transition: height 0.25s ease;
+}
+
+.sidebar-item.active::before,
+.sidebar-item:hover::before {
+    height: 60%;
+}
+
+/* === Input Focus Glow === */
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(108, 187, 86, 0.3), 3px 3px 0px 0px #000;
+    transition: box-shadow 0.2s ease;
+}
+
+/* === Scroll Bar === */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #FFFFFE;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #1E499D;
+    border-radius: 4px;
+    border: 2px solid #FFFFFE;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #6CBB56;
+}
+
+/* === Floating Label Inputs === */
+.float-label-group {
+    position: relative;
+}
+
+.float-label-group input {
+    padding-top: 1.25rem;
+}
+
+.float-label-group label {
+    position: absolute;
+    top: 1rem;
+    left: 1.25rem;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #888;
+    transition: all 0.2s ease;
+    pointer-events: none;
+}
+
+.float-label-group input:focus~label,
+.float-label-group input:not(:placeholder-shown)~label {
+    top: 0.35rem;
+    font-size: 0.6rem;
+    color: #1E499D;
+}
+
+/* === Brutalist Stat Number Pop === */
+@keyframes pop {
+    0% {
+        transform: scale(1);
+    }
+
+    40% {
+        transform: scale(1.08);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.stat-pop {
+    animation: pop 0.4s ease-out;
+}
+
+/* === Green Pulse Indicator === */
+.pulse-green {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #6CBB56;
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 rgba(108, 187, 86, 0.6);
+    animation: pulse-green 1.8s infinite;
+}
+
+@keyframes pulse-green {
+    0% {
+        box-shadow: 0 0 0 0 rgba(108, 187, 86, 0.6);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(108, 187, 86, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(108, 187, 86, 0);
+    }
+}
+
+/* === Blue Pulse Indicator === */
+.pulse-blue {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #1E499D;
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 rgba(30, 73, 157, 0.5);
+    animation: pulse-blue 1.8s infinite;
+}
+
+@keyframes pulse-blue {
+    0% {
+        box-shadow: 0 0 0 0 rgba(30, 73, 157, 0.5);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(30, 73, 157, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(30, 73, 157, 0);
+    }
+}
+
+/* === Page Wipe Overlay === */
+.page-wipe {
+    position: fixed;
+    inset: 0;
+    background: #1E499D;
+    z-index: 9999;
+    transform-origin: top;
+    pointer-events: none;
+}

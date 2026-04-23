@@ -1,0 +1,31 @@
+# Binaries
+nile-connect-backend
+*.exe
+*.dll
+
+# Database files
+demo.db
+*.sqlite
+
+# Environment files (except examples)
+.env
+.env.local
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Go specific
+/bin/
+/pkg/
+
+# Logs
+*.log
+
+# Build artifacts
+coverage.txt
+profile.out
