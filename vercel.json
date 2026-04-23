@@ -6,12 +6,10 @@
 
   "functions": {
     "api/ai/chat.py": {
-      "runtime": "python3.12",
       "memory": 512,
       "maxDuration": 30
     },
     "api/ai/review.py": {
-      "runtime": "python3.12",
       "memory": 1024,
       "maxDuration": 60
     }
