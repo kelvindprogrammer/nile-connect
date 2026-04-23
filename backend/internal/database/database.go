@@ -49,17 +49,35 @@ func Migrate(db *gorm.DB) error {
 			return fmt.Errorf("failed to migrate SQLite database: %w", err)
 		}
 	} else {
-		// Create PostgreSQL ENUM types if they don't exist
-		enums := []string{
-			`DO $$ BEGIN CREATE TYPE role AS ENUM ('student','staff','employer'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;`,
-			`DO $$ BEGIN CREATE TYPE student_subtype AS ENUM ('current','alumni'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;`,
-			`DO $$ BEGIN CREATE TYPE application_status AS ENUM ('saved','applied','reviewing','interview','offered','rejected'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;`,
-			`DO $$ BEGIN CREATE TYPE job_status AS ENUM ('pending','approved','rejected','closed'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;`,
-			`DO $$ BEGIN CREATE TYPE employer_status AS ENUM ('pending','approved','rejected'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;`,
+		// Create ALL PostgreSQL ENUM types before AutoMigrate.
+		// Use sqlDB.Exec (not gorm Exec) to avoid GORM misparsing $$ as placeholders.
+		sqlDB, dbErr := db.DB()
+		if dbErr != nil {
+			return fmt.Errorf("failed to get sql.DB: %w", dbErr)
 		}
-		for _, sql := range enums {
-			if err := db.Exec(sql).Error; err != nil {
-				return fmt.Errorf("failed to create enum types: %w", err)
+		type enumDef struct{ name, values string }
+		enumDefs := []enumDef{
+			{"role", "'student','staff','employer'"},
+			{"student_subtype", "'current','alumni'"},
+			{"employer_status", "'pending','approved','rejected'"},
+			{"job_type", "'internship','full-time','part-time','remote','hybrid'"},
+			{"job_status", "'pending','active','rejected','archived'"},
+			{"application_status", "'saved','applied','interview','offer','rejected'"},
+			{"event_category", "'tech','workshop','fair','webinar'"},
+			{"report_type", "'weekly','monthly'"},
+		}
+		for _, e := range enumDefs {
+			// Check if type exists before creating
+			var exists bool
+			row := sqlDB.QueryRow("SELECT EXISTS(SELECT 1 FROM pg_type WHERE typname = $1)", e.name)
+			if err := row.Scan(&exists); err != nil {
+				return fmt.Errorf("failed to check enum %s: %w", e.name, err)
+			}
+			if !exists {
+				q := fmt.Sprintf("CREATE TYPE %s AS ENUM (%s)", e.name, e.values)
+				if _, execErr := sqlDB.Exec(q); execErr != nil {
+					return fmt.Errorf("failed to create enum %s: %w", e.name, execErr)
+				}
 			}
 		}
 
