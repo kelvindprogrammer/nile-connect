@@ -49,6 +49,20 @@ func Migrate(db *gorm.DB) error {
 			return fmt.Errorf("failed to migrate SQLite database: %w", err)
 		}
 	} else {
+		// Create PostgreSQL ENUM types if they don't exist
+		enums := []string{
+			`DO $$ BEGIN CREATE TYPE role AS ENUM ('student','staff','employer'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;`,
+			`DO $$ BEGIN CREATE TYPE student_subtype AS ENUM ('current','alumni'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;`,
+			`DO $$ BEGIN CREATE TYPE application_status AS ENUM ('saved','applied','reviewing','interview','offered','rejected'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;`,
+			`DO $$ BEGIN CREATE TYPE job_status AS ENUM ('pending','approved','rejected','closed'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;`,
+			`DO $$ BEGIN CREATE TYPE employer_status AS ENUM ('pending','approved','rejected'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;`,
+		}
+		for _, sql := range enums {
+			if err := db.Exec(sql).Error; err != nil {
+				return fmt.Errorf("failed to create enum types: %w", err)
+			}
+		}
+
 		// Use production migrations for PostgreSQL
 		err := db.AutoMigrate(
 			&User{},
