@@ -7,14 +7,14 @@ import (
 )
 
 type Event struct {
-	ID                 string        `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+	ID                 string         `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
 	CreatedAt          time.Time
 	UpdatedAt          time.Time
 	DeletedAt          gorm.DeletedAt `gorm:"index"`
 	OrganiserID        string         `gorm:"not null;index"`
-	OrganiserType      Role           `gorm:"type:role;not null"`
+	OrganiserType      Role           `gorm:"type:text;not null"`
 	Title              string         `gorm:"not null"`
-	Category           EventCategory  `gorm:"type:event_category;not null"`
+	Category           EventCategory  `gorm:"type:text;not null"`
 	Date               time.Time      `gorm:"not null"`
 	Time               string         `gorm:"not null"`
 	Location           string         `gorm:"not null"`
@@ -23,7 +23,7 @@ type Event struct {
 	RegistrationsCount int            `gorm:"default:0"`
 	AttendanceCount    int            `gorm:"default:0"`
 	IsFeatured         bool           `gorm:"default:false"`
-	Status             JobStatus      `gorm:"type:job_status;default:pending"`
+	Status             JobStatus      `gorm:"type:text;default:pending"`
 }
 
 type EventRegistration struct {
@@ -42,7 +42,7 @@ type Post struct {
 	UpdatedAt     time.Time
 	DeletedAt     gorm.DeletedAt `gorm:"index"`
 	AuthorID      string         `gorm:"not null;index"`
-	AuthorType    Role           `gorm:"type:role;not null"`
+	AuthorType    Role           `gorm:"type:text;not null"`
 	Content       string         `gorm:"type:text;not null"`
 	MediaUrl      string
 	LikesCount    int            `gorm:"default:0"`
@@ -66,7 +66,7 @@ type CVDocument struct {
 	StudentID        string         `gorm:"not null;index"`
 	FileUrl          string         `gorm:"not null"`
 	OriginalFilename string         `gorm:"not null"`
-	AnalysisResult   string         `gorm:"type:json"`
+	AnalysisResult   string         `gorm:"type:text"`
 	UploadedAt       time.Time
 }
 
@@ -78,9 +78,10 @@ type AdvisorSlot struct {
 	AdvisorName    string         `gorm:"not null"`
 	Speciality     string         `gorm:"not null"`
 	Rating         float64
-	AvailableTimes string         `gorm:"type:json"`
+	AvailableTimes string         `gorm:"type:text"`
 }
 
+// ReportType values
 type ReportType string
 
 const (
@@ -94,9 +95,7 @@ type Report struct {
 	UpdatedAt   time.Time
 	DeletedAt   gorm.DeletedAt `gorm:"index"`
 	StaffID     string         `gorm:"not null;index"`
-	Type        ReportType     `gorm:"type:report_type;not null"`
+	Type        ReportType     `gorm:"type:text;not null"`
 	GeneratedAt time.Time
 	FileUrl     string
 }
-
-func (ReportType) GormDataType() string { return "report_type" }
