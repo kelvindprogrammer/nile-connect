@@ -22,19 +22,19 @@ const (
 )
 
 type User struct {
-	gorm.Model
-	ID              string         `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
-	FullName        string         `gorm:"not null"`
-	Username        string         `gorm:"uniqueIndex;not null"`
-	Email           string         `gorm:"uniqueIndex;not null"`
-	PasswordHash    string         `gorm:"not null"`
-	Role            Role           `gorm:"type:role;not null"`
-	StudentSubtype  *StudentSubtype `gorm:"type:student_subtype"`
-	Major           string
-	GraduationYear  int
-	IsVerified      bool           `gorm:"default:false"`
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
+	ID             string          `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	DeletedAt      gorm.DeletedAt  `gorm:"index"`
+	FullName       string          `gorm:"not null"`
+	Username       string          `gorm:"uniqueIndex;not null"`
+	Email          string          `gorm:"uniqueIndex;not null"`
+	PasswordHash   string          `gorm:"not null"`
+	Role           Role            `gorm:"type:role;not null"`
+	StudentSubtype *StudentSubtype `gorm:"type:student_subtype"`
+	Major          string
+	GraduationYear int
+	IsVerified     bool            `gorm:"default:false"`
 }
 
 type EmployerStatus string
@@ -46,8 +46,10 @@ const (
 )
 
 type EmployerProfile struct {
-	gorm.Model
 	ID           string         `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	DeletedAt    gorm.DeletedAt `gorm:"index"`
 	UserID       string         `gorm:"not null;index"`
 	CompanyName  string         `gorm:"not null"`
 	Industry     string         `gorm:"not null"`
@@ -57,7 +59,6 @@ type EmployerProfile struct {
 	Website      string
 	LinkedIn     string
 	Status       EmployerStatus `gorm:"type:employer_status;default:pending"`
-	CreatedAt    time.Time
 }
 
 type JobType string
@@ -80,20 +81,21 @@ const (
 )
 
 type Job struct {
-	gorm.Model
-	ID              string   `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
-	EmployerID      string   `gorm:"not null;index"`
-	Title           string   `gorm:"not null"`
-	Type            JobType  `gorm:"type:job_type;not null"`
-	Location        string   `gorm:"not null"`
-	Salary          string
-	Description     string   `gorm:"type:text;not null"`
-	Requirements    string   `gorm:"type:text;not null"`
-	Deadline        time.Time
-	Skills          string   `gorm:"type:text"` // JSON array stored as string
-	Status          JobStatus `gorm:"type:job_status;default:pending"`
-	ApplicantCount  int      `gorm:"default:0"`
-	CreatedAt       time.Time
+	ID             string    `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	DeletedAt      gorm.DeletedAt `gorm:"index"`
+	EmployerID     string         `gorm:"not null;index"`
+	Title          string         `gorm:"not null"`
+	Type           JobType        `gorm:"type:job_type;not null"`
+	Location       string         `gorm:"not null"`
+	Salary         string
+	Description    string         `gorm:"type:text;not null"`
+	Requirements   string         `gorm:"type:text;not null"`
+	Deadline       time.Time
+	Skills         string         `gorm:"type:text"`
+	Status         JobStatus      `gorm:"type:job_status;default:pending"`
+	ApplicantCount int            `gorm:"default:0"`
 }
 
 type ApplicationStatus string
@@ -107,13 +109,14 @@ const (
 )
 
 type Application struct {
-	gorm.Model
-	ID          string            `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
-	JobID       string            `gorm:"not null;index"`
-	StudentID   string            `gorm:"not null;index"`
-	Status      ApplicationStatus `gorm:"type:application_status;default:saved"`
-	AppliedAt   *time.Time
-	UpdatedAt   time.Time
+	ID        string            `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt    `gorm:"index"`
+	JobID     string            `gorm:"not null;index"`
+	StudentID string            `gorm:"not null;index"`
+	Status    ApplicationStatus `gorm:"type:application_status;default:saved"`
+	AppliedAt *time.Time
 }
 
 type EventCategory string
@@ -125,11 +128,11 @@ const (
 	EventCategoryWebinar  EventCategory = "webinar"
 )
 
-// Define custom types for the database
-func (Role) GormDataType() string               { return "role" }
-func (StudentSubtype) GormDataType() string     { return "student_subtype" }
-func (EmployerStatus) GormDataType() string     { return "employer_status" }
-func (JobType) GormDataType() string            { return "job_type" }
-func (JobStatus) GormDataType() string          { return "job_status" }
-func (ApplicationStatus) GormDataType() string  { return "application_status" }
-func (EventCategory) GormDataType() string      { return "event_category" }
+// Custom GormDataType implementations
+func (Role) GormDataType() string              { return "role" }
+func (StudentSubtype) GormDataType() string    { return "student_subtype" }
+func (EmployerStatus) GormDataType() string    { return "employer_status" }
+func (JobType) GormDataType() string           { return "job_type" }
+func (JobStatus) GormDataType() string         { return "job_status" }
+func (ApplicationStatus) GormDataType() string { return "application_status" }
+func (EventCategory) GormDataType() string     { return "event_category" }
