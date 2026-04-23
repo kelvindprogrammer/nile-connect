@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
@@ -247,5 +248,82 @@ INSERT INTO _schema_version (version) VALUES ('v1');
 	}
 
 	log.Println("Database migrated successfully")
+	return nil
+}
+
+// ── SQLite / Demo mode ────────────────────────────────────────────────────────
+
+type sqliteUser struct {
+	gorm.Model
+	ID             string  `gorm:"primaryKey"`
+	FullName       string  `gorm:"not null"`
+	Username       string  `gorm:"uniqueIndex;not null"`
+	Email          string  `gorm:"uniqueIndex;not null"`
+	PasswordHash   string  `gorm:"not null"`
+	Role           string  `gorm:"not null"`
+	StudentSubtype *string
+	Major          string
+	GraduationYear int
+	IsVerified     bool `gorm:"default:false"`
+}
+
+func migrateSQLite(db *gorm.DB) error {
+	if err := db.AutoMigrate(&sqliteUser{}); err != nil {
+		return fmt.Errorf("failed to migrate SQLite schema: %w", err)
+	}
+	return seedDemoData(db)
+}
+
+func seedDemoData(db *gorm.DB) error {
+	var count int64
+	db.Model(&sqliteUser{}).Count(&count)
+	if count > 0 {
+		log.Println("Demo data already exists")
+		return nil
+	}
+
+	now := time.Now()
+	demoUsers := []sqliteUser{
+		{
+			ID:             "1",
+			FullName:       "Demo Student",
+			Username:       "demo_student",
+			Email:          "student@demo.edu",
+			PasswordHash:   "$2a$10$demoHashStudentXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+			Role:           "student",
+			StudentSubtype: func() *string { s := "current"; return &s }(),
+			Major:          "Computer Science",
+			GraduationYear: 2025,
+			IsVerified:     true,
+			Model:          gorm.Model{CreatedAt: now, UpdatedAt: now},
+		},
+		{
+			ID:           "2",
+			FullName:     "Demo Employer",
+			Username:     "demo_employer",
+			Email:        "employer@demo.com",
+			PasswordHash: "$2a$10$demoHashEmployerXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+			Role:         "employer",
+			IsVerified:   true,
+			Model:        gorm.Model{CreatedAt: now, UpdatedAt: now},
+		},
+		{
+			ID:           "3",
+			FullName:     "Demo Staff",
+			Username:     "demo_staff",
+			Email:        "staff@demo.edu",
+			PasswordHash: "$2a$10$demoHashStaffXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+			Role:         "staff",
+			IsVerified:   true,
+			Model:        gorm.Model{CreatedAt: now, UpdatedAt: now},
+		},
+	}
+
+	for _, u := range demoUsers {
+		if err := db.Create(&u).Error; err != nil {
+			return fmt.Errorf("failed to seed demo user %s: %w", u.Email, err)
+		}
+	}
+	log.Println("Demo data seeded successfully")
 	return nil
 }
