@@ -60,20 +60,13 @@ const Login = () => {
                 </p>
             </div>
 
-            {/* Demo credentials hint */}
-            <div className="mt-10 p-4 bg-white/10 border border-white/20 rounded-xl text-left space-y-2">
-                <p className="text-[8px] font-black text-white/60 uppercase tracking-widest mb-3">
-                    Demo Accounts
+            <div className="mt-10 p-4 bg-white/10 border border-white/20 rounded-xl text-left">
+                <p className="text-[8px] font-black text-white/60 uppercase tracking-widest mb-2">
+                    Access
                 </p>
-                {[
-                    { role: 'Student', email: 'student@demo.edu' },
-                    { role: 'Staff', email: 'staff@demo.edu' },
-                    { role: 'Employer', email: 'employer@demo.com' },
-                ].map(({ role: r, email: e }) => (
-                    <div key={r} className="text-[8px] text-white/70 font-bold">
-                        <span className="text-white font-black">{r}:</span> {e} / demo123
-                    </div>
-                ))}
+                <p className="text-[8px] text-white/70">
+                    Use your registered credentials to sign in.
+                </p>
             </div>
         </div>
     );
@@ -119,10 +112,10 @@ const Login = () => {
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder={
                             role === 'student'
-                                ? 'STUDENT@NILE.EDU.NG'
+                                ? 'YOUR@STUDENT.EDU.NG'
                                 : role === 'staff'
-                                ? 'STAFF@DEMO.EDU'
-                                : 'EMPLOYER@DEMO.COM'
+                                ? 'YOUR@STAFF.EDU.NG'
+                                : 'YOUR@COMPANY.COM'
                         }
                         required
                     />

@@ -2,11 +2,15 @@ package server
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/logger"
+	fiberlogger "github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/nile-connect/backend/domain/application"
 	"github.com/nile-connect/backend/domain/auth"
+	"github.com/nile-connect/backend/domain/catchup"
 	"github.com/nile-connect/backend/domain/employer"
+	"github.com/nile-connect/backend/domain/event"
 	"github.com/nile-connect/backend/domain/job"
+	"github.com/nile-connect/backend/domain/staff"
+	"github.com/nile-connect/backend/domain/student"
 	"github.com/nile-connect/backend/internal/ai"
 	"github.com/nile-connect/backend/internal/config"
 	"github.com/nile-connect/backend/internal/middleware"
@@ -16,64 +20,79 @@ import (
 func New(cfg *config.Config, db *gorm.DB, aiClient *ai.Client) *fiber.App {
 	app := fiber.New(fiber.Config{
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": err.Error(),
-			})
+			code := fiber.StatusInternalServerError
+			if e, ok := err.(*fiber.Error); ok {
+				code = e.Code
+			}
+			return c.Status(code).JSON(fiber.Map{"error": err.Error()})
 		},
 	})
 
-	// Global middleware
 	app.Use(middleware.CORS(cfg.AllowedOrigins))
-	app.Use(logger.New())
+	app.Use(fiberlogger.New())
 
-	// Health check (public)
 	app.Get("/health", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{"status": "ok"})
+		return c.JSON(fiber.Map{"status": "ok", "version": "1.0.0"})
 	})
 
-	// Build the real JWT auth middleware using the configured secret
 	authMiddleware := middleware.Auth(cfg.JWTSecret)
 
-	// Register all domains
-	setupAuthDomain(app, cfg, db)
-	setupJobDomain(app, db, authMiddleware)
-	setupEmployerDomain(app, db, authMiddleware)
+	setupAuth(app, cfg, db)
+	setupStudent(app, db, authMiddleware)
+	setupStaff(app, db, authMiddleware)
+	setupEmployer(app, db, authMiddleware)
+	setupJob(app, db, authMiddleware)
+	setupEvent(app, db, authMiddleware)
+	setupFeed(app, db, authMiddleware)
 
 	return app
 }
 
-// setupAuthDomain configures authentication routes (public – no auth middleware)
-func setupAuthDomain(app *fiber.App, cfg *config.Config, db *gorm.DB) {
-	var authService auth.AuthService
-
+func setupAuth(app *fiber.App, cfg *config.Config, db *gorm.DB) {
+	var svc auth.AuthService
 	if db != nil {
-		authRepo := auth.NewRepository(db)
-		authTokenSvc := auth.NewTokenService(cfg)
-		authService = auth.NewService(authRepo, authTokenSvc)
+		repo := auth.NewRepository(db)
+		tokenSvc := auth.NewTokenService(cfg)
+		svc = auth.NewService(repo, tokenSvc)
 	} else {
-		// Demo / no-DB mode
-		authService = auth.NewDemoService(cfg)
+		svc = auth.NewDemoService(cfg)
 	}
-
-	authHandler := auth.NewHandler(authService)
-	auth.SetupRoutes(app, authHandler)
+	auth.SetupRoutes(app, auth.NewHandler(svc))
 }
 
-// setupJobDomain configures job + application routes with real JWT protection
-func setupJobDomain(app *fiber.App, db *gorm.DB, authMiddleware fiber.Handler) {
+func setupStudent(app *fiber.App, db *gorm.DB, authMiddleware fiber.Handler) {
+	repo := student.NewRepository(db)
+	svc := student.NewService(repo)
+	student.SetupRoutes(app, student.NewHandler(svc), authMiddleware)
+}
+
+func setupStaff(app *fiber.App, db *gorm.DB, authMiddleware fiber.Handler) {
+	repo := staff.NewRepository(db)
+	svc := staff.NewService(repo)
+	staff.SetupRoutes(app, staff.NewHandler(svc), authMiddleware)
+}
+
+func setupEmployer(app *fiber.App, db *gorm.DB, authMiddleware fiber.Handler) {
+	repo := employer.NewRepository(db)
+	svc := employer.NewService(repo)
+	employer.Routes(app, employer.NewHandler(svc), authMiddleware)
+}
+
+func setupJob(app *fiber.App, db *gorm.DB, authMiddleware fiber.Handler) {
 	jobRepo := job.NewRepository(db)
 	appRepo := application.NewRepository(db)
-	jobService := job.NewService(jobRepo, appRepo)
-	jobHandler := job.NewHandler(jobService)
-
-	job.Routes(app, jobHandler, authMiddleware)
+	svc := job.NewService(jobRepo, appRepo)
+	job.Routes(app, job.NewHandler(svc), authMiddleware)
 }
 
-// setupEmployerDomain configures employer routes with real JWT protection
-func setupEmployerDomain(app *fiber.App, db *gorm.DB, authMiddleware fiber.Handler) {
-	employerRepo := employer.NewRepository(db)
-	employerService := employer.NewService(employerRepo)
-	employerHandler := employer.NewHandler(employerService)
+func setupEvent(app *fiber.App, db *gorm.DB, authMiddleware fiber.Handler) {
+	repo := event.NewRepository(db)
+	svc := event.NewService(repo)
+	event.SetupRoutes(app, event.NewHandler(svc), authMiddleware)
+}
 
-	employer.Routes(app, employerHandler, authMiddleware)
+func setupFeed(app *fiber.App, db *gorm.DB, authMiddleware fiber.Handler) {
+	repo := catchup.NewRepository(db)
+	svc := catchup.NewService(repo)
+	catchup.SetupRoutes(app, catchup.NewHandler(svc), authMiddleware)
 }

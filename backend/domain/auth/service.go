@@ -2,76 +2,22 @@ package auth
 
 import (
 	"errors"
-	"fmt"
 	"strings"
-	"time"
 
 	"github.com/nile-connect/backend/internal/database"
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Service implements AuthService interface
 type Service struct {
 	repo     AuthRepository
 	tokenSvc *TokenService
 }
 
 func NewService(repo AuthRepository, tokenSvc *TokenService) *Service {
-	return &Service{
-		repo:     repo,
-		tokenSvc: tokenSvc,
-	}
+	return &Service{repo: repo, tokenSvc: tokenSvc}
 }
 
 func (s *Service) Login(email, password string) (*AuthResponse, error) {
-	// DEMO SAFETY: Predefined demo accounts - Always work in demo mode
-	demoAccounts := map[string]*database.User{
-		"student@demo.edu": {
-			ID:           "demo-student-001",
-			FullName:     "Demo Student",
-			Username:     "demo_student",
-			Email:        "student@demo.edu",
-			PasswordHash: "$2a$10$demo_hash_for_demo_only_student",
-			Role:         database.RoleStudent,
-			Major:        "Computer Science",
-			GraduationYear: 2025,
-			IsVerified:   true,
-			StudentSubtype: func() *database.StudentSubtype { 
-				st := database.StudentSubtypeCurrent
-				return &st 
-			}(),
-		},
-		"staff@demo.edu": {
-			ID:           "demo-staff-001",
-			FullName:     "Demo Staff",
-			Username:     "demo_staff",
-			Email:        "staff@demo.edu",
-			PasswordHash: "$2a$10$demo_hash_for_demo_only_staff",
-			Role:         database.RoleStaff,
-			IsVerified:   true,
-		},
-		"employer@demo.com": {
-			ID:           "demo-employer-001",
-			FullName:     "Demo Employer",
-			Username:     "demo_employer",
-			Email:        "employer@demo.com",
-			PasswordHash: "$2a$10$demo_hash_for_demo_only_employer",
-			Role:         database.RoleEmployer,
-			IsVerified:   true,
-		},
-	}
-
-	// DEMO SAFETY: Check if this is a demo account
-	if demoUser, exists := demoAccounts[email]; exists {
-		// For demo accounts, password is always "demo123"
-		demoPassword := "demo123"
-		if password == demoPassword {
-			return s.generateAuthResponse(demoUser)
-		}
-		return nil, errors.New("invalid credentials")
-	}
-
-	// Regular authentication flow
 	user, err := s.repo.FindUserByEmail(email)
 	if err != nil {
 		return nil, errors.New("invalid credentials")
@@ -81,16 +27,16 @@ func (s *Service) Login(email, password string) (*AuthResponse, error) {
 		return nil, errors.New("invalid credentials")
 	}
 
-	// Check employer verification status
+	// Employers must be approved before they can log in
 	if user.Role == database.RoleEmployer {
-		var profile database.EmployerProfile
 		repo, ok := s.repo.(*Repository)
 		if ok {
+			var profile database.EmployerProfile
 			if err := repo.db.Where("user_id = ?", user.ID).First(&profile).Error; err != nil {
 				return nil, errors.New("employer profile not found")
 			}
 			if profile.Status != database.EmployerStatusApproved {
-				return nil, errors.New("employer account pending verification")
+				return nil, errors.New("your account is pending verification by staff")
 			}
 		}
 	}
@@ -99,29 +45,6 @@ func (s *Service) Login(email, password string) (*AuthResponse, error) {
 }
 
 func (s *Service) StudentRegistration(req *RegisterRequest) (*AuthResponse, error) {
-	// DEMO SAFETY: In demo mode, handle "demo" email patterns gracefully
-	if strings.HasSuffix(strings.ToLower(req.Email), "@demo.edu") {
-		// Check if it's the exact demo account
-		if req.Email == "student@demo.edu" || req.Email == "admin@demo.edu" {
-			// Return successful registration for demo purposes
-			demoUsername := "demo_" + strings.ToLower(req.FullName)
-			studentSubtype := database.StudentSubtypeCurrent
-			
-			user := &database.User{
-				ID:             fmt.Sprintf("generated-%d", time.Now().Unix()),
-				FullName:       req.FullName,
-				Username:       demoUsername,
-				Email:          req.Email,
-				PasswordHash:   "$2a$10$demo_hash_for_generated_user",
-				Role:           database.RoleStudent,
-				StudentSubtype: &studentSubtype,
-				IsVerified:     true,
-			}
-			
-			return s.generateAuthResponse(user)
-		}
-	}
-
 	exists, err := s.repo.UserExists(req.Email, req.Username)
 	if err != nil {
 		return nil, err
@@ -177,14 +100,13 @@ func (s *Service) EmployerRegistration(req *EmployerRegisterRequest) (*AuthRespo
 		Email:        req.Email,
 		PasswordHash: string(hashedPassword),
 		Role:         database.RoleEmployer,
-		IsVerified:   true,
+		IsVerified:   false,
 	}
 
 	if err := s.repo.CreateUser(user); err != nil {
 		return nil, err
 	}
 
-	// Create employer profile
 	profile := &database.EmployerProfile{
 		UserID:       user.ID,
 		CompanyName:  req.CompanyName,
@@ -198,49 +120,13 @@ func (s *Service) EmployerRegistration(req *EmployerRegisterRequest) (*AuthRespo
 
 	repo, ok := s.repo.(*Repository)
 	if !ok {
-		return nil, errors.New("repository type assertion failed")
+		return nil, errors.New("internal error")
 	}
 	if err := repo.CreateEmployerProfile(profile); err != nil {
 		return nil, err
 	}
 
 	return s.generateAuthResponse(user)
-}
-
-func (s *Service) RegisterStudent(req *RegisterRequest) (*database.User, error) {
-	exists, err := s.repo.UserExists(req.Email, req.Username)
-	if err != nil {
-		return nil, err
-	}
-	if exists {
-		return nil, errors.New("email or username already exists")
-	}
-
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, err
-	}
-
-	studentSubtype := database.StudentSubtypeCurrent
-	if !isEduEmail(req.Email) {
-		studentSubtype = database.StudentSubtypeAlumni
-	}
-
-	user := &database.User{
-		FullName:       req.FullName,
-		Username:       req.Username,
-		Email:          req.Email,
-		PasswordHash:   string(hashedPassword),
-		Role:           database.RoleStudent,
-		StudentSubtype: &studentSubtype,
-		IsVerified:     true,
-	}
-
-	if err := s.repo.CreateUser(user); err != nil {
-		return nil, err
-	}
-
-	return user, nil
 }
 
 func (s *Service) CompleteStudentProfile(req *ProfileCompletionRequest) (*AuthResponse, error) {
@@ -259,51 +145,6 @@ func (s *Service) CompleteStudentProfile(req *ProfileCompletionRequest) (*AuthRe
 	return s.generateAuthResponse(user)
 }
 
-func (s *Service) RegisterEmployer(req *EmployerRegisterRequest) (*database.User, *database.EmployerProfile, error) {
-	exists, err := s.repo.UserExists(req.Email, req.Username)
-	if err != nil {
-		return nil, nil, err
-	}
-	if exists {
-		return nil, nil, errors.New("email or username already exists")
-	}
-
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	user := &database.User{
-		FullName:     req.FullName,
-		Username:     req.Username,
-		Email:        req.Email,
-		PasswordHash: string(hashedPassword),
-		Role:         database.RoleEmployer,
-		IsVerified:   true,
-	}
-
-	if err := s.repo.CreateUser(user); err != nil {
-		return nil, nil, err
-	}
-
-	profile := &database.EmployerProfile{
-		UserID:       user.ID,
-		CompanyName:  req.CompanyName,
-		Industry:     req.Industry,
-		Location:     req.Location,
-		About:        req.About,
-		ContactEmail: req.ContactEmail,
-		Website:      req.Website,
-		Status:       database.EmployerStatusPending,
-	}
-
-	if err := s.repo.CreateEmployerProfile(profile); err != nil {
-		return nil, nil, err
-	}
-
-	return user, profile, nil
-}
-
 func (s *Service) generateAuthResponse(user *database.User) (*AuthResponse, error) {
 	token, err := s.tokenSvc.GenerateToken(user)
 	if err != nil {
@@ -316,10 +157,9 @@ func (s *Service) generateAuthResponse(user *database.User) (*AuthResponse, erro
 		studentSubtype = &st
 	}
 
-	// Convert string and int to pointers
-	majorPtr := &user.Major
-	graduationYearPtr := &user.GraduationYear
-	
+	major := user.Major
+	gradYear := user.GraduationYear
+
 	return &AuthResponse{
 		User: &User{
 			ID:             user.ID,
@@ -328,8 +168,8 @@ func (s *Service) generateAuthResponse(user *database.User) (*AuthResponse, erro
 			Email:          user.Email,
 			Role:           string(user.Role),
 			StudentSubtype: studentSubtype,
-			Major:          majorPtr,
-			GraduationYear: graduationYearPtr,
+			Major:          &major,
+			GraduationYear: &gradYear,
 			IsVerified:     user.IsVerified,
 		},
 		Token: token,
@@ -337,6 +177,6 @@ func (s *Service) generateAuthResponse(user *database.User) (*AuthResponse, erro
 }
 
 func isEduEmail(email string) bool {
-	return strings.HasSuffix(strings.ToLower(email), ".edu")
+	return strings.HasSuffix(strings.ToLower(email), ".edu") ||
+		strings.HasSuffix(strings.ToLower(email), ".edu.ng")
 }
-
