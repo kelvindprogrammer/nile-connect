@@ -29,7 +29,7 @@ func Load() (*Config, error) {
 	aiAPIKey := getEnv("AI_API_KEY", "")
 	aiAPIURL := getEnv("AI_API_URL", "")
 	fileStorageURL := getEnv("FILE_STORAGE_URL", "/uploads")
-	allowedOrigins := getEnv("ALLOWED_ORIGINS", "http://localhost:5173")
+	allowedOrigins := getEnv("ALLOWED_ORIGINS", "*")
 
 	return &Config{
 		Port:           port,

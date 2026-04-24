@@ -16,6 +16,11 @@ func NewHandler(service JobService) *Handler {
 	return &Handler{service: service}
 }
 
+func localUserID(c *fiber.Ctx) string {
+	id, _ := c.Locals("userID").(string)
+	return id
+}
+
 // ListJobs handles GET /jobs
 func (h *Handler) ListJobs(c *fiber.Ctx) error {
 	filters := &JobFilters{
@@ -201,8 +206,7 @@ func (h *Handler) ApplyToJob(c *fiber.Ctx) error {
 		})
 	}
 
-	// Extract student ID from context (after auth middleware)
-	studentID := c.Locals("user_id").(string)
+	studentID := localUserID(c)
 	if studentID == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"error": "authentication required",
@@ -246,8 +250,7 @@ func (h *Handler) WithdrawApplication(c *fiber.Ctx) error {
 		})
 	}
 
-	// Extract student ID from context
-	studentID := c.Locals("user_id").(string)
+	studentID := localUserID(c)
 	if studentID == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"error": "authentication required",
@@ -318,8 +321,7 @@ func (h *Handler) ApproveJob(c *fiber.Ctx) error {
 
 // GetStudentApplications handles GET /student/applications
 func (h *Handler) GetStudentApplications(c *fiber.Ctx) error {
-	// Extract student ID from context
-	studentID := c.Locals("user_id").(string)
+	studentID := localUserID(c)
 	if studentID == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"error": "authentication required",
@@ -368,7 +370,7 @@ func (h *Handler) SaveJob(c *fiber.Ctx) error {
 		})
 	}
 
-	studentID := c.Locals("user_id").(string)
+	studentID := localUserID(c)
 	if studentID == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"error": "authentication required",
@@ -396,7 +398,7 @@ func (h *Handler) UnsaveJob(c *fiber.Ctx) error {
 		})
 	}
 
-	studentID := c.Locals("user_id").(string)
+	studentID := localUserID(c)
 	if studentID == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"error": "authentication required",
@@ -417,7 +419,7 @@ func (h *Handler) UnsaveJob(c *fiber.Ctx) error {
 
 // GetSavedJobs handles GET /student/saved-jobs
 func (h *Handler) GetSavedJobs(c *fiber.Ctx) error {
-	studentID := c.Locals("user_id").(string)
+	studentID := localUserID(c)
 	if studentID == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"error": "authentication required",
