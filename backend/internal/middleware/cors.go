@@ -32,10 +32,9 @@ func CORS(allowedOrigins string) fiber.Handler {
 	}
 
 	return cors.New(cors.Config{
-		AllowOrigins:     origins,
-		AllowMethods:     "GET,POST,PUT,PATCH,DELETE,OPTIONS",
-		AllowHeaders:     "Content-Type,Authorization,Origin,Accept,X-Requested-With",
-		AllowCredentials: true,
-		MaxAge:           86400, // 24 h preflight cache
+		AllowOrigins: origins,
+		AllowMethods: "GET,POST,PUT,PATCH,DELETE,OPTIONS",
+		AllowHeaders: "Content-Type,Authorization,Origin,Accept,X-Requested-With",
+		MaxAge:       86400,
 	})
 }
