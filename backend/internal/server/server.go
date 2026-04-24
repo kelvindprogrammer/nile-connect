@@ -31,6 +31,11 @@ func New(cfg *config.Config, db *gorm.DB, aiClient *ai.Client) *fiber.App {
 	app.Use(middleware.CORS(cfg.AllowedOrigins))
 	app.Use(fiberlogger.New())
 
+	// Handle all CORS preflight requests globally
+	app.Options("/*", func(c *fiber.Ctx) error {
+		return c.SendStatus(fiber.StatusNoContent)
+	})
+
 	app.Get("/health", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{"status": "ok", "version": "1.0.0"})
 	})
