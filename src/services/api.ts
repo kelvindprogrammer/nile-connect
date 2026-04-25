@@ -4,14 +4,12 @@ import axios from 'axios';
 // Base URL resolution
 // ---------------------------------------------------------------------------
 
-// Go backend – set VITE_API_BASE_URL in .env (e.g. your Railway/Render URL).
-// Falls back to localhost for local development.
+// All backend routes are now Go serverless functions deployed on Vercel
+// at /api/* — same origin as the frontend. No CORS required.
 const API_BASE_URL =
-    (import.meta as any).env?.VITE_API_BASE_URL ||
-    'https://nile-connect-production.up.railway.app';
+    (import.meta as any).env?.VITE_API_BASE_URL || '/api';
 
-// AI serverless functions – served by Vercel at /api/* in production.
-// In local dev Vite proxies /api/* → localhost:5000 (see vite.config.ts).
+// Python AI serverless functions share the same /api/* origin.
 const AI_BASE_URL =
     (import.meta as any).env?.VITE_AI_BASE_URL || '/api';
 
