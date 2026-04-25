@@ -72,7 +72,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPut:
 		jobID := r.URL.Query().Get("id")
 		if jobID == "" {
-			respond.Error(w, http.StatusBadRequest, "job id is required as query param ?id=")
+			respond.Error(w, http.StatusBadRequest, "job id required as query param ?id=")
 			return
 		}
 		var req struct {

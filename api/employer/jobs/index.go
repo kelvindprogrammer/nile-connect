@@ -103,7 +103,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPut:
 		jobID := r.URL.Query().Get("id")
 		if jobID == "" {
-			respond.Error(w, http.StatusBadRequest, "job id is required as query param ?id=")
+			respond.Error(w, http.StatusBadRequest, "job id required as query param ?id=")
 			return
 		}
 		var req jobPostRequest
@@ -132,7 +132,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodDelete:
 		jobID := r.URL.Query().Get("id")
 		if jobID == "" {
-			respond.Error(w, http.StatusBadRequest, "job id is required as query param ?id=")
+			respond.Error(w, http.StatusBadRequest, "job id required as query param ?id=")
 			return
 		}
 		if err := database.Where("id = ? AND employer_id = ?", jobID, auth.UserID).Delete(&models.Job{}).Error; err != nil {

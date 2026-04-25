@@ -66,7 +66,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPut:
 		profileID := r.URL.Query().Get("id")
 		if profileID == "" {
-			respond.Error(w, http.StatusBadRequest, "profile id is required as query param ?id=")
+			respond.Error(w, http.StatusBadRequest, "profile id required as query param ?id=")
 			return
 		}
 		var req struct {
