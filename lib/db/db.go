@@ -2,6 +2,7 @@ package db
 
 import (
 	"os"
+	"strings"
 	"sync"
 
 	"gorm.io/driver/postgres"
@@ -12,25 +13,42 @@ import (
 )
 
 var (
-	once     sync.Once
+	mu       sync.Mutex
 	instance *gorm.DB
-	initErr  error
 )
 
 func Get() (*gorm.DB, error) {
-	once.Do(func() {
-		dsn := os.Getenv("DATABASE_URL")
-		if dsn == "" {
-			dsn = "postgres://localhost:5432/nile_connect"
+	mu.Lock()
+	defer mu.Unlock()
+
+	if instance != nil {
+		return instance, nil
+	}
+
+	dsn := os.Getenv("DATABASE_URL")
+	if dsn == "" {
+		dsn = "postgres://localhost:5432/nile_connect"
+	}
+
+	// Neon (and most cloud Postgres) requires SSL — add it if missing
+	if !strings.Contains(dsn, "sslmode=") {
+		if strings.Contains(dsn, "?") {
+			dsn += "&sslmode=require"
+		} else {
+			dsn += "?sslmode=require"
 		}
-		instance, initErr = gorm.Open(postgres.Open(dsn), &gorm.Config{
-			Logger: logger.Default.LogMode(logger.Silent),
-		})
-		if initErr == nil {
-			migrate(instance)
-		}
+	}
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Silent),
 	})
-	return instance, initErr
+	if err != nil {
+		return nil, err
+	}
+
+	migrate(db)
+	instance = db
+	return instance, nil
 }
 
 func migrate(db *gorm.DB) {
