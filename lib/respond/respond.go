@@ -12,11 +12,11 @@ func JSON(w http.ResponseWriter, status int, body any) {
 }
 
 func OK(w http.ResponseWriter, body any) {
-	JSON(w, http.StatusOK, body)
+	JSON(w, http.StatusOK, map[string]any{"data": body})
 }
 
 func Created(w http.ResponseWriter, body any) {
-	JSON(w, http.StatusCreated, body)
+	JSON(w, http.StatusCreated, map[string]any{"data": body})
 }
 
 func Error(w http.ResponseWriter, status int, msg string) {
