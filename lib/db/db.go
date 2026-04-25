@@ -25,7 +25,14 @@ func Get() (*gorm.DB, error) {
 		return instance, nil
 	}
 
-	dsn := os.Getenv("DATABASE_URL")
+	// Vercel+Neon injects STORAGE_DATABASE_URL; fall back to DATABASE_URL
+	dsn := os.Getenv("STORAGE_DATABASE_URL")
+	if dsn == "" {
+		dsn = os.Getenv("DATABASE_URL")
+	}
+	if dsn == "" {
+		dsn = os.Getenv("POSTGRES_URL")
+	}
 	if dsn == "" {
 		dsn = "postgres://localhost:5432/nile_connect"
 	}
