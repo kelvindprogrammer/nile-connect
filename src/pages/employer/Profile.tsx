@@ -1,47 +1,68 @@
-import React, { useState } from 'react';
-import { Settings, Building2, Link, Link2, UserRound, Pencil, X, Plus, Mail, MapPin, Globe, LogOut } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Settings, Building2, Link2, UserRound, Pencil, X, Mail, Globe, LogOut, Loader2, ShieldCheck, ShieldAlert } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Avatar from '../../components/Avatar';
 import Button from '../../components/Button';
 import Card from '../../components/Card';
-
-interface Product { id: number; name: string; desc: string; }
-interface Contact { id: number; name: string; role: string; }
+import { useToast } from '../../context/ToastContext';
+import { getEmployerProfile, updateEmployerProfile, EmployerProfile as EProfile } from '../../services/employerService';
 
 const EmployerProfile = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+    const { showToast } = useToast();
 
-    const companyName = user?.company || 'YOUR COMPANY';
-    const recruiterName = user?.name || 'RECRUITER';
-    const email = user?.email || 'recruiter@company.com';
-
+    const [profile, setProfile] = useState<EProfile | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
     const [editing, setEditing] = useState(false);
-    const [profile, setProfile] = useState({
-        about: 'A leading innovator in enterprise solutions. We build scalable, high-performance products used by organizations worldwide. Our mission is to simplify complex workflows through intuitive technology.',
-        website: 'company.io',
-        linkedin: 'linkedin.com/company/yourcompany',
-        industry: 'SOFTWARE & TECHNOLOGY',
-        location: 'ABUJA, NIGERIA',
-        products: [
-            { id: 1, name: 'CLOUDDATA PLATFORM', desc: 'A robust analytics engine processing millions of requests daily.' },
-            { id: 2, name: 'WORKFLOW PRO', desc: 'Enterprise project management and automation suite.' },
-        ] as Product[],
-        contacts: [
-            { id: 1, name: recruiterName, role: 'LEAD RECRUITER' },
-            { id: 2, name: 'HIRING TEAM', role: 'TALENT ACQUISITION' },
-        ] as Contact[],
-    });
-    const [editForm, setEditForm] = useState(profile);
+    const [isSaving, setIsSaving] = useState(false);
+    const [editForm, setEditForm] = useState<Partial<EProfile>>({});
 
-    const handleSave = () => { setProfile(editForm); setEditing(false); };
-    const handleCancel = () => { setEditForm(profile); setEditing(false); };
-    
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
+    useEffect(() => {
+        getEmployerProfile()
+            .then(p => { setProfile(p); setEditForm(p); })
+            .catch(() => {})
+            .finally(() => setIsLoading(false));
+    }, []);
+
+    const handleSave = async () => {
+        setIsSaving(true);
+        try {
+            const updated = await updateEmployerProfile({
+                company_name: editForm.company_name,
+                industry: editForm.industry,
+                location: editForm.location,
+                about: editForm.about,
+                contact_email: editForm.contact_email,
+                website: editForm.website,
+                linkedin: editForm.linkedin,
+            });
+            setProfile(updated);
+            setEditForm(updated);
+            setEditing(false);
+            showToast('Profile updated!', 'success');
+        } catch {
+            showToast('Save failed. Please try again.', 'error');
+        } finally {
+            setIsSaving(false);
+        }
     };
+
+    const handleCancel = () => { setEditForm(profile ?? {}); setEditing(false); };
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center h-full">
+                <Loader2 size={32} className="animate-spin text-nile-blue/40" />
+            </div>
+        );
+    }
+
+    const companyName = profile?.company_name || user?.company || 'YOUR COMPANY';
+    const recruiterName = user?.name || 'RECRUITER';
+    const email = profile?.contact_email || user?.email || '';
+    const isVerified = profile?.status === 'approved';
 
     return (
         <div className="p-4 md:p-8 space-y-6 md:space-y-10 anime-fade-in font-sans pb-24 md:pb-20 text-left max-w-4xl mx-auto">
@@ -59,126 +80,124 @@ const EmployerProfile = () => {
                 </div>
 
                 <div className="px-4 md:px-8 pb-6 md:pb-8 relative">
-                    {/* Company Logo Avatar */}
                     <div className="absolute -top-8 md:-top-10 left-4 md:left-8 w-16 h-16 md:w-20 md:h-20 bg-white border-[2px] border-black rounded-[12px] md:rounded-[16px] shadow-[3px_3px_0px_0px_rgba(108,187,86,1)] flex items-center justify-center overflow-hidden">
                         <Building2 size={32} strokeWidth={1.5} className="text-black/40" />
                     </div>
 
-                    <div className="pt-10 md:pt-14 flex justify-between items-end flex-wrap gap-4">
+                    <div className="pt-10 md:pt-14 flex flex-col sm:flex-row justify-between sm:items-end gap-4">
                         <div className="space-y-1 min-w-0">
-                            <div className="flex items-center space-x-2 mb-1">
-                                <h1 className="text-xl md:text-3xl font-black text-black uppercase leading-none tracking-tighter truncate max-w-[200px] md:max-w-none">{companyName} .</h1>
-                                <span className="bg-nile-green text-black px-2 py-0.5 rounded text-[6px] md:text-[7px] font-black border border-black">VERIFIED</span>
+                            <div className="flex items-center gap-2 flex-wrap mb-1">
+                                <h1 className="text-xl md:text-3xl font-black text-black uppercase leading-none tracking-tighter truncate">{companyName} .</h1>
+                                {isVerified ? (
+                                    <span className="flex items-center gap-1 bg-nile-green text-white text-[6px] md:text-[7px] font-black px-2 py-0.5 rounded border border-black flex-shrink-0">
+                                        <ShieldCheck size={8} strokeWidth={3} /> VERIFIED
+                                    </span>
+                                ) : (
+                                    <span className="flex items-center gap-1 bg-yellow-100 text-yellow-700 text-[6px] md:text-[7px] font-black px-2 py-0.5 rounded border border-black flex-shrink-0">
+                                        <ShieldAlert size={8} strokeWidth={3} /> PENDING
+                                    </span>
+                                )}
                             </div>
-                            <p className="text-[8px] md:text-[9px] font-black text-nile-blue/50 uppercase tracking-[0.2em]">{profile.industry} • {profile.location}</p>
+                            <p className="text-[8px] md:text-[9px] font-black text-nile-blue/50 uppercase tracking-[0.2em]">
+                                {profile?.industry || 'SOFTWARE & TECHNOLOGY'} • {profile?.location || 'NIGERIA'}
+                            </p>
                             <div className="flex items-center space-x-2 text-[7px] md:text-[8px] font-black text-black/30 uppercase pt-1 truncate max-w-[250px]">
                                 <Mail size={10} strokeWidth={3} />
                                 <span>{email}</span>
                             </div>
                         </div>
 
-                        <div className="flex space-x-2 w-full md:w-auto mt-4 md:mt-0">
-                             {editing ? (
+                        <div className="flex space-x-2 w-full sm:w-auto">
+                            {editing ? (
                                 <>
-                                    <Button variant="outline" size="sm" fullWidth className="md:w-auto" onClick={handleCancel}>CANCEL</Button>
-                                    <Button size="sm" fullWidth className="md:w-auto" onClick={handleSave}>SAVE</Button>
+                                    <Button variant="outline" size="sm" fullWidth className="sm:w-auto" onClick={handleCancel}>CANCEL</Button>
+                                    <Button size="sm" fullWidth className="sm:w-auto" onClick={handleSave} isLoading={isSaving}>SAVE</Button>
                                 </>
                             ) : (
-                                <>
-                                    <Button variant="outline" size="sm" fullWidth className="md:w-auto" onClick={() => setEditing(true)}>
-                                        <Pencil size={14} className="md:mr-1" /> <span className="hidden md:inline">EDIT PROFILE</span><span className="md:hidden">EDIT</span>
-                                    </Button>
-                                    <Button variant="primary" size="sm" fullWidth className="md:w-auto bg-red-500 hover:bg-red-600 md:hidden" onClick={handleLogout}>
-                                        <LogOut size={14} className="mr-1" /> LOGOUT
-                                    </Button>
-                                </>
+                                <Button variant="outline" size="sm" fullWidth className="sm:w-auto" onClick={() => setEditing(true)}>
+                                    <Pencil size={14} className="mr-2" /> EDIT PROFILE
+                                </Button>
                             )}
                         </div>
                     </div>
-
-                    {/* Stats Row */}
-                    <div className="flex justify-between md:justify-start md:space-x-10 mt-6 pt-5 border-t-[2px] border-black/5 overflow-x-auto no-scrollbar">
-                        <Stat value="3" label="JOBS" />
-                        <Stat value="276" label="APPS" />
-                        <Stat value="12" label="INTERVIEWS" highlight />
-                        <Stat value="4" label="OFFERS" />
-                    </div>
                 </div>
             </div>
 
-            {/* Logout Mobile Only explicitly */}
-            <div className="hidden md:block">
-                <Button variant="outline" size="sm" className="text-red-500 border-red-500/20" onClick={handleLogout}>
-                    <LogOut size={16} className="mr-2" /> EXIT RECRUITER HUB
-                </Button>
-            </div>
+            {/* Logout */}
+            <Button variant="outline" size="sm" className="text-red-500 border-red-500/20" onClick={() => { logout(); navigate('/login'); }}>
+                <LogOut size={16} className="mr-2" /> EXIT RECRUITER HUB
+            </Button>
 
             {/* Body Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-                {/* Main Column */}
                 <div className="md:col-span-2 space-y-6 md:space-y-8">
-                    {/* About */}
                     <Card title="ABOUT COMPANY">
                         {editing ? (
                             <textarea
-                                value={editForm.about}
+                                value={editForm.about ?? ''}
                                 onChange={(e) => setEditForm(p => ({ ...p, about: e.target.value }))}
                                 className="w-full h-28 border-[2px] border-black rounded-xl p-4 font-bold text-xs outline-none focus:shadow-[4px_4px_0px_0px_#1E499D] transition-all bg-nile-white/40 resize-none"
+                                placeholder="Describe your company..."
                             />
                         ) : (
-                            <p className="font-bold text-nile-blue/80 leading-relaxed text-[10px] md:text-[11px] uppercase text-left">{profile.about}</p>
+                            <p className="font-bold text-nile-blue/80 leading-relaxed text-[10px] md:text-[11px] uppercase text-left">
+                                {profile?.about || 'No company description yet. Click Edit Profile to add one.'}
+                            </p>
                         )}
                     </Card>
 
-                    {/* Products */}
-                    <Card title="OFFERINGS">
-                        <div className="space-y-3">
-                            {(editing ? editForm : profile).products.map((p) => (
-                                <div key={p.id} className="p-4 border-[2px] border-black rounded-[16px] md:rounded-2xl bg-nile-white/30 hover:translate-x-[1px] hover:translate-y-[1px] transition-all text-left">
-                                    {editing ? (
-                                        <div className="space-y-2">
-                                            <input value={p.name} onChange={(e) => setEditForm(prev => ({ ...prev, products: prev.products.map(x => x.id === p.id ? { ...x, name: e.target.value } : x) }))} className="w-full border-[2px] border-black rounded-lg p-2 font-black text-xs uppercase outline-none" />
-                                            <input value={p.desc} onChange={(e) => setEditForm(prev => ({ ...prev, products: prev.products.map(x => x.id === p.id ? { ...x, desc: e.target.value } : x) }))} className="w-full border-[2px] border-black rounded-lg p-2 font-bold text-xs outline-none" />
-                                        </div>
-                                    ) : (
-                                        <>
-                                            <p className="text-[11px] md:text-xs font-black uppercase tracking-widest text-black mb-1">{p.name}</p>
-                                            <p className="text-[8px] md:text-[9px] font-bold text-nile-blue/60 leading-relaxed">{p.desc}</p>
-                                        </>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    </Card>
-
-                    {/* Key Contacts */}
-                    <Card title="HIRING TEAM">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {profile.contacts.map((c) => (
-                                <div key={c.id} className="flex items-center space-x-3 p-4 border-[2px] border-black rounded-[16px] md:rounded-2xl hover:bg-nile-white/60 transition-all text-left">
-                                    <div className="w-8 h-8 md:w-10 md:h-10 bg-nile-white border-[2px] border-black rounded-xl flex items-center justify-center flex-shrink-0">
-                                        <UserRound size={18} className="text-black/40" />
+                    {editing && (
+                        <Card title="COMPANY DETAILS">
+                            <div className="space-y-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="text-[9px] font-black text-black/40 uppercase tracking-widest block mb-1">COMPANY NAME</label>
+                                        <input value={editForm.company_name ?? ''} onChange={e => setEditForm(p => ({ ...p, company_name: e.target.value }))} className="w-full border-[2px] border-black rounded-xl p-3 font-black text-xs uppercase outline-none focus:shadow-[3px_3px_0px_0px_#1E499D] bg-nile-white/40" />
                                     </div>
-                                    <div className="min-w-0">
-                                        <p className="text-[9px] font-black text-black uppercase tracking-wide truncate">{c.name}</p>
-                                        <p className="text-[7px] font-black text-nile-blue/40 uppercase tracking-widest">{c.role}</p>
+                                    <div>
+                                        <label className="text-[9px] font-black text-black/40 uppercase tracking-widest block mb-1">INDUSTRY</label>
+                                        <input value={editForm.industry ?? ''} onChange={e => setEditForm(p => ({ ...p, industry: e.target.value }))} className="w-full border-[2px] border-black rounded-xl p-3 font-black text-xs uppercase outline-none focus:shadow-[3px_3px_0px_0px_#1E499D] bg-nile-white/40" />
+                                    </div>
+                                    <div>
+                                        <label className="text-[9px] font-black text-black/40 uppercase tracking-widest block mb-1">LOCATION</label>
+                                        <input value={editForm.location ?? ''} onChange={e => setEditForm(p => ({ ...p, location: e.target.value }))} className="w-full border-[2px] border-black rounded-xl p-3 font-black text-xs uppercase outline-none focus:shadow-[3px_3px_0px_0px_#1E499D] bg-nile-white/40" />
+                                    </div>
+                                    <div>
+                                        <label className="text-[9px] font-black text-black/40 uppercase tracking-widest block mb-1">CONTACT EMAIL</label>
+                                        <input type="email" value={editForm.contact_email ?? ''} onChange={e => setEditForm(p => ({ ...p, contact_email: e.target.value }))} className="w-full border-[2px] border-black rounded-xl p-3 font-black text-xs outline-none focus:shadow-[3px_3px_0px_0px_#1E499D] bg-nile-white/40" />
                                     </div>
                                 </div>
-                            ))}
-                        </div>
-                    </Card>
+                            </div>
+                        </Card>
+                    )}
                 </div>
 
-                {/* Sidebar */}
                 <div className="space-y-6">
                     <Card title="DIGITAL PRESENCE">
                         <div className="space-y-4 text-left">
-                            <LinkRow icon={<Globe size={14} />} label="WEBSITE" value={editing ? undefined : profile.website}>
-                                {editing && <input value={editForm.website} onChange={e => setEditForm(p => ({ ...p, website: e.target.value }))} className="w-full border-[2px] border-black rounded-lg p-2 font-black text-xs outline-none" />}
-                            </LinkRow>
-                            <LinkRow icon={<Link2 size={14} />} label="LINKEDIN" value={editing ? undefined : profile.linkedin}>
-                                {editing && <input value={editForm.linkedin} onChange={e => setEditForm(p => ({ ...p, linkedin: e.target.value }))} className="w-full border-[2px] border-black rounded-lg p-2 font-black text-xs outline-none" />}
-                            </LinkRow>
+                            {editing ? (
+                                <>
+                                    <div>
+                                        <label className="text-[7px] font-black text-black/30 uppercase tracking-[0.2em] flex items-center gap-1.5 mb-1.5"><Globe size={14} /> WEBSITE</label>
+                                        <input value={editForm.website ?? ''} onChange={e => setEditForm(p => ({ ...p, website: e.target.value }))} placeholder="company.io" className="w-full border-[2px] border-black rounded-lg p-2 font-black text-xs outline-none" />
+                                    </div>
+                                    <div>
+                                        <label className="text-[7px] font-black text-black/30 uppercase tracking-[0.2em] flex items-center gap-1.5 mb-1.5"><Link2 size={14} /> LINKEDIN</label>
+                                        <input value={editForm.linkedin ?? ''} onChange={e => setEditForm(p => ({ ...p, linkedin: e.target.value }))} placeholder="linkedin.com/company/..." className="w-full border-[2px] border-black rounded-lg p-2 font-black text-xs outline-none" />
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div>
+                                        <p className="text-[7px] font-black text-black/30 uppercase tracking-[0.2em] flex items-center gap-1.5 mb-1.5"><Globe size={14} /> WEBSITE</p>
+                                        {profile?.website ? <a href={`https://${profile.website}`} target="_blank" rel="noreferrer" className="text-[9px] font-black text-nile-blue underline truncate block">{profile.website}</a> : <p className="text-[9px] font-black text-black/20 uppercase">Not set</p>}
+                                    </div>
+                                    <div>
+                                        <p className="text-[7px] font-black text-black/30 uppercase tracking-[0.2em] flex items-center gap-1.5 mb-1.5"><Link2 size={14} /> LINKEDIN</p>
+                                        {profile?.linkedin ? <a href={`https://${profile.linkedin}`} target="_blank" rel="noreferrer" className="text-[9px] font-black text-nile-blue underline truncate block">{profile.linkedin}</a> : <p className="text-[9px] font-black text-black/20 uppercase">Not set</p>}
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </Card>
 
@@ -196,19 +215,5 @@ const EmployerProfile = () => {
         </div>
     );
 };
-
-const Stat = ({ value, label, highlight = false }: { value: string; label: string; highlight?: boolean }) => (
-    <div className="text-left pr-6 md:pr-0">
-        <p className={`text-lg md:text-xl font-black leading-none ${highlight ? 'text-nile-green' : 'text-black'}`}>{value}</p>
-        <p className="text-[6px] md:text-[7px] font-black text-nile-blue/40 uppercase tracking-[0.15em] mt-1 whitespace-nowrap">{label}</p>
-    </div>
-);
-
-const LinkRow = ({ icon, label, value, children }: { icon: React.ReactNode; label: string; value?: string; children?: React.ReactNode }) => (
-    <div>
-        <p className="text-[7px] font-black text-black/30 uppercase tracking-[0.2em] flex items-center gap-1.5 mb-1.5">{icon} {label}</p>
-        {value ? <a href={`https://${value}`} target="_blank" rel="noreferrer" className="text-[9px] font-black text-nile-blue underline truncate block max-w-full">{value}</a> : children}
-    </div>
-);
 
 export default EmployerProfile;

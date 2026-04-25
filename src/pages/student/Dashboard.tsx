@@ -9,19 +9,31 @@ import PostBar from '../../components/PostBar';
 import Modal from '../../components/Modal';
 import Button from '../../components/Button';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 
 const StudentDashboard = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
+    const { showToast } = useToast();
     const userName = user?.name || 'STUDENT';
     const firstName = userName.split(' ')[0];
     const [isPostModalOpen, setPostModalOpen] = useState(false);
+    const [postContent, setPostContent] = useState('');
+    const [pendingPost, setPendingPost] = useState<{ content: string } | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const timer = setTimeout(() => setIsLoading(false), 600);
         return () => clearTimeout(timer);
     }, []);
+
+    const handlePublish = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!postContent.trim()) return;
+        setPendingPost({ content: postContent });
+        setPostContent('');
+        setPostModalOpen(false);
+    };
 
     if (isLoading) {
         return (
@@ -93,7 +105,7 @@ const StudentDashboard = () => {
                                 <button className="text-[8px] md:text-[9px] font-black text-nile-blue hover:underline uppercase" onClick={() => navigate('/student/feed')}>VIEW ALL</button>
                             </div>
                             <div className="max-w-2xl mx-auto xl:mx-0">
-                                <Feed />
+                                <Feed newPost={pendingPost} onPostConsumed={() => setPendingPost(null)} />
                             </div>
                          </div>
                     </div>
@@ -126,11 +138,13 @@ const StudentDashboard = () => {
                 </div>
 
                 <Modal isOpen={isPostModalOpen} onClose={() => setPostModalOpen(false)} title="NEW POST">
-                    <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); setPostModalOpen(false); }}>
-                        <textarea 
+                    <form className="space-y-6" onSubmit={handlePublish}>
+                        <textarea
                             className="w-full h-32 border-[2px] border-black rounded-xl p-4 font-bold text-xs outline-none focus:shadow-[4px_4px_0px_0px_#1E499D] transition-all bg-nile-white/40"
-                            placeholder="Share an achievement..."
+                            placeholder="Share an update, achievement, or question..."
                             required
+                            value={postContent}
+                            onChange={e => setPostContent(e.target.value)}
                         ></textarea>
                         <div className="flex justify-end gap-2">
                             <Button variant="outline" size="sm" onClick={() => setPostModalOpen(false)} type="button">DISCARD</Button>
