@@ -16,7 +16,7 @@ const StudentFeed = () => {
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-6 sm:gap-0 mb-8 md:mb-16">
                     <div className="flex items-center space-x-4 md:space-x-6 group">
                         <div className="w-12 h-12 md:w-16 md:h-16 bg-nile-blue rounded-[16px] md:rounded-[20px] flex items-center justify-center text-white shadow-brutalist-sm-green group-hover:rotate-6 transition-transform">
-                            <MessageCircle size={24} md:size={32} strokeWidth={2.5} />
+                            <MessageCircle size={28} strokeWidth={2.5} />
                         </div>
                         <div>
                             <h2 className="text-3xl md:text-5xl font-black text-black leading-none uppercase tracking-tight">FEED</h2>

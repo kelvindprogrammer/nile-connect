@@ -64,7 +64,7 @@ const EventsCalendar = () => {
                         <h2 className="text-3xl md:text-6xl font-black text-black leading-none uppercase tracking-tighter">Events .</h2>
                         <p className="text-[10px] md:text-lg font-bold text-nile-blue/70 uppercase tracking-widest">Stay connected with your campus .</p>
                     </div>
-                    <Button variant="primary" size="sm md:lg" className="shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    <Button variant="primary" size="sm" className="shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                         + SUGGEST EVENT
                     </Button>
                 </div>
@@ -99,7 +99,7 @@ const EventsCalendar = () => {
                                 <div className="flex items-center space-x-2"><MapPin size={16} strokeWidth={3} /><span>{filtered.find(e => e.featured)!.location}</span></div>
                                 <div className="flex items-center space-x-2"><Users size={16} strokeWidth={3} /><span>{filtered.find(e => e.featured)!.attendees} GOING</span></div>
                             </div>
-                            <Button variant="outline" size="sm md:lg" className="bg-white border-white text-black hover:bg-white/90 w-full sm:w-auto">
+                            <Button variant="outline" size="sm" className="bg-white border-white text-black hover:bg-white/90 w-full sm:w-auto">
                                 REGISTERED <ArrowRight size={18} className="ml-2" />
                             </Button>
                         </div>
@@ -131,15 +131,15 @@ const EventCard = ({ event }: { event: typeof events[0] }) => (
 
         <div className="space-y-2 md:space-y-3 mb-6 md:mb-8 flex-1">
             <div className="flex items-center space-x-2.5 text-[11px] md:text-sm font-black text-nile-blue/70">
-                <CalendarDays size={14} md:size={16} strokeWidth={3} />
+                <CalendarDays size={14} strokeWidth={3} />
                 <span className="uppercase">{event.date} • {event.time}</span>
             </div>
             <div className="flex items-center space-x-2.5 text-[11px] md:text-sm font-black text-nile-blue/70">
-                <MapPin size={14} md:size={16} strokeWidth={3} />
+                <MapPin size={14} strokeWidth={3} />
                 <span className="uppercase">{event.location}</span>
             </div>
             <div className="flex items-center space-x-2.5 text-[11px] md:text-sm font-black text-nile-blue/70">
-                <Users size={14} md:size={16} strokeWidth={3} />
+                <Users size={14} strokeWidth={3} />
                 <span className="uppercase">{event.attendees} GOING</span>
             </div>
         </div>

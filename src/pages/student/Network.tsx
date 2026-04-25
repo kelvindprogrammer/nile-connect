@@ -121,7 +121,7 @@ const Network = () => {
 
                                 <div className="grid grid-cols-1 gap-2 pt-4 border-t-[2px] border-black/5">
                                     <Button 
-                                        size="xs md:sm" 
+                                        size="sm"
                                         variant={requestedIds.includes(person.id) ? "outline" : "primary"} 
                                         fullWidth 
                                         onClick={() => handleConnectTrigger(person)}

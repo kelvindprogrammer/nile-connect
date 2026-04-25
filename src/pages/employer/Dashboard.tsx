@@ -88,10 +88,10 @@ const EmployerDashboardPage = () => {
                         Your hiring pipeline is <span className="text-nile-green underline">OPTIMIZED</span>. You have 48 new applicants waiting.
                     </p>
                     <div className="flex space-x-3 pt-1">
-                         <Button onClick={() => handleOpenModal('POST NEW JOB')} size="xs md:lg" variant="primary">
-                             <Plus size={16} className="md:mr-2" strokeWidth={3} /> <span className="hidden sm:inline">Post Job</span><span className="sm:hidden">Post</span>
+                         <Button onClick={() => handleOpenModal('POST NEW JOB')} size="sm" variant="primary">
+                             <Plus size={16} className="mr-1" strokeWidth={3} /> Post Job
                          </Button>
-                         <Button variant="outline" size="xs md:lg" onClick={() => navigate('/employer/candidates')}>Talent</Button>
+                         <Button variant="outline" size="sm" onClick={() => navigate('/employer/candidates')}>Talent</Button>
                     </div>
                 </div>
 
@@ -161,13 +161,13 @@ const EmployerDashboardPage = () => {
                                             </div>
                                         </div>
                                         <div className="p-1 px-2 md:px-3 border-[2px] border-black rounded-lg text-[10px] font-black group-hover:bg-black group-hover:text-white transition-all">
-                                            <ArrowRight size={12} md:size={14} />
+                                            <ArrowRight size={14} />
                                         </div>
                                     </div>
                                 </div>
                             ))}
                         </div>
-                        <Button fullWidth variant="ghost" size="xs md:sm" className="mt-6 md:mt-8" onClick={() => navigate('/employer/jobs')}>MANAGE ALL</Button>
+                        <Button fullWidth variant="ghost" size="sm" className="mt-6 md:mt-8" onClick={() => navigate('/employer/jobs')}>MANAGE ALL</Button>
                     </Card>
 
                     <Card title="AI MATCH TALENT">

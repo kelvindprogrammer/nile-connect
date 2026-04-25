@@ -4,31 +4,40 @@ import Button from './Button';
 import InputField from './InputField';
 import { useToast } from '../context/ToastContext';
 import { Upload, CheckCircle2 } from 'lucide-react';
+import { apiClient } from '../services/api';
 
 interface QuickApplyModalProps {
     isOpen: boolean;
     onClose: () => void;
     jobTitle: string;
     company: string;
+    jobId: string;
 }
 
-const QuickApplyModal: React.FC<QuickApplyModalProps> = ({ isOpen, onClose, jobTitle, company }) => {
+const QuickApplyModal: React.FC<QuickApplyModalProps> = ({ isOpen, onClose, jobTitle, company, jobId }) => {
     const { showToast } = useToast();
     const [step, setStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [coverLetter, setCoverLetter] = useState('');
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
-        setTimeout(() => {
-            setIsSubmitting(false);
+        try {
+            await apiClient.post('/api/jobs', { job_id: jobId, cover_letter: coverLetter });
             setStep(2);
             showToast(`Successfully applied to ${company}!`, 'success');
-        }, 1500);
+        } catch (err: any) {
+            const msg = err?.response?.data?.error || 'Application failed. Please try again.';
+            showToast(msg, 'error');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleFinalClose = () => {
         setStep(1);
+        setCoverLetter('');
         onClose();
     };
 
@@ -57,9 +66,11 @@ const QuickApplyModal: React.FC<QuickApplyModalProps> = ({ isOpen, onClose, jobT
 
                     <div className="space-y-3">
                         <label className="text-[10px] font-black text-black tracking-widest uppercase">COVER NOTE (OPTIONAL)</label>
-                        <textarea 
+                        <textarea
                             className="w-full h-32 border-3 border-black rounded-2xl p-4 font-bold text-sm outline-none focus:shadow-brutalist-sm transition-all"
                             placeholder="Why are you a good fit?"
+                            value={coverLetter}
+                            onChange={e => setCoverLetter(e.target.value)}
                         ></textarea>
                     </div>
 

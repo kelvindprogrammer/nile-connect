@@ -87,7 +87,7 @@ const StaffApplications = () => {
                             <Card key={s.role} className="p-4 md:p-8 group hover:translate-y-[-2px] transition-all">
                                 <div className="flex justify-between items-start mb-3 md:mb-6">
                                     <div className="p-2 bg-nile-white rounded-lg border-[1.5px] border-black group-hover:bg-black group-hover:text-white transition-colors flex-shrink-0">
-                                        <Activity size={14} md:size={18} />
+                                        <Activity size={16} />
                                     </div>
                                     <span className={`text-[7px] md:text-[10px] font-black px-1.5 py-0.5 rounded-full border border-black/10 ${s.trend.startsWith('+') ? 'bg-nile-green/10 text-nile-green' : 'bg-red-50 text-red-500'}`}>
                                         {s.trend}
@@ -132,7 +132,7 @@ const StaffApplications = () => {
                                             <p className="text-lg md:text-xl font-black text-black leading-none">{company.active}</p>
                                         </div>
                                         <button className="p-2 md:p-3 bg-nile-green/10 text-nile-green border-2 border-black rounded-xl hover:bg-black hover:text-white transition-all flex-shrink-0">
-                                            <ArrowUpRight size={16} md:size={18} strokeWidth={3} />
+                                            <ArrowUpRight size={16} strokeWidth={3} />
                                         </button>
                                     </div>
                                 </div>
@@ -144,7 +144,7 @@ const StaffApplications = () => {
                 <div className="max-w-4xl mx-auto space-y-6 md:space-y-8 animate-in slide-in-from-bottom-2 w-full">
                      <div className="bg-nile-blue/5 border-[2px] border-dashed border-black/10 rounded-[24px] md:rounded-[32px] p-8 md:p-12 text-center space-y-4 md:space-y-6">
                          <div className="w-12 h-12 md:w-16 md:h-16 bg-white border-[2px] border-black rounded-xl md:rounded-2xl flex items-center justify-center mx-auto shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                             <ShieldCheck size={28} md:size={32} className="text-nile-blue" />
+                             <ShieldCheck size={28} className="text-nile-blue" />
                          </div>
                          <div className="space-y-1 md:space-y-2">
                              <h3 className="text-lg md:text-2xl font-black text-black uppercase tracking-tight leading-none">Vetting Hub</h3>

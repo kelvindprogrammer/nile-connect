@@ -57,8 +57,8 @@ const StudentDashboard = () => {
                             Your network grew by <span className="text-nile-green">12%</span>. <span className="underline">3 tasks</span> pending.
                         </p>
                         <div className="flex space-x-3 pt-1">
-                             <Button onClick={() => navigate('/student/applications')} size="xs md:sm">Tasks</Button>
-                             <Button variant="outline" size="xs md:sm" onClick={() => navigate('/student/profile')}>Profile</Button>
+                             <Button onClick={() => navigate('/student/applications')} size="sm">Tasks</Button>
+                             <Button variant="outline" size="sm" onClick={() => navigate('/student/profile')}>Profile</Button>
                         </div>
                     </div>
 

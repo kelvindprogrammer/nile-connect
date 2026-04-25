@@ -7,13 +7,7 @@ import Feed from '../../components/Feed';
 import Avatar from '../../components/Avatar';
 import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
-
-const stats = [
-    { label: 'USERS', value: '4,218', change: '+12%', type: 'neutral' },
-    { label: 'COs', value: '156', change: '+5', type: 'positive' },
-    { label: 'PENDING', value: '42', change: '-8', type: 'negative' },
-    { label: 'RATE', value: '78%', change: '+3%', type: 'positive' },
-];
+import { getDashboardStats, DashboardStats } from '../../services/staffService';
 
 const pendingApprovals = [
     { id: 1, name: 'MICHAEL OLADELE', major: 'MECH. ENG', doc: 'Internship CV', time: '20m ago' },
@@ -26,13 +20,15 @@ const StaffDashboard = () => {
     const { showToast } = useToast();
     const { user } = useAuth();
     const staffName = user?.name || 'ADMIN';
-    const department = user?.department || 'CAREER SERVICES';
     const [approvals, setApprovals] = useState(pendingApprovals);
     const [isLoading, setIsLoading] = useState(true);
+    const [dashStats, setDashStats] = useState<DashboardStats | null>(null);
 
     useEffect(() => {
-        const timer = setTimeout(() => setIsLoading(false), 800);
-        return () => clearTimeout(timer);
+        getDashboardStats()
+            .then(setDashStats)
+            .catch(() => {})
+            .finally(() => setIsLoading(false));
     }, []);
 
     const handleAction = (id: number, name: string, action: 'approved' | 'rejected') => {
@@ -78,8 +74,8 @@ const StaffDashboard = () => {
                         Global platform health is <span className="text-black underline">OPTIMAL</span>. Systems are active with <span className="text-nile-green">zero downtime</span>.
                     </p>
                     <div className="flex space-x-3 pt-1">
-                         <Button onClick={() => navigate('/staff/services')} size="xs md:lg">Services</Button>
-                         <Button variant="outline" size="xs md:lg" onClick={() => navigate('/staff/profile')}>Security</Button>
+                         <Button onClick={() => navigate('/staff/services')} size="sm">Services</Button>
+                         <Button variant="outline" size="sm" onClick={() => navigate('/staff/profile')}>Security</Button>
                     </div>
                 </div>
 
@@ -103,14 +99,19 @@ const StaffDashboard = () => {
 
             {/* 2. Fast Stats Row */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
-                {stats.map((s) => (
+                {[
+                    { label: 'STUDENTS', value: dashStats ? dashStats.total_students.toLocaleString() : '—', color: 'bg-black/5 text-black' },
+                    { label: 'EMPLOYERS', value: dashStats ? dashStats.total_employers.toLocaleString() : '—', color: 'bg-nile-green/10 text-nile-green' },
+                    { label: 'PENDING', value: dashStats ? dashStats.pending_employers.toLocaleString() : '—', color: 'bg-red-50 text-red-500' },
+                    { label: 'ACTIVE JOBS', value: dashStats ? dashStats.active_jobs.toLocaleString() : '—', color: 'bg-nile-green/10 text-nile-green' },
+                ].map((s) => (
                     <Card key={s.label} className="p-4 md:p-8 hover:translate-y-[-4px] group transition-all">
                         <div className="flex justify-between items-start mb-2 md:mb-4">
-                            <div className={`p-2 md:p-3 rounded-xl border-2 border-black group-hover:bg-black group-hover:text-white transition-colors`}>
-                                <TrendingUp size={16} md:size={20} />
+                            <div className="p-2 md:p-3 rounded-xl border-2 border-black group-hover:bg-black group-hover:text-white transition-colors">
+                                <TrendingUp size={18} />
                             </div>
-                            <span className={`text-[7px] md:text-[10px] font-black px-1.5 py-0.5 rounded-full border-2 border-black ${s.type === 'positive' ? 'bg-nile-green/10 text-nile-green' : s.type === 'negative' ? 'bg-red-50 text-red-500' : 'bg-black/5 text-black'}`}>
-                                {s.change}
+                            <span className={`text-[7px] md:text-[10px] font-black px-1.5 py-0.5 rounded-full border-2 border-black ${s.color}`}>
+                                LIVE
                             </span>
                         </div>
                         <h3 className="text-xl md:text-4xl font-black text-black leading-none uppercase tracking-tighter truncate">{s.value}</h3>
@@ -128,7 +129,7 @@ const StaffDashboard = () => {
                         <div className="flex items-center justify-between mb-6 md:mb-8 pb-3 md:pb-4 border-b-[2px] md:border-b-[3px] border-black/5 text-left">
                             <div className="flex items-center space-x-3 md:space-x-4">
                                 <div className="bg-nile-blue text-white p-2 rounded-lg">
-                                    <FileSearch size={16} md:size={18} />
+                                    <FileSearch size={16} />
                                 </div>
                                 <div>
                                     <h4 className="text-[11px] md:text-sm font-black uppercase text-black leading-none">Verifications</h4>
@@ -143,7 +144,7 @@ const StaffDashboard = () => {
                                 <div key={item.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 md:p-6 bg-nile-white/40 border-[2px] md:border-[3px] border-black rounded-[20px] md:rounded-[24px] hover:bg-white transition-all group gap-4">
                                     <div className="flex items-center space-x-4 md:space-x-5">
                                         <div className="flex-shrink-0">
-                                            <Avatar name={item.name} size="sm md:md" />
+                                            <Avatar name={item.name} size="sm" />
                                         </div>
                                         <div className="text-left min-w-0">
                                             <p className="font-black text-[12px] md:text-sm uppercase text-black leading-none mb-1 truncate">{item.name}</p>
@@ -158,13 +159,13 @@ const StaffDashboard = () => {
                                             onClick={() => handleAction(item.id, item.name, 'approved')}
                                             className="flex-1 sm:flex-none p-2 md:p-3 bg-nile-green text-white border-2 border-black rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-none translate-y-[-2px] active:translate-y-0 transition-all flex items-center justify-center"
                                         >
-                                            <CheckCircle2 size={16} md:size={18} strokeWidth={3} />
+                                            <CheckCircle2 size={18} strokeWidth={3} />
                                         </button>
                                         <button 
                                             onClick={() => handleAction(item.id, item.name, 'rejected')}
                                             className="flex-1 sm:flex-none p-2 md:p-3 bg-white text-red-500 border-2 border-black rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-none translate-y-[-2px] active:translate-y-0 transition-all flex items-center justify-center"
                                         >
-                                            <XCircle size={16} md:size={18} strokeWidth={3} />
+                                            <XCircle size={18} strokeWidth={3} />
                                         </button>
                                     </div>
                                 </div>

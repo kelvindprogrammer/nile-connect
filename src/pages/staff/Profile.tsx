@@ -45,15 +45,15 @@ const StaffProfile = () => {
                             </div>
                             <p className="text-[8px] md:text-[9px] font-black text-nile-blue/50 uppercase tracking-[0.2em]">{department}</p>
                             <div className="flex items-center space-x-2 text-[7px] md:text-[8px] font-black text-black/30 uppercase pt-1 truncate max-w-[250px]">
-                                <Mail size={10} md:size={11} strokeWidth={3} />
+                                <Mail size={10} strokeWidth={3} />
                                 <span>{email}</span>
                             </div>
                         </div>
                         <div className="flex space-x-2 w-full md:w-auto mt-4 md:mt-0">
-                            <Button variant="outline" size="xs md:sm" fullWidth className="md:w-auto">
+                            <Button variant="outline" size="sm" fullWidth className="md:w-auto">
                                 <Settings size={14} className="md:mr-2" /> <span className="hidden md:inline">EDIT PROFILE</span><span className="md:hidden">EDIT</span>
                             </Button>
-                            <Button variant="primary" size="xs md:sm" fullWidth className="md:w-auto bg-red-500 hover:bg-red-600 md:hidden" onClick={handleLogout}>
+                            <Button variant="primary" size="sm" fullWidth className="md:w-auto bg-red-500 hover:bg-red-600 md:hidden" onClick={handleLogout}>
                                 <LogOut size={14} className="mr-1" /> LOGOUT
                             </Button>
                         </div>
@@ -122,7 +122,7 @@ const StaffProfile = () => {
                             <p className="text-[7px] md:text-[8px] font-black text-nile-blue/40 uppercase tracking-widest mt-1 uppercase">GENERATED: {r.date}</p>
                         </div>
                         <button className="w-8 h-8 md:w-9 md:h-9 bg-white border-[2px] border-black rounded-lg md:rounded-xl flex items-center justify-center group-hover:bg-nile-green transition-colors shadow-sm flex-shrink-0">
-                            <Download size={14} md:size={16} strokeWidth={2.5} />
+                            <Download size={14} strokeWidth={2.5} />
                         </button>
                     </div>
                 ))}

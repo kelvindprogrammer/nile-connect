@@ -81,7 +81,7 @@ const StaffMessages = () => {
                                 >
                                     <ChevronLeft size={16} />
                                 </button>
-                                <Avatar name={selected.name} size="sm md:md" />
+                                <Avatar name={selected.name} size="sm" />
                                 <div className="text-left">
                                     <h3 className="font-black text-xs md:text-sm uppercase text-black leading-none">{selected.name}</h3>
                                     <span className="text-[8px] md:text-[9px] font-black text-nile-green uppercase tracking-widest">{selected.online ? 'Online now' : 'Away'}</span>
@@ -130,7 +130,7 @@ const StaffMessages = () => {
                 ) : (
                     <div className="flex-1 flex flex-col items-center justify-center space-y-6 md:space-y-8 p-8">
                          <div className="w-20 h-20 md:w-24 md:h-24 bg-nile-blue/5 border-4 border-dashed border-black/10 rounded-[40px] flex items-center justify-center animate-pulse">
-                            <MessageCircle size={40} md:size={48} className="text-black/10" />
+                            <MessageCircle size={44} className="text-black/10" />
                          </div>
                          <div className="text-center space-y-2 text-left md:text-center">
                             <h3 className="text-xl md:text-2xl font-black text-black uppercase tracking-tighter">System Comms</h3>

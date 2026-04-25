@@ -116,10 +116,10 @@ const EmployerCandidates = () => {
 
                         {/* Professional Actions */}
                         <div className="mt-8 flex flex-col gap-2">
-                             <Button size="xs md:sm" fullWidth onClick={() => handleAction(candidate.name, 'Contact')}>
+                             <Button size="sm" fullWidth onClick={() => handleAction(candidate.name, 'Contact')}>
                                  INTERVIEW <ArrowUpRight size={14} className="ml-1" />
                              </Button>
-                             <Button variant="outline" size="xs md:sm" fullWidth onClick={() => navigate(`/employer/candidates/${candidate.id}`)}>
+                             <Button variant="outline" size="sm" fullWidth onClick={() => navigate(`/employer/candidates/${candidate.id}`)}>
                                  DETAILS <ExternalLink size={12} className="ml-1" />
                              </Button>
                         </div>

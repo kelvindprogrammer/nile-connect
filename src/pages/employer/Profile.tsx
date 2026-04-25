@@ -61,7 +61,7 @@ const EmployerProfile = () => {
                 <div className="px-4 md:px-8 pb-6 md:pb-8 relative">
                     {/* Company Logo Avatar */}
                     <div className="absolute -top-8 md:-top-10 left-4 md:left-8 w-16 h-16 md:w-20 md:h-20 bg-white border-[2px] border-black rounded-[12px] md:rounded-[16px] shadow-[3px_3px_0px_0px_rgba(108,187,86,1)] flex items-center justify-center overflow-hidden">
-                        <Building2 size={28} md:size={36} strokeWidth={1.5} className="text-black/40" />
+                        <Building2 size={32} strokeWidth={1.5} className="text-black/40" />
                     </div>
 
                     <div className="pt-10 md:pt-14 flex justify-between items-end flex-wrap gap-4">
@@ -72,7 +72,7 @@ const EmployerProfile = () => {
                             </div>
                             <p className="text-[8px] md:text-[9px] font-black text-nile-blue/50 uppercase tracking-[0.2em]">{profile.industry} • {profile.location}</p>
                             <div className="flex items-center space-x-2 text-[7px] md:text-[8px] font-black text-black/30 uppercase pt-1 truncate max-w-[250px]">
-                                <Mail size={10} md:size={11} strokeWidth={3} />
+                                <Mail size={10} strokeWidth={3} />
                                 <span>{email}</span>
                             </div>
                         </div>
@@ -80,15 +80,15 @@ const EmployerProfile = () => {
                         <div className="flex space-x-2 w-full md:w-auto mt-4 md:mt-0">
                              {editing ? (
                                 <>
-                                    <Button variant="outline" size="xs md:sm" fullWidth className="md:w-auto" onClick={handleCancel}>CANCEL</Button>
-                                    <Button size="xs md:sm" fullWidth className="md:w-auto" onClick={handleSave}>SAVE</Button>
+                                    <Button variant="outline" size="sm" fullWidth className="md:w-auto" onClick={handleCancel}>CANCEL</Button>
+                                    <Button size="sm" fullWidth className="md:w-auto" onClick={handleSave}>SAVE</Button>
                                 </>
                             ) : (
                                 <>
-                                    <Button variant="outline" size="xs md:sm" fullWidth className="md:w-auto" onClick={() => setEditing(true)}>
+                                    <Button variant="outline" size="sm" fullWidth className="md:w-auto" onClick={() => setEditing(true)}>
                                         <Pencil size={14} className="md:mr-1" /> <span className="hidden md:inline">EDIT PROFILE</span><span className="md:hidden">EDIT</span>
                                     </Button>
-                                    <Button variant="primary" size="xs md:sm" fullWidth className="md:w-auto bg-red-500 hover:bg-red-600 md:hidden" onClick={handleLogout}>
+                                    <Button variant="primary" size="sm" fullWidth className="md:w-auto bg-red-500 hover:bg-red-600 md:hidden" onClick={handleLogout}>
                                         <LogOut size={14} className="mr-1" /> LOGOUT
                                     </Button>
                                 </>
@@ -157,7 +157,7 @@ const EmployerProfile = () => {
                             {profile.contacts.map((c) => (
                                 <div key={c.id} className="flex items-center space-x-3 p-4 border-[2px] border-black rounded-[16px] md:rounded-2xl hover:bg-nile-white/60 transition-all text-left">
                                     <div className="w-8 h-8 md:w-10 md:h-10 bg-nile-white border-[2px] border-black rounded-xl flex items-center justify-center flex-shrink-0">
-                                        <UserRound size={18} md:size={20} className="text-black/40" />
+                                        <UserRound size={18} className="text-black/40" />
                                     </div>
                                     <div className="min-w-0">
                                         <p className="text-[9px] font-black text-black uppercase tracking-wide truncate">{c.name}</p>

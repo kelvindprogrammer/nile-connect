@@ -102,8 +102,8 @@ const Messages = () => {
                                     </div>
                                 </div>
                                 <div className="flex items-center space-x-2 md:space-x-4">
-                                    <button className="hidden sm:flex p-2 md:p-3 bg-nile-white border-[2px] md:border-3 border-black rounded-xl hover:bg-black hover:text-white transition-all shadow-brutalist-sm"><Phone size={16} md:size={18} strokeWidth={2.5}/></button>
-                                    <button className="hidden sm:flex p-2 md:p-3 bg-nile-white border-[2px] md:border-3 border-black rounded-xl hover:bg-black hover:text-white transition-all shadow-brutalist-sm"><Video size={16} md:size={18} strokeWidth={2.5}/></button>
+                                    <button className="hidden sm:flex p-2 md:p-3 bg-nile-white border-[2px] md:border-3 border-black rounded-xl hover:bg-black hover:text-white transition-all shadow-brutalist-sm"><Phone size={16} strokeWidth={2.5}/></button>
+                                    <button className="hidden sm:flex p-2 md:p-3 bg-nile-white border-[2px] md:border-3 border-black rounded-xl hover:bg-black hover:text-white transition-all shadow-brutalist-sm"><Video size={16} strokeWidth={2.5}/></button>
                                     <button className="p-2 text-nile-blue/50"><MoreVertical size={20}/></button>
                                 </div>
                             </div>
@@ -127,7 +127,7 @@ const Messages = () => {
                             {/* Input Area */}
                             <div className="p-4 md:p-8 border-t-[2px] md:border-t-4 border-black bg-white">
                                 <div className="flex items-center space-x-2 md:space-x-4 bg-nile-white border-[2px] md:border-3 border-black rounded-[24px] md:rounded-[30px] p-1.5 md:p-2 pr-3 md:pr-4 shadow-brutalist-sm focus-within:shadow-none transition-all">
-                                    <button className="p-2 md:p-4 text-nile-blue/50 hover:text-black hover:scale-110 transition-all"><Paperclip size={18} md:size={20}/></button>
+                                    <button className="p-2 md:p-4 text-nile-blue/50 hover:text-black hover:scale-110 transition-all"><Paperclip size={18}/></button>
                                     <input 
                                         type="text" 
                                         placeholder="MESSAGE..." 
@@ -137,7 +137,7 @@ const Messages = () => {
                                     />
                                     <button className="hidden sm:block p-2 md:p-4 text-nile-blue/50 hover:text-black transition-all"><Smile size={20}/></button>
                                     <button className="w-10 h-10 md:w-12 md:h-12 bg-nile-green text-black border-2 border-black rounded-full flex items-center justify-center shadow-brutalist-sm hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all">
-                                        <Send size={16} md:size={20} strokeWidth={3} />
+                                        <Send size={16} strokeWidth={3} />
                                     </button>
                                 </div>
                             </div>
