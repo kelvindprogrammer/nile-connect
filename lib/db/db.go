@@ -25,28 +25,26 @@ func Get() (*gorm.DB, error) {
 		return instance, nil
 	}
 
-	// Vercel+Neon injects STORAGE_DATABASE_URL; fall back to DATABASE_URL
-	dsn := os.Getenv("STORAGE_DATABASE_URL")
-	if dsn == "" {
-		dsn = os.Getenv("DATABASE_URL")
-	}
-	if dsn == "" {
-		dsn = os.Getenv("POSTGRES_URL")
-	}
+	dsn := dsn()
 	if dsn == "" {
 		dsn = "postgres://localhost:5432/nile_connect"
 	}
 
-	// Neon (and most cloud Postgres) requires SSL — add it if missing
+	// Ensure SSL — required by Neon and most cloud Postgres providers
 	if !strings.Contains(dsn, "sslmode=") {
+		sep := "?"
 		if strings.Contains(dsn, "?") {
-			dsn += "&sslmode=require"
-		} else {
-			dsn += "?sslmode=require"
+			sep = "&"
 		}
+		dsn += sep + "sslmode=require"
 	}
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+	// PreferSimpleProtocol disables prepared statements so GORM works with
+	// pgBouncer (used by Neon's pooled connections) without errors.
+	db, err := gorm.Open(postgres.New(postgres.Config{
+		DSN:                  dsn,
+		PreferSimpleProtocol: true,
+	}), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
 	})
 	if err != nil {
@@ -56,6 +54,22 @@ func Get() (*gorm.DB, error) {
 	migrate(db)
 	instance = db
 	return instance, nil
+}
+
+// dsn tries several env-var names in priority order.
+// Vercel+Neon injects STORAGE_* vars; standard deployments use DATABASE_URL.
+func dsn() string {
+	for _, key := range []string{
+		"STORAGE_DATABASE_URL_UNPOOLED", // direct connection — best for DDL
+		"STORAGE_DATABASE_URL",          // pooled connection
+		"DATABASE_URL",                  // standard name
+		"POSTGRES_URL",                  // alternate name
+	} {
+		if v := os.Getenv(key); v != "" {
+			return v
+		}
+	}
+	return ""
 }
 
 func migrate(db *gorm.DB) {
