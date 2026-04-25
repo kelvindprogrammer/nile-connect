@@ -7,7 +7,7 @@
   "functions": {
     "api/ai/chat.py":  { "memory": 512,  "maxDuration": 30 },
     "api/ai/review.py": { "memory": 1024, "maxDuration": 60 },
-    "api/**/*.go":     { "memory": 256,  "maxDuration": 10 }
+    "api/**/*.go":     { "memory": 256,  "maxDuration": 30 }
   },
 
   "rewrites": [
