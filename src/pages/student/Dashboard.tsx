@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../layouts/DashboardLayout';
-import { Mail, FileText, TrendingUp, Users, Calendar as CalendarIcon, ArrowUpRight } from 'lucide-react';
+import { Mail, TrendingUp, Calendar as CalendarIcon, ArrowUpRight } from 'lucide-react';
 import Card from '../../components/Card';
 import Avatar from '../../components/Avatar';
 import Feed from '../../components/Feed';
@@ -10,13 +10,16 @@ import Modal from '../../components/Modal';
 import Button from '../../components/Button';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
+import { useProfile, calculateProfileStrength } from '../../hooks/useProfile';
 
 const StudentDashboard = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
     const { showToast } = useToast();
+    const { profile } = useProfile();
     const userName = user?.name || 'STUDENT';
     const firstName = userName.split(' ')[0];
+    const strength = calculateProfileStrength(profile, !!user?.name, !!user?.email);
     const [isPostModalOpen, setPostModalOpen] = useState(false);
     const [postContent, setPostContent] = useState('');
     const [pendingPost, setPendingPost] = useState<{ content: string } | null>(null);
@@ -80,11 +83,11 @@ const StudentDashboard = () => {
                              <span className="text-[8px] font-black text-black opacity-30 uppercase">ACTIVITY</span>
                          </div>
                          <div className="space-y-0.5">
-                             <h4 className="text-2xl font-black text-black leading-none">92%</h4>
+                             <h4 className="text-2xl font-black text-black leading-none">{strength}%</h4>
                              <p className="text-[8px] font-black text-nile-blue opacity-60 uppercase">PROFILE STRENGTH</p>
                          </div>
                          <div className="h-1.5 bg-nile-white rounded-full border border-black overflow-hidden">
-                             <div className="h-full bg-nile-blue w-[92%]"></div>
+                             <div className="h-full bg-nile-blue transition-all duration-700" style={{ width: `${strength}%` }}></div>
                          </div>
                     </div>
                 </section>

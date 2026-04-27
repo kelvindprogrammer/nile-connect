@@ -29,6 +29,7 @@ import JobBoard           from './pages/student/JobBoard';
 import JobDetail          from './pages/student/JobDetail';
 import CareerCenter       from './pages/student/CareerCenter';
 import AICounselor        from './pages/student/AICounselor';
+import MockInterview      from './pages/student/MockInterview';
 import ApplicationTracker from './pages/student/ApplicationTracker';
 import EventsCalendar     from './pages/student/EventsCalendar';
 import StudentProfile     from './pages/student/Profile';
@@ -92,8 +93,9 @@ const App = () => (
                         <Route path="feed"             element={<StudentFeed />} />
                         <Route path="jobs"             element={<JobBoard />} />
                         <Route path="jobs/:id"         element={<JobDetail />} />
-                        <Route path="career"           element={<CareerCenter />} />
-                        <Route path="career/ai"        element={<AICounselor />} />
+                        <Route path="career"                    element={<CareerCenter />} />
+                        <Route path="career/ai"                 element={<AICounselor />} />
+                        <Route path="career/mock-interview"     element={<MockInterview />} />
                         <Route path="applications"     element={<ApplicationTracker />} />
                         <Route path="events"           element={<EventsCalendar />} />
                         <Route path="profile"          element={<StudentProfile />} />

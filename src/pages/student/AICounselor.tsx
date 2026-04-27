@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import {
-    Cpu, Zap, Target, BookOpen, Award, FileText, CheckCircle2,
+    Cpu, Zap, Target, BookOpen, CheckCircle2,
     AlertCircle, Sparkles, Send, MessageSquare, X, Upload,
-    ChevronDown, ChevronRight, Loader2,
+    ChevronDown, Loader2,
 } from 'lucide-react';
+import { formatMarkdown } from '../../utils/formatMarkdown';
 import Button from '../../components/Button';
 import { useToast } from '../../context/ToastContext';
 import Avatar from '../../components/Avatar';
@@ -165,7 +166,7 @@ const AICounselor = () => {
         const text = inputValue.trim();
         if (!text || chatLoading) return;
 
-        const userMsg = { id: Date.now(), role: 'user' as const, text: text.toUpperCase() };
+        const userMsg = { id: Date.now(), role: 'user' as const, text };
         setMessages((prev) => [...prev, userMsg]);
         setInputValue('');
         setChatLoading(true);
@@ -182,7 +183,7 @@ const AICounselor = () => {
             const botMsg = {
                 id: Date.now() + 1,
                 role: 'bot' as const,
-                text: resp.reply.toUpperCase(),
+                text: resp.reply,
             };
             setMessages((prev) => [...prev, botMsg]);
             setChatHistory([...newHistory, { role: 'assistant', content: resp.reply }]);
@@ -398,8 +399,8 @@ const AICounselor = () => {
                                     <Sparkles className="text-nile-green" size={28} />
                                     <h3 className="text-2xl md:text-3xl font-black uppercase tracking-tighter">FULL AI REVIEW</h3>
                                 </div>
-                                <div className="text-[10px] md:text-xs font-bold text-white/70 uppercase leading-relaxed whitespace-pre-wrap">
-                                    {cvReview.review}
+                                <div className="text-[11px] md:text-xs text-white/80 leading-relaxed">
+                                    {formatMarkdown(cvReview.review, 'text-white/80')}
                                 </div>
                             </div>
 
@@ -488,22 +489,23 @@ const AICounselor = () => {
                         <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar bg-nile-white/20">
                             {messages.map((m) => (
                                 <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                    <div className={`max-w-[85%] p-4 border-2 border-black rounded-2xl text-[9px] font-black leading-relaxed uppercase
+                                    <div className={`max-w-[85%] p-4 border-2 border-black rounded-2xl text-[10px] font-bold leading-relaxed
                                         ${m.role === 'user'
-                                            ? 'bg-nile-blue text-white rounded-tr-none shadow-[2px_2px_0px_0px_rgba(108,187,86,1)]'
+                                            ? 'bg-nile-blue text-white rounded-tr-none shadow-[2px_2px_0px_0px_rgba(108,187,86,1)] uppercase font-black'
                                             : 'bg-white text-black rounded-tl-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'}`}
                                     >
-                                        {m.text}
+                                        {m.role === 'bot' ? formatMarkdown(m.text) : m.text}
                                     </div>
                                 </div>
                             ))}
                             {chatLoading && (
-                                <div className="flex justify-start">
-                                    <div className="p-4 border-2 border-black rounded-2xl rounded-tl-none bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                                        <Loader2 size={14} className="text-nile-blue animate-spin" />
-                                    </div>
+                            <div className="flex justify-start">
+                                <div className="p-4 border-2 border-black rounded-2xl rounded-tl-none bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center gap-2">
+                                    <Loader2 size={14} className="text-nile-blue animate-spin" />
+                                    <span className="text-[8px] font-black text-black/40 uppercase tracking-widest">Thinking...</span>
                                 </div>
-                            )}
+                            </div>
+                        )}
                             <div ref={chatEndRef} />
                         </div>
 
