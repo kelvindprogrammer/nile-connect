@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"errors"
 	"strings"
 
@@ -174,6 +176,37 @@ func (s *Service) generateAuthResponse(user *database.User) (*AuthResponse, erro
 		},
 		Token: token,
 	}, nil
+}
+
+func (s *Service) ForgotPassword(email string) (string, error) {
+	user, err := s.repo.FindUserByEmail(email)
+	if err != nil {
+		return "", errors.New("email not found")
+	}
+	b := make([]byte, 20)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
+	}
+	token := hex.EncodeToString(b)
+	if err := s.repo.SaveResetToken(user.ID, token); err != nil {
+		return "", err
+	}
+	return token, nil
+}
+
+func (s *Service) ResetPassword(token, newPassword string) error {
+	userID, err := s.repo.FindResetToken(token)
+	if err != nil {
+		return err
+	}
+	hash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	if err := s.repo.UpdatePassword(userID, string(hash)); err != nil {
+		return err
+	}
+	return s.repo.MarkResetTokenUsed(token)
 }
 
 func isEduEmail(email string) bool {

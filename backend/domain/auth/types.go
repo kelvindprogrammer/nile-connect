@@ -60,6 +60,8 @@ type AuthService interface {
 	StudentRegistration(req *RegisterRequest) (*AuthResponse, error)
 	EmployerRegistration(req *EmployerRegisterRequest) (*AuthResponse, error)
 	CompleteStudentProfile(req *ProfileCompletionRequest) (*AuthResponse, error)
+	ForgotPassword(email string) (string, error)
+	ResetPassword(token, newPassword string) error
 }
 
 // Repository interface
@@ -71,4 +73,8 @@ type AuthRepository interface {
 	CreateEmployerProfile(profile *database.EmployerProfile) error
 	UpdateUser(user *database.User) error
 	UserExists(email, username string) (bool, error)
+	SaveResetToken(userID, token string) error
+	FindResetToken(token string) (string, error) // returns userID
+	MarkResetTokenUsed(token string) error
+	UpdatePassword(userID, hash string) error
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/nile-connect/backend/domain/employer"
 	"github.com/nile-connect/backend/domain/event"
 	"github.com/nile-connect/backend/domain/job"
+	"github.com/nile-connect/backend/domain/messages"
 	"github.com/nile-connect/backend/domain/staff"
 	"github.com/nile-connect/backend/domain/student"
 	"github.com/nile-connect/backend/internal/ai"
@@ -49,6 +50,7 @@ func New(cfg *config.Config, db *gorm.DB, aiClient *ai.Client) *fiber.App {
 	setupJob(app, db, authMiddleware)
 	setupEvent(app, db, authMiddleware)
 	setupFeed(app, db, authMiddleware)
+	setupMessages(app, db, authMiddleware)
 
 	return app
 }
@@ -100,4 +102,9 @@ func setupFeed(app *fiber.App, db *gorm.DB, authMiddleware fiber.Handler) {
 	repo := catchup.NewRepository(db)
 	svc := catchup.NewService(repo)
 	catchup.SetupRoutes(app, catchup.NewHandler(svc), authMiddleware)
+}
+
+func setupMessages(app *fiber.App, db *gorm.DB, authMiddleware fiber.Handler) {
+	repo := messages.NewRepository(db)
+	messages.SetupRoutes(app, messages.NewHandler(repo), authMiddleware)
 }

@@ -29,3 +29,11 @@ func (s *DemoService) EmployerRegistration(_ *EmployerRegisterRequest) (*AuthRes
 func (s *DemoService) CompleteStudentProfile(_ *ProfileCompletionRequest) (*AuthResponse, error) {
 	return nil, errors.New("service unavailable: database not configured")
 }
+
+func (s *DemoService) ForgotPassword(_ string) (string, error) {
+	return "", errors.New("service unavailable: database not configured")
+}
+
+func (s *DemoService) ResetPassword(_, _ string) error {
+	return errors.New("service unavailable: database not configured")
+}

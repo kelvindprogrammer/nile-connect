@@ -53,13 +53,41 @@ func Migrate(db *gorm.DB) error {
 		log.Printf("Warning: could not check migration state: %v", err)
 	}
 	if alreadyMigrated {
-		log.Println("Schema already up to date, skipping migration")
+		// Incremental v2: create new tables if they don't exist yet
+		v2Tables := []string{
+			`CREATE TABLE IF NOT EXISTS messages (
+				id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+				created_at TIMESTAMPTZ DEFAULT NOW(), updated_at TIMESTAMPTZ DEFAULT NOW(), deleted_at TIMESTAMPTZ,
+				sender_id TEXT NOT NULL, receiver_id TEXT NOT NULL, content TEXT NOT NULL, is_read BOOLEAN DEFAULT FALSE
+			)`,
+			`CREATE INDEX IF NOT EXISTS idx_messages_sender   ON messages(sender_id)`,
+			`CREATE INDEX IF NOT EXISTS idx_messages_receiver ON messages(receiver_id)`,
+			`CREATE TABLE IF NOT EXISTS connections (
+				id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+				created_at TIMESTAMPTZ DEFAULT NOW(), updated_at TIMESTAMPTZ DEFAULT NOW(), deleted_at TIMESTAMPTZ,
+				requester_id TEXT NOT NULL, receiver_id TEXT NOT NULL, status TEXT DEFAULT 'pending', note TEXT
+			)`,
+			`CREATE INDEX IF NOT EXISTS idx_connections_requester ON connections(requester_id)`,
+			`CREATE INDEX IF NOT EXISTS idx_connections_receiver  ON connections(receiver_id)`,
+			`CREATE TABLE IF NOT EXISTS password_resets (
+				id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+				created_at TIMESTAMPTZ DEFAULT NOW(), deleted_at TIMESTAMPTZ,
+				user_id TEXT NOT NULL, token TEXT UNIQUE NOT NULL, expires_at TIMESTAMPTZ NOT NULL, used BOOLEAN DEFAULT FALSE
+			)`,
+			`CREATE INDEX IF NOT EXISTS idx_password_resets_token ON password_resets(token)`,
+		}
+		for _, q := range v2Tables {
+			if _, err := sqlDB.Exec(q); err != nil {
+				log.Printf("Warning during v2 migration: %v", err)
+			}
+		}
+		log.Println("v2 migration complete")
 		return nil
 	}
 
 	// Drop any partially-created tables and stale enum types from previous failed runs
 	cleanupSQL := []string{
-		`DROP TABLE IF EXISTS reports, advisor_slots, cv_documents, post_likes, posts, event_registrations, events, applications, jobs, employer_profiles, users CASCADE`,
+		`DROP TABLE IF EXISTS password_resets, connections, messages, reports, advisor_slots, cv_documents, post_likes, posts, event_registrations, events, applications, jobs, employer_profiles, users CASCADE`,
 		`DROP TYPE IF EXISTS role, student_subtype, employer_status, job_type, job_status, application_status, event_category, report_type CASCADE`,
 	}
 	for _, q := range cleanupSQL {
@@ -236,11 +264,49 @@ CREATE TABLE reports (
 );
 CREATE INDEX idx_reports_staff_id ON reports(staff_id);
 
+CREATE TABLE messages (
+    id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at  TIMESTAMPTZ DEFAULT NOW(),
+    updated_at  TIMESTAMPTZ DEFAULT NOW(),
+    deleted_at  TIMESTAMPTZ,
+    sender_id   TEXT        NOT NULL,
+    receiver_id TEXT        NOT NULL,
+    content     TEXT        NOT NULL,
+    is_read     BOOLEAN     DEFAULT FALSE
+);
+CREATE INDEX idx_messages_sender   ON messages(sender_id);
+CREATE INDEX idx_messages_receiver ON messages(receiver_id);
+CREATE INDEX idx_messages_created  ON messages(created_at);
+
+CREATE TABLE connections (
+    id           UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at   TIMESTAMPTZ DEFAULT NOW(),
+    updated_at   TIMESTAMPTZ DEFAULT NOW(),
+    deleted_at   TIMESTAMPTZ,
+    requester_id TEXT        NOT NULL,
+    receiver_id  TEXT        NOT NULL,
+    status       TEXT        DEFAULT 'pending',
+    note         TEXT
+);
+CREATE INDEX idx_connections_requester ON connections(requester_id);
+CREATE INDEX idx_connections_receiver  ON connections(receiver_id);
+
+CREATE TABLE password_resets (
+    id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    deleted_at TIMESTAMPTZ,
+    user_id    TEXT        NOT NULL,
+    token      TEXT        UNIQUE NOT NULL,
+    expires_at TIMESTAMPTZ NOT NULL,
+    used       BOOLEAN     DEFAULT FALSE
+);
+CREATE INDEX idx_password_resets_token ON password_resets(token);
+
 CREATE TABLE _schema_version (
     version     TEXT        PRIMARY KEY,
     migrated_at TIMESTAMPTZ DEFAULT NOW()
 );
-INSERT INTO _schema_version (version) VALUES ('v1');
+INSERT INTO _schema_version (version) VALUES ('v1'), ('v2') ON CONFLICT DO NOTHING;
 `
 
 	if _, err := sqlDB.Exec(schema); err != nil {

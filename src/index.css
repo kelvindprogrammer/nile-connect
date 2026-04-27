@@ -348,6 +348,46 @@ select:focus {
     pointer-events: none;
 }
 
+/* === Nile Connect Logo Orbital Animations === */
+@keyframes ncOrbitCW {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+@keyframes ncOrbitCCW {
+    from { transform: rotate(200deg); }
+    to   { transform: rotate(-160deg); }
+}
+@keyframes ncFloat {
+    0%, 100% { transform: translateY(0px); }
+    50%       { transform: translateY(-12px); }
+}
+@keyframes ncPulseGlow {
+    0%, 100% { box-shadow: 0 0 20px 4px rgba(30,73,157,0.3); }
+    50%       { box-shadow: 0 0 40px 10px rgba(108,187,86,0.4); }
+}
+@keyframes ncReveal {
+    from { opacity: 0; transform: translateY(30px) scale(0.95); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes ncRevealLeft {
+    from { opacity: 0; transform: translateX(-40px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes ncRevealRight {
+    from { opacity: 0; transform: translateX(40px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes ncMarquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+}
+.nc-float       { animation: ncFloat 4s ease-in-out infinite; }
+.nc-pulse-glow  { animation: ncPulseGlow 3s ease-in-out infinite; }
+.nc-reveal      { animation: ncReveal 0.7s cubic-bezier(0.16,1,0.3,1) forwards; }
+.nc-reveal-left { animation: ncRevealLeft 0.7s cubic-bezier(0.16,1,0.3,1) forwards; }
+.nc-reveal-right{ animation: ncRevealRight 0.7s cubic-bezier(0.16,1,0.3,1) forwards; }
+.nc-marquee     { animation: ncMarquee 20s linear infinite; }
+
 /* === No Scrollbar === */
 .no-scrollbar {
     scrollbar-width: none;

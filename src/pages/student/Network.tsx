@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import DashboardLayout from '../../layouts/DashboardLayout';
-import { UserPlus, Search, MessageCircle, MapPin, ArrowRight, UserCheck, UserMinus } from 'lucide-react';
+import { UserPlus, Search, MessageCircle, MapPin, ArrowRight, UserCheck, UserMinus, Loader2 } from 'lucide-react';
 import Avatar from '../../components/Avatar';
-import Card from '../../components/Card';
 import Button from '../../components/Button';
 import { useToast } from '../../context/ToastContext';
 import ConnectionModal from '../../components/ConnectionModal';
+import { searchUsers, type UserProfile } from '../../services/messageService';
 
+// Fallback seed data shown until the API returns results
 const networkData = [
     { id: 1, name: 'Tunde Afolayan', role: 'Alumni (2022)', major: 'Mechanical Engineering', company: 'Shell Nigeria', location: 'Lagos', bio: 'Petroleum engineer passionate about sustainable energy.' },
     { id: 2, name: 'Zainab Bello', role: 'Student (400L)', major: 'Law', company: '', location: 'Abuja', bio: 'Law student focused on human rights advocacy.' },
@@ -22,24 +23,70 @@ const networkData = [
 
 const FILTER_TABS = ['ALL', 'STUDENT', 'ALUMNI', 'STAFF', 'EMPLOYER'];
 
+type Person = {
+    id: string | number;
+    name: string;
+    role: string;
+    major: string;
+    company: string;
+    location: string;
+    bio: string;
+};
+
+function apiUserToPerson(u: UserProfile): Person {
+    const role = u.role === 'student'
+        ? (u.student_subtype === 'alumni' ? 'Alumni' : `Student`)
+        : u.role === 'staff' ? 'Staff' : 'Employer';
+    return {
+        id: u.id,
+        name: u.full_name,
+        role,
+        major: u.major || u.role,
+        company: '',
+        location: 'Nigeria',
+        bio: '',
+    };
+}
+
 const Network = () => {
     const navigate = useNavigate();
     const { showToast } = useToast();
     const [searchParams, setSearchParams] = useSearchParams();
     const [searchTerm, setSearchTerm] = useState(searchParams.get('q') || '');
     const [filter, setFilter] = useState('ALL');
-    const [connectedIds, setConnectedIds] = useState<Set<number>>(new Set());
-    const [pendingIds, setPendingIds] = useState<Set<number>>(new Set());
-    const [followingIds, setFollowingIds] = useState<Set<number>>(new Set());
-    const [selectedPerson, setSelectedPerson] = useState<typeof networkData[0] | null>(null);
+    const [connectedIds, setConnectedIds] = useState<Set<string | number>>(new Set());
+    const [pendingIds, setPendingIds] = useState<Set<string | number>>(new Set());
+    const [followingIds, setFollowingIds] = useState<Set<string | number>>(new Set());
+    const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
     const [isConnectModalOpen, setConnectModalOpen] = useState(false);
+    const [apiPeople, setApiPeople] = useState<Person[]>([]);
+    const [apiLoading, setApiLoading] = useState(true);
 
     useEffect(() => {
         const q = searchParams.get('q');
         if (q) setSearchTerm(q);
     }, [searchParams]);
 
-    const handleConnect = (person: typeof networkData[0]) => {
+    // Fetch real users from API
+    const fetchUsers = useCallback(async () => {
+        setApiLoading(true);
+        try {
+            const role = filter === 'ALL' ? '' : filter.toLowerCase();
+            const users = await searchUsers(searchTerm, role);
+            setApiPeople(users.map(apiUserToPerson));
+        } catch {
+            setApiPeople([]); // Fall back to seed data
+        } finally {
+            setApiLoading(false);
+        }
+    }, [searchTerm, filter]);
+
+    useEffect(() => {
+        const debounce = setTimeout(fetchUsers, 300);
+        return () => clearTimeout(debounce);
+    }, [fetchUsers]);
+
+    const handleConnect = (person: Person) => {
         if (connectedIds.has(person.id)) {
             showToast(`Disconnected from ${person.name}`, 'info');
             setConnectedIds(prev => { const n = new Set(prev); n.delete(person.id); return n; });
@@ -52,7 +99,7 @@ const Network = () => {
         }
     };
 
-    const handleFollow = (person: typeof networkData[0]) => {
+    const handleFollow = (person: Person) => {
         if (followingIds.has(person.id)) {
             setFollowingIds(prev => { const n = new Set(prev); n.delete(person.id); return n; });
             showToast(`Unfollowed ${person.name}`, 'info');
@@ -62,15 +109,17 @@ const Network = () => {
         }
     };
 
-    const filteredData = networkData.filter(u => {
-        const matchesSearch = !searchTerm ||
-            u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            u.major.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (u.company && u.company.toLowerCase().includes(searchTerm.toLowerCase())) ||
-            u.location.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesFilter = filter === 'ALL' || u.role.toUpperCase().includes(filter);
-        return matchesSearch && matchesFilter;
-    });
+    // Use real API users if available, otherwise fall back to seed data
+    const displayData: Person[] = apiPeople.length > 0
+        ? apiPeople
+        : networkData.filter(u => {
+            const matchesSearch = !searchTerm ||
+                u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                u.major.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesFilter = filter === 'ALL' || u.role.toUpperCase().includes(filter);
+            return matchesSearch && matchesFilter;
+          });
+    const filteredData = displayData;
 
     const connections = connectedIds.size + pendingIds.size;
     const following = followingIds.size;
@@ -138,8 +187,12 @@ const Network = () => {
                 )}
 
                 {/* Grid */}
-                {filteredData.length === 0 ? (
-                    <div className="py-16 text-center border-[2px] border-dashed border-black/10 rounded-[24px]">
+                {apiLoading && apiPeople.length === 0 ? (
+                    <div className="flex justify-center py-20 col-span-full">
+                        <Loader2 size={28} className="animate-spin text-nile-blue/40" />
+                    </div>
+                ) : filteredData.length === 0 ? (
+                    <div className="py-16 text-center border-[2px] border-dashed border-black/10 rounded-[24px] col-span-full">
                         <p className="text-[10px] font-black text-black/20 uppercase tracking-[0.2em]">NO PEOPLE FOUND</p>
                         <button onClick={() => { setSearchTerm(''); setFilter('ALL'); setSearchParams({}); }} className="text-[9px] font-black text-nile-blue underline mt-2 hover:text-nile-green transition-colors">
                             CLEAR SEARCH
@@ -184,7 +237,7 @@ const Network = () => {
 const PersonCard = ({
     person, isConnected, isPending, isFollowing, onConnect, onFollow, onMessage,
 }: {
-    person: typeof networkData[0];
+    person: Person;
     isConnected: boolean; isPending: boolean; isFollowing: boolean;
     onConnect: () => void; onFollow: () => void; onMessage: () => void;
 }) => (

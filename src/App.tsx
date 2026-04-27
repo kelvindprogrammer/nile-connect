@@ -9,6 +9,7 @@ import Onboarding         from './pages/auth/Onboarding';
 import Login              from './pages/auth/Login';
 import Register           from './pages/auth/Register';
 import JoinAs             from './pages/auth/JoinAs';
+import ForgotPassword     from './pages/auth/ForgotPassword';
 
 // ── Onboarding Flow ───────────────────────────────────────────────────────
 import StudentStatus       from './pages/onboarding/StudentStatus';
@@ -75,9 +76,10 @@ const App = () => (
                     {/* Public entry */}
                     <Route path="/"           element={<Navigate to="/onboarding" replace />} />
                     <Route path="/onboarding" element={<T><Onboarding /></T>} />
-                    <Route path="/login"      element={<T><Login /></T>} />
-                    <Route path="/register"   element={<T><Register /></T>} />
-                    <Route path="/join-as"    element={<T><JoinAs /></T>} />
+                    <Route path="/login"            element={<T><Login /></T>} />
+                    <Route path="/register"         element={<T><Register /></T>} />
+                    <Route path="/join-as"          element={<T><JoinAs /></T>} />
+                    <Route path="/forgot-password"  element={<T><ForgotPassword /></T>} />
 
                     {/* Onboarding / setup flow */}
                     <Route path="/student-status"        element={<T><StudentStatus /></T>} />

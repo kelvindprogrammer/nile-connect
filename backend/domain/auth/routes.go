@@ -16,4 +16,8 @@ func SetupRoutes(app *fiber.App, handler *Handler) {
 	authGroup.Post("/register/student", handler.StudentRegistration)
 	authGroup.Post("/register/employer", handler.EmployerRegistration)
 	authGroup.Post("/profile/complete", handler.CompleteStudentProfile)
+
+	// Password reset
+	authGroup.Post("/forgot-password", handler.ForgotPassword)
+	authGroup.Post("/reset-password", handler.ResetPassword)
 }

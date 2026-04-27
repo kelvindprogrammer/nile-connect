@@ -6,6 +6,7 @@ import {
     Grid3X3, X, ArrowRight,
 } from 'lucide-react';
 import Avatar from '../components/Avatar';
+import NileConnectLogo from '../components/NileConnectLogo';
 import NotificationTray from '../components/NotificationTray';
 import { useAuth } from '../context/AuthContext';
 
@@ -160,9 +161,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             <aside className="hidden md:flex w-[84px] bg-white border-r-[2px] border-black flex-col items-center py-6 z-30 flex-shrink-0">
                 <div
                     onClick={() => navigate('/student')}
-                    className="w-10 h-10 bg-nile-blue rounded-xl flex items-center justify-center text-white font-black text-sm shadow-[2px_2px_0px_0px_rgba(108,187,86,1)] border-[2px] border-black mb-8 flex-shrink-0 cursor-pointer hover:rotate-6 transition-transform"
+                    className="mb-6 cursor-pointer hover:scale-105 transition-transform flex-shrink-0"
                 >
-                    NC
+                    <NileConnectLogo size="xs" showText={false} showTagline={false} animated />
                 </div>
 
                 <nav className="flex-1 flex flex-col items-center space-y-1 w-full custom-scrollbar overflow-y-auto px-1">
@@ -236,7 +237,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                     >
                         <div className="w-10 h-1 bg-black/20 rounded-full mx-auto mb-5" />
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-black/40">NAVIGATE TO</h3>
+                            <NileConnectLogo size="xs" showText showTagline={false} animated={false} />
                             <button onClick={() => setShowMoreMenu(false)} className="p-1.5 rounded-lg border-2 border-black/10">
                                 <X size={14} strokeWidth={3} />
                             </button>
