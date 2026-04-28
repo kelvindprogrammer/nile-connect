@@ -9,6 +9,7 @@ import Avatar from '../components/Avatar';
 import NileConnectLogo from '../components/NileConnectLogo';
 import NotificationTray from '../components/NotificationTray';
 import { useAuth } from '../context/AuthContext';
+import { useProfilePicture } from '../hooks/useProfilePicture';
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -91,6 +92,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { user, logout } = useAuth();
+    const { picture: profilePic } = useProfilePicture();
     const [showNotifications, setShowNotifications] = useState(false);
     const [showMoreMenu, setShowMoreMenu] = useState(false);
     const [showMailBadge, setShowMailBadge] = useState(true);
@@ -186,7 +188,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                         className="w-9 h-9 rounded-full border-[2px] border-black/10 overflow-hidden cursor-pointer hover:border-nile-blue transition-colors"
                         onClick={() => navigate('/student/profile')}
                     >
-                        <Avatar name={userName} size="sm" />
+                        <Avatar name={userName} size="sm" src={profilePic || undefined} />
                     </div>
                 </div>
             </aside>
@@ -276,7 +278,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                             onClick={() => navigate('/student')}
                             className="md:hidden w-8 h-8 rounded-lg border-2 border-black overflow-hidden cursor-pointer"
                         >
-                            <Avatar name={userName} size="sm" />
+                            <Avatar name={userName} size="sm" src={profilePic || undefined} />
                         </div>
                         <div className="hidden sm:flex items-center text-[9px] font-black uppercase tracking-widest text-black/40">
                             <span className="hover:text-nile-blue cursor-pointer transition-colors" onClick={() => navigate('/student')}>
@@ -368,7 +370,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                                 <p className="text-[7px] font-bold text-nile-blue/50 uppercase mt-0.5 tracking-wider">{displayInfo}</p>
                             </div>
                             <div className="w-8 h-8 rounded-lg border-[2px] border-black shadow-[2px_2px_0px_0px_rgba(108,187,86,1)] group-hover:translate-x-0.5 group-hover:translate-y-0.5 group-hover:shadow-none transition-all overflow-hidden">
-                                <Avatar name={userName} size="sm" />
+                                <Avatar name={userName} size="sm" src={profilePic || undefined} />
                             </div>
                         </div>
                     </div>

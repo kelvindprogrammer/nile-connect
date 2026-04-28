@@ -11,6 +11,7 @@ import { useAuth } from '../../context/AuthContext';
 import Button from '../../components/Button';
 import { apiClient } from '../../services/api';
 import { useProfile, calculateProfileStrength } from '../../hooks/useProfile';
+import { useProfilePicture } from '../../hooks/useProfilePicture';
 
 interface StudentProfile {
     id: string;
@@ -28,6 +29,7 @@ const Profile = () => {
     const navigate = useNavigate();
     const { user, logout } = useAuth();
     const { profile } = useProfile();
+    const { picture: profilePic } = useProfilePicture();
     const [apiProfile, setApiProfile] = useState<StudentProfile | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [showCvModal, setShowCvModal] = useState(false);
@@ -89,7 +91,7 @@ const Profile = () => {
 
                     <div className="px-4 md:px-8 pb-6 md:pb-8 relative">
                         <div className="absolute -top-8 md:-top-12 left-4 md:left-8 w-16 h-16 md:w-24 md:h-24 rounded-[16px] md:rounded-[20px] border-[2px] border-black bg-white shadow-[3px_3px_0px_0px_#1E499D] md:shadow-[4px_4px_0px_0px_#1E499D] flex items-center justify-center overflow-hidden">
-                            <Avatar name={displayName} size="lg" />
+                            <Avatar name={displayName} size="lg" src={profilePic || undefined} />
                         </div>
 
                         <div className="pt-10 md:pt-16 flex flex-col sm:flex-row justify-between sm:items-end gap-4">

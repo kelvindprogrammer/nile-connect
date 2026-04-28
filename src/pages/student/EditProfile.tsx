@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import {
     User, Mail, MapPin, Camera, Save, ArrowLeft,
     Link as LinkIcon, Link2, GraduationCap, Phone,
-    Code2, Plus, Trash2, Briefcase,
+    Code2, Plus, Trash2, Briefcase, Loader2,
 } from 'lucide-react';
 import Card from '../../components/Card';
 import InputField from '../../components/InputField';
@@ -13,12 +13,16 @@ import Avatar from '../../components/Avatar';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { useProfile, type Experience } from '../../hooks/useProfile';
+import { useProfilePicture } from '../../hooks/useProfilePicture';
 
 const EditProfile = () => {
     const navigate = useNavigate();
     const { user, login } = useAuth();
     const { showToast } = useToast();
     const { profile, updateProfile } = useProfile();
+    const { picture, uploadPicture, removePicture } = useProfilePicture();
+    const picInputRef = useRef<HTMLInputElement>(null);
+    const [uploadingPic, setUploadingPic] = useState(false);
 
     const [name, setName] = useState(user?.name || '');
     const [email, setEmail] = useState(user?.email || '');
@@ -83,19 +87,42 @@ const EditProfile = () => {
                     {/* Avatar */}
                     <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 p-6 bg-nile-blue/5 border-[2px] border-dashed border-black/10 rounded-[24px]">
                         <div className="relative group flex-shrink-0">
-                            <div className="w-20 h-20 rounded-full border-[2px] border-black overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                                <Avatar name={name} size="lg" />
+                            <div className="w-20 h-20 rounded-[16px] border-[2px] border-black overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                                {picture ? (
+                                    <img src={picture} alt={name} className="w-full h-full object-cover" />
+                                ) : (
+                                    <Avatar name={name} size="lg" />
+                                )}
                             </div>
-                            <button type="button" className="absolute -bottom-1 -right-1 p-2 bg-black text-white rounded-full border-2 border-white shadow-sm hover:scale-110 transition-transform">
-                                <Camera size={12} />
+                            <button
+                                type="button"
+                                onClick={() => picInputRef.current?.click()}
+                                className="absolute -bottom-1 -right-1 p-2 bg-nile-green text-white rounded-full border-2 border-white shadow-sm hover:scale-110 transition-transform"
+                            >
+                                {uploadingPic ? <Loader2 size={12} className="animate-spin" /> : <Camera size={12} />}
                             </button>
+                            <input
+                                ref={picInputRef}
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={async e => {
+                                    const file = e.target.files?.[0];
+                                    if (!file) return;
+                                    setUploadingPic(true);
+                                    try { await uploadPicture(file); showToast('Picture updated!', 'success'); }
+                                    catch (err: any) { showToast(err.message || 'Upload failed', 'error'); }
+                                    finally { setUploadingPic(false); if (picInputRef.current) picInputRef.current.value = ''; }
+                                }}
+                            />
                         </div>
                         <div className="space-y-1 text-center sm:text-left">
                             <h4 className="text-sm font-black text-black uppercase">PROFILE IMAGE</h4>
-                            <p className="text-[9px] font-black text-nile-blue/40 uppercase tracking-widest">JPG, PNG — max 2MB</p>
+                            <p className="text-[9px] font-black text-nile-blue/40 uppercase tracking-widest">JPG, PNG, WEBP — max 4MB</p>
+                            {picture && <p className="text-[8px] font-black text-nile-green uppercase">✓ PHOTO UPLOADED</p>}
                             <div className="flex gap-2 pt-1 justify-center sm:justify-start">
-                                <Button size="xs" variant="primary" type="button">UPLOAD</Button>
-                                <Button size="xs" variant="outline" type="button">REMOVE</Button>
+                                <Button size="xs" variant="primary" type="button" onClick={() => picInputRef.current?.click()}>UPLOAD NEW</Button>
+                                {picture && <Button size="xs" variant="outline" type="button" onClick={() => { removePicture(); showToast('Photo removed', 'info'); }}>REMOVE</Button>}
                             </div>
                         </div>
                     </div>
