@@ -145,53 +145,53 @@ const StudentDashboard = () => {
                     </div>
 
                     {/* Main content row */}
-                    <div className="flex items-center gap-4 px-4 py-3">
+                    <div className="flex items-center gap-5 px-5 py-4">
 
                         {/* Avatar */}
                         <div className="relative flex-shrink-0">
-                            <div className="w-12 h-12 md:w-14 md:h-14 rounded-[12px] border-[2px] border-black overflow-hidden shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                            <div className="w-16 h-16 md:w-20 md:h-20 rounded-[16px] border-[2px] border-black overflow-hidden shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
                                 {picture
                                     ? <img src={picture} alt={userName} className="w-full h-full object-cover" />
-                                    : <div className="w-full h-full bg-nile-blue flex items-center justify-center"><span className="font-black text-white text-sm">{userName.split(' ').map(n=>n[0]).join('').slice(0,2)}</span></div>}
+                                    : <div className="w-full h-full bg-nile-blue flex items-center justify-center"><span className="font-black text-white text-lg">{userName.split(' ').map(n=>n[0]).join('').slice(0,2)}</span></div>}
                             </div>
-                            <button onClick={() => fileRef.current?.click()} className="absolute -bottom-1 -right-1 w-5 h-5 bg-nile-green border-[1.5px] border-white rounded-full flex items-center justify-center hover:scale-110 transition-all">
-                                {uploadingPic ? <Loader2 size={9} className="text-white animate-spin" /> : <Camera size={9} className="text-white" />}
+                            <button onClick={() => fileRef.current?.click()} className="absolute -bottom-1.5 -right-1.5 w-6 h-6 bg-nile-green border-2 border-white rounded-full flex items-center justify-center hover:scale-110 transition-all shadow-sm">
+                                {uploadingPic ? <Loader2 size={11} className="text-white animate-spin" /> : <Camera size={11} className="text-white" />}
                             </button>
                             <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handlePicSelect} />
                         </div>
 
                         {/* Name + info */}
                         <div className="flex-1 min-w-0">
-                            <p className="text-[8px] font-black text-black/35 uppercase tracking-widest">Good {greeting},</p>
-                            <h1 className="text-xl md:text-2xl font-black text-black leading-none uppercase tracking-tighter">
+                            <p className="text-[9px] font-black text-black/35 uppercase tracking-widest">Good {greeting},</p>
+                            <h1 className="text-2xl md:text-3xl font-black text-black leading-none uppercase tracking-tighter">
                                 {firstName}<span className="text-nile-green">.</span>
                             </h1>
-                            <p className="text-[7px] font-black text-nile-blue/50 uppercase tracking-widest mt-0.5">
+                            <p className="text-[8px] font-black text-nile-blue/50 uppercase tracking-widest mt-0.5">
                                 {userType} · {userDept}
                             </p>
-                            <p className="text-[9px] font-bold text-black/50 leading-snug mt-1 hidden sm:block max-w-xs">{insight}</p>
+                            <p className="text-[10px] font-bold text-black/50 leading-snug mt-1.5 hidden sm:block max-w-sm">{insight}</p>
                         </div>
 
                         {/* Right: ring + stats */}
                         <div className="flex items-center gap-3 flex-shrink-0">
                             {/* Ring */}
                             <div className="flex flex-col items-center gap-1">
-                                <Ring pct={strength} size={52} />
-                                <button onClick={() => navigate('/student/profile/edit')} className={`text-[6px] font-black uppercase tracking-widest ${sColor} hover:underline`}>
-                                    {strength < 100 ? 'COMPLETE' : '✓ DONE'}
+                                <Ring pct={strength} size={68} />
+                                <button onClick={() => navigate('/student/profile/edit')} className={`text-[7px] font-black uppercase tracking-widest ${sColor} hover:underline`}>
+                                    {strength < 100 ? 'COMPLETE →' : '✓ DONE'}
                                 </button>
                             </div>
-                            {/* Stats row */}
-                            <div className="hidden sm:grid grid-cols-2 gap-1">
+                            {/* Stats 2×2 */}
+                            <div className="hidden sm:grid grid-cols-2 gap-1.5">
                                 {[
                                     { v:'0',    l:'APPS',   c:'text-black' },
                                     { v:'3',    l:'NET',    c:'text-nile-blue' },
                                     { v:'2',    l:'EVENTS', c:'text-yellow-500' },
                                     { v:'150+', l:'JOBS',   c:'text-nile-green' },
                                 ].map(s => (
-                                    <div key={s.l} className="bg-nile-white border border-black/8 rounded-lg px-2.5 py-1 text-center min-w-[44px]">
-                                        <p className={`text-xs font-black leading-none ${s.c}`}>{s.v}</p>
-                                        <p className="text-[5px] font-black text-black/30 uppercase tracking-widest mt-0.5">{s.l}</p>
+                                    <div key={s.l} className="bg-nile-white border border-black/10 rounded-xl px-3 py-1.5 text-center min-w-[50px]">
+                                        <p className={`text-sm font-black leading-none ${s.c}`}>{s.v}</p>
+                                        <p className="text-[6px] font-black text-black/30 uppercase tracking-widest mt-0.5">{s.l}</p>
                                     </div>
                                 ))}
                             </div>
@@ -199,35 +199,35 @@ const StudentDashboard = () => {
                     </div>
 
                     {/* Action buttons row */}
-                    <div className="flex items-center gap-2 px-4 pb-3">
-                        <button onClick={() => navigate('/student/jobs')} className="flex items-center gap-1.5 px-3.5 py-1.5 bg-nile-green text-white text-[8px] font-black uppercase tracking-wider rounded-lg border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-px hover:translate-y-px hover:shadow-none transition-all">
-                            <Briefcase size={10} strokeWidth={3} /> FIND JOBS
+                    <div className="flex items-center gap-2 px-5 pb-4">
+                        <button onClick={() => navigate('/student/jobs')} className="flex items-center gap-1.5 px-4 py-2 bg-nile-green text-white text-[9px] font-black uppercase tracking-wider rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-px hover:translate-y-px hover:shadow-none transition-all">
+                            <Briefcase size={12} strokeWidth={3} /> FIND JOBS
                         </button>
-                        <button onClick={() => navigate('/student/career/ai')} className="flex items-center gap-1.5 px-3.5 py-1.5 bg-nile-blue text-white text-[8px] font-black uppercase tracking-wider rounded-lg border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-px hover:translate-y-px hover:shadow-none transition-all">
-                            <Brain size={10} strokeWidth={3} /> AI CAREER
+                        <button onClick={() => navigate('/student/career/ai')} className="flex items-center gap-1.5 px-4 py-2 bg-nile-blue text-white text-[9px] font-black uppercase tracking-wider rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-px hover:translate-y-px hover:shadow-none transition-all">
+                            <Brain size={12} strokeWidth={3} /> AI CAREER
                         </button>
-                        <button onClick={() => navigate('/student/profile/edit')} className="flex items-center gap-1.5 px-3.5 py-1.5 bg-white text-black text-[8px] font-black uppercase tracking-wider rounded-lg border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-black hover:text-white transition-all">
+                        <button onClick={() => navigate('/student/profile/edit')} className="flex items-center gap-1.5 px-4 py-2 bg-white text-black text-[9px] font-black uppercase tracking-wider rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-black hover:text-white transition-all">
                             PROFILE
                         </button>
-                        <p className="hidden md:block text-[8px] font-bold text-black/25 italic ml-2 truncate max-w-xs">"{quote}"</p>
+                        <p className="hidden lg:block text-[9px] font-bold text-black/25 italic ml-2 truncate">"{quote}"</p>
                     </div>
                 </section>
 
-                {/* ── QUICK ACTIONS — compact horizontal chips ──────────── */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                {/* ── QUICK ACTIONS ─────────────────────────────────────── */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {[
-                        { icon: <Briefcase size={14} strokeWidth={2.5} className="text-white" />, label:'Job Board', desc:'150+ roles', to:'/student/jobs', bg:'bg-nile-blue' },
-                        { icon: <Brain size={14} strokeWidth={2.5} className="text-white" />,     label:'AI Career',  desc:'CV & advice',  to:'/student/career/ai', bg:'bg-black' },
-                        { icon: <Mic size={14} strokeWidth={2.5} className="text-white" />,      label:'Mock Interview', desc:'AI coach', to:'/student/career/mock-interview', bg:'bg-nile-green' },
-                        { icon: <Users size={14} strokeWidth={2.5} className="text-black" />,    label:'Network',    desc:'Connect & grow', to:'/student/network', bg:'bg-yellow-400' },
+                        { icon: <Briefcase size={17} strokeWidth={2.5} className="text-white" />, label:'Job Board',       desc:'150+ active roles', to:'/student/jobs',                   bg:'bg-nile-blue' },
+                        { icon: <Brain     size={17} strokeWidth={2.5} className="text-white" />, label:'AI Career',       desc:'CV analysis & advice', to:'/student/career/ai',           bg:'bg-black' },
+                        { icon: <Mic       size={17} strokeWidth={2.5} className="text-white" />, label:'Mock Interview',  desc:'Practice with AI', to:'/student/career/mock-interview',  bg:'bg-nile-green' },
+                        { icon: <Users     size={17} strokeWidth={2.5} className="text-black" />, label:'Network',         desc:'Connect & grow',    to:'/student/network',               bg:'bg-yellow-400' },
                     ].map(a => (
                         <button key={a.label} onClick={() => navigate(a.to)}
-                            className="flex items-center gap-3 p-3 bg-white border-[2px] border-black rounded-[14px] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all text-left group"
+                            className="flex items-center gap-3 p-4 bg-white border-[2px] border-black rounded-[16px] shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] transition-all text-left group"
                         >
-                            <div className={`w-8 h-8 rounded-xl border-2 border-black flex items-center justify-center flex-shrink-0 ${a.bg} group-hover:scale-105 transition-transform`}>{a.icon}</div>
+                            <div className={`w-10 h-10 rounded-xl border-2 border-black flex items-center justify-center flex-shrink-0 ${a.bg} group-hover:scale-105 transition-transform`}>{a.icon}</div>
                             <div className="min-w-0">
-                                <p className="font-black text-[10px] uppercase leading-none text-black">{a.label}</p>
-                                <p className="text-[7px] font-bold text-black/35 uppercase tracking-wider mt-0.5">{a.desc}</p>
+                                <p className="font-black text-xs uppercase leading-none text-black">{a.label}</p>
+                                <p className="text-[8px] font-bold text-black/35 uppercase tracking-wider mt-1">{a.desc}</p>
                             </div>
                         </button>
                     ))}
