@@ -18,6 +18,8 @@
     { "source": "/api/auth/register/student",   "destination": "/api/auth?path=register-student" },
     { "source": "/api/auth/register/employer",  "destination": "/api/auth?path=register-employer" },
     { "source": "/api/auth/profile/complete",   "destination": "/api/auth?path=complete-profile" },
+    { "source": "/api/auth/forgot-password",    "destination": "/api/auth?path=forgot-password" },
+    { "source": "/api/auth/reset-password",     "destination": "/api/auth?path=reset-password" },
 
     { "source": "/api/student/profile",         "destination": "/api/student?path=profile" },
     { "source": "/api/student/applications",    "destination": "/api/student?path=applications" },
@@ -30,6 +32,12 @@
 
     { "source": "/api/employer/profile",        "destination": "/api/employer?path=profile" },
     { "source": "/api/employer/jobs",           "destination": "/api/employer?path=jobs" },
+
+    { "source": "/api/messages/conversations",  "destination": "/api/messages?path=conversations" },
+    { "source": "/api/messages/thread/:toId",   "destination": "/api/messages?path=thread&toId=:toId" },
+    { "source": "/api/messages/send/:toId",     "destination": "/api/messages?path=send&toId=:toId" },
+
+    { "source": "/api/users/search",            "destination": "/api/users?path=search" },
 
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],

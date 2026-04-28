@@ -83,5 +83,7 @@ func migrate(db *gorm.DB) {
 		&models.EventRegistration{},
 		&models.Post{},
 		&models.PostLike{},
+		&models.Message{},
+		&models.PasswordReset{},
 	)
 }

@@ -34,7 +34,7 @@ const Profile = () => {
 
     useEffect(() => {
         apiClient
-            .get<ApiEnvelope<StudentProfile>>('/api/student/profile')
+            .get<ApiEnvelope<StudentProfile>>('/student/profile')
             .then(({ data }) => setApiProfile(data.data))
             .catch(() => {})
             .finally(() => setIsLoading(false));

@@ -36,12 +36,12 @@ export const getConversations = async (): Promise<Conversation[]> => {
 };
 
 export const getThread = async (toUserID: string): Promise<Message[]> => {
-    const { data } = await apiClient.get<Envelope<{ messages: Message[] }>>(`/messages/thread/${toUserID}`);
+    const { data } = await apiClient.get<Envelope<{ messages: Message[] }>>(`/messages/thread/${toUserID}`, { params: { toId: toUserID } });
     return data.data.messages ?? [];
 };
 
 export const sendMessage = async (toUserID: string, content: string): Promise<Message> => {
-    const { data } = await apiClient.post<Envelope<Message>>(`/messages/send/${toUserID}`, { content });
+    const { data } = await apiClient.post<Envelope<Message>>(`/messages/send/${toUserID}`, { content }, { params: { toId: toUserID } });
     return data.data;
 };
 

@@ -1,9 +1,12 @@
 package handler
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"net/http"
 	"strings"
+	"time"
 
 	"nile-connect/lib/db"
 	"nile-connect/lib/jwtutil"
@@ -29,6 +32,10 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		registerEmployer(w, r)
 	case "complete-profile":
 		completeProfile(w, r)
+	case "forgot-password":
+		forgotPassword(w, r)
+	case "reset-password":
+		resetPassword(w, r)
 	default:
 		respond.Error(w, http.StatusNotFound, "not found")
 	}
@@ -353,6 +360,107 @@ func completeProfile(w http.ResponseWriter, r *http.Request) {
 }
 
 // ── helpers ───────────────────────────────────────────────────────────────────
+
+// ── forgot password ───────────────────────────────────────────────────────────
+
+func forgotPassword(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		respond.Error(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+	var req struct {
+		Email string `json:"email"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.Email == "" {
+		respond.Error(w, http.StatusBadRequest, "email is required")
+		return
+	}
+
+	database, err := db.Get()
+	if err != nil {
+		respond.Error(w, http.StatusInternalServerError, "database unavailable")
+		return
+	}
+
+	var user models.User
+	if err := database.Where("email = ? AND deleted_at IS NULL", strings.ToLower(req.Email)).First(&user).Error; err != nil {
+		// Don't reveal whether email exists
+		respond.OK(w, map[string]any{"message": "If that email is registered, a reset link has been sent."})
+		return
+	}
+
+	// Generate a secure token
+	b := make([]byte, 20)
+	if _, err := rand.Read(b); err != nil {
+		respond.Error(w, http.StatusInternalServerError, "could not generate token")
+		return
+	}
+	token := hex.EncodeToString(b)
+
+	// Invalidate previous tokens for this user
+	database.Model(&models.PasswordReset{}).Where("user_id = ? AND used = false", user.ID).Update("used", true)
+
+	reset := models.PasswordReset{
+		UserID:    user.ID,
+		Token:     token,
+		ExpiresAt: time.Now().Add(1 * time.Hour),
+	}
+	database.Create(&reset)
+
+	// In production: send token via email. For demo, return in response.
+	respond.OK(w, map[string]any{
+		"message": "Reset token generated. In production this would be emailed.",
+		"token":   token,
+	})
+}
+
+// ── reset password ────────────────────────────────────────────────────────────
+
+func resetPassword(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		respond.Error(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+	var req struct {
+		Token       string `json:"token"`
+		NewPassword string `json:"new_password"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		respond.Error(w, http.StatusBadRequest, "invalid request body")
+		return
+	}
+	if req.Token == "" || req.NewPassword == "" {
+		respond.Error(w, http.StatusBadRequest, "token and new_password are required")
+		return
+	}
+	if len(req.NewPassword) < 8 {
+		respond.Error(w, http.StatusBadRequest, "password must be at least 8 characters")
+		return
+	}
+
+	database, err := db.Get()
+	if err != nil {
+		respond.Error(w, http.StatusInternalServerError, "database unavailable")
+		return
+	}
+
+	var reset models.PasswordReset
+	if err := database.Where("token = ? AND used = false AND expires_at > NOW() AND deleted_at IS NULL", req.Token).First(&reset).Error; err != nil {
+		respond.Error(w, http.StatusBadRequest, "invalid or expired reset token")
+		return
+	}
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		respond.Error(w, http.StatusInternalServerError, "could not hash password")
+		return
+	}
+
+	database.Model(&models.User{}).Where("id = ?", reset.UserID).Update("password_hash", string(hash))
+	database.Model(&models.PasswordReset{}).Where("token = ?", req.Token).Update("used", true)
+
+	respond.OK(w, map[string]any{"message": "Password reset successfully"})
+}
 
 func isEduEmail(email string) bool {
 	lower := strings.ToLower(email)

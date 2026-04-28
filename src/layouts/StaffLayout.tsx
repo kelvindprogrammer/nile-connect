@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { 
-    Home, 
-    Briefcase, 
-    FileText, 
-    Calendar, 
-    UserRound, 
-    LogOut, 
-    Settings as SvcsIcon, 
-    Bell, 
+    Home,
+    Briefcase,
+    FileText,
+    Calendar,
+    UserRound,
+    LogOut,
+    Settings as SvcsIcon,
+    Bell,
     Mail,
     ChevronRight,
     Search,
-    Shield
+    Shield,
+    HeartHandshake
 } from 'lucide-react';
 import Avatar from '../components/Avatar';
 import NotificationTray from '../components/NotificationTray';
@@ -100,6 +101,7 @@ const StaffLayout = () => {
                     <SlimNavItem to="/staff/services" icon={<SvcsIcon />} label="SVCS" isActive={location.pathname.startsWith('/staff/services')} />
                     <SlimNavItem to="/staff/applications" icon={<FileText />} label="APPS" isActive={location.pathname.startsWith('/staff/applications')} />
                     <SlimNavItem to="/staff/events" icon={<Calendar />} label="LIVE" isActive={location.pathname.startsWith('/staff/events')} />
+                    <SlimNavItem to="/staff/crm" icon={<HeartHandshake />} label="CRM" isActive={location.pathname.startsWith('/staff/crm')} />
                     <SlimNavItem to="/staff/profile" icon={<UserRound />} label="USER" isActive={location.pathname.startsWith('/staff/profile')} />
                 </nav>
 

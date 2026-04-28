@@ -47,29 +47,29 @@ export interface StaffEmployer {
 }
 
 export const getDashboardStats = async (): Promise<DashboardStats> => {
-    const { data } = await apiClient.get<ApiEnvelope<DashboardStats>>('/api/staff/dashboard');
+    const { data } = await apiClient.get<ApiEnvelope<DashboardStats>>('/staff/dashboard');
     return data.data;
 };
 
 export const getStaffApplications = async (): Promise<StaffApplication[]> => {
-    const { data } = await apiClient.get<ApiEnvelope<{ applications: StaffApplication[] }>>('/api/staff/applications');
+    const { data } = await apiClient.get<ApiEnvelope<{ applications: StaffApplication[] }>>('/staff/applications');
     return data.data.applications;
 };
 
 export const getStaffJobs = async (): Promise<StaffJob[]> => {
-    const { data } = await apiClient.get<ApiEnvelope<{ jobs: StaffJob[] }>>('/api/staff/jobs');
+    const { data } = await apiClient.get<ApiEnvelope<{ jobs: StaffJob[] }>>('/staff/jobs');
     return data.data.jobs;
 };
 
 export const updateJobStatus = async (jobId: string, status: string): Promise<void> => {
-    await apiClient.put(`/api/staff/jobs?id=${jobId}`, { status });
+    await apiClient.put(`/staff/jobs?id=${jobId}`, { status });
 };
 
 export const getStaffEmployers = async (): Promise<StaffEmployer[]> => {
-    const { data } = await apiClient.get<ApiEnvelope<{ employers: StaffEmployer[] }>>('/api/staff/employers');
+    const { data } = await apiClient.get<ApiEnvelope<{ employers: StaffEmployer[] }>>('/staff/employers');
     return data.data.employers;
 };
 
 export const updateEmployerStatus = async (profileId: string, status: string): Promise<void> => {
-    await apiClient.put(`/api/staff/employers?id=${profileId}`, { status });
+    await apiClient.put(`/staff/employers?id=${profileId}`, { status });
 };

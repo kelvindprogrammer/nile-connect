@@ -118,3 +118,24 @@ type PostLike struct {
 	PostID    string         `gorm:"not null;index"`
 	UserID    string         `gorm:"not null;index"`
 }
+
+type Message struct {
+	ID         string         `gorm:"primaryKey;type:text;default:gen_random_uuid()"`
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+	DeletedAt  gorm.DeletedAt `gorm:"index"`
+	SenderID   string         `gorm:"not null;index"`
+	ReceiverID string         `gorm:"not null;index"`
+	Content    string         `gorm:"type:text;not null"`
+	IsRead     bool           `gorm:"default:false"`
+}
+
+type PasswordReset struct {
+	ID        string         `gorm:"primaryKey;type:text;default:gen_random_uuid()"`
+	CreatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
+	UserID    string         `gorm:"not null;index"`
+	Token     string         `gorm:"uniqueIndex;not null"`
+	ExpiresAt time.Time      `gorm:"not null"`
+	Used      bool           `gorm:"default:false"`
+}

@@ -24,7 +24,7 @@ const QuickApplyModal: React.FC<QuickApplyModalProps> = ({ isOpen, onClose, jobT
         e.preventDefault();
         setIsSubmitting(true);
         try {
-            await apiClient.post('/api/jobs', { job_id: jobId, cover_letter: coverLetter });
+            await apiClient.post('/jobs', { job_id: jobId, cover_letter: coverLetter });
             setStep(2);
             showToast(`Successfully applied to ${company}!`, 'success');
         } catch (err: any) {

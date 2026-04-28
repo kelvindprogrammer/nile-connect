@@ -45,30 +45,30 @@ export interface EmployerProfile {
 }
 
 export const getEmployerProfile = async (): Promise<EmployerProfile> => {
-    const { data } = await apiClient.get<ApiEnvelope<EmployerProfile>>('/api/employer/profile');
+    const { data } = await apiClient.get<ApiEnvelope<EmployerProfile>>('/employer/profile');
     return data.data;
 };
 
 export const updateEmployerProfile = async (payload: Partial<EmployerProfile>): Promise<EmployerProfile> => {
-    const { data } = await apiClient.put<ApiEnvelope<EmployerProfile>>('/api/employer/profile', payload);
+    const { data } = await apiClient.put<ApiEnvelope<EmployerProfile>>('/employer/profile', payload);
     return data.data;
 };
 
 export const getEmployerJobs = async (): Promise<JobListing[]> => {
-    const { data } = await apiClient.get<ApiEnvelope<{ jobs: JobListing[] }>>('/api/employer/jobs');
+    const { data } = await apiClient.get<ApiEnvelope<{ jobs: JobListing[] }>>('/employer/jobs');
     return data.data.jobs ?? [];
 };
 
 export const postJob = async (req: CreateJobRequest): Promise<JobListing> => {
-    const { data } = await apiClient.post<ApiEnvelope<JobListing>>('/api/employer/jobs', req);
+    const { data } = await apiClient.post<ApiEnvelope<JobListing>>('/employer/jobs', req);
     return data.data;
 };
 
 export const updateJob = async (id: string, payload: Partial<CreateJobRequest>): Promise<JobListing> => {
-    const { data } = await apiClient.put<ApiEnvelope<JobListing>>(`/api/employer/jobs?id=${id}`, payload);
+    const { data } = await apiClient.put<ApiEnvelope<JobListing>>(`/employer/jobs?id=${id}`, payload);
     return data.data;
 };
 
 export const deleteJob = async (id: string): Promise<void> => {
-    await apiClient.delete(`/api/employer/jobs?id=${id}`);
+    await apiClient.delete(`/employer/jobs?id=${id}`);
 };
