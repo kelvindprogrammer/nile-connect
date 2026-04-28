@@ -152,7 +152,7 @@ const CRMManager = () => {
         setSending(reminder.id);
         try {
             // Post to feed as a broadcast message
-            await apiClient.post('/feed', {
+            await apiClient.post('/api/feed', {
                 content: `[CRM] ${reminder.title}: ${reminder.message}`,
             });
             setReminders(prev => prev.map(r => r.id === reminder.id ? { ...r, sent: true } : r));

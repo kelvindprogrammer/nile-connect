@@ -236,20 +236,23 @@ const AICounselor = () => {
     // Render
     // -----------------------------------------------------------------------
 
+    // Show chat open by default so the Architect is immediately visible
+    useEffect(() => { setShowChat(true); }, []);
+
     return (
         <DashboardLayout>
-            <div className="p-4 md:p-10 space-y-8 md:space-y-12 font-sans bg-nile-white min-h-full pb-24 text-left relative">
+            <div className="p-4 md:p-6 font-sans bg-nile-white min-h-full pb-24 md:pb-4 text-left">
 
                 {/* Header */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b-[2px] md:border-b-[3px] border-black pb-8 md:pb-12">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b-[2px] border-black pb-5 mb-6">
                     <div className="space-y-2">
-                        <div className="flex items-center space-x-3 text-nile-green">
-                            <Cpu size={24} strokeWidth={2.5} />
-                            <span className="text-[10px] font-black uppercase tracking-[0.3em]">NEURAL ENGINE V2.0</span>
+                        <div className="flex items-center space-x-2 text-nile-green mb-1">
+                            <Cpu size={18} strokeWidth={2.5} />
+                            <span className="text-[9px] font-black uppercase tracking-[0.3em]">NEURAL ENGINE V2.0</span>
                         </div>
-                        <h2 className="text-4xl md:text-7xl font-black text-black leading-none uppercase tracking-tighter">Career Architect .</h2>
-                        <p className="text-sm md:text-xl font-bold text-nile-blue/70 uppercase tracking-widest max-w-2xl">
-                            AI-driven CV analysis, skill-gap mapping, and professional growth pathways.
+                        <h2 className="text-3xl md:text-5xl font-black text-black leading-none uppercase tracking-tighter">Career Architect .</h2>
+                        <p className="text-xs font-bold text-nile-blue/70 uppercase tracking-widest max-w-xl">
+                            AI-driven CV analysis, skill mapping, and the Career Architect chat — always on.
                         </p>
                     </div>
                     {resultReady && !requestedConsultation && (
@@ -267,6 +270,10 @@ const AICounselor = () => {
                     )}
                 </div>
 
+                {/* ── TWO-COLUMN LAYOUT: CV work (left) + Chat always visible (right) ── */}
+                <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+                {/* ── LEFT: CV upload / results ── */}
+                <div className="xl:col-span-8">
                 {/* ---- PRE-RESULT: Upload + Launch ---- */}
                 {!resultReady ? (
                     <div className="max-w-4xl mx-auto space-y-12 py-12 text-center">
@@ -461,86 +468,86 @@ const AICounselor = () => {
                     </div>
                 )}
 
-                {/* ---- FLOATING CHAT ---- */}
-                {showChat && (
-                    <div className="fixed bottom-6 right-6 z-[100] w-[calc(100vw-48px)] md:w-96 flex flex-col bg-white border-4 border-black rounded-[32px] shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] h-[500px]">
-                        {/* Header */}
-                        <div className="p-5 border-b-4 border-black flex items-center justify-between bg-black text-white rounded-t-[28px]">
-                            <div className="flex items-center space-x-3">
-                                <div className="w-8 h-8 bg-nile-green rounded-lg flex items-center justify-center border-2 border-white">
-                                    <Cpu size={16} />
-                                </div>
-                                <div>
-                                    <p className="text-[10px] font-black uppercase tracking-tighter">Career Architect Bot</p>
-                                    <div className="flex items-center space-x-1">
-                                        <div className="w-1.5 h-1.5 bg-nile-green rounded-full animate-pulse" />
-                                        <span className="text-[7px] font-black opacity-50 uppercase tracking-widest">
-                                            {chatLoading ? 'THINKING...' : 'ONLINE • READY'}
-                                        </span>
-                                    </div>
+                </div>{/* end left column */}
+
+                {/* ── RIGHT: Career Architect Chat — ALWAYS VISIBLE ── */}
+                <div className="xl:col-span-4">
+                    <div className="sticky top-20 flex flex-col bg-white border-[3px] border-black rounded-[28px] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden h-[calc(100vh-180px)] min-h-[480px]">
+                        {/* Chat header */}
+                        <div className="p-4 border-b-[3px] border-black flex items-center gap-3 bg-black text-white flex-shrink-0">
+                            <div className="w-9 h-9 bg-nile-green rounded-xl flex items-center justify-center border-2 border-white flex-shrink-0">
+                                <Cpu size={16} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="text-[11px] font-black uppercase tracking-tight leading-none">Career Architect</p>
+                                <div className="flex items-center gap-1.5 mt-0.5">
+                                    <div className="w-1.5 h-1.5 bg-nile-green rounded-full animate-pulse" />
+                                    <span className="text-[7px] font-black opacity-50 uppercase tracking-widest">
+                                        {chatLoading ? 'THINKING...' : 'ONLINE · READY TO HELP'}
+                                    </span>
                                 </div>
                             </div>
-                            <button onClick={() => setShowChat(false)} className="p-1 hover:text-nile-green transition-colors">
-                                <X size={20} strokeWidth={3} />
-                            </button>
+                            <div className="text-[7px] font-black text-white/30 uppercase">AI</div>
                         </div>
 
                         {/* Messages */}
-                        <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar bg-nile-white/20">
+                        <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-nile-white/30 custom-scrollbar">
                             {messages.map((m) => (
                                 <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                    <div className={`max-w-[85%] p-4 border-2 border-black rounded-2xl text-[10px] font-bold leading-relaxed
+                                    {m.role === 'bot' && (
+                                        <div className="w-6 h-6 rounded-full bg-black flex items-center justify-center flex-shrink-0 mr-2 mt-auto mb-1">
+                                            <Cpu size={10} className="text-nile-green" />
+                                        </div>
+                                    )}
+                                    <div className={`max-w-[82%] px-3.5 py-3 border-2 border-black rounded-2xl text-[10px] leading-relaxed
                                         ${m.role === 'user'
-                                            ? 'bg-nile-blue text-white rounded-tr-none shadow-[2px_2px_0px_0px_rgba(108,187,86,1)] uppercase font-black'
-                                            : 'bg-white text-black rounded-tl-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'}`}
+                                            ? 'bg-nile-blue text-white rounded-tr-sm shadow-[2px_2px_0px_0px_rgba(108,187,86,1)] font-black uppercase'
+                                            : 'bg-white text-black rounded-tl-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] font-bold'}`}
                                     >
-                                        {m.role === 'bot' ? formatMarkdown(m.text) : m.text}
+                                        {m.role === 'bot' ? formatMarkdown(m.text, 'text-[10px]') : m.text}
                                     </div>
                                 </div>
                             ))}
                             {chatLoading && (
-                            <div className="flex justify-start">
-                                <div className="p-4 border-2 border-black rounded-2xl rounded-tl-none bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center gap-2">
-                                    <Loader2 size={14} className="text-nile-blue animate-spin" />
-                                    <span className="text-[8px] font-black text-black/40 uppercase tracking-widest">Thinking...</span>
+                                <div className="flex justify-start">
+                                    <div className="w-6 h-6 rounded-full bg-black flex items-center justify-center flex-shrink-0 mr-2">
+                                        <Cpu size={10} className="text-nile-green" />
+                                    </div>
+                                    <div className="px-4 py-3 border-2 border-black rounded-2xl rounded-tl-sm bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center gap-2">
+                                        <Loader2 size={12} className="text-nile-blue animate-spin" />
+                                        <span className="text-[8px] font-black text-black/40 uppercase tracking-wider">Thinking...</span>
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
                             <div ref={chatEndRef} />
                         </div>
 
                         {/* Input */}
-                        <form onSubmit={handleSendMessage} className="p-4 border-t-4 border-black bg-white rounded-b-[28px]">
+                        <form onSubmit={handleSendMessage} className="p-3 border-t-[3px] border-black bg-white flex-shrink-0">
                             <div className="relative">
                                 <input
                                     type="text"
                                     value={inputValue}
                                     onChange={(e) => setInputValue(e.target.value)}
-                                    placeholder="ASK ABOUT SKILLS, SALARY, PATHS..."
+                                    placeholder="Ask about skills, salary, career paths..."
                                     disabled={chatLoading}
-                                    className="w-full bg-nile-white border-[2px] border-black rounded-xl py-3 pl-4 pr-12 font-black text-[9px] uppercase outline-none focus:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all disabled:opacity-50"
+                                    className="w-full bg-nile-white border-[2px] border-black rounded-xl py-2.5 pl-4 pr-11 font-bold text-[10px] outline-none focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all disabled:opacity-50"
                                 />
                                 <button
                                     type="submit"
-                                    disabled={chatLoading}
-                                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-black text-white rounded-lg hover:bg-nile-blue transition-colors disabled:opacity-50"
+                                    disabled={chatLoading || !inputValue.trim()}
+                                    className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 bg-nile-green text-white rounded-lg hover:bg-nile-blue transition-colors disabled:opacity-40 disabled:bg-black"
                                 >
-                                    <Send size={14} />
+                                    <Send size={13} />
                                 </button>
                             </div>
+                            <p className="text-[7px] font-black text-black/25 uppercase tracking-widest text-center mt-2">
+                                UPLOAD CV ABOVE FOR PERSONALISED ADVICE
+                            </p>
                         </form>
                     </div>
-                )}
-
-                {/* FAB */}
-                {!showChat && (
-                    <button
-                        onClick={() => setShowChat(true)}
-                        className="fixed bottom-24 md:bottom-8 right-6 z-50 w-14 h-14 bg-nile-green text-white border-4 border-black rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center group hover:-translate-y-1 transition-all"
-                    >
-                        <MessageSquare className="group-hover:scale-120 transition-transform" size={24} />
-                    </button>
-                )}
+                </div>
+                </div>{/* end grid */}
             </div>
         </DashboardLayout>
     );

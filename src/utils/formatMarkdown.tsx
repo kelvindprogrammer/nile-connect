@@ -1,5 +1,27 @@
 import React from 'react';
 
+// Pre-process text: strip/convert HTML tags to markdown equivalents
+function preprocessText(raw: string): string {
+    return raw
+        .replace(/<br\s*\/?>/gi, '\n')
+        .replace(/<\/p>/gi, '\n\n')
+        .replace(/<p[^>]*>/gi, '')
+        .replace(/<strong[^>]*>([\s\S]*?)<\/strong>/gi, '**$1**')
+        .replace(/<b[^>]*>([\s\S]*?)<\/b>/gi, '**$1**')
+        .replace(/<em[^>]*>([\s\S]*?)<\/em>/gi, '*$1*')
+        .replace(/<i[^>]*>([\s\S]*?)<\/i>/gi, '*$1*')
+        .replace(/<h[1-6][^>]*>([\s\S]*?)<\/h[1-6]>/gi, '## $1\n')
+        .replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, '- $1\n')
+        .replace(/<[^>]+>/g, '')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&nbsp;/g, ' ')
+        .replace(/\n{3,}/g, '\n\n'); // Collapse excessive newlines
+}
+
 function renderInline(text: string): React.ReactNode[] {
     const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g);
     return parts.map((part, i) => {
@@ -19,7 +41,8 @@ function renderInline(text: string): React.ReactNode[] {
 export function formatMarkdown(text: string, className?: string): React.ReactNode {
     if (!text) return null;
 
-    const lines = text.split('\n');
+    const clean = preprocessText(text);
+    const lines = clean.split('\n');
     const elements: React.ReactNode[] = [];
     let listBuffer: string[] = [];
     let listType: 'ul' | 'ol' = 'ul';
@@ -49,21 +72,21 @@ export function formatMarkdown(text: string, className?: string): React.ReactNod
         if (trimmed.startsWith('### ')) {
             flushList();
             elements.push(
-                <h4 key={i} className="font-black text-current text-sm mt-4 mb-1.5 pb-0.5 border-b border-current/10 uppercase tracking-tight">
+                <h4 key={i} className="font-black text-current text-sm mt-3 mb-1 pb-0.5 border-b border-current/10 uppercase tracking-tight">
                     {renderInline(trimmed.slice(4))}
                 </h4>
             );
         } else if (trimmed.startsWith('## ')) {
             flushList();
             elements.push(
-                <h3 key={i} className="font-black text-current text-base mt-5 mb-2 uppercase tracking-tighter">
+                <h3 key={i} className="font-black text-current text-base mt-4 mb-1.5 uppercase tracking-tighter">
                     {renderInline(trimmed.slice(3))}
                 </h3>
             );
         } else if (trimmed.startsWith('# ')) {
             flushList();
             elements.push(
-                <h2 key={i} className="font-black text-current text-lg mt-5 mb-2 uppercase tracking-tighter">
+                <h2 key={i} className="font-black text-current text-lg mt-4 mb-2 uppercase tracking-tighter">
                     {renderInline(trimmed.slice(2))}
                 </h2>
             );
@@ -76,7 +99,7 @@ export function formatMarkdown(text: string, className?: string): React.ReactNod
         } else if (!trimmed) {
             flushList();
             if (elements.length > 0 && i < lines.length - 1) {
-                elements.push(<div key={`gap-${i}`} className="h-2" />);
+                elements.push(<div key={`gap-${i}`} className="h-1.5" />);
             }
         } else {
             flushList();
@@ -89,7 +112,7 @@ export function formatMarkdown(text: string, className?: string): React.ReactNod
     flushList();
 
     return (
-        <div className={`text-left space-y-1 ${className ?? ''}`}>
+        <div className={`text-left space-y-0.5 ${className ?? ''}`}>
             {elements}
         </div>
     );

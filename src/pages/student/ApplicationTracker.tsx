@@ -34,7 +34,7 @@ const ApplicationTracker = () => {
 
     useEffect(() => {
         apiClient
-            .get<ApiEnvelope<{ applications: AppItem[] }>>('/student/applications')
+            .get<ApiEnvelope<{ applications: AppItem[] }>>('/api/student/applications')
             .then(({ data }) => setApps(data.data.applications ?? []))
             .catch(() => setApps([]))
             .finally(() => setIsLoading(false));

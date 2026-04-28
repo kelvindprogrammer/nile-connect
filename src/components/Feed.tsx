@@ -44,7 +44,7 @@ const Feed: React.FC<FeedProps> = ({ newPost, onPostConsumed }) => {
 
     const fetchPosts = () => {
         apiClient
-            .get<ApiEnvelope<{ posts: ApiPost[] }>>('/feed')
+            .get<ApiEnvelope<{ posts: ApiPost[] }>>('/api/feed')
             .then(({ data }) => setPosts(data.data.posts ?? []))
             .catch(() => setPosts([]))
             .finally(() => setIsLoading(false));
@@ -55,7 +55,7 @@ const Feed: React.FC<FeedProps> = ({ newPost, onPostConsumed }) => {
     useEffect(() => {
         if (!newPost) return;
         apiClient
-            .post<ApiEnvelope<ApiPost>>('/feed', { content: newPost.content })
+            .post<ApiEnvelope<ApiPost>>('/api/feed', { content: newPost.content })
             .then(({ data }) => {
                 setPosts(prev => [data.data, ...prev]);
                 showToast('Post published!', 'success');

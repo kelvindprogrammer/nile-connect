@@ -30,7 +30,7 @@ const ForgotPassword = () => {
         }
         setIsLoading(true);
         try {
-            await apiClient.post('/auth/forgot-password', { email });
+            await apiClient.post('/api/auth/forgot-password', { email });
             setStep('sent');
         } catch (err: any) {
             const msg = err?.response?.data?.error || 'Failed to send reset link. Please try again.';
@@ -47,7 +47,7 @@ const ForgotPassword = () => {
         if (newPassword !== confirmPassword) { showToast('Passwords do not match.', 'error'); return; }
         setIsLoading(true);
         try {
-            await apiClient.post('/auth/reset-password', { token, new_password: newPassword });
+            await apiClient.post('/api/auth/reset-password', { token, new_password: newPassword });
             setStep('done');
             showToast('Password reset successfully!', 'success');
         } catch (err: any) {

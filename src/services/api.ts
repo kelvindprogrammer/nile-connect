@@ -3,31 +3,21 @@ import axios from 'axios';
 // ---------------------------------------------------------------------------
 // Base URL resolution
 // ---------------------------------------------------------------------------
-
-// All backend routes are now Go serverless functions deployed on Vercel
-// at /api/* — same origin as the frontend. No CORS required.
-const API_BASE_URL =
-    (import.meta as any).env?.VITE_API_BASE_URL || '/api';
-
-// Python AI serverless functions share the same /api/* origin.
-const AI_BASE_URL =
-    (import.meta as any).env?.VITE_AI_BASE_URL || '/api';
-
-// ---------------------------------------------------------------------------
-// Axios instances
+// Using empty baseURL so all calls use explicit absolute paths like /api/feed.
+// This is immune to VITE_API_BASE_URL misconfiguration and Axios path-merging quirks.
+// Every apiClient call MUST include the full /api/... prefix.
+// Every aiClient call MUST include the full /api/ai/... prefix.
 // ---------------------------------------------------------------------------
 
-/** Client for the Go backend (auth, jobs, employer, student, etc.) */
 export const apiClient = axios.create({
-    baseURL: API_BASE_URL,
+    baseURL: '',
     headers: { 'Content-Type': 'application/json' },
     timeout: 15_000,
 });
 
-/** Client for the Python AI serverless functions */
 export const aiClient = axios.create({
-    baseURL: AI_BASE_URL,
-    timeout: 60_000, // AI can be slow
+    baseURL: '',
+    timeout: 60_000,
 });
 
 // ---------------------------------------------------------------------------
@@ -54,7 +44,6 @@ const handleAuthError = (error: any) => {
     if (error.response?.status === 401) {
         localStorage.removeItem('nile_token');
         localStorage.removeItem('nile_user');
-        // Redirect to login without hard-refreshing the React router
         window.dispatchEvent(new CustomEvent('auth:expired'));
     }
     return Promise.reject(error);

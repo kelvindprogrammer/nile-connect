@@ -47,7 +47,7 @@ const EventsCalendar = () => {
 
     useEffect(() => {
         apiClient
-            .get<ApiEnvelope<{ events: ApiEvent[] }>>('/events')
+            .get<ApiEnvelope<{ events: ApiEvent[] }>>('/api/events')
             .then(({ data }) => setEvents(data.data.events ?? []))
             .catch(() => setEvents([]))
             .finally(() => setIsLoading(false));

@@ -56,7 +56,7 @@ const JobBoard = () => {
 
     useEffect(() => {
         apiClient
-            .get<ApiEnvelope<{ jobs: Job[] }>>('/jobs', { params: search ? { q: search } : {} })
+            .get<ApiEnvelope<{ jobs: Job[] }>>('/api/jobs', { params: search ? { q: search } : {} })
             .then(({ data }) => setJobs(data.data.jobs ?? []))
             .catch(() => setJobs([]))
             .finally(() => setIsLoading(false));
