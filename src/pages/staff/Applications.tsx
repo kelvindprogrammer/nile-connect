@@ -1,186 +1,358 @@
-import React, { useState, useEffect } from 'react';
-import { BarChart2, Building2, ShieldCheck, UserCheck, UserX, Clock, ArrowUpRight, Filter, Search, Activity, Layers } from 'lucide-react';
-import Card from '../../components/Card';
-import Button from '../../components/Button';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import {
+    ClipboardList, Building2, Search, CheckCircle2, XCircle,
+    Loader2, AlertCircle, ShieldCheck, Clock, Users
+} from 'lucide-react';
 import Avatar from '../../components/Avatar';
 import { useToast } from '../../context/ToastContext';
+import {
+    getStaffApplications,
+    getStaffEmployers,
+    updateEmployerStatus,
+    StaffApplication,
+    StaffEmployer,
+} from '../../services/staffService';
 
-interface PendingRecruiter {
-    id: number;
-    name: string;
-    company: string;
-    submitted: string;
-    status: 'PENDING' | 'VERIFIED' | 'REJECTED';
-}
+// ── Types ─────────────────────────────────────────────────────────────────────
 
-const mockRecruiters: PendingRecruiter[] = [
-    { id: 1, name: 'Sarah Jenkins', company: 'Google Tech', submitted: '2h ago', status: 'PENDING' },
-    { id: 2, name: 'David Kabir', company: 'Shell NG', submitted: '5h ago', status: 'PENDING' },
-];
+type MainTab = 'PIPELINE' | 'EMPLOYER VERIFICATION';
+type StatusFilter = 'ALL' | 'applied' | 'interview' | 'offer' | 'rejected';
+type EmployerSubTab = 'PENDING' | 'APPROVED' | 'REJECTED';
+
+// ── Loading Skeleton ──────────────────────────────────────────────────────────
+
+const LoadingSkeleton = () => (
+    <div className="p-4 md:p-8 space-y-8 animate-pulse">
+        <div className="h-14 bg-black/5 rounded-2xl w-72" />
+        <div className="flex gap-2">
+            {[1, 2].map(i => <div key={i} className="h-10 bg-black/5 rounded-xl w-48" />)}
+        </div>
+        <div className="space-y-4">
+            {[1, 2, 3, 4].map(i => <div key={i} className="h-16 bg-black/5 rounded-[20px]" />)}
+        </div>
+    </div>
+);
+
+// ── Status badge helpers ──────────────────────────────────────────────────────
+
+const statusConfig: Record<string, { label: string; bg: string; text: string }> = {
+    applied:   { label: 'APPLIED',    bg: 'bg-blue-50',    text: 'text-blue-600' },
+    interview: { label: 'INTERVIEW',  bg: 'bg-yellow-50',  text: 'text-yellow-600' },
+    offer:     { label: 'OFFER',      bg: 'bg-nile-green/20', text: 'text-nile-green' },
+    rejected:  { label: 'REJECTED',   bg: 'bg-red-50',     text: 'text-red-500' },
+};
+
+const getStatusConfig = (status: string) =>
+    statusConfig[status.toLowerCase()] ?? { label: status.toUpperCase(), bg: 'bg-black/5', text: 'text-black/60' };
+
+// ── Main Component ────────────────────────────────────────────────────────────
 
 const StaffApplications = () => {
     const { showToast } = useToast();
-    const [activeTab, setActiveTab] = useState<'ANALYTICS' | 'VERIFICATIONS'>('ANALYTICS');
-    const [recruiters, setRecruiters] = useState<PendingRecruiter[]>(mockRecruiters);
+
+    const [mainTab, setMainTab] = useState<MainTab>('PIPELINE');
+    const [applications, setApplications] = useState<StaffApplication[]>([]);
+    const [employers, setEmployers] = useState<StaffEmployer[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [actionLoading, setActionLoading] = useState<Record<string, boolean>>({});
 
-    useEffect(() => {
-        const timer = setTimeout(() => setIsLoading(false), 800);
-        return () => clearTimeout(timer);
-    }, []);
+    // Pipeline filters
+    const [search, setSearch] = useState('');
+    const [statusFilter, setStatusFilter] = useState<StatusFilter>('ALL');
 
-    const handleVerify = (id: number, name: string, action: 'VERIFIED' | 'REJECTED') => {
-        setRecruiters(prev => prev.filter(r => r.id !== id));
-        showToast(`Recruiter ${name} has been ${action.toLowerCase()}.`, action === 'VERIFIED' ? 'success' : 'error');
+    // Employer sub-tab
+    const [empSubTab, setEmpSubTab] = useState<EmployerSubTab>('PENDING');
+
+    const fetchAll = useCallback(async () => {
+        try {
+            const [apps, emps] = await Promise.all([
+                getStaffApplications(),
+                getStaffEmployers(),
+            ]);
+            setApplications(apps);
+            setEmployers(emps);
+        } catch {
+            showToast('Failed to load data.', 'error');
+        } finally {
+            setIsLoading(false);
+        }
+    }, [showToast]);
+
+    useEffect(() => { fetchAll(); }, [fetchAll]);
+
+    const pendingEmployers = useMemo(() => employers.filter(e => e.status === 'pending'), [employers]);
+
+    const filteredApps = useMemo(() => {
+        return applications.filter(app => {
+            const matchesSearch = !search ||
+                app.student_name.toLowerCase().includes(search.toLowerCase()) ||
+                app.company.toLowerCase().includes(search.toLowerCase()) ||
+                app.job_title.toLowerCase().includes(search.toLowerCase());
+            const matchesStatus = statusFilter === 'ALL' || app.status.toLowerCase() === statusFilter;
+            return matchesSearch && matchesStatus;
+        });
+    }, [applications, search, statusFilter]);
+
+    const empsBySubTab = useMemo(() => {
+        const map: Record<EmployerSubTab, string> = {
+            PENDING: 'pending',
+            APPROVED: 'approved',
+            REJECTED: 'rejected',
+        };
+        return employers.filter(e => e.status === map[empSubTab]);
+    }, [employers, empSubTab]);
+
+    const handleEmployerAction = async (emp: StaffEmployer, status: 'approved' | 'rejected') => {
+        setActionLoading(prev => ({ ...prev, [emp.id]: true }));
+        try {
+            await updateEmployerStatus(emp.id, status);
+            setEmployers(prev => prev.map(e => e.id === emp.id ? { ...e, status } : e));
+            showToast(
+                `${emp.company_name} has been ${status}.`,
+                status === 'approved' ? 'success' : 'error'
+            );
+        } catch {
+            showToast(`Failed to update ${emp.company_name}.`, 'error');
+        } finally {
+            setActionLoading(prev => ({ ...prev, [emp.id]: false }));
+        }
     };
 
-    const analytics = [
-        { role: "SW ENGR", apps: "1.2k", trend: "+12%", color: "text-nile-green" },
-        { role: "DATA", apps: "856", trend: "+5%", color: "text-nile-blue" },
-        { role: "PROD", apps: "412", trend: "-2%", color: "text-red-500" },
-        { role: "UX", apps: "289", trend: "+18%", color: "text-nile-green" }
-    ];
+    const statusFilters: StatusFilter[] = ['ALL', 'applied', 'interview', 'offer', 'rejected'];
 
-    if (isLoading) {
-        return (
-            <div className="p-4 md:p-8 space-y-6 md:space-y-8 animate-pulse text-left h-full">
-                <div className="h-40 md:h-48 bg-black/5 rounded-[24px] md:rounded-[40px] border-[2px] border-black/5"></div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-                    {[1,2,3,4].map(i => <div key={i} className="h-24 md:h-32 bg-black/5 rounded-2xl"></div>)}
-                </div>
-            </div>
-        );
-    }
+    if (isLoading) return <LoadingSkeleton />;
 
     return (
-        <div className="p-4 md:p-8 space-y-8 md:space-y-12 anime-fade-in font-sans pb-24 md:pb-20 text-left h-full">
-            {/* 1. Header & Strategy Section */}
-            <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 md:gap-8 border-b-[2px] md:border-b-[3px] border-black pb-6 md:pb-10">
-                <div className="space-y-1 md:space-y-2">
-                    <h2 className="text-2xl md:text-4xl font-black text-black leading-none uppercase tracking-tighter">Logistics .</h2>
-                    <p className="text-[8px] md:text-[10px] font-black text-nile-blue/50 uppercase tracking-[0.2em] truncate">RECRUITMENT FLOWS & AUTH</p>
+        <div className="p-4 md:p-8 space-y-8 anime-fade-in font-sans pb-20 text-left min-h-full">
+
+            {/* Header */}
+            <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 border-b-[2px] border-black pb-6">
+                <div className="space-y-1">
+                    <h2 className="text-3xl md:text-4xl font-black text-black leading-none uppercase tracking-tighter">
+                        Pipeline Hub
+                    </h2>
+                    <p className="text-[9px] md:text-[10px] font-black text-black/40 uppercase tracking-[0.2em]">
+                        APPLICATIONS &amp; EMPLOYER MANAGEMENT
+                    </p>
                 </div>
-                
-                <div className="flex bg-white p-1 border-[2px] border-black rounded-[16px] md:rounded-2xl shadow-sm w-full md:w-auto">
-                    {(['ANALYTICS', 'VERIFICATIONS'] as const).map(t => (
+
+                <div className="flex flex-wrap gap-1 bg-white p-1 border-[2px] border-black rounded-2xl shadow-sm">
+                    {(['PIPELINE', 'EMPLOYER VERIFICATION'] as MainTab[]).map(tab => (
                         <button
-                            key={t}
-                            onClick={() => setActiveTab(t)}
-                            className={`flex-1 md:flex-none px-4 md:px-8 py-2 md:py-3 rounded-xl font-black text-[8px] md:text-[10px] tracking-widest uppercase transition-all whitespace-nowrap
-                                ${activeTab === t ? 'bg-black text-white shadow-[2px_2px_0px_0px_#1E499D]' : 'text-black/40 hover:text-black'}
-                            `}
+                            key={tab}
+                            onClick={() => setMainTab(tab)}
+                            className={`px-4 py-2 rounded-xl font-black text-[9px] tracking-widest uppercase transition-all flex items-center gap-2 whitespace-nowrap
+                                ${mainTab === tab ? 'bg-black text-white shadow-[2px_2px_0px_0px_#6CBB56]' : 'text-black/40 hover:text-black'}`}
                         >
-                            {t} {t === 'VERIFICATIONS' && recruiters.length > 0 && (
-                                <span className="ml-1.5 md:ml-2 bg-red-500 text-white px-1.5 md:px-2 py-0.5 rounded-full text-[7px] md:text-[8px]">{recruiters.length}</span>
+                            {tab === 'PIPELINE' ? <ClipboardList size={13} /> : <ShieldCheck size={13} />}
+                            <span>{tab}</span>
+                            {tab === 'EMPLOYER VERIFICATION' && pendingEmployers.length > 0 && (
+                                <span className={`w-5 h-5 flex items-center justify-center rounded-full text-[7px] font-black
+                                    ${mainTab === tab ? 'bg-red-500 text-white' : 'bg-red-100 text-red-500'}`}>
+                                    {pendingEmployers.length}
+                                </span>
                             )}
                         </button>
                     ))}
                 </div>
             </div>
 
-            {/* 2. Content Sections */}
-            {activeTab === 'ANALYTICS' ? (
-                <div className="space-y-8 md:space-y-12">
-                     {/* System Metrics Hero */}
-                     <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
-                        {analytics.map((s) => (
-                            <Card key={s.role} className="p-4 md:p-8 group hover:translate-y-[-2px] transition-all">
-                                <div className="flex justify-between items-start mb-3 md:mb-6">
-                                    <div className="p-2 bg-nile-white rounded-lg border-[1.5px] border-black group-hover:bg-black group-hover:text-white transition-colors flex-shrink-0">
-                                        <Activity size={16} />
-                                    </div>
-                                    <span className={`text-[7px] md:text-[10px] font-black px-1.5 py-0.5 rounded-full border border-black/10 ${s.trend.startsWith('+') ? 'bg-nile-green/10 text-nile-green' : 'bg-red-50 text-red-500'}`}>
-                                        {s.trend}
-                                    </span>
-                                </div>
-                                <h3 className="text-xl md:text-3xl font-black text-black leading-none tracking-tighter truncate">{s.apps}</h3>
-                                <p className="text-[7px] md:text-[9px] font-black text-black/30 uppercase mt-2 tracking-widest truncate">{s.role}</p>
-                            </Card>
-                        ))}
-                     </section>
+            {/* ── APPLICATION PIPELINE ──────────────────────────────── */}
+            {mainTab === 'PIPELINE' && (
+                <div className="space-y-6 anime-fade-in">
+                    {/* Count */}
+                    <div className="flex flex-wrap gap-3 items-center">
+                        <span className="px-4 py-2 bg-black text-white border-[2px] border-black rounded-xl font-black text-[9px] uppercase tracking-widest">
+                            {filteredApps.length} {filteredApps.length === 1 ? 'APPLICATION' : 'APPLICATIONS'}
+                        </span>
+                        {statusFilter !== 'ALL' && (
+                            <button
+                                onClick={() => setStatusFilter('ALL')}
+                                className="text-[8px] font-black text-black/40 uppercase tracking-widest underline"
+                            >
+                                CLEAR FILTER
+                            </button>
+                        )}
+                    </div>
 
-                     {/* Top Partner Organizations */}
-                     <section className="space-y-6">
-                         <div className="flex items-center justify-between px-2">
-                            <h3 className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] flex items-center text-black/40">
-                                <Layers size={14} className="mr-2" /> ENGAGEMENT INDEX
-                            </h3>
-                         </div>
-                         <div className="space-y-3 md:space-y-4">
-                            {[
-                                { name: 'Google Tech', apps: 850, active: 12 },
-                                { name: 'Shell NG', apps: 420, active: 5 },
-                                { name: 'Access Bank', apps: 380, active: 8 },
-                            ].map(company => (
-                                <div key={company.name} className="bg-white border-[2px] border-black rounded-[20px] md:rounded-[24px] p-4 md:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between transition-all hover:bg-nile-white/40 gap-4">
-                                    <div className="flex items-center space-x-4 md:space-x-6 min-w-0">
-                                        <div className="w-10 h-10 md:w-12 md:h-12 bg-black text-white rounded-xl flex items-center justify-center border-2 border-black font-black flex-shrink-0">
-                                            {company.name[0]}
+                    {/* Search */}
+                    <div className="relative">
+                        <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-black/30" />
+                        <input
+                            type="text"
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
+                            placeholder="SEARCH BY STUDENT, JOB TITLE, OR COMPANY..."
+                            className="w-full pl-10 pr-4 py-3 rounded-xl border-[2px] border-black font-black text-[9px] tracking-widest uppercase outline-none focus:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all bg-nile-white/60 focus:bg-white"
+                        />
+                    </div>
+
+                    {/* Status filters */}
+                    <div className="flex flex-wrap gap-2">
+                        {statusFilters.map(sf => {
+                            const cfg = sf === 'ALL' ? null : getStatusConfig(sf);
+                            const count = sf === 'ALL' ? applications.length : applications.filter(a => a.status.toLowerCase() === sf).length;
+                            return (
+                                <button
+                                    key={sf}
+                                    onClick={() => setStatusFilter(sf)}
+                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-[2px] border-black font-black text-[8px] uppercase tracking-widest transition-all
+                                        ${statusFilter === sf ? 'bg-black text-white' : 'bg-white text-black hover:bg-black/5'}`}
+                                >
+                                    {sf}
+                                    <span className={`w-4 h-4 flex items-center justify-center rounded-full text-[7px] ${statusFilter === sf ? 'bg-white/20 text-white' : cfg ? `${cfg.bg} ${cfg.text}` : 'bg-black/10 text-black/60'}`}>
+                                        {count}
+                                    </span>
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    {/* Applications list */}
+                    {filteredApps.length === 0 ? (
+                        <EmptyState icon={<ClipboardList size={28} />} label="No applications match your filters" />
+                    ) : (
+                        <div className="space-y-3">
+                            {filteredApps.map(app => {
+                                const sc = getStatusConfig(app.status);
+                                return (
+                                    <div key={app.id} className="bg-white border-[2px] border-black rounded-[20px] p-4 md:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all">
+                                        <div className="flex items-center gap-4 min-w-0 flex-1">
+                                            <Avatar name={app.student_name || '?'} size="sm" />
+                                            <div className="min-w-0">
+                                                <p className="font-black text-sm uppercase text-black leading-none mb-1 truncate">{app.student_name || 'Unknown Student'}</p>
+                                                <p className="text-[8px] font-black text-black/40 uppercase tracking-wider truncate">
+                                                    {app.job_title || 'N/A'} &bull; {app.company || 'N/A'}
+                                                </p>
+                                                {app.applied_at && (
+                                                    <p className="text-[7px] font-bold text-black/20 uppercase flex items-center gap-1 mt-0.5">
+                                                        <Clock size={9} />
+                                                        {new Date(app.applied_at).toLocaleDateString()}
+                                                    </p>
+                                                )}
+                                            </div>
                                         </div>
-                                        <div className="min-w-0">
-                                            <h4 className="text-lg md:text-xl font-black text-black leading-none mb-1 uppercase tracking-tight truncate">{company.name}</h4>
-                                            <p className="text-[8px] md:text-[9px] font-black text-nile-blue/40 uppercase tracking-widest truncate">Verified Partner Hub</p>
+                                        <span className={`shrink-0 text-[8px] font-black px-3 py-1.5 rounded-xl border-[2px] border-black uppercase tracking-widest ${sc.bg} ${sc.text}`}>
+                                            {sc.label}
+                                        </span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* ── EMPLOYER VERIFICATION ─────────────────────────────── */}
+            {mainTab === 'EMPLOYER VERIFICATION' && (
+                <div className="space-y-6 anime-fade-in">
+                    {/* Sub-tab bar */}
+                    <div className="flex flex-wrap gap-1 bg-white p-1 border-[2px] border-black rounded-2xl shadow-sm w-fit">
+                        {(['PENDING', 'APPROVED', 'REJECTED'] as EmployerSubTab[]).map(sub => {
+                            const counts: Record<EmployerSubTab, number> = {
+                                PENDING: pendingEmployers.length,
+                                APPROVED: employers.filter(e => e.status === 'approved').length,
+                                REJECTED: employers.filter(e => e.status === 'rejected').length,
+                            };
+                            return (
+                                <button
+                                    key={sub}
+                                    onClick={() => setEmpSubTab(sub)}
+                                    className={`px-4 py-2 rounded-xl font-black text-[9px] tracking-widest uppercase transition-all flex items-center gap-2
+                                        ${empSubTab === sub ? 'bg-black text-white' : 'text-black/40 hover:text-black'}`}
+                                >
+                                    {sub}
+                                    <span className={`w-5 h-5 flex items-center justify-center rounded-full text-[7px] font-black
+                                        ${empSubTab === sub
+                                            ? sub === 'PENDING' ? 'bg-red-500 text-white' : 'bg-white/20 text-white'
+                                            : sub === 'PENDING' ? 'bg-red-100 text-red-500' : 'bg-black/10 text-black/60'}`}>
+                                        {counts[sub]}
+                                    </span>
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    {/* Employer cards */}
+                    {empsBySubTab.length === 0 ? (
+                        <EmptyState
+                            icon={<Building2 size={28} />}
+                            label={`No ${empSubTab.toLowerCase()} employers`}
+                        />
+                    ) : (
+                        <div className="space-y-3">
+                            {empsBySubTab.map(emp => (
+                                <div key={emp.id} className="bg-white border-[2px] border-black rounded-[20px] shadow-[3px_3px_0px_0px_rgba(0,0,0,0.08)] p-4 md:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all">
+                                    <div className="flex items-center gap-4 min-w-0 flex-1">
+                                        <div className="w-11 h-11 bg-black text-white rounded-xl flex items-center justify-center font-black text-lg flex-shrink-0 border-2 border-black">
+                                            {emp.company_name.charAt(0).toUpperCase()}
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <div className="flex flex-wrap items-center gap-2 mb-1">
+                                                <p className="font-black text-sm uppercase text-black leading-none truncate">{emp.company_name}</p>
+                                                <StatusBadge status={emp.status} />
+                                            </div>
+                                            <p className="text-[8px] font-black text-black/40 uppercase tracking-wider truncate">
+                                                {emp.industry} &bull; {emp.location}
+                                            </p>
+                                            <p className="text-[8px] font-bold text-nile-blue/50 truncate">{emp.contact_email}</p>
+                                            <p className="text-[7px] font-black text-black/20 uppercase flex items-center gap-1 mt-0.5">
+                                                <Clock size={9} />
+                                                REGISTERED {new Date(emp.created_at).toLocaleDateString()}
+                                            </p>
                                         </div>
                                     </div>
-                                    <div className="flex w-full sm:w-auto justify-between sm:justify-end items-center sm:space-x-12 px-1 sm:px-0">
-                                         <div className="text-left sm:text-center">
-                                            <p className="text-[7px] md:text-[8px] font-black text-black/30 uppercase mb-0.5 md:mb-1">APPS</p>
-                                            <p className="text-lg md:text-xl font-black text-black leading-none">{company.apps}</p>
+
+                                    {empSubTab === 'PENDING' && (
+                                        <div className="flex gap-2 w-full sm:w-auto shrink-0">
+                                            <button
+                                                onClick={() => handleEmployerAction(emp, 'approved')}
+                                                disabled={actionLoading[emp.id]}
+                                                className="flex items-center gap-1.5 px-3 py-2 bg-nile-green text-white border-[2px] border-black rounded-xl font-black text-[9px] uppercase tracking-widest shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all disabled:opacity-50"
+                                            >
+                                                {actionLoading[emp.id] ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle2 size={12} strokeWidth={3} />}
+                                                <span className="hidden sm:inline">APPROVE</span>
+                                            </button>
+                                            <button
+                                                onClick={() => handleEmployerAction(emp, 'rejected')}
+                                                disabled={actionLoading[emp.id]}
+                                                className="flex items-center gap-1.5 px-3 py-2 bg-white text-red-500 border-[2px] border-black rounded-xl font-black text-[9px] uppercase tracking-widest shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all disabled:opacity-50 hover:bg-red-50"
+                                            >
+                                                {actionLoading[emp.id] ? <Loader2 size={12} className="animate-spin" /> : <XCircle size={12} strokeWidth={3} />}
+                                                <span className="hidden sm:inline">REJECT</span>
+                                            </button>
                                         </div>
-                                        <div className="text-left sm:text-center">
-                                            <p className="text-[7px] md:text-[8px] font-black text-black/30 uppercase mb-0.5 md:mb-1">JOBS</p>
-                                            <p className="text-lg md:text-xl font-black text-black leading-none">{company.active}</p>
-                                        </div>
-                                        <button className="p-2 md:p-3 bg-nile-green/10 text-nile-green border-2 border-black rounded-xl hover:bg-black hover:text-white transition-all flex-shrink-0">
-                                            <ArrowUpRight size={16} strokeWidth={3} />
-                                        </button>
-                                    </div>
+                                    )}
                                 </div>
                             ))}
-                         </div>
-                     </section>
-                </div>
-            ) : (
-                <div className="max-w-4xl mx-auto space-y-6 md:space-y-8 animate-in slide-in-from-bottom-2 w-full">
-                     <div className="bg-nile-blue/5 border-[2px] border-dashed border-black/10 rounded-[24px] md:rounded-[32px] p-8 md:p-12 text-center space-y-4 md:space-y-6">
-                         <div className="w-12 h-12 md:w-16 md:h-16 bg-white border-[2px] border-black rounded-xl md:rounded-2xl flex items-center justify-center mx-auto shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                             <ShieldCheck size={28} className="text-nile-blue" />
-                         </div>
-                         <div className="space-y-1 md:space-y-2">
-                             <h3 className="text-lg md:text-2xl font-black text-black uppercase tracking-tight leading-none">Vetting Hub</h3>
-                             <p className="text-[8px] md:text-[10px] font-bold text-nile-blue/40 uppercase tracking-widest leading-relaxed">System awaiting authorization.</p>
-                         </div>
-                     </div>
-
-                     <div className="space-y-3 md:space-y-4">
-                        {recruiters.map(r => (
-                             <div key={r.id} className="bg-white border-[2px] border-black rounded-[20px] md:rounded-[24px] p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between shadow-[4px_4px_0px_0px_rgba(30,73,157,0.1)] group hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all gap-4">
-                                <div className="flex items-center space-x-3 md:space-x-4">
-                                    <Avatar name={r.name} size="sm" />
-                                    <div className="text-left min-w-0">
-                                        <h4 className="text-[12px] md:text-sm font-black text-black leading-none mb-1 uppercase truncate">{r.name}</h4>
-                                        <p className="text-[8px] md:text-[9px] font-black text-nile-green uppercase tracking-widest truncate">{r.company}</p>
-                                    </div>
-                                </div>
-                                <div className="flex space-x-2 md:space-x-3">
-                                    <Button size="xs" fullWidth className="sm:flex-none" onClick={() => handleVerify(r.id, r.name, 'VERIFIED')}>
-                                        <UserCheck size={14} className="mr-1 md:mr-2" /> <span className="hidden sm:inline">VERIFY</span><span className="sm:hidden">OK</span>
-                                    </Button>
-                                    <Button size="xs" variant="outline" fullWidth className="sm:flex-none" onClick={() => handleVerify(r.id, r.name, 'REJECTED')}>
-                                        <UserX size={14} className="mr-1 md:mr-2" /> <span className="hidden sm:inline">DENY</span><span className="sm:hidden">NO</span>
-                                    </Button>
-                                </div>
-                             </div>
-                        ))}
-                        {recruiters.length === 0 && (
-                            <div className="py-12 md:py-20 text-center opacity-30 font-black uppercase text-[8px] md:text-[10px] tracking-[0.2em]">
-                                SYSTEM STATUS: CLEAR.
-                            </div>
-                        )}
-                     </div>
+                        </div>
+                    )}
                 </div>
             )}
         </div>
+    );
+};
+
+// ── Sub-components ────────────────────────────────────────────────────────────
+
+const EmptyState = ({ label, icon }: { label: string; icon: React.ReactNode }) => (
+    <div className="py-20 text-center border-2 border-dashed border-black/10 rounded-[28px]">
+        <div className="text-black/20 mx-auto mb-3 flex justify-center">{icon}</div>
+        <p className="text-[9px] font-black text-black/30 uppercase tracking-[0.2em]">{label}</p>
+    </div>
+);
+
+const StatusBadge = ({ status }: { status: string }) => {
+    const configs: Record<string, string> = {
+        pending:  'bg-yellow-50 text-yellow-600',
+        approved: 'bg-nile-green/20 text-nile-green',
+        rejected: 'bg-red-50 text-red-500',
+    };
+    const cls = configs[status] ?? 'bg-black/5 text-black/60';
+    return (
+        <span className={`text-[7px] font-black px-2 py-0.5 rounded border-[1.5px] border-black uppercase ${cls}`}>
+            {status.toUpperCase()}
+        </span>
     );
 };
 

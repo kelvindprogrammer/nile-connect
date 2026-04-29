@@ -30,6 +30,12 @@ export interface StaffEmployer {
     status: string; created_at: string;
 }
 
+export interface StaffStudent {
+    id: string; full_name: string; email: string;
+    major: string; graduation_year: number;
+    is_verified: boolean; created_at: string;
+}
+
 export const getDashboardStats = async (): Promise<DashboardStats> => {
     const { data } = await apiClient.get<ApiEnvelope<DashboardStats>>('/api/staff/dashboard');
     return data.data;
@@ -37,12 +43,12 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
 
 export const getStaffApplications = async (): Promise<StaffApplication[]> => {
     const { data } = await apiClient.get<ApiEnvelope<{ applications: StaffApplication[] }>>('/api/staff/applications');
-    return data.data.applications;
+    return data.data.applications ?? [];
 };
 
 export const getStaffJobs = async (): Promise<StaffJob[]> => {
     const { data } = await apiClient.get<ApiEnvelope<{ jobs: StaffJob[] }>>('/api/staff/jobs');
-    return data.data.jobs;
+    return data.data.jobs ?? [];
 };
 
 export const updateJobStatus = async (jobId: string, status: string): Promise<void> => {
@@ -51,9 +57,18 @@ export const updateJobStatus = async (jobId: string, status: string): Promise<vo
 
 export const getStaffEmployers = async (): Promise<StaffEmployer[]> => {
     const { data } = await apiClient.get<ApiEnvelope<{ employers: StaffEmployer[] }>>('/api/staff/employers');
-    return data.data.employers;
+    return data.data.employers ?? [];
 };
 
 export const updateEmployerStatus = async (profileId: string, status: string): Promise<void> => {
     await apiClient.put(`/api/staff/employers?id=${profileId}`, { status });
+};
+
+export const getStaffStudents = async (): Promise<StaffStudent[]> => {
+    const { data } = await apiClient.get<ApiEnvelope<{ students: StaffStudent[] }>>('/api/staff/students');
+    return data.data.students ?? [];
+};
+
+export const verifyStudent = async (studentId: string, verified: boolean): Promise<void> => {
+    await apiClient.put(`/api/staff/students?id=${studentId}`, { verified });
 };

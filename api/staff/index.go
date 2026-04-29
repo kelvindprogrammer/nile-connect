@@ -241,10 +241,6 @@ func staffEmployers(w http.ResponseWriter, r *http.Request) {
 // ── students ──────────────────────────────────────────────────────────────────
 
 func staffStudents(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		respond.Error(w, http.StatusMethodNotAllowed, "method not allowed")
-		return
-	}
 	database, err := db.Get()
 	if err != nil {
 		respond.Error(w, http.StatusInternalServerError, "database unavailable")
@@ -261,12 +257,34 @@ func staffStudents(w http.ResponseWriter, r *http.Request) {
 		CreatedAt      time.Time `json:"created_at"`
 	}
 
-	var users []models.User
-	database.Where("role = ? AND deleted_at IS NULL", "student").Order("created_at desc").Find(&users)
+	switch r.Method {
+	case http.MethodGet:
+		var users []models.User
+		database.Where("role = ? AND deleted_at IS NULL", "student").Order("created_at desc").Find(&users)
 
-	result := make([]stuSum, 0, len(users))
-	for _, u := range users {
-		result = append(result, stuSum{ID: u.ID, FullName: u.FullName, Email: u.Email, Major: u.Major, GraduationYear: u.GraduationYear, IsVerified: u.IsVerified, CreatedAt: u.CreatedAt})
+		result := make([]stuSum, 0, len(users))
+		for _, u := range users {
+			result = append(result, stuSum{ID: u.ID, FullName: u.FullName, Email: u.Email, Major: u.Major, GraduationYear: u.GraduationYear, IsVerified: u.IsVerified, CreatedAt: u.CreatedAt})
+		}
+		respond.OK(w, map[string]any{"students": result})
+
+	case http.MethodPut:
+		studentID := r.URL.Query().Get("id")
+		if studentID == "" {
+			respond.Error(w, http.StatusBadRequest, "student id required as ?id=")
+			return
+		}
+		var req struct {
+			Verified bool `json:"verified"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			respond.Error(w, http.StatusBadRequest, "invalid request body")
+			return
+		}
+		database.Model(&models.User{}).Where("id = ? AND role = ?", studentID, "student").Update("is_verified", req.Verified)
+		respond.OK(w, map[string]string{"message": "student verification updated"})
+
+	default:
+		respond.Error(w, http.StatusMethodNotAllowed, "method not allowed")
 	}
-	respond.OK(w, map[string]any{"students": result})
 }
