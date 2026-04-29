@@ -113,13 +113,19 @@ const Login = () => {
                     </Button>
                 </form>
 
-                <div className="pt-6 border-t-[2px] border-black/5 space-y-4">
+                <div className="pt-6 border-t-[2px] border-black/5 space-y-3">
                     <p className="text-[9px] font-black text-black/30 uppercase tracking-[0.15em] text-center">NEW TO NILE CONNECT?</p>
                     <button
                         onClick={() => navigate('/join-as')}
                         className="w-full py-3 text-[10px] font-black text-nile-blue uppercase tracking-widest border-[2px] border-nile-blue/20 rounded-xl hover:bg-nile-blue hover:text-white hover:border-nile-blue transition-all"
                     >
                         CREATE PROFESSIONAL PROFILE →
+                    </button>
+                    <button
+                        onClick={() => navigate('/demo')}
+                        className="w-full py-2.5 text-[9px] font-black text-nile-green uppercase tracking-widest border-[2px] border-nile-green/20 rounded-xl hover:bg-nile-green hover:text-white hover:border-nile-green transition-all flex items-center justify-center gap-2"
+                    >
+                        <span>✦</span> DEMO ACCESS — ALL ROLES <span>✦</span>
                     </button>
                 </div>
             </div>
