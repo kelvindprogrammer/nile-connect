@@ -36,6 +36,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		forgotPassword(w, r)
 	case "reset-password":
 		resetPassword(w, r)
+	case "seed-demo":
+		seedDemo(w, r)
 	default:
 		respond.Error(w, http.StatusNotFound, "not found")
 	}
@@ -465,4 +467,89 @@ func resetPassword(w http.ResponseWriter, r *http.Request) {
 func isEduEmail(email string) bool {
 	lower := strings.ToLower(email)
 	return strings.HasSuffix(lower, ".edu") || strings.HasSuffix(lower, ".edu.ng")
+}
+
+// ── seed demo accounts ────────────────────────────────────────────────────────
+
+func seedDemo(w http.ResponseWriter, r *http.Request) {
+	database, err := db.Get()
+	if err != nil {
+		respond.Error(w, http.StatusInternalServerError, "database unavailable")
+		return
+	}
+
+	const pw = "NileDemo2025!"
+	hash, _ := bcrypt.GenerateFromPassword([]byte(pw), bcrypt.DefaultCost)
+	h := string(hash)
+
+	type account struct {
+		Role     string `json:"role"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
+		Status   string `json:"status"`
+	}
+	var results []account
+
+	// Student
+	var n int64
+	database.Model(&models.User{}).Where("email = ?", "student@demo.nileconnect.com").Count(&n)
+	if n == 0 {
+		sub := "current"
+		database.Create(&models.User{
+			FullName: "Demo Student", Username: "demo_student",
+			Email: "student@demo.nileconnect.com", PasswordHash: h,
+			Role: "student", StudentSubtype: sub,
+			Major: "Computer Science", GraduationYear: 2026, IsVerified: true,
+		})
+		results = append(results, account{"student", "student@demo.nileconnect.com", pw, "created"})
+	} else {
+		database.Model(&models.User{}).Where("email = ?", "student@demo.nileconnect.com").Update("password_hash", h)
+		results = append(results, account{"student", "student@demo.nileconnect.com", pw, "already exists"})
+	}
+
+	// Staff
+	database.Model(&models.User{}).Where("email = ?", "staff@demo.nileconnect.com").Count(&n)
+	if n == 0 {
+		database.Create(&models.User{
+			FullName: "Demo Staff", Username: "demo_staff",
+			Email: "staff@demo.nileconnect.com", PasswordHash: h,
+			Role: "staff", IsVerified: true,
+		})
+		results = append(results, account{"staff", "staff@demo.nileconnect.com", pw, "created"})
+	} else {
+		database.Model(&models.User{}).Where("email = ?", "staff@demo.nileconnect.com").Update("password_hash", h)
+		results = append(results, account{"staff", "staff@demo.nileconnect.com", pw, "already exists"})
+	}
+
+	// Employer
+	database.Model(&models.User{}).Where("email = ?", "employer@demo.nileconnect.com").Count(&n)
+	if n == 0 {
+		emp := models.User{
+			FullName: "Demo Employer", Username: "demo_employer",
+			Email: "employer@demo.nileconnect.com", PasswordHash: h,
+			Role: "employer", IsVerified: true,
+		}
+		database.Create(&emp)
+		// Fetch created user to get ID
+		var created models.User
+		database.Where("email = ?", "employer@demo.nileconnect.com").First(&created)
+		database.Create(&models.EmployerProfile{
+			UserID: created.ID, CompanyName: "Demo Company",
+			Industry: "Technology", Location: "Abuja, Nigeria",
+			About: "Demo employer for testing.", ContactEmail: "employer@demo.nileconnect.com",
+			Status: "approved",
+		})
+		results = append(results, account{"employer", "employer@demo.nileconnect.com", pw, "created"})
+	} else {
+		database.Model(&models.User{}).Where("email = ?", "employer@demo.nileconnect.com").Update("password_hash", h)
+		var existing models.User
+		database.Where("email = ?", "employer@demo.nileconnect.com").First(&existing)
+		database.Model(&models.EmployerProfile{}).Where("user_id = ?", existing.ID).Update("status", "approved")
+		results = append(results, account{"employer", "employer@demo.nileconnect.com", pw, "already exists"})
+	}
+
+	respond.OK(w, map[string]any{
+		"message":  "Demo accounts ready. Use these on the login page.",
+		"accounts": results,
+	})
 }
