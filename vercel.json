@@ -39,6 +39,8 @@
 
     { "source": "/api/users/search",            "destination": "/api/users?path=search" },
 
+    { "source": "/api/seed",                    "destination": "/api/seed" },
+
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
 
