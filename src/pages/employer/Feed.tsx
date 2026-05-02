@@ -1,176 +1,168 @@
-import React, { useState } from 'react';
-import { MessageCircle, Plus, Heart, Share2 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { MessageCircle, Plus, Heart, Send, Loader2, X } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
+import { apiClient } from '../../services/api';
 
 interface Post {
-    id: number;
-    company: string;
-    type: string;
-    time: string;
+    id: string;
+    author_id: string;
+    author_type: string;
     content: string;
-    likes: number;
-    comments: number;
-    hasImage: boolean;
-    liked: boolean;
+    likes_count: number;
+    comments_count: number;
+    created_at: string;
+    liked?: boolean;
 }
 
-const initialPosts: Post[] = [
-    {
-        id: 1,
-        company: 'TECH INNOVATIONS INC.',
-        type: 'COMPANY',
-        time: '2H AGO',
-        content: 'We are hiring! Check out our new roles for the summer.',
-        likes: 87,
-        comments: 14,
-        hasImage: true,
-        liked: false,
-    },
-    {
-        id: 2,
-        company: 'NEXUS LABS',
-        type: 'COMPANY',
-        time: '5H AGO',
-        content: 'Join us for our upcoming campus info session on April 20th! Meet our engineers and learn about life at Nexus.',
-        likes: 43,
-        comments: 6,
-        hasImage: false,
-        liked: false,
-    },
-];
+const EmployerFeed = () => {
+    const { user } = useAuth();
+    const { showToast } = useToast();
+    const [posts, setPosts] = useState<Post[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [showCompose, setShowCompose] = useState(false);
+    const [newPost, setNewPost] = useState('');
+    const [posting, setPosting] = useState(false);
 
-const EmployerCatchUp = () => {
-    const [posts, setPosts] = useState<Post[]>(initialPosts);
-    const [showNewPost, setShowNewPost] = useState(false);
-    const [newPostText, setNewPostText] = useState('');
+    const load = useCallback(async () => {
+        try {
+            const { data } = await apiClient.get<{ data: { posts: Post[] } }>('/api/feed');
+            setPosts(data.data.posts ?? []);
+        } catch {
+            showToast('Failed to load feed.', 'error');
+        } finally {
+            setLoading(false);
+        }
+    }, [showToast]);
 
-    const handleLike = (id: number) => {
-        setPosts((prev) =>
-            prev.map((p) =>
-                p.id === id ? { ...p, liked: !p.liked, likes: p.liked ? p.likes - 1 : p.likes + 1 } : p
-            )
-        );
+    useEffect(() => { load(); }, [load]);
+
+    const handlePost = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newPost.trim()) return;
+        setPosting(true);
+        try {
+            const { data } = await apiClient.post<{ data: Post }>('/api/feed', { content: newPost.trim() });
+            setPosts(p => [data.data, ...p]);
+            setNewPost('');
+            setShowCompose(false);
+            showToast('Posted!', 'success');
+        } catch {
+            showToast('Failed to post.', 'error');
+        } finally {
+            setPosting(false);
+        }
     };
 
-    const handlePost = () => {
-        if (!newPostText.trim()) return;
-        setPosts((prev) => [
-            {
-                id: Date.now(),
-                company: 'TECHCORP',
-                type: 'COMPANY',
-                time: 'JUST NOW',
-                content: newPostText,
-                likes: 0,
-                comments: 0,
-                hasImage: false,
-                liked: false,
-            },
-            ...prev,
-        ]);
-        setNewPostText('');
-        setShowNewPost(false);
+    const toggleLike = (id: string) => {
+        setPosts(p => p.map(post =>
+            post.id === id
+                ? { ...post, liked: !post.liked, likes_count: post.liked ? post.likes_count - 1 : post.likes_count + 1 }
+                : post
+        ));
+    };
+
+    const timeAgo = (dateStr: string) => {
+        const diff = Date.now() - new Date(dateStr).getTime();
+        const mins = Math.floor(diff / 60000);
+        if (mins < 1) return 'JUST NOW';
+        if (mins < 60) return `${mins}M AGO`;
+        const hrs = Math.floor(mins / 60);
+        if (hrs < 24) return `${hrs}H AGO`;
+        return `${Math.floor(hrs / 24)}D AGO`;
     };
 
     return (
-        <div className="w-full max-w-3xl flex flex-col space-y-10 anime-fade-in font-sans pb-10 mx-auto">
-            {/* Header card */}
-            <div className="bg-white border-4 border-black rounded-[24px] px-8 py-5 shadow-brutalist flex justify-between items-center relative overflow-hidden">
-                <div className="flex items-center gap-4 relative z-10">
-                    <MessageCircle size={28} strokeWidth={2.5} />
-                    <h1 className="text-3xl font-black text-black uppercase tracking-widest mt-1">
-                        FEED
-                    </h1>
+        <div className="p-4 md:p-8 space-y-8 anime-fade-in font-sans pb-20 text-left min-h-full max-w-3xl mx-auto">
+
+            {/* Header */}
+            <div className="flex items-center justify-between border-b-[2px] border-black pb-6">
+                <div>
+                    <h2 className="text-3xl md:text-5xl font-black text-black uppercase leading-none tracking-tighter">Community .</h2>
+                    <p className="text-[9px] font-black text-black/40 uppercase tracking-[0.2em] mt-1">NILE CONNECT LIVE FEED</p>
                 </div>
-                <button 
-                    onClick={() => setShowNewPost(true)}
-                    className="relative z-10 bg-white border-3 border-black rounded-full px-6 py-3 font-black text-xs uppercase tracking-widest flex items-center hover:bg-black hover:text-white transition-colors group shadow-brutalist-sm hover:translate-x-1 hover:translate-y-1 hover:shadow-none"
-                >
-                    <Plus size={16} strokeWidth={3} className="mr-2" /> NEW POST
+                <button onClick={() => setShowCompose(v => !v)}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-black text-white border-[2px] border-black rounded-xl font-black text-[9px] uppercase shadow-[3px_3px_0px_0px_#6CBB56] hover:translate-x-px hover:translate-y-px hover:shadow-[2px_2px_0px_0px_#6CBB56] transition-all">
+                    {showCompose ? <X size={13} strokeWidth={3} /> : <Plus size={13} strokeWidth={3} />}
+                    {showCompose ? 'CANCEL' : 'POST'}
                 </button>
             </div>
 
-            {/* New post composer */}
-            {showNewPost && (
-                <div className="bg-white border-4 border-black rounded-[24px] p-6 shadow-brutalist anime-fade-in">
-                    <p className="font-black text-sm uppercase tracking-widest mb-4">NEW POST</p>
-                    <textarea
-                        value={newPostText}
-                        onChange={(e) => setNewPostText(e.target.value)}
-                        placeholder="What's on your mind?"
-                        className="w-full border-3 border-black rounded-[16px] p-4 font-bold text-sm outline-none focus:shadow-brutalist-sm transition-all resize-y min-h-[120px] placeholder:text-nile-blue/70"
-                    />
-                    <div className="flex justify-end gap-4 mt-6">
-                        <button 
-                            onClick={() => setShowNewPost(false)}
-                            className="bg-white text-black border-3 border-black px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-nile-white transition-colors"
-                        >
-                            CANCEL
-                        </button>
-                        <button 
-                            onClick={handlePost}
-                            className="bg-nile-blue text-nile-white border-3 border-black px-8 py-3 rounded-full font-black text-[10px] uppercase tracking-widest shadow-[2px_2px_0px_0px_#000] hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-none transition-all"
-                        >
-                            POST
-                        </button>
-                    </div>
+            {/* Compose */}
+            {showCompose && (
+                <div className="bg-white border-[2px] border-black rounded-[24px] p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] anime-fade-in">
+                    <p className="text-[9px] font-black uppercase tracking-widest text-black/40 mb-3">NEW POST · VISIBLE TO ALL STUDENTS</p>
+                    <form onSubmit={handlePost}>
+                        <textarea
+                            value={newPost}
+                            onChange={e => setNewPost(e.target.value)}
+                            placeholder="Share a job opening, company update, hiring tips..."
+                            rows={4}
+                            className="w-full border-[2px] border-black rounded-xl py-3 px-4 font-bold text-sm outline-none focus:shadow-[3px_3px_0px_0px_#1E499D] bg-nile-white/40 resize-none transition-all"
+                            autoFocus
+                        />
+                        <div className="flex justify-end gap-3 mt-3">
+                            <button type="button" onClick={() => setShowCompose(false)}
+                                className="px-4 py-2 border-2 border-black rounded-xl font-black text-[9px] uppercase hover:bg-black hover:text-white transition-all">
+                                CANCEL
+                            </button>
+                            <button type="submit" disabled={!newPost.trim() || posting}
+                                className="flex items-center gap-2 px-5 py-2 bg-nile-blue text-white border-2 border-black rounded-xl font-black text-[9px] uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-px hover:translate-y-px hover:shadow-none transition-all disabled:opacity-40">
+                                {posting ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
+                                {posting ? 'POSTING...' : 'PUBLISH'}
+                            </button>
+                        </div>
+                    </form>
                 </div>
             )}
 
             {/* Feed */}
-            <div className="flex flex-col space-y-10">
-                {posts.map((post) => (
-                    <div key={post.id} className="bg-white border-4 border-black rounded-[24px] shadow-brutalist overflow-hidden hover:-translate-y-1 transition-transform duration-300">
-                        {/* Post Header */}
-                        <div className="p-6 pb-0 flex justify-between items-start">
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-full border-3 border-black flex items-center justify-center font-black text-lg bg-white shadow-[2px_2px_0px_0px_#000]">
-                                    {post.company[0]}
+            {loading ? (
+                <div className="space-y-6 animate-pulse">
+                    {[1,2,3].map(i => <div key={i} className="h-40 bg-black/5 rounded-[24px]" />)}
+                </div>
+            ) : posts.length === 0 ? (
+                <div className="py-20 text-center border-[2px] border-dashed border-black/10 rounded-[28px]">
+                    <MessageCircle size={28} className="text-black/15 mx-auto mb-4" />
+                    <p className="text-[9px] font-black text-black/30 uppercase">No posts yet — be the first to post!</p>
+                </div>
+            ) : (
+                <div className="space-y-5">
+                    {posts.map(post => (
+                        <div key={post.id} className="bg-white border-[2px] border-black rounded-[24px] overflow-hidden hover:translate-y-[-1px] shadow-[3px_3px_0px_0px_rgba(0,0,0,0.1)] hover:shadow-[4px_4px_0px_0px_rgba(30,73,157,0.2)] transition-all">
+                            <div className="p-5 md:p-6">
+                                <div className="flex items-start justify-between mb-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 bg-nile-blue text-white rounded-xl flex items-center justify-center font-black text-sm flex-shrink-0">
+                                            {post.author_type === 'employer' ? '🏢' : post.author_type === 'staff' ? '🎓' : '👤'}
+                                        </div>
+                                        <div>
+                                            <p className="font-black text-[10px] uppercase text-black">
+                                                {post.author_id === user?.id ? 'YOU' : post.author_type === 'employer' ? 'COMPANY' : post.author_type.toUpperCase()}
+                                            </p>
+                                            <p className="text-[7px] font-black text-black/30 uppercase tracking-widest">{timeAgo(post.created_at)}</p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h3 className="font-black text-sm md:text-base uppercase tracking-widest leading-none text-black mb-1">{post.company}</h3>
-                                    <p className="text-[10px] font-black text-nile-blue uppercase tracking-widest">{post.type}</p>
+                                <p className="text-sm font-bold text-black leading-relaxed">{post.content}</p>
+                                <div className="flex gap-5 mt-5 pt-4 border-t-[2px] border-black/5">
+                                    <button onClick={() => toggleLike(post.id)}
+                                        className={`flex items-center gap-1.5 font-black text-[9px] uppercase transition-colors ${post.liked ? 'text-black' : 'text-black/30 hover:text-black'}`}>
+                                        <Heart size={14} strokeWidth={post.liked ? 3 : 2} fill={post.liked ? '#000' : 'none'} />
+                                        {post.likes_count}
+                                    </button>
+                                    <button className="flex items-center gap-1.5 font-black text-[9px] uppercase text-black/30 hover:text-black transition-colors">
+                                        <MessageCircle size={14} strokeWidth={2} />
+                                        {post.comments_count}
+                                    </button>
                                 </div>
-                            </div>
-                            <span className="text-[10px] font-black text-nile-blue/70 uppercase tracking-widest mt-1">{post.time}</span>
-                        </div>
-
-                        {/* Image Placeholder */}
-                        {post.hasImage && (
-                            <div className="w-full h-80 bg-nile-white border-nile-blue border-y-4 border-black mt-6 flex items-center justify-center relative group cursor-pointer overflow-hidden">
-                                <div className="absolute inset-0 grayscale opacity-80" style={{ background: 'url("https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80") center/cover no-repeat' }}></div>
-                            </div>
-                        )}
-
-                        {/* Content */}
-                        <div className="p-6">
-                            <p className="text-sm font-bold text-black leading-relaxed mb-6">
-                                {post.content}
-                            </p>
-
-                            {/* Actions */}
-                            <div className="flex gap-6 border-t-3 border-black pt-5 mt-2">
-                                <button
-                                    onClick={() => handleLike(post.id)}
-                                    className={`flex items-center gap-2 font-black text-[10px] uppercase tracking-widest transition-colors ${post.liked ? 'text-black' : 'text-nile-blue/70 hover:text-black'}`}
-                                >
-                                    <Heart size={16} strokeWidth={post.liked ? 3 : 2} fill={post.liked ? '#111' : 'none'} className="mb-0.5" />
-                                    {post.likes} LIKES
-                                </button>
-                                <button className="flex items-center gap-2 font-black text-[10px] uppercase tracking-widest text-nile-blue/70 hover:text-black transition-colors">
-                                    <MessageCircle size={16} strokeWidth={2} className="mb-0.5" />
-                                    {post.comments} COMMENTS
-                                </button>
-                                <button className="ml-auto flex items-center gap-2 font-black text-[10px] uppercase tracking-widest text-nile-blue/70 hover:text-black transition-colors">
-                                    <Share2 size={16} strokeWidth={2} className="mb-0.5" />
-                                    SHARE
-                                </button>
                             </div>
                         </div>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 };
 
-export default EmployerCatchUp;
+export default EmployerFeed;

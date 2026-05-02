@@ -31,6 +31,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		employerProfile(w, r, auth)
 	case "jobs":
 		employerJobs(w, r, auth)
+	case "applications":
+		employerApplications(w, r, auth)
 	default:
 		respond.Error(w, http.StatusNotFound, "not found")
 	}
@@ -218,3 +220,83 @@ func employerJobs(w http.ResponseWriter, r *http.Request, auth *mw.AuthCtx) {
 	}
 }
 
+// ── applications ──────────────────────────────────────────────────────────────
+
+func employerApplications(w http.ResponseWriter, r *http.Request, auth *mw.AuthCtx) {
+	database, err := db.Get()
+	if err != nil {
+		respond.Error(w, http.StatusInternalServerError, "database unavailable")
+		return
+	}
+
+	type appResp struct {
+		ID             string     `json:"id"`
+		StudentID      string     `json:"student_id"`
+		StudentName    string     `json:"student_name"`
+		StudentEmail   string     `json:"student_email"`
+		Major          string     `json:"major"`
+		GraduationYear int        `json:"graduation_year"`
+		IsVerified     bool       `json:"is_verified"`
+		JobID          string     `json:"job_id"`
+		JobTitle       string     `json:"job_title"`
+		Status         string     `json:"status"`
+		AppliedAt      *time.Time `json:"applied_at"`
+	}
+
+	switch r.Method {
+	case http.MethodGet:
+		var jobs []models.Job
+		database.Where("employer_id = ? AND deleted_at IS NULL", auth.UserID).Find(&jobs)
+		if len(jobs) == 0 {
+			respond.OK(w, map[string]any{"applications": []appResp{}})
+			return
+		}
+		jobIDs := make([]string, 0, len(jobs))
+		jobMap := make(map[string]string)
+		for _, j := range jobs {
+			jobIDs = append(jobIDs, j.ID)
+			jobMap[j.ID] = j.Title
+		}
+		var apps []models.Application
+		database.Where("job_id IN ? AND deleted_at IS NULL", jobIDs).Order("created_at desc").Find(&apps)
+		result := make([]appResp, 0, len(apps))
+		for _, a := range apps {
+			resp := appResp{ID: a.ID, StudentID: a.StudentID, JobID: a.JobID, Status: a.Status, AppliedAt: a.AppliedAt}
+			resp.JobTitle = jobMap[a.JobID]
+			var student models.User
+			if database.Where("id = ?", a.StudentID).First(&student).Error == nil {
+				resp.StudentName = student.FullName
+				resp.StudentEmail = student.Email
+				resp.Major = student.Major
+				resp.GraduationYear = student.GraduationYear
+				resp.IsVerified = student.IsVerified
+			}
+			result = append(result, resp)
+		}
+		respond.OK(w, map[string]any{"applications": result})
+
+	case http.MethodPut:
+		appID := r.URL.Query().Get("id")
+		if appID == "" {
+			respond.Error(w, http.StatusBadRequest, "application id required as ?id=")
+			return
+		}
+		var req struct {
+			Status string `json:"status"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			respond.Error(w, http.StatusBadRequest, "invalid request body")
+			return
+		}
+		allowed := map[string]bool{"applied": true, "screening": true, "interview": true, "offer": true, "rejected": true}
+		if !allowed[req.Status] {
+			respond.Error(w, http.StatusBadRequest, "invalid status")
+			return
+		}
+		database.Model(&models.Application{}).Where("id = ?", appID).Update("status", req.Status)
+		respond.OK(w, map[string]string{"message": "application status updated"})
+
+	default:
+		respond.Error(w, http.StatusMethodNotAllowed, "method not allowed")
+	}
+}

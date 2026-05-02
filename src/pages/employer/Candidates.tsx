@@ -1,136 +1,173 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Filter, Star, Users, MapPin, GraduationCap, ArrowUpRight, Zap, Target, ExternalLink } from 'lucide-react';
-import Avatar from '../../components/Avatar';
-import Card from '../../components/Card';
-import Button from '../../components/Button';
+import {
+    Search, Users, GraduationCap, CheckCircle2,
+    MessageSquare, ArrowUpRight, Briefcase,
+} from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
+import { getEmployerApplications, EmployerApplication } from '../../services/employerService';
 
-const candidates = [
-    { id: 1, name: 'GRACE STANLEY', major: 'COMPUTER SCIENCE', level: '400L', skills: ['REACT', 'NODE.JS', 'TYPESCRIPT'], match: 98, stats: { gpa: '3.9', projects: 12 }, location: 'ABUJA' },
-    { id: 2, name: 'MICHAEL BROWN', major: 'DATA SCIENCE', level: 'ALUMNI', skills: ['PYTHON', 'PYTORCH', 'SQL'], match: 92, stats: { gpa: '3.7', projects: 8 }, location: 'LAGOS' },
-    { id: 3, name: 'AISHAT YUSUF', major: 'CYBERSECURITY', level: '300L', skills: ['SIEM', 'NETWORK SECURITY'], match: 85, stats: { gpa: '3.8', projects: 5 }, location: 'REMOTE' },
-];
+type FilterStatus = 'all' | 'applied' | 'screening' | 'interview' | 'offer' | 'rejected';
+
+const statusBadge: Record<string, string> = {
+    applied:   'bg-nile-blue/10 text-nile-blue border-nile-blue/20',
+    screening: 'bg-purple-50 text-purple-600 border-purple-200',
+    interview: 'bg-orange-50 text-orange-500 border-orange-200',
+    offer:     'bg-nile-green/20 text-nile-green border-nile-green/30',
+    rejected:  'bg-red-50 text-red-500 border-red-200',
+};
 
 const EmployerCandidates = () => {
-    const { showToast } = useToast();
     const navigate = useNavigate();
-    const [tab, setTab] = useState<'recommended' | 'saved' | 'all'>('recommended');
-    const [searchTerm, setSearchTerm] = useState('');
+    const { showToast } = useToast();
+    const [applications, setApplications] = useState<EmployerApplication[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [search, setSearch] = useState('');
+    const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
 
-    const handleAction = (name: string, action: string) => {
-        showToast(`${action} action triggered for ${name}`, 'success');
-    };
+    const load = useCallback(async () => {
+        setLoading(true);
+        try { setApplications(await getEmployerApplications()); }
+        catch { showToast('Failed to load candidates.', 'error'); }
+        finally { setLoading(false); }
+    }, [showToast]);
+
+    useEffect(() => { load(); }, [load]);
+
+    // Deduplicate by student_id — one card per student (show their best/latest status)
+    const candidates = useMemo(() => {
+        const map = new Map<string, EmployerApplication & { jobs: string[] }>();
+        for (const app of applications) {
+            const existing = map.get(app.student_id);
+            if (existing) {
+                existing.jobs.push(app.job_title);
+                // prefer higher-stage status
+                const rank = ['rejected', 'applied', 'screening', 'interview', 'offer'];
+                if (rank.indexOf(app.status) > rank.indexOf(existing.status)) {
+                    existing.status = app.status;
+                }
+            } else {
+                map.set(app.student_id, { ...app, jobs: [app.job_title] });
+            }
+        }
+        return Array.from(map.values());
+    }, [applications]);
+
+    const filtered = useMemo(() => candidates
+        .filter(c => filterStatus === 'all' || c.status === filterStatus)
+        .filter(c => !search ||
+            (c.student_name || '').toLowerCase().includes(search.toLowerCase()) ||
+            (c.major || '').toLowerCase().includes(search.toLowerCase()) ||
+            c.jobs.some(j => j.toLowerCase().includes(search.toLowerCase()))
+        ),
+        [candidates, filterStatus, search]
+    );
+
+    if (loading) return (
+        <div className="p-4 md:p-8 space-y-6 animate-pulse">
+            <div className="h-12 bg-black/5 rounded-2xl w-64" />
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                {[1,2,3,4,5,6].map(i => <div key={i} className="h-48 bg-black/5 rounded-[24px]" />)}
+            </div>
+        </div>
+    );
 
     return (
-        <div className="p-4 md:p-8 space-y-6 md:space-y-10 anime-fade-in font-sans pb-20 text-left h-full">
-            {/* 1. Header */}
-            <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 border-b-[2px] border-black pb-6 md:pb-8">
-                <div className="space-y-1">
-                    <h2 className="text-2xl md:text-4xl font-black text-black leading-none uppercase tracking-tighter">Talent Pool .</h2>
-                    <p className="text-[8px] md:text-[10px] font-black text-nile-blue/50 uppercase tracking-[0.2em] flex items-center">
-                        NILE GRADUATE RECRUITMENT <Target size={14} className="ml-2 text-nile-green" />
-                    </p>
+        <div className="p-4 md:p-8 space-y-8 anime-fade-in font-sans pb-20 text-left min-h-full">
+
+            {/* Header */}
+            <div className="border-b-[2px] border-black pb-6">
+                <h2 className="text-3xl md:text-5xl font-black text-black uppercase leading-none tracking-tighter">Talent Pool .</h2>
+                <p className="text-[9px] font-black text-black/40 uppercase tracking-[0.2em] mt-1">
+                    {candidates.length} UNIQUE CANDIDATES · ALL APPLIED TO YOUR LISTINGS
+                </p>
+            </div>
+
+            {/* Filters */}
+            <div className="flex flex-col md:flex-row gap-3">
+                <div className="relative flex-1">
+                    <Search size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-black/30" />
+                    <input type="text" value={search} onChange={e => setSearch(e.target.value)}
+                        placeholder="SEARCH BY NAME, MAJOR OR ROLE..."
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border-[2px] border-black font-black text-[9px] tracking-widest uppercase outline-none focus:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] bg-nile-white/60 focus:bg-white transition-all" />
                 </div>
-                
-                <div className="flex bg-white p-1 border-[2px] border-black rounded-xl shadow-sm w-full md:w-auto overflow-x-auto no-scrollbar">
-                    {(['recommended', 'saved', 'all'] as const).map(t => (
-                        <button
-                            key={t}
-                            onClick={() => setTab(t)}
-                            className={`flex-1 md:flex-none px-4 md:px-6 py-2 rounded-lg font-black text-[8px] md:text-[9px] tracking-widest uppercase transition-all whitespace-nowrap
-                                ${tab === t ? 'bg-black text-white shadow-[2px_2px_0px_0px_#6CBB56]' : 'text-black/40 hover:text-black'}
-                            `}
-                        >
-                            {t}
+                <div className="flex bg-white p-1 border-[2px] border-black rounded-xl gap-0.5 overflow-x-auto">
+                    {(['all', 'applied', 'screening', 'interview', 'offer', 'rejected'] as FilterStatus[]).map(f => (
+                        <button key={f} onClick={() => setFilterStatus(f)}
+                            className={`px-2.5 py-1.5 rounded-lg font-black text-[7px] uppercase tracking-wider transition-all whitespace-nowrap
+                                ${filterStatus === f ? 'bg-black text-white' : 'text-black/40 hover:text-black'}`}>
+                            {f}
                         </button>
                     ))}
                 </div>
             </div>
 
-            {/* 2. Search & Filter */}
-            <div className="flex flex-col md:flex-row gap-4">
-                 <div className="flex-1 relative group w-full">
-                    <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-black/30 group-focus-within:text-black transition-colors" />
-                    <input 
-                        type="text" 
-                        placeholder="FILTER BY SKILLS, MAJOR..." 
-                        className="w-full pl-11 pr-4 py-3 md:py-3.5 rounded-xl border-[2px] border-black font-black text-[9px] tracking-widest uppercase outline-none focus:bg-white focus:shadow-[4px_4px_0px_0px_#1E499D] transition-all bg-nile-white/40 placeholder:text-black/20"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
+            {/* Candidates grid */}
+            {filtered.length === 0 ? (
+                <div className="py-24 text-center border-[2px] border-dashed border-black/10 rounded-[32px]">
+                    <Users size={32} className="text-black/15 mx-auto mb-4" />
+                    <p className="text-[9px] font-black text-black/30 uppercase tracking-[0.2em]">
+                        {search ? 'No candidates match your search' : applications.length === 0 ? 'No candidates yet — post jobs to attract talent' : `No ${filterStatus} candidates`}
+                    </p>
                 </div>
-                <Button variant="outline" size="sm" className="hidden sm:flex">
-                     <Filter size={14} className="mr-2" /> FILTERS
-                </Button>
-            </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {filtered.map(c => (
+                        <CandidateCard key={c.student_id} candidate={c} onMessage={() => navigate('/employer/messages')} />
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};
 
-            {/* 3. Talent Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {candidates.map(candidate => (
-                    <div key={candidate.id} className="group relative bg-white border-[2px] border-black rounded-[20px] md:rounded-[24px] p-5 md:p-6 transition-all hover:translate-y-[-2px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col">
-                        
-                        <div className="flex justify-between items-start mb-6">
-                            <div className="flex items-center space-x-3 min-w-0">
-                                <Avatar name={candidate.name} size="md" />
-                                <div className="min-w-0">
-                                    <h3 className="text-base md:text-lg font-black text-black uppercase tracking-tight leading-none mb-1 truncate">{candidate.name}</h3>
-                                    <div className="flex flex-wrap items-center gap-2">
-                                        <span className="text-[7px] md:text-[8px] font-black text-nile-blue/50 uppercase truncate">{candidate.major}</span>
-                                        <span className="text-[7px] md:text-[8px] font-black text-nile-green uppercase">{candidate.level}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="bg-nile-green text-black px-1.5 md:px-2 py-0.5 md:py-1 rounded-lg border border-black shadow-[2px_2px_0px_0px_#000] text-[6px] md:text-[8px] font-black flex-shrink-0">
-                                {candidate.match}% MATCH
-                            </div>
-                        </div>
+const CandidateCard = ({ candidate, onMessage }: {
+    candidate: EmployerApplication & { jobs: string[] };
+    onMessage: () => void;
+}) => {
+    const badge = statusBadge[candidate.status] || 'bg-black/5 text-black/40 border-black/10';
+    const initials = (candidate.student_name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
 
-                        <div className="space-y-4 flex-1">
-                            <div className="grid grid-cols-2 gap-4 pb-4 border-b border-dashed border-black/10">
-                                <div className="text-left">
-                                    <p className="text-[6px] md:text-[7px] font-black text-black/30 uppercase tracking-widest">GPA</p>
-                                    <p className="text-xs md:text-sm font-black text-black">{candidate.stats.gpa}<span className="text-[8px] md:text-[9px] text-black/30"> / 4.0</span></p>
-                                </div>
-                                <div className="text-left">
-                                    <p className="text-[6px] md:text-[7px] font-black text-black/30 uppercase tracking-widest">PROJECTS</p>
-                                    <p className="text-xs md:text-sm font-black text-black">{candidate.stats.projects}+</p>
-                                </div>
-                            </div>
-
-                            <div className="space-y-2 text-left">
-                                <p className="text-[6px] md:text-[7px] font-black text-black/20 uppercase tracking-widest">SKILLS</p>
-                                <div className="flex flex-wrap gap-1">
-                                    {candidate.skills.slice(0, 3).map(s => (
-                                        <span key={s} className="px-1.5 md:px-2 py-0.5 md:py-1 bg-nile-white border border-black/10 rounded-md text-[6px] md:text-[7px] font-black text-black uppercase truncate">{s}</span>
-                                    ))}
-                                    {candidate.skills.length > 3 && <span className="text-[6px] md:text-[7px] font-black text-black/20 self-center">+{candidate.skills.length - 3}</span>}
-                                </div>
-                            </div>
-
-                            <div className="flex items-center space-x-3 md:space-x-4 text-[7px] md:text-[8px] font-black text-black/30 uppercase pt-4 border-t border-black/5">
-                                <span className="flex items-center"><MapPin size={10} className="mr-1 text-nile-green" /> {candidate.location}</span>
-                                <span className="flex items-center"><Zap size={10} className="mr-1 text-nile-blue" /> TOP 5%</span>
-                            </div>
-                        </div>
-
-                        {/* Professional Actions */}
-                        <div className="mt-8 flex flex-col gap-2">
-                             <Button size="sm" fullWidth onClick={() => handleAction(candidate.name, 'Contact')}>
-                                 INTERVIEW <ArrowUpRight size={14} className="ml-1" />
-                             </Button>
-                             <Button variant="outline" size="sm" fullWidth onClick={() => navigate(`/employer/candidates/${candidate.id}`)}>
-                                 DETAILS <ExternalLink size={12} className="ml-1" />
-                             </Button>
-                        </div>
+    return (
+        <div className="bg-white border-[2px] border-black rounded-[24px] p-5 flex flex-col gap-4 hover:translate-y-[-2px] shadow-[3px_3px_0px_0px_rgba(0,0,0,0.1)] hover:shadow-[4px_4px_0px_0px_rgba(30,73,157,0.4)] transition-all">
+            <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-nile-blue text-white rounded-2xl flex items-center justify-center font-black text-base flex-shrink-0">
+                        {initials}
                     </div>
-                ))}
+                    <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
+                            <p className="font-black text-sm uppercase text-black truncate leading-none">{candidate.student_name}</p>
+                            {candidate.is_verified && <CheckCircle2 size={11} className="text-nile-green flex-shrink-0" strokeWidth={3} />}
+                        </div>
+                        <span className={`text-[7px] font-black px-2 py-0.5 rounded-full border uppercase ${badge}`}>
+                            {candidate.status}
+                        </span>
+                    </div>
+                </div>
             </div>
 
-            {/* Load more */}
-            <div className="pt-6 md:pt-10">
-                <button className="w-full py-8 md:py-12 border-[2px] border-dashed border-black/5 rounded-[24px] md:rounded-[32px] text-[8px] md:text-[10px] font-black text-nile-blue/20 hover:border-black/20 hover:text-black/40 transition-all uppercase tracking-[0.2em]">
-                    Syncing Additional Profiles ...
+            <div className="space-y-2 text-[8px] font-black text-black/50 uppercase">
+                {candidate.major && (
+                    <div className="flex items-center gap-2">
+                        <GraduationCap size={11} className="text-nile-blue flex-shrink-0" />
+                        <span className="truncate">{candidate.major}</span>
+                        {candidate.graduation_year > 0 && <span className="text-black/30">· {candidate.graduation_year}</span>}
+                    </div>
+                )}
+                <div className="flex items-start gap-2">
+                    <Briefcase size={11} className="text-nile-green flex-shrink-0 mt-0.5" />
+                    <span className="truncate">{candidate.jobs.slice(0, 2).join(', ')}{candidate.jobs.length > 2 ? ` +${candidate.jobs.length - 2}` : ''}</span>
+                </div>
+            </div>
+
+            <div className="flex gap-2 mt-auto">
+                <button onClick={onMessage}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 border-[2px] border-black rounded-xl font-black text-[8px] uppercase hover:bg-black hover:text-white transition-all">
+                    <MessageSquare size={12} /> MESSAGE
+                </button>
+                <button className="p-2.5 border-[2px] border-black rounded-xl text-black/40 hover:border-nile-blue hover:text-nile-blue transition-all">
+                    <ArrowUpRight size={14} />
                 </button>
             </div>
         </div>

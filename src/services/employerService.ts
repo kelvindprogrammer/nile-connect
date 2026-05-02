@@ -20,6 +20,20 @@ export interface EmployerProfile {
     website: string; linkedin: string; status: string;
 }
 
+export interface EmployerApplication {
+    id: string;
+    student_id: string;
+    student_name: string;
+    student_email: string;
+    major: string;
+    graduation_year: number;
+    is_verified: boolean;
+    job_id: string;
+    job_title: string;
+    status: string;
+    applied_at: string | null;
+}
+
 export const getEmployerProfile = async (): Promise<EmployerProfile> => {
     const { data } = await apiClient.get<ApiEnvelope<EmployerProfile>>('/api/employer/profile');
     return data.data;
@@ -47,4 +61,13 @@ export const updateJob = async (id: string, payload: Partial<CreateJobRequest>):
 
 export const deleteJob = async (id: string): Promise<void> => {
     await apiClient.delete(`/api/employer/jobs?id=${id}`);
+};
+
+export const getEmployerApplications = async (): Promise<EmployerApplication[]> => {
+    const { data } = await apiClient.get<ApiEnvelope<{ applications: EmployerApplication[] }>>('/api/employer/applications');
+    return data.data.applications ?? [];
+};
+
+export const updateApplicationStatus = async (appId: string, status: string): Promise<void> => {
+    await apiClient.put(`/api/employer/applications?id=${appId}`, { status });
 };

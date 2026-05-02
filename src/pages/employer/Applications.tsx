@@ -1,190 +1,178 @@
-import React, { useState, useEffect } from 'react';
-import { FileText, Mail, Phone, MessageSquare, ChevronRight, UserCheck, UserX, Clock, Filter, Search } from 'lucide-react';
-import Card from '../../components/Card';
-import Button from '../../components/Button';
-import Avatar from '../../components/Avatar';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+    Search, CheckCircle2, Loader2, ClipboardList,
+    MessageSquare, GraduationCap, ChevronDown,
+} from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
+import {
+    getEmployerApplications, updateApplicationStatus, EmployerApplication,
+} from '../../services/employerService';
 
-interface Applicant {
-    id: number;
-    name: string;
-    major: string;
-    appliedDate: string;
-    status: 'APPLIED' | 'SCREENING' | 'INTERVIEW' | 'OFFER' | 'REJECTED';
-    score: number;
-}
+type Filter = 'all' | 'applied' | 'screening' | 'interview' | 'offer' | 'rejected';
 
-const mockApplicants: Applicant[] = [
-    { id: 1, name: 'Grace Stanley', major: 'Computer Science', appliedDate: '2d ago', status: 'SCREENING', score: 98 },
-    { id: 2, name: 'Michael Brown', major: 'Mechanical Engineering', appliedDate: '2d ago', status: 'APPLIED', score: 85 },
-    { id: 3, name: 'Aishat Yusuf', major: 'Business Admin', appliedDate: '3d ago', status: 'INTERVIEW', score: 92 },
-    { id: 4, name: 'Ibrahim Musa', major: 'Information Tech', appliedDate: '4d ago', status: 'APPLIED', score: 88 },
-];
+const statusConfig: Record<string, { color: string }> = {
+    applied:   { color: 'bg-nile-blue/10 text-nile-blue border-nile-blue/20' },
+    screening: { color: 'bg-purple-50 text-purple-600 border-purple-200' },
+    interview: { color: 'bg-orange-50 text-orange-500 border-orange-200' },
+    offer:     { color: 'bg-nile-green/20 text-nile-green border-nile-green/30' },
+    rejected:  { color: 'bg-red-50 text-red-500 border-red-200' },
+};
+
+const FILTERS: Filter[] = ['all', 'applied', 'screening', 'interview', 'offer', 'rejected'];
 
 const EmployerApplications = () => {
+    const navigate = useNavigate();
     const { showToast } = useToast();
-    const [activeJobId, setActiveJobId] = useState(1);
-    const [applicants, setApplicants] = useState<Applicant[]>(mockApplicants);
-    const [isLoading, setIsLoading] = useState(true);
+    const [applications, setApplications] = useState<EmployerApplication[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [filter, setFilter] = useState<Filter>('all');
+    const [search, setSearch] = useState('');
+    const [actionLoading, setActionLoading] = useState<Record<string, boolean>>({});
 
-    useEffect(() => {
-        const timer = setTimeout(() => setIsLoading(false), 800);
-        return () => clearTimeout(timer);
-    }, [activeJobId]);
+    const load = useCallback(async () => {
+        setLoading(true);
+        try { setApplications(await getEmployerApplications()); }
+        catch { showToast('Failed to load applications.', 'error'); }
+        finally { setLoading(false); }
+    }, [showToast]);
 
-    const handleStatusChange = (id: number, newStatus: Applicant['status']) => {
-        setApplicants(prev => prev.map(a => a.id === id ? { ...a, status: newStatus } : a));
-        showToast(`Candidate status updated to ${newStatus}`, 'success');
+    useEffect(() => { load(); }, [load]);
+
+    const handleStatusChange = async (app: EmployerApplication, newStatus: string) => {
+        setActionLoading(p => ({ ...p, [app.id]: true }));
+        try {
+            await updateApplicationStatus(app.id, newStatus);
+            setApplications(p => p.map(a => a.id === app.id ? { ...a, status: newStatus } : a));
+            showToast(`${app.student_name} moved to ${newStatus}.`, 'success');
+        } catch {
+            showToast('Update failed.', 'error');
+        } finally {
+            setActionLoading(p => ({ ...p, [app.id]: false }));
+        }
     };
 
-    const stats = [
-        { label: 'APPLIED', count: applicants.filter(a => a.status === 'APPLIED').length + 14 },
-        { label: 'SCREENING', count: applicants.filter(a => a.status === 'SCREENING').length + 5 },
-        { label: 'INTERVIEW', count: applicants.filter(a => a.status === 'INTERVIEW').length + 2 },
-        { label: 'OFFER', count: 1 },
-    ];
+    const filtered = useMemo(() => applications
+        .filter(a => filter === 'all' || a.status === filter)
+        .filter(a => !search ||
+            (a.student_name || '').toLowerCase().includes(search.toLowerCase()) ||
+            (a.job_title || '').toLowerCase().includes(search.toLowerCase()) ||
+            (a.major || '').toLowerCase().includes(search.toLowerCase())
+        ),
+        [applications, filter, search]
+    );
 
-    if (isLoading) {
-        return (
-            <div className="p-8 space-y-8 animate-pulse text-left h-full">
-                <div className="h-20 bg-black/5 rounded-2xl w-1/3"></div>
-                <div className="grid grid-cols-4 gap-6">
-                    {[1,2,3,4].map(i => <div key={i} className="h-24 bg-black/5 rounded-2xl"></div>)}
-                </div>
-                <div className="space-y-4">
-                    {[1,2,3,4].map(i => <div key={i} className="h-20 bg-black/5 rounded-3xl"></div>)}
-                </div>
-            </div>
-        );
-    }
+    const countFor = (f: Filter) => f === 'all' ? applications.length : applications.filter(a => a.status === f).length;
+
+    if (loading) return (
+        <div className="p-4 md:p-8 space-y-6 animate-pulse">
+            <div className="h-12 bg-black/5 rounded-2xl w-64" />
+            <div className="flex gap-2">{FILTERS.map(f => <div key={f} className="h-9 bg-black/5 rounded-xl w-24" />)}</div>
+            {[1,2,3,4].map(i => <div key={i} className="h-24 bg-black/5 rounded-[20px]" />)}
+        </div>
+    );
 
     return (
-        <div className="p-8 space-y-10 anime-fade-in font-sans pb-20 text-left h-full">
-            {/* 1. Header & Job Navigator */}
-            <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 border-b-[2px] border-black pb-8">
-                <div className="space-y-1">
-                    <h2 className="text-4xl font-black text-black leading-none uppercase tracking-tighter">Applications Board .</h2>
-                    <p className="text-[10px] font-black text-nile-blue/50 uppercase tracking-[0.2em]">REVIEW CANDIDATE PIPELINES & TALENT</p>
-                </div>
-                
-                <div className="flex bg-white p-1 border-[2px] border-black rounded-2xl shadow-sm">
-                    {[{ id: 1, label: 'SOFTWARE ENGR' }, { id: 2, label: 'DATA ANALYST' }].map(job => (
-                        <button
-                            key={job.id}
-                            onClick={() => setActiveJobId(job.id)}
-                            className={`px-6 py-2.5 rounded-xl font-black text-[9px] tracking-widest uppercase transition-all
-                                ${activeJobId === job.id ? 'bg-black text-white' : 'text-black/40 hover:text-black'}
-                            `}
-                        >
-                            {job.label}
-                        </button>
-                    ))}
-                </div>
+        <div className="p-4 md:p-8 space-y-8 anime-fade-in font-sans pb-20 text-left min-h-full">
+            <div className="border-b-[2px] border-black pb-6">
+                <h2 className="text-3xl md:text-5xl font-black text-black uppercase leading-none tracking-tighter">Applications .</h2>
+                <p className="text-[9px] font-black text-black/40 uppercase tracking-[0.2em] mt-1">
+                    {applications.length} TOTAL · {applications.filter(a => a.status === 'applied').length} NEW · MANAGE YOUR PIPELINE
+                </p>
             </div>
 
-            {/* 2. Professional Pipeline Overview */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                {stats.map((s) => (
-                    <Card key={s.label} variant="flat" className="p-6 border-[2px] border-black shadow-[4px_4px_0px_0px_rgba(30,73,157,1)] text-center flex flex-col justify-center items-center group hover:bg-black hover:text-white transition-all cursor-default">
-                        <p className="text-3xl font-black leading-none group-hover:scale-110 transition-transform">{s.count}</p>
-                        <p className="text-[9px] font-black uppercase tracking-widest mt-2">{s.label}</p>
-                    </Card>
+            <div className="flex bg-white p-1 border-[2px] border-black rounded-2xl shadow-sm overflow-x-auto">
+                {FILTERS.map(f => (
+                    <button key={f} onClick={() => setFilter(f)}
+                        className={`flex items-center gap-1.5 px-3 md:px-5 py-2 rounded-xl font-black text-[8px] tracking-widest uppercase transition-all whitespace-nowrap flex-shrink-0
+                            ${filter === f ? 'bg-black text-white shadow-[2px_2px_0px_0px_#6CBB56]' : 'text-black/40 hover:text-black'}`}>
+                        {f.toUpperCase()}
+                        <span className={`text-[7px] px-1.5 py-0.5 rounded-full font-black ${filter === f ? 'bg-white/20 text-white' : 'bg-black/5 text-black/40'}`}>
+                            {countFor(f)}
+                        </span>
+                    </button>
                 ))}
             </div>
 
-            {/* 3. Applicant Management */}
-            <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
-                
-                {/* Left: Applicant List */}
-                <div className="xl:col-span-8 space-y-6">
-                    <div className="flex items-center justify-between px-2">
-                        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center">
-                            <Filter size={14} className="mr-2 text-nile-blue" /> CANDIDATE LIST
-                        </h3>
-                        <div className="relative">
-                            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-black/30" />
-                            <input type="text" placeholder="FILTER..." className="pl-9 pr-4 py-2 border-[2px] border-black rounded-lg bg-nile-white text-[9px] font-black uppercase tracking-widest outline-none focus:bg-white" />
-                        </div>
-                    </div>
-
-                    <div className="space-y-4">
-                        {applicants.map((a) => (
-                            <div key={a.id} className="bg-white border-[2px] border-black rounded-[24px] p-5 flex flex-col md:flex-row items-center justify-between transition-all hover:translate-y-[-2px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                                <div className="flex items-center space-x-4">
-                                    <Avatar name={a.name} size="sm" />
-                                    <div>
-                                        <div className="flex items-center space-x-3 mb-1">
-                                            <h4 className="text-sm font-black text-black uppercase">{a.name}</h4>
-                                            <span className="text-[8px] font-black px-2 py-0.5 rounded border border-black/10 bg-nile-blue/5 text-nile-blue uppercase">{a.status}</span>
-                                        </div>
-                                        <p className="text-[9px] font-black text-black/30 uppercase tracking-widest">
-                                            {a.major} • {a.appliedDate} • AI SCORE: <span className="text-nile-green">{a.score}</span>
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="mt-6 md:mt-0 flex space-x-3">
-                                    {a.status === 'APPLIED' && (
-                                        <Button size="xs" onClick={() => handleStatusChange(a.id, 'SCREENING')}>SHORTLIST</Button>
-                                    )}
-                                    {a.status === 'SCREENING' && (
-                                        <Button size="xs" variant="secondary" onClick={() => handleStatusChange(a.id, 'INTERVIEW')}>SCHEDULE</Button>
-                                    )}
-                                    {a.status === 'INTERVIEW' && (
-                                        <Button size="xs" variant="primary" onClick={() => handleStatusChange(a.id, 'OFFER')}>EXTEND OFFER</Button>
-                                    )}
-                                    <Button size="xs" variant="outline">RESUME</Button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Right: Administrative Support */}
-                <div className="xl:col-span-4 space-y-8">
-                     <Card title="RECRUITER SUPPORT" className="text-left">
-                        <div className="flex items-center space-x-4 mb-6">
-                            <div className="w-12 h-12 bg-black text-white rounded-xl flex items-center justify-center border-2 border-black">
-                                <Mail size={24} />
-                            </div>
-                            <div>
-                                <h4 className="text-xs font-black uppercase text-black leading-none">Sarah Jenkins</h4>
-                                <p className="text-[8px] font-bold text-nile-blue/40 uppercase mt-1 tracking-widest">Placement Director</p>
-                            </div>
-                        </div>
-                        <p className="text-[10px] font-bold text-nile-blue/60 leading-relaxed uppercase mb-6">
-                            "Having issues with a candidate profile or technical assessment integration? We are here to help."
-                        </p>
-                        <div className="space-y-3">
-                            <Button fullWidth onClick={() => showToast('Connecting to staff chat...', 'success')}>
-                                <MessageSquare size={14} className="mr-2" /> MESSAGE STAFF
-                            </Button>
-                            <Button fullWidth variant="outline">
-                                <Phone size={14} className="mr-2" /> CALL CAREER SVC
-                            </Button>
-                        </div>
-                     </Card>
-
-                     <Card title="QUICK METRICS">
-                        <div className="space-y-6">
-                            {[
-                                { label: 'GENDER BALANCE', val: 55 },
-                                { label: 'DEPT DIVERSITY', val: 78 },
-                                { label: 'AVG. TEST SCORE', val: 92 },
-                            ].map((m) => (
-                                <div key={m.label} className="space-y-2">
-                                    <div className="flex justify-between text-[8px] font-black uppercase tracking-widest">
-                                        <span>{m.label}</span>
-                                        <span className="text-nile-blue">{m.val}%</span>
-                                    </div>
-                                    <div className="h-2 bg-nile-white border-[1px] border-black/10 rounded-full overflow-hidden">
-                                        <div className="h-full bg-nile-green" style={{ width: `${m.val}%` }} />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                     </Card>
-                </div>
+            <div className="relative">
+                <Search size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-black/30" />
+                <input type="text" value={search} onChange={e => setSearch(e.target.value)}
+                    placeholder="SEARCH BY NAME, JOB OR MAJOR..."
+                    className="w-full pl-10 pr-4 py-3 rounded-xl border-[2px] border-black font-black text-[9px] tracking-widest uppercase outline-none focus:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] bg-nile-white/60 focus:bg-white transition-all" />
             </div>
+
+            {filtered.length === 0 ? (
+                <div className="py-20 text-center border-[2px] border-dashed border-black/10 rounded-[28px]">
+                    <ClipboardList size={28} className="text-black/15 mx-auto mb-4" />
+                    <p className="text-[9px] font-black text-black/30 uppercase tracking-[0.2em]">
+                        {search ? 'No matches' : filter === 'all' ? 'No applications yet — post jobs to attract talent' : `No ${filter} applications`}
+                    </p>
+                </div>
+            ) : (
+                <div className="space-y-3">
+                    {filtered.map(app => (
+                        <div key={app.id} className="bg-white border-[2px] border-black rounded-[20px] p-4 md:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all">
+                            <div className="w-10 h-10 bg-nile-blue text-white rounded-xl flex items-center justify-center font-black text-sm flex-shrink-0">
+                                {(app.student_name || '?').charAt(0).toUpperCase()}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <div className="flex flex-wrap items-center gap-2 mb-1">
+                                    <p className="font-black text-sm uppercase text-black truncate">{app.student_name}</p>
+                                    {app.is_verified && (
+                                        <span className="flex items-center gap-1 text-[7px] font-black text-nile-green bg-nile-green/10 px-2 py-0.5 rounded-full border border-nile-green/20">
+                                            <CheckCircle2 size={8} strokeWidth={3} /> VERIFIED
+                                        </span>
+                                    )}
+                                </div>
+                                <p className="text-[9px] font-black text-nile-blue uppercase truncate">{app.job_title}</p>
+                                <div className="flex flex-wrap gap-3 mt-1">
+                                    {app.major && (
+                                        <span className="flex items-center gap-1 text-[7px] font-black text-black/40 uppercase">
+                                            <GraduationCap size={9} />{app.major}
+                                        </span>
+                                    )}
+                                    {app.graduation_year > 0 && (
+                                        <span className="text-[7px] font-black text-black/30 uppercase">CLASS OF {app.graduation_year}</span>
+                                    )}
+                                    {app.applied_at && (
+                                        <span className="text-[7px] font-black text-black/20 uppercase">
+                                            {new Date(app.applied_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2 w-full sm:w-auto flex-shrink-0">
+                                <button onClick={() => navigate('/employer/messages')}
+                                    className="p-2 border-[2px] border-black/10 rounded-xl text-black/40 hover:border-black hover:text-nile-blue transition-all">
+                                    <MessageSquare size={14} />
+                                </button>
+                                <StatusSelect current={app.status} loading={!!actionLoading[app.id]} onChange={s => handleStatusChange(app, s)} />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};
+
+const StatusSelect = ({ current, loading, onChange }: {
+    current: string; loading: boolean; onChange: (s: string) => void;
+}) => {
+    const cfg = statusConfig[current] || { color: 'bg-black/5 text-black/40 border-black/10' };
+    return loading ? (
+        <div className={`flex items-center gap-2 px-3 py-2 border-[2px] rounded-xl font-black text-[8px] uppercase ${cfg.color}`}>
+            <Loader2 size={11} className="animate-spin" /> ...
+        </div>
+    ) : (
+        <div className="relative">
+            <select value={current} onChange={e => onChange(e.target.value)}
+                className={`appearance-none pl-3 pr-8 py-2 border-[2px] rounded-xl font-black text-[8px] uppercase tracking-wider cursor-pointer outline-none ${cfg.color} border-current`}>
+                {['applied', 'screening', 'interview', 'offer', 'rejected'].map(o => (
+                    <option key={o} value={o}>{o.toUpperCase()}</option>
+                ))}
+            </select>
+            <ChevronDown size={10} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
         </div>
     );
 };
