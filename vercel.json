@@ -21,6 +21,7 @@
     { "source": "/api/auth/forgot-password",    "destination": "/api/auth?path=forgot-password" },
     { "source": "/api/auth/reset-password",     "destination": "/api/auth?path=reset-password" },
     { "source": "/api/auth/seed-demo",          "destination": "/api/auth?path=seed-demo" },
+    { "source": "/api/auth/delete-account",     "destination": "/api/auth?path=delete-account" },
 
     { "source": "/api/student/profile",         "destination": "/api/student?path=profile" },
     { "source": "/api/student/applications",    "destination": "/api/student?path=applications" },

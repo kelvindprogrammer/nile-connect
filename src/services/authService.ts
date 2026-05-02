@@ -45,3 +45,7 @@ export const completeStudentProfile = async (req: ProfileCompletionRequest): Pro
     const { data } = await apiClient.post<ApiEnvelope<AuthResponse>>('/api/auth/profile/complete', req);
     return data.data;
 };
+
+export const deleteAccount = async (): Promise<void> => {
+    await apiClient.post('/api/auth/delete-account');
+};

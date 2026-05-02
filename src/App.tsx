@@ -45,6 +45,7 @@ import StaffCRMManager    from './pages/staff/CRMManager';
 import StaffEvents        from './pages/staff/Events';
 import StaffJobs          from './pages/staff/Jobs';
 import StaffServices      from './pages/staff/Services';
+import StaffReports       from './pages/staff/Reports';
 import StaffProfile       from './pages/staff/Profile';
 import StaffMessages      from './pages/staff/Messages';
 import StaffSettings      from './pages/staff/Settings';
@@ -115,6 +116,7 @@ const App = () => (
                         <Route path="crm"          element={<StaffCRMManager />} />
                         <Route path="jobs"         element={<StaffJobs />} />
                         <Route path="services"     element={<StaffServices />} />
+                        <Route path="reports"      element={<StaffReports />} />
                         <Route path="profile"      element={<StaffProfile />} />
                         <Route path="messages"     element={<StaffMessages />} />
                         <Route path="settings"     element={<StaffSettings />} />

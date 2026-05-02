@@ -38,6 +38,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		resetPassword(w, r)
 	case "seed-demo":
 		seedDemo(w, r)
+	case "delete-account":
+		deleteAccount(w, r)
 	default:
 		respond.Error(w, http.StatusNotFound, "not found")
 	}
@@ -467,6 +469,31 @@ func resetPassword(w http.ResponseWriter, r *http.Request) {
 func isEduEmail(email string) bool {
 	lower := strings.ToLower(email)
 	return strings.HasSuffix(lower, ".edu") || strings.HasSuffix(lower, ".edu.ng")
+}
+
+// ── delete account ────────────────────────────────────────────────────────────
+
+func deleteAccount(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost && r.Method != http.MethodDelete {
+		respond.Error(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+	auth, err := mw.Auth(r)
+	if err != nil {
+		respond.Error(w, http.StatusUnauthorized, "authentication required")
+		return
+	}
+	database, err := db.Get()
+	if err != nil {
+		respond.Error(w, http.StatusInternalServerError, "database unavailable")
+		return
+	}
+	// Soft-delete: set deleted_at so existing rows are kept for audit
+	if err := database.Model(&models.User{}).Where("id = ?", auth.UserID).Update("deleted_at", time.Now()).Error; err != nil {
+		respond.Error(w, http.StatusInternalServerError, "could not delete account")
+		return
+	}
+	respond.OK(w, map[string]string{"message": "Account deleted successfully"})
 }
 
 // ── seed demo accounts ────────────────────────────────────────────────────────

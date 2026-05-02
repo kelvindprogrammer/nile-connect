@@ -49,6 +49,56 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	switch r.Method {
+	case http.MethodDelete:
+		auth, err := mw.Auth(r)
+		if err != nil || auth.Role != "staff" {
+			respond.Error(w, http.StatusForbidden, "staff access required")
+			return
+		}
+		eventID := r.URL.Query().Get("id")
+		if eventID == "" {
+			respond.Error(w, http.StatusBadRequest, "event id required as ?id=")
+			return
+		}
+		database.Where("id = ?", eventID).Delete(&models.Event{})
+		respond.OK(w, map[string]string{"message": "event deleted"})
+
+	case http.MethodPut:
+		auth, err := mw.Auth(r)
+		if err != nil || auth.Role != "staff" {
+			respond.Error(w, http.StatusForbidden, "staff access required")
+			return
+		}
+		eventID := r.URL.Query().Get("id")
+		if eventID == "" {
+			respond.Error(w, http.StatusBadRequest, "event id required as ?id=")
+			return
+		}
+		var req struct {
+			Status     *string `json:"status"`
+			IsFeatured *bool   `json:"is_featured"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			respond.Error(w, http.StatusBadRequest, "invalid request body")
+			return
+		}
+		updates := map[string]any{}
+		if req.Status != nil {
+			allowed := map[string]bool{"pending": true, "published": true, "cancelled": true}
+			if !allowed[*req.Status] {
+				respond.Error(w, http.StatusBadRequest, "invalid status")
+				return
+			}
+			updates["status"] = *req.Status
+		}
+		if req.IsFeatured != nil {
+			updates["is_featured"] = *req.IsFeatured
+		}
+		if len(updates) > 0 {
+			database.Model(&models.Event{}).Where("id = ?", eventID).Updates(updates)
+		}
+		respond.OK(w, map[string]string{"message": "event updated"})
+
 	case http.MethodGet:
 		var events []models.Event
 		if err := database.Where("deleted_at IS NULL").Order("date asc").Find(&events).Error; err != nil {

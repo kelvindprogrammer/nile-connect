@@ -32,7 +32,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	case "applications":
 		staffApplications(w, r)
 	case "jobs":
-		staffJobs(w, r)
+		staffJobs(w, r, auth.UserID)
 	case "employers":
 		staffEmployers(w, r)
 	case "students":
@@ -124,7 +124,7 @@ func staffApplications(w http.ResponseWriter, r *http.Request) {
 
 // ── jobs ──────────────────────────────────────────────────────────────────────
 
-func staffJobs(w http.ResponseWriter, r *http.Request) {
+func staffJobs(w http.ResponseWriter, r *http.Request, staffUserID string) {
 	database, err := db.Get()
 	if err != nil {
 		respond.Error(w, http.StatusInternalServerError, "database unavailable")
@@ -156,6 +156,45 @@ func staffJobs(w http.ResponseWriter, r *http.Request) {
 			result = append(result, s)
 		}
 		respond.OK(w, map[string]any{"jobs": result})
+
+	case http.MethodPost:
+		var req struct {
+			Title        string `json:"title"`
+			Type         string `json:"type"`
+			Location     string `json:"location"`
+			Salary       string `json:"salary"`
+			Description  string `json:"description"`
+			Requirements string `json:"requirements"`
+			Skills       string `json:"skills"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			respond.Error(w, http.StatusBadRequest, "invalid request body")
+			return
+		}
+		if req.Title == "" || req.Location == "" || req.Description == "" {
+			respond.Error(w, http.StatusBadRequest, "title, location and description are required")
+			return
+		}
+		jobType := req.Type
+		if jobType == "" {
+			jobType = "full-time"
+		}
+		job := models.Job{
+			EmployerID:   staffUserID,
+			Title:        req.Title,
+			Type:         jobType,
+			Location:     req.Location,
+			Salary:       req.Salary,
+			Description:  req.Description,
+			Requirements: req.Requirements,
+			Skills:       req.Skills,
+			Status:       "active",
+		}
+		if err := database.Create(&job).Error; err != nil {
+			respond.Error(w, http.StatusInternalServerError, "could not create job")
+			return
+		}
+		respond.OK(w, map[string]string{"message": "job posted", "id": job.ID})
 
 	case http.MethodPut:
 		jobID := r.URL.Query().Get("id")
