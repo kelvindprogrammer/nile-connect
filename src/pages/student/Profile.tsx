@@ -28,7 +28,7 @@ interface ApiEnvelope<T> { data: T; }
 const Profile = () => {
     const navigate = useNavigate();
     const { user, logout } = useAuth();
-    const { profile } = useProfile();
+    const { profile } = useProfile(user?.id);
     const { picture: profilePic } = useProfilePicture();
     const [apiProfile, setApiProfile] = useState<StudentProfile | null>(null);
     const [isLoading, setIsLoading] = useState(true);

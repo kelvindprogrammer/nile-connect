@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { 
     Home, 
     Briefcase, 
@@ -56,6 +56,9 @@ const EmployerLayout = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { user, logout } = useAuth();
+
+    // Auth guard: redirect to login if not authenticated
+    if (!user) return <Navigate to="/login" replace />;
     const [showNotifications, setShowNotifications] = useState(false);
     const [progress, setProgress] = useState(0);
 
@@ -64,7 +67,7 @@ const EmployerLayout = () => {
 
     const handleLogout = () => {
         logout();
-        navigate('/login');
+        navigate('/login', { replace: true });
     };
 
     useEffect(() => {

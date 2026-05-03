@@ -67,7 +67,7 @@ const Ring = ({ pct, size = 64 }: { pct: number; size?: number }) => {
 const StudentDashboard = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
-    const { profile } = useProfile();
+    const { profile } = useProfile(user?.id);
     const { picture, uploadPicture } = useProfilePicture();
     const { showToast } = useToast();
 

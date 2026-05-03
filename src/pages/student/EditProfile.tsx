@@ -19,7 +19,7 @@ const EditProfile = () => {
     const navigate = useNavigate();
     const { user, login } = useAuth();
     const { showToast } = useToast();
-    const { profile, updateProfile } = useProfile();
+    const { profile, updateProfile } = useProfile(user?.id);
     const { picture, uploadPicture, removePicture } = useProfilePicture();
     const picInputRef = useRef<HTMLInputElement>(null);
     const [uploadingPic, setUploadingPic] = useState(false);

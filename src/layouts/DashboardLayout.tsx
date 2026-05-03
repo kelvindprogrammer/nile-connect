@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Navigate } from 'react-router-dom';
 import {
     Home, MessageSquare, Briefcase, GraduationCap, LayoutList,
     Calendar, User, LogOut, Mail, Bell, Search, Users, ChevronRight,
@@ -92,6 +92,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { user, logout } = useAuth();
+
+    // Auth guard: redirect to login if not authenticated
+    if (!user) return <Navigate to="/login" replace />;
     const { picture: profilePic } = useProfilePicture();
     const [showNotifications, setShowNotifications] = useState(false);
     const [showMoreMenu, setShowMoreMenu] = useState(false);
@@ -132,7 +135,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
     const breadcrumbs = location.pathname.split('/').filter(x => x && x !== 'student');
 
-    const handleLogout = () => { logout(); navigate('/login'); };
+    const handleLogout = () => { logout(); navigate('/login', { replace: true }); };
 
     const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter' && searchQuery.trim()) {

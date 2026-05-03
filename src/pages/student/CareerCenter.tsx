@@ -24,7 +24,7 @@ const CareerCenter = () => {
     const navigate = useNavigate();
     const { showToast } = useToast();
     const { user } = useAuth();
-    const { profile } = useProfile();
+    const { profile } = useProfile(user?.id);
     const strength = calculateProfileStrength(profile, !!user?.name, !!user?.email);
 
     const [showAllAdvisors, setShowAllAdvisors] = useState(false);
