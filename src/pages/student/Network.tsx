@@ -88,10 +88,10 @@ const Network = () => {
 
     const handleConnect = (person: Person) => {
         if (connectedIds.has(person.id)) {
-            showToast(`Disconnected from ${person.name}`, 'info');
+            showToast(`Disconnected from ${person.name}`, 'success');
             setConnectedIds(prev => { const n = new Set(prev); n.delete(person.id); return n; });
         } else if (pendingIds.has(person.id)) {
-            showToast(`Connection request to ${person.name} cancelled`, 'info');
+            showToast(`Connection request to ${person.name} cancelled`, 'success');
             setPendingIds(prev => { const n = new Set(prev); n.delete(person.id); return n; });
         } else {
             setSelectedPerson(person);
@@ -102,7 +102,7 @@ const Network = () => {
     const handleFollow = (person: Person) => {
         if (followingIds.has(person.id)) {
             setFollowingIds(prev => { const n = new Set(prev); n.delete(person.id); return n; });
-            showToast(`Unfollowed ${person.name}`, 'info');
+            showToast(`Unfollowed ${person.name}`, 'success');
         } else {
             setFollowingIds(prev => new Set([...prev, person.id]));
             showToast(`Following ${person.name}`, 'success');
@@ -148,7 +148,9 @@ const Network = () => {
                         </div>
                         <div className="w-px h-6 bg-black/10" />
                         <div className="text-left flex-1 md:flex-none">
-                            <p className="text-lg font-black text-black leading-none">{networkData.length}</p>
+                            <p className="text-lg font-black text-black leading-none">
+                                {apiLoading ? '—' : apiPeople.length > 0 ? apiPeople.length : networkData.length}
+                            </p>
                             <p className="text-[8px] font-black text-black/40 uppercase tracking-widest mt-0.5">SUGGESTED</p>
                         </div>
                     </div>

@@ -25,8 +25,7 @@ export const getConversations = async (): Promise<Conversation[]> => {
 
 export const getThread = async (toUserID: string): Promise<Message[]> => {
     const { data } = await apiClient.get<Envelope<{ messages: Message[] }>>(
-        `/api/messages/thread/${toUserID}`,
-        { params: { toId: toUserID } }
+        `/api/messages/thread/${toUserID}`
     );
     return data.data.messages ?? [];
 };
@@ -34,8 +33,7 @@ export const getThread = async (toUserID: string): Promise<Message[]> => {
 export const sendMessage = async (toUserID: string, content: string): Promise<Message> => {
     const { data } = await apiClient.post<Envelope<Message>>(
         `/api/messages/send/${toUserID}`,
-        { content },
-        { params: { toId: toUserID } }
+        { content }
     );
     return data.data;
 };

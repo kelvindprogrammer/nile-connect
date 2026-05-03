@@ -388,6 +388,115 @@ select:focus {
 .nc-reveal-right{ animation: ncRevealRight 0.7s cubic-bezier(0.16,1,0.3,1) forwards; }
 .nc-marquee     { animation: ncMarquee 20s linear infinite; }
 
+/* === Stagger Reveal — for list items === */
+.stagger > * {
+    opacity: 0;
+    transform: translateY(12px);
+    animation: slideUp 0.45s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+.stagger > *:nth-child(1)  { animation-delay: 0.05s; }
+.stagger > *:nth-child(2)  { animation-delay: 0.10s; }
+.stagger > *:nth-child(3)  { animation-delay: 0.15s; }
+.stagger > *:nth-child(4)  { animation-delay: 0.20s; }
+.stagger > *:nth-child(5)  { animation-delay: 0.25s; }
+.stagger > *:nth-child(6)  { animation-delay: 0.30s; }
+.stagger > *:nth-child(7)  { animation-delay: 0.35s; }
+.stagger > *:nth-child(8)  { animation-delay: 0.40s; }
+
+/* === Magnetic Pull Button (tactile hover) === */
+.magnetic-btn {
+    transition: transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                box-shadow 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.magnetic-btn:hover {
+    transform: translateY(-3px);
+}
+.magnetic-btn:active {
+    transform: translateY(0) scale(0.97);
+}
+
+/* === Card entry animation === */
+@keyframes cardReveal {
+    from { opacity: 0; transform: translateY(16px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.card-reveal {
+    animation: cardReveal 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* === Brutalist focus ring === */
+.focus-ring:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px #fff, 0 0 0 5px #1E499D;
+    border-radius: 4px;
+}
+
+/* === Checkbox bounce === */
+@keyframes checkBounce {
+    0%   { transform: scale(1); }
+    30%  { transform: scale(1.25); }
+    60%  { transform: scale(0.9); }
+    100% { transform: scale(1); }
+}
+.check-bounce {
+    animation: checkBounce 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+/* === Skeleton shimmer === */
+@keyframes skeletonPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+.skeleton {
+    animation: skeletonPulse 1.5s ease-in-out infinite;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.8s infinite;
+    border-radius: 8px;
+}
+
+/* === Number count-up animation === */
+@keyframes numberPop {
+    0%   { transform: scale(0.6) translateY(8px); opacity: 0; }
+    60%  { transform: scale(1.08) translateY(-2px); opacity: 1; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+.number-pop {
+    animation: numberPop 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* === Status badge pulse on appear === */
+@keyframes badgeIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+}
+.badge-in {
+    animation: badgeIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* === Notification shake === */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    15%  { transform: translateX(-4px) rotate(-2deg); }
+    30%  { transform: translateX(4px) rotate(2deg); }
+    45%  { transform: translateX(-3px); }
+    60%  { transform: translateX(3px); }
+    75%  { transform: translateX(-2px); }
+    90%  { transform: translateX(2px); }
+}
+.shake {
+    animation: shake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+/* === Page header reveal === */
+@keyframes headerReveal {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.header-reveal {
+    animation: headerReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 /* === No Scrollbar === */
 .no-scrollbar {
     scrollbar-width: none;
@@ -460,4 +569,178 @@ select:focus {
 }
 .origin-top-right {
     transform-origin: top right;
+}
+
+/* ============================================================
+   PREMIUM MICRO-INTERACTIONS & HARDWARE-ACCELERATED ANIMATIONS
+   ============================================================ */
+
+/* === Button press — tactile depth effect === */
+.btn-tactile {
+    transform: translateZ(0);
+    will-change: transform, box-shadow;
+    transition: transform 0.1s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.1s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.btn-tactile:hover  { transform: translate(-1px, -1px); }
+.btn-tactile:active { transform: translate(3px, 3px); box-shadow: none !important; }
+
+/* === Satisfying card lift on hover === */
+.card-lift {
+    transform: translateZ(0);
+    will-change: transform, box-shadow;
+    transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                box-shadow 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.card-lift:hover {
+    transform: translateY(-4px) translateZ(0);
+    box-shadow: 6px 10px 0px 0px rgba(0,0,0,1);
+}
+
+/* === Input focus expansion === */
+.input-focus-grow {
+    transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+.input-focus-grow:focus {
+    transform: scaleY(1.015);
+    box-shadow: 3px 3px 0px 0px #1E499D;
+}
+
+/* === Nav item active indicator slide === */
+.nav-indicator {
+    position: relative;
+    overflow: hidden;
+}
+.nav-indicator::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%) scaleX(0);
+    width: 60%; height: 2px;
+    background: #6CBB56;
+    border-radius: 2px 2px 0 0;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform-origin: center;
+}
+.nav-indicator.active::after,
+.nav-indicator:hover::after {
+    transform: translateX(-50%) scaleX(1);
+}
+
+/* === Toast slide-in === */
+@keyframes toastSlideIn {
+    from { transform: translateX(110%) translateZ(0); opacity: 0; }
+    to   { transform: translateX(0) translateZ(0); opacity: 1; }
+}
+@keyframes toastSlideOut {
+    from { transform: translateX(0) translateZ(0); opacity: 1; }
+    to   { transform: translateX(110%) translateZ(0); opacity: 0; }
+}
+.toast-in  { animation: toastSlideIn  0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+.toast-out { animation: toastSlideOut 0.3s cubic-bezier(0.4, 0, 1, 1) forwards; }
+
+/* === Skeleton loading — enhanced shimmer === */
+@keyframes skeletonShimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+.skeleton-enhanced {
+    background: linear-gradient(90deg,
+        #f0f0f0 25%,
+        #e4e4e4 37%,
+        #f0f0f0 63%
+    );
+    background-size: 400% 100%;
+    animation: skeletonShimmer 1.4s ease-in-out infinite;
+    border-radius: 8px;
+}
+
+/* === Profile ring progress animate === */
+@keyframes ringFill {
+    from { stroke-dashoffset: 100%; }
+    to   { stroke-dashoffset: var(--ring-offset, 0); }
+}
+
+/* === Floating action button pulse === */
+@keyframes fabPulse {
+    0%   { box-shadow: 0 0 0 0 rgba(108,187,86,0.5); }
+    70%  { box-shadow: 0 0 0 12px rgba(108,187,86,0); }
+    100% { box-shadow: 0 0 0 0 rgba(108,187,86,0); }
+}
+.fab-pulse { animation: fabPulse 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+
+/* === Status dot — live indicator === */
+@keyframes liveDot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.6; transform: scale(0.8); }
+}
+.live-dot { animation: liveDot 1.5s ease-in-out infinite; }
+
+/* === Stat counter pop-in === */
+@keyframes counterReveal {
+    0%   { opacity: 0; transform: translateY(12px) scale(0.85); }
+    70%  { opacity: 1; transform: translateY(-3px) scale(1.05); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.counter-reveal {
+    animation: counterReveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* === Modal backdrop blur-in === */
+@keyframes backdropIn {
+    from { opacity: 0; backdrop-filter: blur(0px); }
+    to   { opacity: 1; backdrop-filter: blur(8px); }
+}
+.backdrop-in { animation: backdropIn 0.25s ease forwards; }
+
+/* === Modal panel slide-up === */
+@keyframes modalIn {
+    from { opacity: 0; transform: translateY(24px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.modal-in { animation: modalIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+/* === Tag/chip bouncy appear === */
+@keyframes chipIn {
+    from { opacity: 0; transform: scale(0.6) rotate(-3deg); }
+    to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+.chip-in { animation: chipIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+/* === Sidebar active item glow === */
+.sidebar-active-glow {
+    box-shadow: inset 3px 0 0 #6CBB56, 0 0 20px rgba(108,187,86,0.08);
+}
+
+/* === Swipe-hint for mobile cards === */
+@keyframes swipeHint {
+    0%   { transform: translateX(0); }
+    20%  { transform: translateX(-6px); }
+    50%  { transform: translateX(4px); }
+    80%  { transform: translateX(-2px); }
+    100% { transform: translateX(0); }
+}
+.swipe-hint { animation: swipeHint 0.8s ease 1s 1; }
+
+/* === Typewriter cursor blink === */
+@keyframes cursorBlink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0; }
+}
+.cursor-blink::after {
+    content: '|';
+    margin-left: 1px;
+    animation: cursorBlink 1s step-end infinite;
+    color: #6CBB56;
+}
+
+/* === Focus visible ring (accessibility) === */
+*:focus-visible {
+    outline: 2.5px solid #6CBB56;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+button:focus-visible, a:focus-visible {
+    outline: 2.5px solid #6CBB56;
+    outline-offset: 3px;
 }

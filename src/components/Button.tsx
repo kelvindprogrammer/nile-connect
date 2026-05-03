@@ -1,65 +1,67 @@
-import * as React from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "../lib/utils"
+import React from 'react';
+import { Loader2 } from 'lucide-react';
+import { cn } from '../lib/utils';
 
-const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-  {
-    variants: {
-      variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
-        // Custom Nile styles
-        nile: "bg-black text-white border-2 border-black hover:bg-nile-blue hover:border-nile-blue shadow-[3px_3px_0px_0px_rgba(108,187,86,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all font-black uppercase tracking-widest",
-        nileGreen: "bg-nile-green text-white border-2 border-black hover:opacity-90 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all font-black uppercase tracking-widest",
-        nileBlue: "bg-nile-blue text-white border-2 border-black hover:opacity-90 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all font-black uppercase tracking-widest",
-      },
-      size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
-        icon: "h-10 w-10",
-        xs: "h-7 px-2 text-[10px]",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  }
-)
+type ButtonVariant = 'primary' | 'outline' | 'ghost' | 'danger' | 'nile' | 'nileGreen' | 'nileBlue';
+type ButtonSize    = 'xs' | 'sm' | 'md' | 'lg';
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
-  asChild?: boolean
-  fullWidth?: boolean
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    variant?:   ButtonVariant;
+    size?:      ButtonSize;
+    fullWidth?: boolean;
+    isLoading?: boolean;
+    asChild?:   boolean;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, fullWidth = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button"
-    return (
-      <Comp
+const variantClasses: Record<ButtonVariant, string> = {
+    primary:   'bg-black text-white border-[2px] border-black shadow-[3px_3px_0px_0px_rgba(108,187,86,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none',
+    outline:   'bg-white text-black border-[2px] border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:bg-black hover:text-white hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none',
+    ghost:     'bg-transparent text-black border-[2px] border-transparent hover:bg-black/5 hover:border-black/10',
+    danger:    'bg-red-500 text-white border-[2px] border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none',
+    nile:      'bg-nile-blue text-white border-[2px] border-black shadow-[3px_3px_0px_0px_rgba(108,187,86,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none',
+    nileGreen: 'bg-nile-green text-white border-[2px] border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none',
+    nileBlue:  'bg-nile-blue text-white border-[2px] border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none',
+};
+
+const sizeClasses: Record<ButtonSize, string> = {
+    xs: 'px-2.5 py-1    text-[8px]  rounded-lg',
+    sm: 'px-4   py-2    text-[9px]  rounded-xl',
+    md: 'px-5   py-2.5  text-[10px] rounded-xl',
+    lg: 'px-7   py-3.5  text-[11px] rounded-2xl',
+};
+
+const Button: React.FC<ButtonProps> = ({
+    variant   = 'primary',
+    size      = 'md',
+    fullWidth = false,
+    isLoading = false,
+    disabled,
+    className,
+    children,
+    ...props
+}) => (
+    <button
+        disabled={disabled || isLoading}
         className={cn(
-            buttonVariants({ variant, size, className }),
-            fullWidth && "w-full"
+            'inline-flex items-center justify-center gap-2',
+            'font-black uppercase tracking-widest leading-none',
+            'transition-all duration-150 ease-out',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nile-green focus-visible:ring-offset-2',
+            'disabled:opacity-40 disabled:pointer-events-none disabled:translate-x-0 disabled:translate-y-0 disabled:shadow-none',
+            variantClasses[variant],
+            sizeClasses[size],
+            fullWidth && 'w-full',
+            className,
         )}
-        ref={ref}
         {...props}
-      />
-    )
-  }
-)
-Button.displayName = "Button"
+    >
+        {isLoading && <Loader2 size={12} className="animate-spin flex-shrink-0" />}
+        {children}
+    </button>
+);
+
+Button.displayName = 'Button';
 
 export default Button;
-export { Button, buttonVariants };
+export { Button };
+export type { ButtonProps };
