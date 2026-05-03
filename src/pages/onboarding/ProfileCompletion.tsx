@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthLayout from '../../layouts/AuthLayout';
 import BrutalistIconBox from '../../components/BrutalistIconBox';
+import { redirectToPortal } from '../../utils/navigation';
 
 const ProfileCompletion = () => {
     const navigate = useNavigate();
@@ -29,7 +30,7 @@ const ProfileCompletion = () => {
                     </p>
                 </div>
 
-                <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); navigate('/student'); }}>
+                <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); redirectToPortal('student'); }}>
                     <div className="space-y-3">
                         <label className="text-sm font-black text-black tracking-widest uppercase">Major</label>
                         <select 
