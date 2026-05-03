@@ -23,15 +23,23 @@ export interface ExtendedProfile {
 const STORAGE_KEY = 'nile_extended_profile';
 
 const defaults: ExtendedProfile = {
-    bio: '',
+    bio: 'Professional student at Nile University, passionate about developing impactful solutions and exploring new technologies. Seeking opportunities to grow and contribute to the industry.',
     location: 'Abuja, Nigeria',
-    major: '',
-    linkedIn: '',
-    portfolio: '',
-    github: '',
-    phone: '',
-    experiences: [],
-    skills: [],
+    major: 'Computer Science',
+    linkedIn: 'linkedin.com/in/username',
+    portfolio: 'portfolio-link.com',
+    github: 'github.com/username',
+    phone: '+234 000 000 0000',
+    experiences: [
+        {
+            id: 'default-1',
+            title: 'Undergraduate Researcher',
+            company: 'Nile University of Nigeria',
+            duration: 'Jan 2023 – Present',
+            description: 'Assisting in research projects related to software engineering and data analysis.'
+        }
+    ],
+    skills: ['Teamwork', 'Communication', 'Problem Solving', 'Leadership'],
 };
 
 export function useProfile() {

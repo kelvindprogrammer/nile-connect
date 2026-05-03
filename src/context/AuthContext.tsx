@@ -1,9 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import type { BackendUser, AuthResponse } from '../services/authService';
-
-// ---------------------------------------------------------------------------
-// Frontend User type – maps from backend's BackendUser
-// ---------------------------------------------------------------------------
+import { apiClient } from '../services/api';
 
 export interface User {
     id: string;
@@ -23,80 +19,70 @@ export interface User {
 interface AuthContextType {
     user: User | null;
     token: string | null;
-    /** Called after a successful API auth response */
-    loginWithResponse: (resp: AuthResponse) => void;
-    /** Manually set a user (local-only, no token) – kept for legacy flows */
-    login: (user: User) => void;
+    isLoading: boolean;
     logout: () => void;
     isAuthenticated: boolean;
+    // Keeping these for backwards compatibility if needed, but they are no-ops now
+    loginWithResponse: (resp: any) => void;
+    login: (user: User) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// ---------------------------------------------------------------------------
-// Helper: map backend user → frontend User
-// ---------------------------------------------------------------------------
-
-export const mapBackendUser = (bu: BackendUser): User => ({
-    id: bu.id,
-    name: bu.full_name,
-    username: bu.username,
-    email: bu.email,
-    role: bu.role as User['role'],
-    type: bu.student_subtype === 'alumni' ? 'alumni' : 'current',
-    major: bu.major ?? undefined,
-    graduationYear: bu.graduation_year ?? undefined,
-    isVerified: bu.is_verified,
-});
-
-// ---------------------------------------------------------------------------
-// Provider
-// ---------------------------------------------------------------------------
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
-    const [token, setToken] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-    // Rehydrate on mount
+    // Fetch centralized session on mount
     useEffect(() => {
-        const savedUser = localStorage.getItem('nile_user');
-        const savedToken = localStorage.getItem('nile_token');
-        if (savedUser) {
-            try { setUser(JSON.parse(savedUser)); } catch { /* ignore */ }
-        }
-        if (savedToken) setToken(savedToken);
-    }, []);
+        const fetchSession = async () => {
+            try {
+                // Request hits the local /api/auth/session proxy, which forwards the cookie to Campus One
+                const { data } = await apiClient.get('/api/auth/session', { withCredentials: true });
+                if (data && data.user) {
+                    setUser({
+                        id: data.user.id,
+                        name: data.user.name,
+                        username: data.user.email.split('@')[0], // Extract username from email
+                        email: data.user.email,
+                        role: data.user.role as any,
+                        isVerified: true
+                    });
+                } else {
+                    setUser(null);
+                }
+            } catch (err) {
+                console.warn("Session check failed or no active session.");
+                setUser(null);
+            } finally {
+                setIsLoading(false);
+            }
+        };
 
-    // Listen for token expiry events emitted by the axios interceptor
-    useEffect(() => {
-        const handleExpiry = () => logout();
-        window.addEventListener('auth:expired', handleExpiry);
-        return () => window.removeEventListener('auth:expired', handleExpiry);
-    }, []);
-
-    const loginWithResponse = useCallback((resp: AuthResponse) => {
-        const mapped = mapBackendUser(resp.user);
-        setUser(mapped);
-        setToken(resp.token);
-        localStorage.setItem('nile_user', JSON.stringify(mapped));
-        localStorage.setItem('nile_token', resp.token);
-    }, []);
-
-    const login = useCallback((userData: User) => {
-        setUser(userData);
-        localStorage.setItem('nile_user', JSON.stringify(userData));
+        fetchSession();
     }, []);
 
     const logout = useCallback(() => {
         setUser(null);
-        setToken(null);
-        localStorage.removeItem('nile_user');
-        localStorage.removeItem('nile_token');
+        // Delegate to portal sign-out
+        window.location.href = `https://portal.builtbysalih.com/sign-out?callbackURL=${encodeURIComponent(window.location.href)}`;
     }, []);
+
+    // No-ops for legacy local auth flow
+    const loginWithResponse = useCallback(() => {}, []);
+    const login = useCallback(() => {}, []);
 
     return (
         <AuthContext.Provider
-            value={{ user, token, loginWithResponse, login, logout, isAuthenticated: !!user }}
+            value={{ 
+                user, 
+                token: null, // Tokens are no longer managed client-side
+                isLoading, 
+                logout, 
+                isAuthenticated: !!user,
+                loginWithResponse,
+                login
+            }}
         >
             {children}
         </AuthContext.Provider>

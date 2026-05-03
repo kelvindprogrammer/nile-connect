@@ -103,11 +103,11 @@ const EmployerDashboard = () => {
                             : 'Post your first job to start finding talent'}
                     </p>
                     <div className="flex gap-3 pt-1">
-                        <button onClick={() => navigate('/employer/jobs')}
+                        <button onClick={() => navigate('/jobs')}
                             className="flex items-center gap-2 px-4 py-2.5 bg-black text-white border-[2px] border-black rounded-xl font-black text-[9px] uppercase shadow-[3px_3px_0px_0px_#6CBB56] hover:translate-x-px hover:translate-y-px hover:shadow-[2px_2px_0px_0px_#6CBB56] transition-all">
                             <Plus size={13} strokeWidth={3} /> POST JOB
                         </button>
-                        <button onClick={() => navigate('/employer/applications')}
+                        <button onClick={() => navigate('/applications')}
                             className="flex items-center gap-2 px-4 py-2.5 bg-white border-[2px] border-black rounded-xl font-black text-[9px] uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-px hover:translate-y-px hover:shadow-none transition-all">
                             VIEW APPLICANTS
                         </button>
@@ -166,7 +166,7 @@ const EmployerDashboard = () => {
                     <div className="bg-white border-[2px] border-black rounded-[24px] p-5 md:p-6 shadow-[3px_3px_0px_0px_rgba(30,73,157,0.2)]">
                         <div className="flex items-center justify-between mb-5">
                             <h3 className="text-[10px] font-black uppercase tracking-widest text-black/50">LATEST APPLICANTS</h3>
-                            <button onClick={() => navigate('/employer/applications')}
+                            <button onClick={() => navigate('/applications')}
                                 className="text-[8px] font-black text-nile-blue uppercase tracking-wider flex items-center gap-1 hover:text-black transition-colors">
                                 VIEW ALL <ChevronRight size={10} />
                             </button>
@@ -201,7 +201,7 @@ const EmployerDashboard = () => {
                     <div className="bg-white border-[2px] border-black rounded-[24px] p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                         <div className="flex items-center justify-between mb-5">
                             <h3 className="text-[10px] font-black uppercase tracking-widest text-black/50">YOUR LISTINGS</h3>
-                            <button onClick={() => navigate('/employer/jobs')} className="text-[8px] font-black text-nile-blue uppercase flex items-center gap-1 hover:text-black transition-colors">
+                            <button onClick={() => navigate('/jobs')} className="text-[8px] font-black text-nile-blue uppercase flex items-center gap-1 hover:text-black transition-colors">
                                 MANAGE <ChevronRight size={10} />
                             </button>
                         </div>
@@ -209,13 +209,13 @@ const EmployerDashboard = () => {
                             <div className="py-10 text-center border-[2px] border-dashed border-black/10 rounded-[20px]">
                                 <Briefcase size={24} className="text-black/15 mx-auto mb-3" />
                                 <p className="text-[9px] font-black text-black/25 uppercase">No listings yet</p>
-                                <button onClick={() => navigate('/employer/jobs')}
+                                <button onClick={() => navigate('/jobs')}
                                     className="mt-4 px-4 py-2 bg-black text-white border-2 border-black rounded-xl font-black text-[8px] uppercase shadow-[2px_2px_0px_0px_#6CBB56] hover:translate-x-px hover:translate-y-px hover:shadow-none transition-all">
                                     <Plus size={10} className="inline mr-1" /> POST FIRST JOB
                                 </button>
                             </div>
                         ) : jobs.slice(0, 5).map(job => (
-                            <div key={job.id} onClick={() => navigate('/employer/jobs')}
+                            <div key={job.id} onClick={() => navigate('/jobs')}
                                 className="flex items-center justify-between p-3 border-[2px] border-black/5 rounded-xl hover:border-black hover:bg-nile-white transition-all cursor-pointer group mb-2">
                                 <div className="flex-1 min-w-0">
                                     <p className="font-black text-[10px] uppercase text-black truncate leading-none group-hover:text-nile-blue transition-colors">{job.title}</p>
@@ -231,8 +231,8 @@ const EmployerDashboard = () => {
 
                     {/* Quick nav */}
                     <div className="grid grid-cols-2 gap-3">
-                        <QuickAction label="CANDIDATES" icon={<Users size={16} />} onClick={() => navigate('/employer/candidates')} />
-                        <QuickAction label="MESSAGES" icon={<TrendingUp size={16} />} onClick={() => navigate('/employer/messages')} />
+                        <QuickAction label="CANDIDATES" icon={<Users size={16} />} onClick={() => navigate('/candidates')} />
+                        <QuickAction label="MESSAGES" icon={<TrendingUp size={16} />} onClick={() => navigate('/messages')} />
                     </div>
                 </div>
             </div>

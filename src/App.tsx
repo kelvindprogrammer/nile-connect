@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import PageTransition from './components/PageTransition';
 import { ToastProvider } from './context/ToastContext';
 import { AuthProvider } from './context/AuthContext';
+import { getSubdomain, getPortalUrl, SUBDOMAINS } from './utils/subdomain';
+import ProtectedRoute from './components/ProtectedRoute';
 
 // ── Entry & Auth Pages ────────────────────────────────────────────────────
 import Onboarding         from './pages/auth/Onboarding';
@@ -35,6 +37,7 @@ import ApplicationTracker from './pages/student/ApplicationTracker';
 import EventsCalendar     from './pages/student/EventsCalendar';
 import StudentProfile     from './pages/student/Profile';
 import EditProfile        from './pages/student/EditProfile';
+import LearningPath      from './pages/student/LearningPath';
 import Network            from './pages/student/Network';
 import StudentMessages    from './pages/student/Messages';
 
@@ -49,6 +52,7 @@ import StaffReports       from './pages/staff/Reports';
 import StaffProfile       from './pages/staff/Profile';
 import StaffMessages      from './pages/staff/Messages';
 import StaffSettings      from './pages/staff/Settings';
+import StudentActivity   from './pages/staff/StudentActivity';
 
 // ── Employer Section ──────────────────────────────────────────────────────
 import EmployerDashboard      from './pages/employer/Dashboard';
@@ -70,79 +74,106 @@ const T = ({ children }: { children: React.ReactNode }) => (
     <PageTransition>{children}</PageTransition>
 );
 
-const App = () => (
-    <ToastProvider>
-        <AuthProvider>
-            <Router>
-                <Routes>
-                    {/* Public entry */}
-                    <Route path="/"           element={<Navigate to="/onboarding" replace />} />
-                    <Route path="/onboarding" element={<T><Onboarding /></T>} />
-                    <Route path="/login"            element={<T><Login /></T>} />
-                    <Route path="/register"         element={<T><Register /></T>} />
-                    <Route path="/join-as"          element={<T><JoinAs /></T>} />
-                    <Route path="/forgot-password"  element={<T><ForgotPassword /></T>} />
+const SSORedirect = ({ type }: { type: 'sign-in' | 'sign-out' }) => {
+    useEffect(() => {
+        window.location.href = `https://portal.builtbysalih.com/${type}?callbackURL=${encodeURIComponent(window.location.origin)}`;
+    }, [type]);
+    return (
+        <div className="flex items-center justify-center h-screen bg-white">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+        </div>
+    );
+};
 
-                    {/* Onboarding / setup flow */}
-                    <Route path="/student-status"        element={<T><StudentStatus /></T>} />
-                    <Route path="/alumni-login"          element={<T><AlumniLogin /></T>} />
-                    <Route path="/student-portal"        element={<T><StudentPortal /></T>} />
-                    <Route path="/profile-completion"    element={<T><ProfileCompletion /></T>} />
-                    <Route path="/employer-registration" element={<EmployerRegistration />} />
-                    <Route path="/awaiting-verification" element={<AwaitingVerification />} />
+const App = () => {
+    const subdomain = getSubdomain();
 
-                    {/* Student (authenticated) */}
-                    <Route path="/student">
-                        <Route index                   element={<StudentDashboard />} />
-                        <Route path="feed"             element={<StudentFeed />} />
-                        <Route path="jobs"             element={<JobBoard />} />
-                        <Route path="jobs/:id"         element={<JobDetail />} />
-                        <Route path="career"                    element={<CareerCenter />} />
-                        <Route path="career/ai"                 element={<AICounselor />} />
-                        <Route path="career/mock-interview"     element={<MockInterview />} />
-                        <Route path="applications"     element={<ApplicationTracker />} />
-                        <Route path="events"           element={<EventsCalendar />} />
-                        <Route path="profile"          element={<StudentProfile />} />
-                        <Route path="profile/edit"     element={<EditProfile />} />
-                        <Route path="network"          element={<Network />} />
-                        <Route path="messages"         element={<StudentMessages />} />
-                    </Route>
+    return (
+        <ToastProvider>
+            <AuthProvider>
+                <Router>
+                    <Routes>
+                        {/* --- Subdomain-specific Dashboard Routes --- */}
+                        {subdomain === SUBDOMAINS.STUDENT && (
+                            <Route path="/" element={<ProtectedRoute allowedRoles={['student']}><T><StudentDashboard /></T></ProtectedRoute>}>
+                                <Route path="feed"             element={<StudentFeed />} />
+                                <Route path="jobs"             element={<JobBoard />} />
+                                <Route path="jobs/:id"         element={<JobDetail />} />
+                                <Route path="career"           element={<CareerCenter />} />
+                                <Route path="career/ai"        element={<AICounselor />} />
+                                <Route path="career/learning"  element={<LearningPath />} />
+                                <Route path="career/mock-interview" element={<MockInterview />} />
+                                <Route path="applications"     element={<ApplicationTracker />} />
+                                <Route path="events"           element={<EventsCalendar />} />
+                                <Route path="profile"          element={<StudentProfile />} />
+                                <Route path="profile/edit"     element={<EditProfile />} />
+                                <Route path="network"          element={<Network />} />
+                                <Route path="messages"         element={<StudentMessages />} />
+                            </Route>
+                        )}
 
-                    {/* Staff (authenticated, layout-wrapped) */}
-                    <Route path="/staff" element={<StaffLayout />}>
-                        <Route index               element={<StaffDashboard />} />
-                        <Route path="applications" element={<StaffApplications />} />
-                        <Route path="events"       element={<StaffEvents />} />
-                        <Route path="crm"          element={<StaffCRMManager />} />
-                        <Route path="jobs"         element={<StaffJobs />} />
-                        <Route path="services"     element={<StaffServices />} />
-                        <Route path="reports"      element={<StaffReports />} />
-                        <Route path="profile"      element={<StaffProfile />} />
-                        <Route path="messages"     element={<StaffMessages />} />
-                        <Route path="settings"     element={<StaffSettings />} />
-                    </Route>
+                        {subdomain === SUBDOMAINS.STAFF && (
+                            <Route path="/" element={<ProtectedRoute allowedRoles={['staff']}><StaffLayout /></ProtectedRoute>}>
+                                <Route index               element={<StaffDashboard />} />
+                                <Route path="activity"     element={<StudentActivity />} />
+                                <Route path="applications" element={<StaffApplications />} />
+                                <Route path="events"       element={<StaffEvents />} />
+                                <Route path="crm"          element={<StaffCRMManager />} />
+                                <Route path="jobs"         element={<StaffJobs />} />
+                                <Route path="services"     element={<StaffServices />} />
+                                <Route path="reports"      element={<StaffReports />} />
+                                <Route path="profile"      element={<StaffProfile />} />
+                                <Route path="messages"     element={<StaffMessages />} />
+                                <Route path="settings"     element={<StaffSettings />} />
+                            </Route>
+                        )}
 
-                    {/* Employer (authenticated, layout-wrapped) */}
-                    <Route path="/employer" element={<EmployerLayout />}>
-                        <Route index                      element={<EmployerDashboard />} />
-                        <Route path="candidates"          element={<EmployerCandidates />} />
-                        <Route path="candidates/:id"      element={<EmployerCandidateDetail />} />
-                        <Route path="jobs"                element={<EmployerJobs />} />
-                        <Route path="applications"        element={<EmployerApplications />} />
+                        {subdomain === SUBDOMAINS.EMPLOYER && (
+                            <Route path="/" element={<ProtectedRoute allowedRoles={['employer']}><EmployerLayout /></ProtectedRoute>}>
+                                <Route index                      element={<EmployerDashboard />} />
+                                <Route path="candidates"          element={<EmployerCandidates />} />
+                                <Route path="candidates/:id"      element={<EmployerCandidateDetail />} />
+                                <Route path="jobs"                element={<EmployerJobs />} />
+                                <Route path="applications"        element={<EmployerApplications />} />
+                                <Route path="feed"                element={<EmployerFeed />} />
+                                <Route path="events"              element={<EmployerEvents />} />
+                                <Route path="profile"             element={<EmployerProfile />} />
+                                <Route path="messages"            element={<EmployerMessages />} />
+                                <Route path="settings"            element={<EmployerSettings />} />
+                            </Route>
+                        )}
 
-                        <Route path="feed"                element={<EmployerFeed />} />
-                        <Route path="events"              element={<EmployerEvents />} />
-                        <Route path="profile"             element={<EmployerProfile />} />
-                        <Route path="messages"            element={<EmployerMessages />} />
-                        <Route path="settings"            element={<EmployerSettings />} />
-                    </Route>
+                        {/* --- Shared Public & Onboarding Routes --- */}
+                        <Route path="/"           element={<Navigate to="/onboarding" replace />} />
+                        <Route path="/onboarding" element={<T><Onboarding /></T>} />
+                        
+                        {/* Auth is handled by Campus One SSO, intercept these routes */}
+                        <Route path="/login"            element={<SSORedirect type="sign-in" />} />
+                        <Route path="/register"         element={<SSORedirect type="sign-in" />} />
+                        <Route path="/join-as"          element={<SSORedirect type="sign-in" />} />
+                        <Route path="/forgot-password"  element={<SSORedirect type="sign-in" />} />
 
-                    {/* Catch-all */}
-                    <Route path="*" element={<NotFound />} />
-                </Routes>
-            </Router>
-        </AuthProvider>
-    </ToastProvider>
-);
+                        {/* Onboarding / setup flow */}
+                        <Route path="/student-status"        element={<T><StudentStatus /></T>} />
+                        <Route path="/alumni-login"          element={<T><AlumniLogin /></T>} />
+                        <Route path="/student-portal"        element={<T><StudentPortal /></T>} />
+                        <Route path="/profile-completion"    element={<T><ProfileCompletion /></T>} />
+                        <Route path="/employer-registration" element={<EmployerRegistration />} />
+                        <Route path="/awaiting-verification" element={<AwaitingVerification />} />
+
+                        {/* Legacy path support (optional, redirects to subdomain if needed or keeps working) */}
+                        <Route path="/student/*" element={<Navigate to={getPortalUrl(SUBDOMAINS.STUDENT)} replace />} />
+                        <Route path="/staff/*" element={<Navigate to={getPortalUrl(SUBDOMAINS.STAFF)} replace />} />
+                        <Route path="/employer/*" element={<Navigate to={getPortalUrl(SUBDOMAINS.EMPLOYER)} replace />} />
+                        
+                        {/* Catch-all */}
+                        <Route path="*" element={<NotFound />} />
+                    </Routes>
+                </Router>
+            </AuthProvider>
+        </ToastProvider>
+    );
+};
 
 export default App;
+

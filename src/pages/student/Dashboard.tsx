@@ -177,7 +177,7 @@ const StudentDashboard = () => {
                             {/* Ring */}
                             <div className="flex flex-col items-center gap-1">
                                 <Ring pct={strength} size={68} />
-                                <button onClick={() => navigate('/student/profile/edit')} className={`text-[7px] font-black uppercase tracking-widest ${sColor} hover:underline`}>
+                                <button onClick={() => navigate('/profile/edit')} className={`text-[7px] font-black uppercase tracking-widest ${sColor} hover:underline`}>
                                     {strength < 100 ? 'COMPLETE →' : '✓ DONE'}
                                 </button>
                             </div>
@@ -200,13 +200,13 @@ const StudentDashboard = () => {
 
                     {/* Action buttons row */}
                     <div className="flex items-center gap-2 px-5 pb-4">
-                        <button onClick={() => navigate('/student/jobs')} className="flex items-center gap-1.5 px-4 py-2 bg-nile-green text-white text-[9px] font-black uppercase tracking-wider rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-px hover:translate-y-px hover:shadow-none transition-all">
+                        <button onClick={() => navigate('/jobs')} className="flex items-center gap-1.5 px-4 py-2 bg-nile-green text-white text-[9px] font-black uppercase tracking-wider rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-px hover:translate-y-px hover:shadow-none transition-all">
                             <Briefcase size={12} strokeWidth={3} /> FIND JOBS
                         </button>
-                        <button onClick={() => navigate('/student/career/ai')} className="flex items-center gap-1.5 px-4 py-2 bg-nile-blue text-white text-[9px] font-black uppercase tracking-wider rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-px hover:translate-y-px hover:shadow-none transition-all">
+                        <button onClick={() => navigate('/career/ai')} className="flex items-center gap-1.5 px-4 py-2 bg-nile-blue text-white text-[9px] font-black uppercase tracking-wider rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-px hover:translate-y-px hover:shadow-none transition-all">
                             <Brain size={12} strokeWidth={3} /> AI CAREER
                         </button>
-                        <button onClick={() => navigate('/student/profile/edit')} className="flex items-center gap-1.5 px-4 py-2 bg-white text-black text-[9px] font-black uppercase tracking-wider rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-black hover:text-white transition-all">
+                        <button onClick={() => navigate('/profile/edit')} className="flex items-center gap-1.5 px-4 py-2 bg-white text-black text-[9px] font-black uppercase tracking-wider rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-black hover:text-white transition-all">
                             PROFILE
                         </button>
                         <p className="hidden lg:block text-[9px] font-bold text-black/25 italic ml-2 truncate">"{quote}"</p>
@@ -216,10 +216,10 @@ const StudentDashboard = () => {
                 {/* ── QUICK ACTIONS ─────────────────────────────────────── */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {[
-                        { icon: <Briefcase size={17} strokeWidth={2.5} className="text-white" />, label:'Job Board',       desc:'150+ active roles', to:'/student/jobs',                   bg:'bg-nile-blue' },
-                        { icon: <Brain     size={17} strokeWidth={2.5} className="text-white" />, label:'AI Career',       desc:'CV analysis & advice', to:'/student/career/ai',           bg:'bg-black' },
-                        { icon: <Mic       size={17} strokeWidth={2.5} className="text-white" />, label:'Mock Interview',  desc:'Practice with AI', to:'/student/career/mock-interview',  bg:'bg-nile-green' },
-                        { icon: <Users     size={17} strokeWidth={2.5} className="text-black" />, label:'Network',         desc:'Connect & grow',    to:'/student/network',               bg:'bg-yellow-400' },
+                        { icon: <Briefcase size={17} strokeWidth={2.5} className="text-white" />, label:'Job Board',       desc:'150+ active roles', to:'/jobs',                   bg:'bg-nile-blue' },
+                        { icon: <Brain     size={17} strokeWidth={2.5} className="text-white" />, label:'AI Career',       desc:'CV analysis & advice', to:'/career/ai',           bg:'bg-black' },
+                        { icon: <Mic       size={17} strokeWidth={2.5} className="text-white" />, label:'Mock Interview',  desc:'Practice with AI', to:'/career/mock-interview',  bg:'bg-nile-green' },
+                        { icon: <Users     size={17} strokeWidth={2.5} className="text-black" />, label:'Network',         desc:'Connect & grow',    to:'/network',               bg:'bg-yellow-400' },
                     ].map(a => (
                         <button key={a.label} onClick={() => navigate(a.to)}
                             className="flex items-center gap-3 p-4 bg-white border-[2px] border-black rounded-[16px] shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] transition-all text-left group"
@@ -246,7 +246,7 @@ const StudentDashboard = () => {
                                 <h3 className="text-[9px] font-black uppercase tracking-[0.2em] flex items-center gap-1.5">
                                     <ArrowUpRight size={12} className="text-nile-green" /> COMMUNITY PULSE
                                 </h3>
-                                <button onClick={() => navigate('/student/feed')} className="text-[8px] font-black text-nile-blue uppercase hover:text-nile-green transition-colors flex items-center gap-0.5">
+                                <button onClick={() => navigate('/feed')} className="text-[8px] font-black text-nile-blue uppercase hover:text-nile-green transition-colors flex items-center gap-0.5">
                                     VIEW ALL <ChevronRight size={9} strokeWidth={3} />
                                 </button>
                             </div>
@@ -274,7 +274,7 @@ const StudentDashboard = () => {
                                     <span className="flex items-center gap-1 text-[7px] font-black text-nile-green"><Target size={8}/> {jobs[jobIdx].match}% MATCH</span>
                                 </div>
                             </div>
-                            <button onClick={() => navigate('/student/jobs')} className="mt-3 w-full py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-1">
+                            <button onClick={() => navigate('/jobs')} className="mt-3 w-full py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-1">
                                 APPLY NOW <ArrowUpRight size={10} strokeWidth={3} />
                             </button>
                         </div>
@@ -283,21 +283,21 @@ const StudentDashboard = () => {
                         <div className="bg-white border-[2px] border-black rounded-[18px] p-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
                             <div className="flex items-center justify-between mb-3">
                                 <h3 className="text-[9px] font-black uppercase tracking-widest">Network</h3>
-                                <button onClick={() => navigate('/student/network')} className="text-[7px] font-black text-nile-blue uppercase hover:text-nile-green transition-colors">SEE ALL →</button>
+                                <button onClick={() => navigate('/network')} className="text-[7px] font-black text-nile-blue uppercase hover:text-nile-green transition-colors">SEE ALL →</button>
                             </div>
                             <div className="flex items-center mb-3">
                                 {['Mary Johnson','James Brown','Sophia Chen','Ahmad Garba'].map((n,i) => (
-                                    <div key={n} className="w-7 h-7 rounded-full border-[2px] border-white overflow-hidden flex-shrink-0 hover:scale-110 transition-transform cursor-pointer" style={{marginLeft:i>0?'-7px':0,zIndex:4-i}} onClick={() => navigate('/student/network')}>
+                                    <div key={n} className="w-7 h-7 rounded-full border-[2px] border-white overflow-hidden flex-shrink-0 hover:scale-110 transition-transform cursor-pointer" style={{marginLeft:i>0?'-7px':0,zIndex:4-i}} onClick={() => navigate('/network')}>
                                         <Avatar name={n} size="sm" />
                                     </div>
                                 ))}
-                                <div className="w-7 h-7 rounded-full border-[2px] border-black bg-nile-white flex items-center justify-center text-[6px] font-black text-black/40 cursor-pointer hover:bg-nile-blue hover:text-white transition-all" style={{marginLeft:'-7px',zIndex:0}} onClick={() => navigate('/student/network')}>+8</div>
+                                <div className="w-7 h-7 rounded-full border-[2px] border-black bg-nile-white flex items-center justify-center text-[6px] font-black text-black/40 cursor-pointer hover:bg-nile-blue hover:text-white transition-all" style={{marginLeft:'-7px',zIndex:0}} onClick={() => navigate('/network')}>+8</div>
                             </div>
                             <div className="space-y-1.5">
-                                <MentorRow name="Mary Johnson" role="Career Advisor" onMail={() => navigate('/student/messages')} />
-                                <MentorRow name="James Brown" role="Industry Mentor" onMail={() => navigate('/student/messages')} />
+                                <MentorRow name="Mary Johnson" role="Career Advisor" onMail={() => navigate('/messages')} />
+                                <MentorRow name="James Brown" role="Industry Mentor" onMail={() => navigate('/messages')} />
                             </div>
-                            <button onClick={() => navigate('/student/network')} className="mt-3 w-full py-1.5 border-[2px] border-dashed border-black/15 rounded-xl text-[8px] font-black uppercase tracking-widest text-black/35 hover:border-nile-blue hover:text-nile-blue transition-all flex items-center justify-center gap-1">
+                            <button onClick={() => navigate('/network')} className="mt-3 w-full py-1.5 border-[2px] border-dashed border-black/15 rounded-xl text-[8px] font-black uppercase tracking-widest text-black/35 hover:border-nile-blue hover:text-nile-blue transition-all flex items-center justify-center gap-1">
                                 <Users size={10} strokeWidth={3} /> EXPAND NETWORK
                             </button>
                         </div>
@@ -313,7 +313,7 @@ const StudentDashboard = () => {
                             <EventRow time="9:45" title="Electronics Lesson" tag="CLASS" active />
                             <EventRow time="11:00" title="Resume Workshop" tag="CAREER" />
                             <EventRow time="14:00" title="Career Fair" tag="EVENT" />
-                            <button onClick={() => navigate('/student/events')} className="mt-2.5 w-full py-1.5 bg-nile-white border-[2px] border-black rounded-xl text-[8px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all flex items-center justify-center gap-1">
+                            <button onClick={() => navigate('/events')} className="mt-2.5 w-full py-1.5 bg-nile-white border-[2px] border-black rounded-xl text-[8px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all flex items-center justify-center gap-1">
                                 <CalendarIcon size={10} strokeWidth={3} /> FULL CALENDAR
                             </button>
                         </div>
@@ -327,7 +327,7 @@ const StudentDashboard = () => {
                             <p className="text-[9px] font-bold text-black/65 leading-relaxed">
                                 Add your LinkedIn to increase recruiter visibility by <strong className="text-nile-blue">3×</strong>.
                             </p>
-                            <button onClick={() => navigate('/student/profile/edit')} className="mt-1.5 text-[7px] font-black text-nile-green uppercase tracking-widest hover:underline flex items-center gap-0.5">
+                            <button onClick={() => navigate('/profile/edit')} className="mt-1.5 text-[7px] font-black text-nile-green uppercase tracking-widest hover:underline flex items-center gap-0.5">
                                 UPDATE <ChevronRight size={9} strokeWidth={3} />
                             </button>
                         </div>

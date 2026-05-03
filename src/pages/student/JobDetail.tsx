@@ -43,7 +43,7 @@ const JobDetail = () => {
                 
                 {/* Back Navigation */}
                 <button 
-                    onClick={() => navigate('/student/jobs')}
+                    onClick={() => navigate('/jobs')}
                     className="flex items-center space-x-2 text-black/40 font-black uppercase tracking-widest text-[9px] hover:text-black transition-colors"
                 >
                     <ArrowLeft size={14} strokeWidth={3} />
@@ -74,7 +74,7 @@ const JobDetail = () => {
                         <Button variant="outline" size="md" className="px-5">
                             <Bookmark size={18} fill={job.saved ? 'black' : 'none'} />
                         </Button>
-                        <Button variant="primary" size="md" className="flex-1 md:flex-none" onClick={() => navigate('/student/applications')}>
+                        <Button variant="primary" size="md" className="flex-1 md:flex-none" onClick={() => navigate('/applications')}>
                             APPLY NOW <ExternalLink size={16} className="ml-2" />
                         </Button>
                     </div>

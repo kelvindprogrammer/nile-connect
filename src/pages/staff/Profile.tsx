@@ -10,6 +10,7 @@ import { useProfilePicture } from '../../hooks/useProfilePicture';
 import { useToast } from '../../context/ToastContext';
 import { getDashboardStats, DashboardStats } from '../../services/staffService';
 import DeleteAccountModal from '../../components/DeleteAccountModal';
+import { getHomeUrl } from '../../utils/subdomain';
 
 const StaffProfile = () => {
     const { user, logout } = useAuth();
@@ -39,7 +40,7 @@ const StaffProfile = () => {
         }
     };
 
-    const handleLogout = () => { logout(); navigate('/login'); };
+    const handleLogout = () => { logout(); window.location.href = getHomeUrl('/login'); };
 
     const statItems = stats ? [
         { label: 'STUDENTS', value: stats.total_students, icon: <Users size={16} /> },
@@ -136,7 +137,7 @@ const StaffProfile = () => {
                             icon={<Settings size={14} />}
                             label="ACCOUNT SETTINGS"
                             desc="Password, security preferences"
-                            onClick={() => navigate('/staff/settings')}
+                            onClick={() => navigate('/settings')}
                         />
                         <ActionRow
                             icon={<LogOut size={14} />}

@@ -40,10 +40,47 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		seedDemo(w, r)
 	case "delete-account":
 		deleteAccount(w, r)
+	case "session":
+		sessionHandler(w, r)
 	default:
 		respond.Error(w, http.StatusNotFound, "not found")
 	}
 }
+
+// ── session proxy ──────────────────────────────────────────────────────────────
+
+func sessionHandler(w http.ResponseWriter, r *http.Request) {
+	req, err := http.NewRequest(http.MethodGet, "https://api.builtbysalih.com/api/session", nil)
+	if err != nil {
+		respond.Error(w, http.StatusInternalServerError, "internal server error")
+		return
+	}
+	req.Header.Set("Cookie", r.Header.Get("Cookie"))
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		respond.Error(w, http.StatusInternalServerError, "failed to reach auth service")
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		respond.Error(w, http.StatusUnauthorized, "unauthorized")
+		return
+	}
+
+	var sessionResp map[string]any
+	if err := json.NewDecoder(resp.Body).Decode(&sessionResp); err != nil {
+		respond.Error(w, http.StatusInternalServerError, "failed to decode auth response")
+		return
+	}
+
+	// Forward the exact JSON response back to the client
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(sessionResp)
+}
+
 
 // ── shared response type ──────────────────────────────────────────────────────
 

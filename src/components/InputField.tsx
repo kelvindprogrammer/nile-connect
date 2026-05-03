@@ -1,47 +1,42 @@
-import React from 'react';
+import * as React from "react"
+import { cn } from "../lib/utils"
 
-interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
-    label: string;
-    error?: string;
+export interface InputProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {
+    label?: string;
     icon?: React.ReactNode;
 }
 
-const InputField: React.FC<InputFieldProps> = ({ label, error, icon, className = '', ...props }) => {
+const InputField = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type, label, icon, ...props }, ref) => {
     return (
-        <div className={`flex flex-col space-y-1.5 w-full text-left`}>
-            <label className="text-[9px] font-black text-black uppercase tracking-[0.15em] ml-1">
-                {label}
-            </label>
-            
-            <div className="relative group">
-                {icon && (
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-nile-blue/40 group-focus-within:text-nile-blue transition-colors">
-                        {React.cloneElement(icon as React.ReactElement, { size: 16 })}
-                    </div>
-                )}
-                
-                <input
-                    className={`
-                        w-full bg-nile-white/40 border-[2px] border-black rounded-xl py-3 px-4
-                        font-bold text-xs text-black placeholder:text-nile-blue/20 outline-none
-                        transition-all duration-200
-                        ${icon ? 'pl-11' : ''}
-                        focus:bg-white focus:border-nile-blue focus:shadow-[3px_3px_0px_0px_#1E499D]
-                        hover:bg-white
-                        ${error ? 'border-red-500 shadow-[3px_3px_0px_0px_#EF4444]' : ''}
-                        ${className}
-                    `}
-                    {...props}
-                />
+      <div className="flex flex-col gap-1.5 w-full">
+        {label && (
+          <label className="text-[10px] font-black text-black/40 uppercase tracking-[0.2em] ml-1">
+            {label}
+          </label>
+        )}
+        <div className="relative group">
+          {icon && (
+            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-black/30 group-focus-within:text-nile-blue transition-colors">
+              {icon}
             </div>
-            
-            {error && (
-                <p className="text-[9px] font-black text-red-500 uppercase tracking-widest ml-1">
-                    {error}
-                </p>
+          )}
+          <input
+            type={type}
+            className={cn(
+              "flex h-11 w-full rounded-xl border-[2px] border-black bg-nile-white/40 px-4 py-2 text-sm font-bold ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:bg-white focus-visible:shadow-[3px_3px_0px_0px_rgba(30,73,157,1)] transition-all disabled:cursor-not-allowed disabled:opacity-50",
+              icon && "pl-11",
+              className
             )}
+            ref={ref}
+            {...props}
+          />
         </div>
-    );
-};
+      </div>
+    )
+  }
+)
+InputField.displayName = "InputField"
 
-export default InputField;
+export default InputField

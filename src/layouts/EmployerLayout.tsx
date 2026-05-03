@@ -9,14 +9,15 @@ import NileConnectLogo from '../components/NileConnectLogo';
 import NotificationTray from '../components/NotificationTray';
 import { useAuth } from '../context/AuthContext';
 import { useProfilePicture } from '../hooks/useProfilePicture';
+import { getRelativePath, getHomeUrl } from '../utils/subdomain';
 
 const navItems = [
-    { to: '/employer',              icon: <Home />,      label: 'DASH',      exact: true },
-    { to: '/employer/candidates',   icon: <Users />,     label: 'TALENT' },
-    { to: '/employer/jobs',         icon: <Briefcase />, label: 'JOBS' },
-    { to: '/employer/applications', icon: <Briefcase />, label: 'APPS' },
-    { to: '/employer/messages',     icon: <Mail />,      label: 'MAIL' },
-    { to: '/employer/profile',      icon: <UserRound />, label: 'ME' },
+    { to: '/',              icon: <Home />,      label: 'DASH',      exact: true },
+    { to: '/candidates',   icon: <Users />,     label: 'TALENT' },
+    { to: '/jobs',         icon: <Briefcase />, label: 'JOBS' },
+    { to: '/applications', icon: <Briefcase />, label: 'APPS' },
+    { to: '/messages',     icon: <Mail />,      label: 'MAIL' },
+    { to: '/profile',      icon: <UserRound />, label: 'ME' },
 ];
 
 const isActive = (to: string, pathname: string, exact = false) =>
@@ -86,7 +87,7 @@ const EmployerLayout = () => {
 
             {/* Desktop Sidebar */}
             <aside className="hidden md:flex w-[84px] bg-white border-r-[2px] border-black flex-col items-center py-5 z-30 flex-shrink-0">
-                <div onClick={() => navigate('/employer')} className="mb-6 cursor-pointer hover:scale-105 transition-transform">
+                <div onClick={() => navigate('/')} className="mb-6 cursor-pointer hover:scale-105 transition-transform">
                     <NileConnectLogo size="xs" showText={false} animated />
                 </div>
                 <nav className="flex-1 flex flex-col items-center space-y-0.5 w-full overflow-y-auto px-1">
@@ -96,11 +97,11 @@ const EmployerLayout = () => {
                     ))}
                 </nav>
                 <div className="mt-auto pt-3 border-t-[2px] border-black/5 w-full flex flex-col items-center gap-3">
-                    <button onClick={() => { logout(); navigate('/login'); }} className="opacity-40 hover:opacity-100 text-red-500 transition-all p-1">
+                    <button onClick={() => { logout(); window.location.href = getHomeUrl('/login'); }} className="opacity-40 hover:opacity-100 text-red-500 transition-all p-1">
                         <LogOut size={17} />
                     </button>
                     <div className="w-9 h-9 rounded-full border-[2px] border-black/10 overflow-hidden cursor-pointer hover:border-black transition-colors"
-                        onClick={() => navigate('/employer/profile')}>
+                        onClick={() => navigate('/profile')}>
                         {picture
                             ? <img src={picture} alt={userName} className="w-full h-full object-cover" />
                             : <Avatar name={userName} size="sm" />}
@@ -126,11 +127,11 @@ const EmployerLayout = () => {
             <main className="flex-1 flex flex-col min-w-0 bg-white h-full relative">
                 <header className="border-b-[2px] border-black flex items-center justify-between px-4 md:px-6 bg-white/90 backdrop-blur-md sticky top-0 z-20 flex-shrink-0" style={{ height: '52px' }}>
                     <div className="flex items-center gap-3">
-                        <div onClick={() => navigate('/employer/profile')} className="md:hidden w-8 h-8 rounded-lg border-2 border-black overflow-hidden cursor-pointer">
+                        <div onClick={() => navigate('/profile')} className="md:hidden w-8 h-8 rounded-lg border-2 border-black overflow-hidden cursor-pointer">
                             {picture ? <img src={picture} alt={userName} className="w-full h-full object-cover" /> : <Avatar name={userName} size="sm" />}
                         </div>
                         <div className="hidden sm:flex items-center text-[8px] font-black uppercase tracking-widest text-black/40">
-                            <span className="hover:text-black cursor-pointer transition-colors" onClick={() => navigate('/employer')}>RECRUITER HUB</span>
+                            <span className="hover:text-black cursor-pointer transition-colors" onClick={() => navigate('/')}>RECRUITER HUB</span>
                             {breadcrumbs.map((c, i) => (
                                 <React.Fragment key={c}>
                                     <ChevronRight size={9} className="mx-1.5 opacity-30" />
