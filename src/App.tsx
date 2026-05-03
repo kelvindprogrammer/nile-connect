@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import PageTransition from './components/PageTransition';
 import { ToastProvider } from './context/ToastContext';
@@ -74,17 +74,6 @@ const T = ({ children }: { children: React.ReactNode }) => (
     <PageTransition>{children}</PageTransition>
 );
 
-const SSORedirect = ({ type }: { type: 'sign-in' | 'sign-out' }) => {
-    useEffect(() => {
-        window.location.href = `https://portal.builtbysalih.com/${type}?callbackURL=${encodeURIComponent(window.location.origin)}`;
-    }, [type]);
-    return (
-        <div className="flex items-center justify-center h-screen bg-white">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
-        </div>
-    );
-};
-
 const App = () => {
     const subdomain = getSubdomain();
 
@@ -146,12 +135,10 @@ const App = () => {
                         {/* --- Shared Public & Onboarding Routes --- */}
                         <Route path="/"           element={<Navigate to="/onboarding" replace />} />
                         <Route path="/onboarding" element={<T><Onboarding /></T>} />
-                        
-                        {/* Auth is handled by Campus One SSO, intercept these routes */}
-                        <Route path="/login"            element={<SSORedirect type="sign-in" />} />
-                        <Route path="/register"         element={<SSORedirect type="sign-in" />} />
-                        <Route path="/join-as"          element={<SSORedirect type="sign-in" />} />
-                        <Route path="/forgot-password"  element={<SSORedirect type="sign-in" />} />
+                        <Route path="/login"            element={<T><Login /></T>} />
+                        <Route path="/register"         element={<T><Register /></T>} />
+                        <Route path="/join-as"          element={<T><JoinAs /></T>} />
+                        <Route path="/forgot-password"  element={<T><ForgotPassword /></T>} />
 
                         {/* Onboarding / setup flow */}
                         <Route path="/student-status"        element={<T><StudentStatus /></T>} />
