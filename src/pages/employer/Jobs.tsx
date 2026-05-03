@@ -125,7 +125,7 @@ const EmployerJobs = () => {
                                     </button>
                                 </div>
                                 <div className="pt-4 md:pt-6 border-t-[1.5px] md:border-t-2 border-dashed border-black/5 mt-4 md:mt-6 flex justify-between items-center">
-                                    <button onClick={() => navigate('/applications')} className="text-[8px] md:text-[10px] font-black text-nile-blue underline underline-offset-4 hover:text-nile-green transition-colors uppercase tracking-widest">REVIEW CANDIDATES</button>
+                                    <button onClick={() => navigate('/employer/applications')} className="text-[8px] md:text-[10px] font-black text-nile-blue underline underline-offset-4 hover:text-nile-green transition-colors uppercase tracking-widest">REVIEW CANDIDATES</button>
                                     <button className="text-[8px] md:text-[10px] font-black text-red-500 uppercase tracking-widest">ARCHIVE</button>
                                 </div>
                             </Card>

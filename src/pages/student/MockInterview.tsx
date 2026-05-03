@@ -151,7 +151,7 @@ const MockInterview = () => {
             <DashboardLayout>
                 <div className="p-4 md:p-10 space-y-8 font-sans bg-nile-white min-h-full pb-24 text-left anime-fade-in">
                     <div className="flex items-center gap-4 border-b-[2px] border-black pb-6">
-                        <button onClick={() => navigate('/career')} className="p-2 border-2 border-black rounded-xl hover:bg-black hover:text-white transition-all">
+                        <button onClick={() => navigate('/student/career')} className="p-2 border-2 border-black rounded-xl hover:bg-black hover:text-white transition-all">
                             <ArrowLeft size={18} strokeWidth={3} />
                         </button>
                         <div>
@@ -288,7 +288,7 @@ const MockInterview = () => {
                         <Button onClick={() => { setPhase('setup'); setQas([]); setHistory([]); setCurrentAnswer(''); setQuestionCount(0); }} variant="outline" fullWidth>
                             <RefreshCw size={14} className="mr-2" /> NEW SESSION
                         </Button>
-                        <Button onClick={() => navigate('/career')} fullWidth>
+                        <Button onClick={() => navigate('/student/career')} fullWidth>
                             <ChevronRight size={14} className="mr-2" /> DONE
                         </Button>
                     </div>

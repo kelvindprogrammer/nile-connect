@@ -12,7 +12,6 @@ import {
     type StudentRegisterRequest,
     type EmployerRegisterRequest,
 } from '../../services/authService';
-import { redirectToPortal } from '../../utils/navigation';
 
 const Register = () => {
     const navigate = useNavigate();
@@ -97,12 +96,7 @@ const Register = () => {
                 const resp = await registerStudent(req);
                 loginWithResponse(resp);
                 showToast(`Account created! Welcome, ${formData.name}`, 'success');
-                
-                if (roleParam === 'staff') {
-                    redirectToPortal('staff');
-                } else {
-                    navigate('/profile-completion');
-                }
+                navigate(roleParam === 'staff' ? '/staff' : '/profile-completion');
             }
         } catch (err: any) {
             const msg =

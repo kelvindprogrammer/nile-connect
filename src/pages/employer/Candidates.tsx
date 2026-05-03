@@ -113,7 +113,7 @@ const EmployerCandidates = () => {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                     {filtered.map(c => (
-                        <CandidateCard key={c.student_id} candidate={c} onMessage={() => navigate('/messages')} />
+                        <CandidateCard key={c.student_id} candidate={c} onMessage={() => navigate('/employer/messages')} />
                     ))}
                 </div>
             )}
@@ -166,10 +166,7 @@ const CandidateCard = ({ candidate, onMessage }: {
                     className="flex-1 flex items-center justify-center gap-1.5 py-2.5 border-[2px] border-black rounded-xl font-black text-[8px] uppercase hover:bg-black hover:text-white transition-all">
                     <MessageSquare size={12} /> MESSAGE
                 </button>
-                <button 
-                    onClick={() => navigate(`/candidates/${candidate.student_id}`)}
-                    className="p-2.5 border-[2px] border-black rounded-xl text-black/40 hover:border-nile-blue hover:text-nile-blue transition-all"
-                >
+                <button className="p-2.5 border-[2px] border-black rounded-xl text-black/40 hover:border-nile-blue hover:text-nile-blue transition-all">
                     <ArrowUpRight size={14} />
                 </button>
             </div>

@@ -10,7 +10,6 @@ import Button from '../../components/Button';
 import { useToast } from '../../context/ToastContext';
 import Avatar from '../../components/Avatar';
 import { useAuth } from '../../context/AuthContext';
-import { useLearningPath } from '../../hooks/useLearningPath';
 import {
     sendChatMessage,
     reviewCV,
@@ -42,9 +41,9 @@ const Badge = ({ label }: { label: string }) => (
 );
 
 const AnalysisCard = ({
-    icon, title, items, alert = false, onAdd,
+    icon, title, items, alert = false,
 }: {
-    icon: React.ReactNode; title: string; items: string[]; alert?: boolean; onAdd?: (item: string) => void;
+    icon: React.ReactNode; title: string; items: string[]; alert?: boolean;
 }) => (
     <div
         className={`bg-white border-3 border-black rounded-[28px] p-6 md:p-8 flex flex-col transition-all hover:translate-x-[2px] hover:translate-y-[2px] shadow-brutalist-sm text-left ${alert ? 'border-red-500/20' : ''}`}
@@ -55,19 +54,9 @@ const AnalysisCard = ({
         </div>
         <ul className="space-y-3 flex-1">
             {items.map((it, i) => (
-                <li key={i} className="flex items-center justify-between group">
-                    <div className="flex items-start space-x-2 text-[9px] md:text-[10px] font-black text-nile-blue/60 uppercase">
-                        <ChevronDown size={14} className="-rotate-90 text-black/20 group-hover:text-black transition-colors" />
-                        <span className="group-hover:text-black transition-colors">{it}</span>
-                    </div>
-                    {onAdd && (
-                        <button 
-                            onClick={() => onAdd(it)}
-                            className="opacity-0 group-hover:opacity-100 p-1 bg-nile-green text-white rounded-md border border-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[-1px] transition-all"
-                        >
-                            <Plus size={10} strokeWidth={3} />
-                        </button>
-                    )}
+                <li key={i} className="flex items-start space-x-2 text-[9px] md:text-[10px] font-black text-nile-blue/60 uppercase group">
+                    <ChevronDown size={14} className="-rotate-90 text-black/20 group-hover:text-black transition-colors" />
+                    <span className="group-hover:text-black transition-colors">{it}</span>
                 </li>
             ))}
         </ul>
@@ -93,7 +82,6 @@ const OptimizationStep = ({ num, task, desc }: { num: string; task: string; desc
 const AICounselor = () => {
     const { showToast } = useToast();
     const { user } = useAuth();
-    const { addTask } = useLearningPath();
 
     // CV upload & review
     const [cvFile, setCvFile] = useState<File | null>(null);
@@ -167,16 +155,6 @@ const AICounselor = () => {
     const handleRequestConsultation = () => {
         setRequestedConsultation(true);
         showToast('Consultation request sent to Career Services.', 'success');
-    };
-
-    const handleAddTask = (item: string) => {
-        addTask({
-            title: item,
-            source: 'AI Recommendation',
-            category: item.toLowerCase().includes('course') || item.toLowerCase().includes('learn') ? 'course' : 'skill',
-            priority: 'medium'
-        });
-        showToast('Added to your Learning Path!', 'success');
     };
 
     // -----------------------------------------------------------------------
@@ -419,7 +397,6 @@ const AICounselor = () => {
                                         'BOOK A CAREER ADVISOR SESSION',
                                         'APPLY TO MATCHED JOB LISTINGS',
                                     ]}
-                                    onAdd={handleAddTask}
                                 />
                             </div>
 

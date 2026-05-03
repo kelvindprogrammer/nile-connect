@@ -34,7 +34,7 @@ const CandidateDetail = () => {
             
             {/* Nav */}
             <button 
-                onClick={() => navigate('/candidates')}
+                onClick={() => navigate('/employer/candidates')}
                 className="flex items-center space-x-2 text-black/40 font-black uppercase tracking-widest text-[9px] hover:text-black transition-colors"
             >
                 <ArrowLeft size={14} strokeWidth={3} />

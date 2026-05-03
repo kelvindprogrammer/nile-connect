@@ -193,7 +193,7 @@ const StaffServices = () => {
                             tab={tab}
                             loading={!!actionLoading[student.id]}
                             onVerify={handleVerify}
-                            onMessage={() => navigate('/messages')}
+                            onMessage={() => navigate('/staff/messages')}
                         />
                     ))}
                 </div>
