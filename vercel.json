@@ -22,10 +22,11 @@
     { "source": "/api/auth/reset-password",     "destination": "/api/auth?path=reset-password" },
     { "source": "/api/auth/seed-demo",          "destination": "/api/auth?path=seed-demo" },
     { "source": "/api/auth/delete-account",     "destination": "/api/auth?path=delete-account" },
-    { "source": "/api/auth/session",            "destination": "/api/auth?path=session" },
 
     { "source": "/api/student/profile",         "destination": "/api/student?path=profile" },
     { "source": "/api/student/applications",    "destination": "/api/student?path=applications" },
+
+    { "source": "/api/jobs/:id",                "destination": "/api/jobs?id=:id" },
 
     { "source": "/api/staff/dashboard",         "destination": "/api/staff?path=dashboard" },
     { "source": "/api/staff/applications",      "destination": "/api/staff?path=applications" },

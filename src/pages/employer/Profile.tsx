@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Building2, Link2, UserRound, Pencil, X, Mail, Globe, LogOut, Loader2, ShieldCheck, ShieldAlert, AlertCircle, Trash2 } from 'lucide-react';
+import { Settings, Building2, Link2, Pencil, X, Mail, Globe, LogOut, Loader2, ShieldCheck, ShieldAlert, Trash2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Avatar from '../../components/Avatar';
@@ -8,6 +8,7 @@ import Card from '../../components/Card';
 import { useToast } from '../../context/ToastContext';
 import { getHomeUrl } from '../../utils/subdomain';
 import { getEmployerProfile, updateEmployerProfile, EmployerProfile as EProfile } from '../../services/employerService';
+import { deleteAccount } from '../../services/authService';
 
 const EmployerProfile = () => {
     const { user, logout } = useAuth();
@@ -130,14 +131,15 @@ const EmployerProfile = () => {
                     <LogOut size={16} className="mr-2" /> EXIT RECRUITER HUB
                 </Button>
                 
-                <button 
-                    onClick={() => {
-                        if (window.confirm('Are you sure you want to delete your employer account? All job listings and application data will be permanently removed.')) {
-                            showToast('Deleting account...', 'info');
-                            setTimeout(() => {
-                                localStorage.clear();
-                                window.location.href = getHomeUrl('/');
-                            }, 1500);
+                <button
+                    onClick={async () => {
+                        if (!window.confirm('Delete your employer account? All job listings and application data will be permanently removed. This cannot be undone.')) return;
+                        try {
+                            await deleteAccount();
+                            logout();
+                            window.location.href = getHomeUrl('/');
+                        } catch {
+                            showToast('Failed to delete account. Please try again.', 'error');
                         }
                     }}
                     className="flex items-center gap-2 px-4 py-2 border-[2px] border-red-200 rounded-xl text-red-500 text-[9px] font-black uppercase hover:bg-red-50 transition-all"

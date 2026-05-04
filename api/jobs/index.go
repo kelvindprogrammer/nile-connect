@@ -46,6 +46,49 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		q := r.URL.Query()
+
+		// GET /api/jobs?id=<uuid> — single job detail
+		if jobID := q.Get("id"); jobID != "" {
+			var job models.Job
+			if err := database.Where("id = ? AND deleted_at IS NULL", jobID).First(&job).Error; err != nil {
+				respond.Error(w, http.StatusNotFound, "job not found")
+				return
+			}
+			type jobDetail struct {
+				ID             string    `json:"id"`
+				Title          string    `json:"title"`
+				CompanyName    string    `json:"company_name"`
+				Location       string    `json:"location"`
+				Type           string    `json:"type"`
+				Salary         string    `json:"salary"`
+				Skills         string    `json:"skills"`
+				Description    string    `json:"description"`
+				Requirements   string    `json:"requirements"`
+				Status         string    `json:"status"`
+				ApplicantCount int       `json:"applicant_count"`
+				PostedAt       time.Time `json:"posted_at"`
+			}
+			detail := jobDetail{
+				ID:             job.ID,
+				Title:          job.Title,
+				Location:       job.Location,
+				Type:           job.Type,
+				Salary:         job.Salary,
+				Skills:         job.Skills,
+				Description:    job.Description,
+				Requirements:   job.Requirements,
+				Status:         job.Status,
+				ApplicantCount: job.ApplicantCount,
+				PostedAt:       job.CreatedAt,
+			}
+			var emp models.EmployerProfile
+			if database.Where("user_id = ?", job.EmployerID).First(&emp).Error == nil {
+				detail.CompanyName = emp.CompanyName
+			}
+			respond.OK(w, map[string]any{"job": detail})
+			return
+		}
+
 		query := database.Model(&models.Job{}).Where("status = ? AND deleted_at IS NULL", "active")
 		if t := q.Get("type"); t != "" {
 			query = query.Where("type = ?", t)

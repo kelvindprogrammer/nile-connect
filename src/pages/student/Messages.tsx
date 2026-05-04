@@ -174,7 +174,7 @@ const Messages = () => {
         localStreamRef.current = null;
         currentCallRef.current = null;
         if (callTimerRef.current) clearInterval(callTimerRef.current);
-        showToast(`Call ended (${formatDuration(callDuration)})`, 'info');
+        showToast(`Call ended (${formatDuration(callDuration)})`, 'success');
         setCallType(null);
         setIsMuted(false);
         setIsVideoOff(false);

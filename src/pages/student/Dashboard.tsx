@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { apiClient } from '../../services/api';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import {
     Briefcase, Brain, Mic, Users, Mail, CalendarIcon,
@@ -86,16 +87,29 @@ const StudentDashboard = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [uploadingPic, setUploadingPic] = useState(false);
     const [jobIdx, setJobIdx] = useState(0);
+    const [appCount, setAppCount] = useState<number | null>(null);
+    const [jobCount, setJobCount] = useState<number | null>(null);
     const fileRef = useRef<HTMLInputElement>(null);
 
-    const jobs = [
+    const spotlightJobs = [
         { company: 'Google Nigeria', role: 'Software Engineer Intern', type: 'REMOTE', match: 94 },
         { company: 'Shell Nigeria', role: 'Data Analyst', type: 'HYBRID', match: 88 },
         { company: 'Access Bank', role: 'Business Analyst', type: 'ONSITE', match: 81 },
     ];
 
-    useEffect(() => { const t = setTimeout(() => setIsLoading(false), 250); return () => clearTimeout(t); }, []);
-    useEffect(() => { const iv = setInterval(() => setJobIdx(i => (i+1) % jobs.length), 4000); return () => clearInterval(iv); }, []);
+    useEffect(() => {
+        const t = setTimeout(() => setIsLoading(false), 250);
+        apiClient.get<any>('/api/student/applications').then(r => {
+            const apps = r.data?.data?.applications ?? [];
+            setAppCount(Array.isArray(apps) ? apps.length : 0);
+        }).catch(() => setAppCount(0));
+        apiClient.get<any>('/api/jobs').then(r => {
+            const jobs = r.data?.data?.jobs ?? [];
+            setJobCount(Array.isArray(jobs) ? jobs.length : 0);
+        }).catch(() => setJobCount(0));
+        return () => clearTimeout(t);
+    }, []);
+    useEffect(() => { const iv = setInterval(() => setJobIdx(i => (i+1) % spotlightJobs.length), 4000); return () => clearInterval(iv); }, []);
 
     const handlePicSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const f = e.target.files?.[0]; if (!f) return;
@@ -184,10 +198,10 @@ const StudentDashboard = () => {
                             {/* Stats 2×2 */}
                             <div className="hidden sm:grid grid-cols-2 gap-1.5">
                                 {[
-                                    { v:'0',    l:'APPS',   c:'text-black' },
-                                    { v:'3',    l:'NET',    c:'text-nile-blue' },
-                                    { v:'2',    l:'EVENTS', c:'text-yellow-500' },
-                                    { v:'150+', l:'JOBS',   c:'text-nile-green' },
+                                    { v: appCount !== null ? String(appCount) : '—', l:'APPS',   c:'text-black' },
+                                    { v:'—',    l:'NET',    c:'text-nile-blue' },
+                                    { v:'—',    l:'EVENTS', c:'text-yellow-500' },
+                                    { v: jobCount !== null ? `${jobCount}` : '—', l:'JOBS', c:'text-nile-green' },
                                 ].map(s => (
                                     <div key={s.l} className="bg-nile-white border border-black/10 rounded-xl px-3 py-1.5 text-center min-w-[50px]">
                                         <p className={`text-sm font-black leading-none ${s.c}`}>{s.v}</p>
@@ -264,14 +278,14 @@ const StudentDashboard = () => {
                                     <Star size={11} className="text-yellow-300" fill="#fde047" />
                                     <p className="text-[7px] font-black uppercase tracking-widest opacity-60">JOB SPOTLIGHT</p>
                                 </div>
-                                <div className="flex gap-1">{jobs.map((_,i) => <div key={i} className={`h-1 rounded-full transition-all ${i===jobIdx?'w-3 bg-nile-green':'w-1 bg-white/20'}`}/>)}</div>
+                                <div className="flex gap-1">{spotlightJobs.map((_,i) => <div key={i} className={`h-1 rounded-full transition-all ${i===jobIdx?'w-3 bg-nile-green':'w-1 bg-white/20'}`}/>)}</div>
                             </div>
                             <div key={jobIdx} className="space-y-1.5 animate-in fade-in duration-500">
-                                <p className="text-[7px] font-black text-white/50 uppercase">{jobs[jobIdx].company}</p>
-                                <h4 className="text-sm font-black uppercase leading-tight">{jobs[jobIdx].role}</h4>
+                                <p className="text-[7px] font-black text-white/50 uppercase">{spotlightJobs[jobIdx].company}</p>
+                                <h4 className="text-sm font-black uppercase leading-tight">{spotlightJobs[jobIdx].role}</h4>
                                 <div className="flex items-center gap-1.5">
-                                    <span className="text-[7px] font-black px-2 py-0.5 bg-white/10 border border-white/20 rounded-full uppercase">{jobs[jobIdx].type}</span>
-                                    <span className="flex items-center gap-1 text-[7px] font-black text-nile-green"><Target size={8}/> {jobs[jobIdx].match}% MATCH</span>
+                                    <span className="text-[7px] font-black px-2 py-0.5 bg-white/10 border border-white/20 rounded-full uppercase">{spotlightJobs[jobIdx].type}</span>
+                                    <span className="flex items-center gap-1 text-[7px] font-black text-nile-green"><Target size={8}/> {spotlightJobs[jobIdx].match}% MATCH</span>
                                 </div>
                             </div>
                             <button onClick={() => navigate('/jobs')} className="mt-3 w-full py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-1">

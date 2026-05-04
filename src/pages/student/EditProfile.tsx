@@ -15,10 +15,11 @@ import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { useProfile, type Experience } from '../../hooks/useProfile';
 import { useProfilePicture } from '../../hooks/useProfilePicture';
+import { deleteAccount } from '../../services/authService';
 
 const EditProfile = () => {
     const navigate = useNavigate();
-    const { user, login } = useAuth();
+    const { user, login, logout } = useAuth();
     const { showToast } = useToast();
     const { profile, updateProfile } = useProfile();
     const { picture, uploadPicture, removePicture } = useProfilePicture();
@@ -125,7 +126,7 @@ const EditProfile = () => {
                             {picture && <p className="text-[8px] font-black text-nile-green uppercase">✓ PHOTO UPLOADED</p>}
                             <div className="flex gap-2 pt-1 justify-center sm:justify-start">
                                 <Button size="xs" variant="primary" type="button" onClick={() => picInputRef.current?.click()}>UPLOAD NEW</Button>
-                                {picture && <Button size="xs" variant="outline" type="button" onClick={() => { removePicture(); showToast('Photo removed', 'info'); }}>REMOVE</Button>}
+                                {picture && <Button size="xs" variant="outline" type="button" onClick={() => { removePicture(); showToast('Photo removed', 'success'); }}>REMOVE</Button>}
                             </div>
                         </div>
                     </div>
@@ -292,13 +293,14 @@ const EditProfile = () => {
                                 type="button" 
                                 variant="outline" 
                                 className="border-red-500 text-red-600 hover:bg-red-600 hover:text-white transition-all shadow-[3px_3px_0px_0px_rgba(220,38,38,1)] hover:shadow-none"
-                                onClick={() => {
-                                    if (window.confirm('Are you absolutely sure you want to delete your account? This action cannot be undone.')) {
-                                        showToast('Account deletion initiated...', 'info');
-                                        setTimeout(() => {
-                                            localStorage.clear();
-                                            window.location.href = getHomeUrl('/');
-                                        }, 1500);
+                                onClick={async () => {
+                                    if (!window.confirm('Are you absolutely sure you want to delete your account? This action cannot be undone.')) return;
+                                    try {
+                                        await deleteAccount();
+                                        logout();
+                                        window.location.href = getHomeUrl('/');
+                                    } catch {
+                                        showToast('Deletion failed. Please try again.', 'error');
                                     }
                                 }}
                             >

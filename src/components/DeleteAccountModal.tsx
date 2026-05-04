@@ -24,7 +24,7 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ onClose }) => {
         try {
             await deleteAccount();
             logout();
-            showToast('Account deleted. Sorry to see you go.', 'info');
+            showToast('Account deleted. Sorry to see you go.', 'success');
             navigate('/onboarding');
         } catch {
             showToast('Deletion failed. Please try again.', 'error');

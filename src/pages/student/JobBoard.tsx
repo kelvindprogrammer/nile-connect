@@ -219,7 +219,7 @@ const JobBoard = () => {
                             <JobCard
                                 key={job.id}
                                 job={job}
-                                onNavigate={() => navigate(`/student/jobs/${job.id}`)}
+                                onNavigate={() => navigate(`/jobs/${job.id}`)}
                                 onApply={() => handleQuickApply(job)}
                             />
                         ))}
