@@ -36,6 +36,7 @@ import EventsCalendar     from './pages/student/EventsCalendar';
 import StudentProfile     from './pages/student/Profile';
 import EditProfile        from './pages/student/EditProfile';
 import LearningPath       from './pages/student/LearningPath';
+import LiveSession        from './pages/student/LiveSession';
 import Network            from './pages/student/Network';
 import StudentMessages    from './pages/student/Messages';
 
@@ -108,6 +109,7 @@ const App = () => (
                         <Route path="profile/edit"     element={<EditProfile />} />
                         <Route path="network"          element={<Network />} />
                         <Route path="messages"         element={<StudentMessages />} />
+                        <Route path="session/:roomId"  element={<LiveSession />} />
                     </Route>
 
                     {/* Staff (authenticated, layout-wrapped) */}

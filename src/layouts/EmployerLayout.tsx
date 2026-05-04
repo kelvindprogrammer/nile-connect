@@ -47,10 +47,8 @@ const SlimNavItem = ({ to, icon, label, isActive, mobile = false }: { to: string
 const EmployerLayout = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { user, logout } = useAuth();
+    const { user, logout, isLoading } = useAuth();
 
-    // Auth guard: redirect to login if not authenticated
-    if (!user) return <Navigate to="/login" replace />;
     const [showNotifications, setShowNotifications] = useState(false);
     const [showMoreMenu, setShowMoreMenu] = useState(false);
     const [progress, setProgress] = useState(0);
@@ -84,10 +82,17 @@ const EmployerLayout = () => {
         { name: 'ME',     path: '/employer/profile',      icon: <UserRound /> },
     ];
 
+    if (isLoading) return (
+        <div className="flex items-center justify-center h-screen bg-white">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-nile-green" />
+        </div>
+    );
+    if (!user) return <Navigate to="/login" replace />;
+
     return (
         <div className="flex h-screen bg-nile-white text-black font-sans overflow-hidden">
-            <div 
-                className="fixed top-0 left-0 h-0.5 bg-nile-green transition-all duration-500 z-[100]" 
+            <div
+                className="fixed top-0 left-0 h-0.5 bg-nile-green transition-all duration-500 z-[100]"
                 style={{ width: `${progress}%`, opacity: progress === 100 ? 0 : 1 }}
             />
 

@@ -261,6 +261,7 @@ const StaffJobs: React.FC = () => {
     const [jobs, setJobs]           = useState<StaffJob[]>([]);
     const [applications, setApplications] = useState<StaffApplication[]>([]);
     const [loading, setLoading]     = useState(true);
+    const [loadError, setLoadError] = useState(false);
     const [actionLoading, setActionLoading] = useState<Record<string, boolean>>({});
 
     // Active jobs tab filters
@@ -278,19 +279,23 @@ const StaffJobs: React.FC = () => {
 
     const loadData = useCallback(async () => {
         setLoading(true);
+        setLoadError(false);
         try {
-            const [jobsData, appsData] = await Promise.all([
+            const [jobsData, appsData] = await Promise.allSettled([
                 getStaffJobs(),
                 getStaffApplications(),
             ]);
-            setJobs(jobsData);
-            setApplications(appsData);
+            if (jobsData.status === 'fulfilled') setJobs(jobsData.value);
+            if (appsData.status === 'fulfilled') setApplications(appsData.value);
+            if (jobsData.status === 'rejected' && appsData.status === 'rejected') {
+                setLoadError(true);
+            }
         } catch {
-            showToast('Failed to load placement data.', 'error');
+            setLoadError(true);
         } finally {
             setLoading(false);
         }
-    }, [showToast]);
+    }, []);
 
     useEffect(() => { loadData(); }, [loadData]);
 
@@ -438,6 +443,21 @@ const StaffJobs: React.FC = () => {
             </div>
         );
     }
+
+    if (loadError) return (
+        <div className="p-8 flex flex-col items-center justify-center min-h-[60vh] gap-4 text-center">
+            <div className="w-16 h-16 bg-red-50 border-[2px] border-red-200 rounded-[20px] flex items-center justify-center">
+                <AlertCircle size={28} className="text-red-400" />
+            </div>
+            <div>
+                <p className="font-black text-lg uppercase text-black">Could not load jobs data</p>
+                <p className="text-[9px] font-black text-black/40 uppercase tracking-widest mt-1">Check your connection or try logging out and back in</p>
+            </div>
+            <button onClick={loadData} className="px-6 py-3 bg-black text-white border-[2px] border-black rounded-xl font-black text-[9px] uppercase tracking-widest shadow-[3px_3px_0px_0px_#6CBB56] hover:shadow-none hover:translate-x-px hover:translate-y-px transition-all">
+                TRY AGAIN
+            </button>
+        </div>
+    );
 
     // ─────────────────────────────────────────────────────────────────────────
     return (

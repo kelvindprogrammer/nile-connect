@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import {
     Upload, Video, ArrowUpRight, BookOpen, Star, ChevronRight,
-    Cpu, Sparkles, X, Calendar, Clock, User, CheckCircle2, Mail,
+    Cpu, Sparkles, X, Calendar, Clock, User, CheckCircle2, Mail, Zap, Copy,
 } from 'lucide-react';
 import Button from '../../components/Button';
 import Avatar from '../../components/Avatar';
@@ -32,17 +32,39 @@ const CareerCenter = () => {
     const [bookingDate, setBookingDate] = useState('');
     const [bookingNote, setBookingNote] = useState('');
     const [bookingDone, setBookingDone] = useState<Set<number>>(new Set());
+    const [sessionLink, setSessionLink] = useState('');
+    const [showSessionModal, setShowSessionModal] = useState(false);
 
     const visibleAdvisors = showAllAdvisors ? allAdvisors : allAdvisors.slice(0, 2);
+
+    const generateRoomId = () => {
+        const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        return Array.from({ length: 12 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    };
+
+    const handleStartLiveSession = () => {
+        const roomId = generateRoomId();
+        const link = `${window.location.origin}/student/session/${roomId}`;
+        setSessionLink(link);
+        setShowSessionModal(true);
+    };
+
+    const handleJoinSession = () => {
+        const roomId = sessionLink.split('/session/')[1];
+        if (roomId) navigate(`/student/session/${roomId}`);
+    };
 
     const handleBook = (e: React.FormEvent) => {
         e.preventDefault();
         if (!bookingAdvisor) return;
+        const roomId = generateRoomId();
         setBookingDone(prev => new Set([...prev, bookingAdvisor.id]));
-        showToast(`Session booked with ${bookingAdvisor.name}!`, 'success');
+        showToast(`Session booked with ${bookingAdvisor.name}! Starting video room...`, 'success');
         setBookingAdvisor(null);
         setBookingDate('');
         setBookingNote('');
+        // Navigate to session
+        setTimeout(() => navigate(`/student/session/${roomId}`), 1200);
     };
 
     return (
@@ -50,9 +72,17 @@ const CareerCenter = () => {
             <div className="p-4 md:p-10 space-y-6 md:space-y-8 font-sans bg-nile-white min-h-full pb-24">
 
                 {/* Header */}
-                <div className="border-b-[2px] border-black pb-6">
-                    <h2 className="text-3xl md:text-6xl font-black text-black leading-none uppercase tracking-tighter">Careers .</h2>
-                    <p className="text-[10px] md:text-lg font-bold text-nile-blue/70 uppercase mt-2 tracking-widest">Accelerate your professional readiness .</p>
+                <div className="border-b-[2px] border-black pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+                    <div>
+                        <h2 className="text-3xl md:text-6xl font-black text-black leading-none uppercase tracking-tighter">Careers .</h2>
+                        <p className="text-[10px] md:text-lg font-bold text-nile-blue/70 uppercase mt-2 tracking-widest">Accelerate your professional readiness .</p>
+                    </div>
+                    <button
+                        onClick={handleStartLiveSession}
+                        className="flex items-center gap-2 px-5 py-3 bg-nile-blue text-white border-[2px] border-black rounded-xl font-black text-[9px] uppercase tracking-widest shadow-[3px_3px_0px_0px_rgba(108,187,86,1)] hover:translate-x-px hover:translate-y-px hover:shadow-[2px_2px_0px_0px_rgba(108,187,86,1)] transition-all flex-shrink-0 animate-pulse"
+                    >
+                        <Zap size={13} strokeWidth={3} /> START LIVE SESSION
+                    </button>
                 </div>
 
                 {/* Career Readiness Banner */}
@@ -215,6 +245,54 @@ const CareerCenter = () => {
                                 </Button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Live Session Modal */}
+            {showSessionModal && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={() => setShowSessionModal(false)}>
+                    <div className="bg-white border-[3px] border-black rounded-[28px] shadow-[8px_8px_0px_0px_rgba(108,187,86,1)] max-w-md w-full p-6 space-y-5 anime-fade-in"
+                        onClick={e => e.stopPropagation()}>
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-nile-blue rounded-xl border-2 border-black flex items-center justify-center">
+                                    <Video size={18} className="text-white" />
+                                </div>
+                                <div>
+                                    <h3 className="font-black text-base uppercase tracking-tight">Live Session</h3>
+                                    <p className="text-[7px] font-black text-black/40 uppercase tracking-widest">REAL-TIME VIDEO CALL</p>
+                                </div>
+                            </div>
+                            <button onClick={() => setShowSessionModal(false)} className="p-1.5 rounded-lg border-2 border-black/10 hover:bg-black/5">
+                                <X size={14} strokeWidth={3} />
+                            </button>
+                        </div>
+
+                        <div className="p-4 bg-nile-blue/5 border-[2px] border-nile-blue/20 rounded-[16px] space-y-2">
+                            <p className="text-[8px] font-black text-black/50 uppercase tracking-widest">YOUR SESSION LINK</p>
+                            <p className="text-[9px] font-bold text-nile-blue break-all leading-relaxed">{sessionLink}</p>
+                        </div>
+
+                        <div className="space-y-2">
+                            <p className="text-[9px] font-black text-black/60 leading-relaxed">
+                                Share this link with your career advisor. When they join, you'll be connected in a live video call — right here in NileConnect.
+                            </p>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => { navigator.clipboard.writeText(sessionLink); showToast('Link copied!', 'success'); }}
+                                    className="flex items-center gap-1.5 px-3 py-2 border-[2px] border-black rounded-xl font-black text-[8px] uppercase hover:bg-black hover:text-white transition-all"
+                                >
+                                    <Copy size={12} /> COPY LINK
+                                </button>
+                                <button
+                                    onClick={handleJoinSession}
+                                    className="flex-1 py-2 bg-nile-blue text-white border-[2px] border-black rounded-xl font-black text-[9px] uppercase tracking-widest shadow-[3px_3px_0px_0px_rgba(108,187,86,1)] hover:shadow-none hover:translate-x-px hover:translate-y-px transition-all flex items-center justify-center gap-2"
+                                >
+                                    <Zap size={12} /> JOIN NOW
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}

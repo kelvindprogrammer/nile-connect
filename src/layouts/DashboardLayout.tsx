@@ -91,10 +91,8 @@ const MoreMenuItem = ({ to, icon, label, onClose }: { to: string; icon: React.Re
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { user, logout } = useAuth();
+    const { user, logout, isLoading } = useAuth();
 
-    // Auth guard: redirect to login if not authenticated
-    if (!user) return <Navigate to="/login" replace />;
     const { picture: profilePic } = useProfilePicture();
     const [showNotifications, setShowNotifications] = useState(false);
     const [showMoreMenu, setShowMoreMenu] = useState(false);
@@ -153,6 +151,14 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
     const mobileNavLeft = navItems.slice(0, 2);
     const mobileNavRight = [navItems[4], navItems[8]]; // JOBS, PROFILE
+
+    // Wait for localStorage hydration before redirecting
+    if (isLoading) return (
+        <div className="flex items-center justify-center h-screen bg-white">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-nile-blue" />
+        </div>
+    );
+    if (!user) return <Navigate to="/login" replace />;
 
     return (
         <div className="flex h-screen bg-nile-white text-black font-sans overflow-hidden">

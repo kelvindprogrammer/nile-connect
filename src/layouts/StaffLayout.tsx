@@ -87,9 +87,7 @@ const MoreMenuItem = ({ to, icon, label, onClose, active }: { to: string; icon: 
 const StaffLayout = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { user, logout } = useAuth();
-
-    if (!user) return <Navigate to="/login" replace />;
+    const { user, logout, isLoading } = useAuth();
 
     const [showNotifications, setShowNotifications] = useState(false);
     const [showMoreMenu, setShowMoreMenu] = useState(false);
@@ -110,6 +108,13 @@ const StaffLayout = () => {
 
     const mobileNavLeft  = [navItems[0], navItems[1]];
     const mobileNavRight = [navItems[3], navItems[6]];
+
+    if (isLoading) return (
+        <div className="flex items-center justify-center h-screen bg-white">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black" />
+        </div>
+    );
+    if (!user) return <Navigate to="/login" replace />;
 
     return (
         <div className="flex h-screen bg-nile-white text-black font-sans overflow-hidden">

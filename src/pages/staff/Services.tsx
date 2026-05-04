@@ -4,7 +4,7 @@ import {
     CheckCircle2, Users, Loader2, Search, X, ChevronDown,
 } from 'lucide-react';
 import Avatar from '../../components/Avatar';
-import { Button } from '../../components/Button';
+import Button from '../../components/Button';
 import { useToast } from '../../context/ToastContext';
 import { getStaffStudents, StaffStudent } from '../../services/staffService';
 
@@ -423,6 +423,7 @@ const StaffServices: React.FC = () => {
 
     const [requests, setRequests] = useState<ServiceRequest[]>([]);
     const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(false);
     const [actionLoading, setActionLoading] = useState<Record<string, boolean>>({});
 
     const [activeTab, setActiveTab] = useState<TabFilter>('ALL REQUESTS');
@@ -435,15 +436,16 @@ const StaffServices: React.FC = () => {
 
     const load = useCallback(async () => {
         setLoading(true);
+        setLoadError(false);
         try {
             const students = await getStaffStudents();
             setRequests(buildRequests(students));
         } catch {
-            showToast('Failed to load student data.', 'error');
+            setLoadError(true);
         } finally {
             setLoading(false);
         }
-    }, [showToast]);
+    }, []);
 
     useEffect(() => { load(); }, [load]);
 
@@ -565,6 +567,21 @@ const StaffServices: React.FC = () => {
             </div>
         );
     }
+
+    if (loadError) return (
+        <div className="p-8 flex flex-col items-center justify-center min-h-[60vh] gap-4 text-center">
+            <div className="w-16 h-16 bg-red-50 border-[2px] border-red-200 rounded-[20px] flex items-center justify-center">
+                <span className="text-3xl">⚠️</span>
+            </div>
+            <div>
+                <p className="font-black text-lg uppercase text-black">Could not load student data</p>
+                <p className="text-[9px] font-black text-black/40 uppercase tracking-widest mt-1">Please try again or log out and back in</p>
+            </div>
+            <button onClick={load} className="px-6 py-3 bg-black text-white border-[2px] border-black rounded-xl font-black text-[9px] uppercase tracking-widest shadow-[3px_3px_0px_0px_#6CBB56] hover:shadow-none hover:translate-x-px hover:translate-y-px transition-all">
+                TRY AGAIN
+            </button>
+        </div>
+    );
 
     // ── Render ────────────────────────────────────────────────────────────────
 
