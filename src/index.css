@@ -597,6 +597,28 @@ select:focus {
     box-shadow: 6px 10px 0px 0px rgba(0,0,0,1);
 }
 
+/* === Brutalist form input === */
+.input-brutalist {
+    width: 100%;
+    border: 2px solid #000;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-weight: 900;
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    outline: none;
+    background: rgba(255,255,254,0.6);
+    transition: box-shadow 0.15s ease, background 0.15s ease;
+}
+.input-brutalist:focus {
+    background: #fff;
+    box-shadow: 3px 3px 0px 0px #1E499D;
+}
+.input-brutalist::placeholder {
+    color: rgba(0,0,0,0.25);
+    font-weight: 700;
+}
+
 /* === Input focus expansion === */
 .input-focus-grow {
     transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.15s ease;

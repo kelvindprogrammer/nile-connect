@@ -1,20 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { 
-    Home, 
-    Briefcase, 
-    Users, 
-    MessageSquare, 
-    Settings, 
-    LogOut, 
-    Bell, 
-    Mail,
-    ChevronRight,
-    Search,
-    Building2,
-    UserRound
+import {
+    Home, Briefcase, Users, Settings, LogOut,
+    Bell, Mail, ChevronRight, Search, UserRound,
+    Calendar, FileText, Grid3X3, X,
 } from 'lucide-react';
 import Avatar from '../components/Avatar';
+import NileConnectLogo from '../components/NileConnectLogo';
 import NotificationTray from '../components/NotificationTray';
 import { useAuth } from '../context/AuthContext';
 
@@ -60,6 +52,7 @@ const EmployerLayout = () => {
     // Auth guard: redirect to login if not authenticated
     if (!user) return <Navigate to="/login" replace />;
     const [showNotifications, setShowNotifications] = useState(false);
+    const [showMoreMenu, setShowMoreMenu] = useState(false);
     const [progress, setProgress] = useState(0);
 
     const userName = user?.name || "Recruiter";
@@ -82,12 +75,13 @@ const EmployerLayout = () => {
     const breadcrumbs = location.pathname.split('/').filter(x => x && x !== 'employer');
 
     const menuItems = [
-        { name: 'DASH', path: '/employer', icon: <Home /> },
-        { name: 'TALENT', path: '/employer/candidates', icon: <Users /> },
-        { name: 'JOBS', path: '/employer/jobs', icon: <Briefcase /> },
-        { name: 'MAIL', path: '/employer/messages', icon: <Mail /> },
-        { name: 'SETUP', path: '/employer/settings', icon: <Settings /> },
-        { name: 'ME', path: '/employer/profile', icon: <UserRound /> },
+        { name: 'DASH',   path: '/employer',              icon: <Home />,       exact: true },
+        { name: 'TALENT', path: '/employer/candidates',   icon: <Users /> },
+        { name: 'JOBS',   path: '/employer/jobs',         icon: <Briefcase /> },
+        { name: 'APPS',   path: '/employer/applications', icon: <FileText /> },
+        { name: 'EVENTS', path: '/employer/events',       icon: <Calendar /> },
+        { name: 'MAIL',   path: '/employer/messages',     icon: <Mail /> },
+        { name: 'ME',     path: '/employer/profile',      icon: <UserRound /> },
     ];
 
     return (
@@ -98,12 +92,12 @@ const EmployerLayout = () => {
             />
 
             {/* Desktop Sidebar */}
-            <aside className="hidden md:flex w-[84px] bg-white border-r-[2px] border-black flex flex-col items-center py-6 z-30 flex-shrink-0">
-                <div 
+            <aside className="hidden md:flex w-[84px] bg-white border-r-[2px] border-black flex-col items-center py-6 z-30 flex-shrink-0">
+                <div
                     onClick={() => navigate('/employer')}
-                    className="w-10 h-10 bg-black rounded-xl flex items-center justify-center text-white font-black text-sm shadow-[2px_2px_0px_0px_rgba(108,187,86,1)] border-[2px] border-black mb-10 flex-shrink-0 cursor-pointer hover:rotate-6 transition-transform"
+                    className="mb-8 cursor-pointer hover:scale-105 transition-transform flex-shrink-0"
                 >
-                    <Building2 size={20} className="text-nile-green" />
+                    <NileConnectLogo size="xs" showText={false} showTagline={false} animated />
                 </div>
                 
                 <nav className="flex-1 flex flex-col items-center space-y-1 w-full custom-scrollbar overflow-y-auto px-1">
@@ -127,17 +121,55 @@ const EmployerLayout = () => {
             </aside>
 
             {/* Mobile Bottom Navigation */}
-            <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t-[2px] border-black h-16 px-4 flex items-center justify-between z-[40] shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+            <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t-[2px] border-black h-[60px] px-2 flex items-center justify-around z-[40] shadow-[0_-4px_10px_rgba(0,0,0,0.06)]">
                 <SlimNavItem to="/employer" icon={<Home />} label="DASH" isActive={location.pathname === '/employer'} mobile />
                 <SlimNavItem to="/employer/candidates" icon={<Users />} label="TALENT" isActive={location.pathname.startsWith('/employer/candidates')} mobile />
-                <div onClick={() => navigate('/employer/jobs')} className="flex-1 flex flex-col items-center justify-center -mt-8">
-                     <div className="w-12 h-12 bg-nile-green border-2 border-black rounded-full flex items-center justify-center shadow-[4px_4px_0px_0px_#000] rotate-45 hover:rotate-0 transition-transform cursor-pointer">
-                        <Briefcase className="-rotate-45 text-white" size={20} />
-                     </div>
+                <div onClick={() => setShowMoreMenu(true)} className="flex-1 flex flex-col items-center justify-center -mt-6 flex-shrink-0 cursor-pointer">
+                    <div className="w-12 h-12 bg-nile-green border-[2px] border-black rounded-full flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:scale-105 transition-all">
+                        <Grid3X3 size={20} className="text-white" />
+                    </div>
+                    <span className="text-[5px] font-black tracking-[0.1em] mt-1 text-black/40">MORE</span>
                 </div>
                 <SlimNavItem to="/employer/messages" icon={<Mail />} label="MAIL" isActive={location.pathname.startsWith('/employer/messages')} mobile />
                 <SlimNavItem to="/employer/profile" icon={<UserRound />} label="ME" isActive={location.pathname.startsWith('/employer/profile')} mobile />
             </nav>
+
+            {/* Mobile More Menu Overlay */}
+            {showMoreMenu && (
+                <div className="md:hidden fixed inset-0 z-[60] flex items-end" onClick={() => setShowMoreMenu(false)}>
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+                    <div className="relative w-full bg-white border-t-[3px] border-black rounded-t-[28px] pt-4 pb-8 px-5 shadow-[0_-8px_40px_rgba(0,0,0,0.25)] animate-in slide-in-from-bottom-4"
+                        onClick={e => e.stopPropagation()}>
+                        <div className="w-10 h-1 bg-black/20 rounded-full mx-auto mb-5" />
+                        <div className="flex items-center justify-between mb-4">
+                            <NileConnectLogo size="xs" showText showTagline={false} animated={false} />
+                            <button onClick={() => setShowMoreMenu(false)} className="p-1.5 rounded-lg border-2 border-black/10">
+                                <X size={14} strokeWidth={3} />
+                            </button>
+                        </div>
+                        <div className="grid grid-cols-4 gap-2.5">
+                            {menuItems.map(item => (
+                                <button key={item.path}
+                                    onClick={() => { navigate(item.path); setShowMoreMenu(false); }}
+                                    className={`flex flex-col items-center justify-center gap-2 p-3 rounded-[16px] border-[2px] transition-all
+                                        ${location.pathname === item.path || (!item.exact && location.pathname.startsWith(item.path + '/'))
+                                            ? 'bg-black text-white border-black shadow-[2px_2px_0px_0px_rgba(108,187,86,1)]'
+                                            : 'bg-white text-black border-black/10 hover:border-black hover:bg-nile-white'}`}>
+                                    <div className="w-8 h-8 flex items-center justify-center">
+                                        {React.cloneElement(item.icon as React.ReactElement, { size: 20 })}
+                                    </div>
+                                    <span className="text-[7px] font-black uppercase tracking-widest leading-none">{item.name}</span>
+                                </button>
+                            ))}
+                        </div>
+                        <div className="mt-4 pt-4 border-t-[2px] border-black/5">
+                            <button onClick={handleLogout} className="w-full py-3 flex items-center justify-center gap-2 text-red-500 text-[9px] font-black uppercase tracking-widest border-2 border-red-200 rounded-[14px] hover:bg-red-50 transition-colors">
+                                <LogOut size={14} strokeWidth={3} /> LOG OUT
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <main className="flex-1 flex flex-col min-w-0 bg-white h-full relative">
                 <header className="h-14 border-b-[2px] border-black flex items-center justify-between px-4 md:px-6 bg-white/80 backdrop-blur-md sticky top-0 z-20 flex-shrink-0">

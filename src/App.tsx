@@ -41,7 +41,6 @@ import StudentMessages    from './pages/student/Messages';
 
 // ── Staff Section ─────────────────────────────────────────────────────────
 import StaffDashboard     from './pages/staff/Dashboard';
-import StaffApplications  from './pages/staff/Applications';
 import StaffCRMManager    from './pages/staff/CRMManager';
 import StaffEvents        from './pages/staff/Events';
 import StaffJobs          from './pages/staff/Jobs';
@@ -115,7 +114,7 @@ const App = () => (
                     <Route path="/staff" element={<StaffLayout />}>
                         <Route index               element={<StaffDashboard />} />
                         <Route path="activity"     element={<StudentActivity />} />
-                        <Route path="applications" element={<StaffApplications />} />
+                        <Route path="applications" element={<Navigate to="/staff/jobs" replace />} />
                         <Route path="events"       element={<StaffEvents />} />
                         <Route path="crm"          element={<StaffCRMManager />} />
                         <Route path="jobs"         element={<StaffJobs />} />
