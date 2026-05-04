@@ -1,14 +1,5 @@
 import axios from 'axios';
 
-// ---------------------------------------------------------------------------
-// Base URL resolution
-// ---------------------------------------------------------------------------
-// Using empty baseURL so all calls use explicit absolute paths like /api/feed.
-// This is immune to VITE_API_BASE_URL misconfiguration and Axios path-merging quirks.
-// Every apiClient call MUST include the full /api/... prefix.
-// Every aiClient call MUST include the full /api/ai/... prefix.
-// ---------------------------------------------------------------------------
-
 export const apiClient = axios.create({
     baseURL: '',
     headers: { 'Content-Type': 'application/json' },
@@ -21,9 +12,8 @@ export const aiClient = axios.create({
 });
 
 // ---------------------------------------------------------------------------
-// Request interceptor – attach JWT bearer token on every request
+// Attach JWT on every request
 // ---------------------------------------------------------------------------
-
 const attachToken = (config: any) => {
     const token = localStorage.getItem('nile_token');
     if (token) {
@@ -37,15 +27,44 @@ apiClient.interceptors.request.use(attachToken, (err) => Promise.reject(err));
 aiClient.interceptors.request.use(attachToken, (err) => Promise.reject(err));
 
 // ---------------------------------------------------------------------------
-// Response interceptor – handle 401 globally (token expired)
+// Clear stale auth and dispatch logout event
 // ---------------------------------------------------------------------------
+const clearAuth = () => {
+    localStorage.removeItem('nile_token');
+    localStorage.removeItem('nile_user');
+    window.dispatchEvent(new CustomEvent('auth:expired'));
+};
 
+// ---------------------------------------------------------------------------
+// Response interceptor
+// 401 = invalid/expired token       → force re-login
+// 403 on role-protected endpoints   = JWT has wrong role (stale SSO token)
+//                                    → force re-login so user gets fresh JWT
+// We do NOT clear auth on 403 for /api/auth/login (employer pending approval)
+// ---------------------------------------------------------------------------
 const handleAuthError = (error: any) => {
-    if (error.response?.status === 401) {
-        localStorage.removeItem('nile_token');
-        localStorage.removeItem('nile_user');
-        window.dispatchEvent(new CustomEvent('auth:expired'));
+    const status = error.response?.status;
+    const url: string = error.config?.url || '';
+
+    if (status === 401) {
+        clearAuth();
+        return Promise.reject(error);
     }
+
+    // 403 on role-gated API routes = stale JWT with wrong/missing role
+    const isRoleGated =
+        url.includes('/api/staff/') ||
+        url.includes('/api/employer/') ||
+        url.includes('/api/student/') ||
+        url.includes('/api/messages/') ||
+        url.includes('/api/events') ||
+        url.includes('/api/feed');
+
+    if (status === 403 && isRoleGated) {
+        clearAuth();
+        return Promise.reject(error);
+    }
+
     return Promise.reject(error);
 };
 
