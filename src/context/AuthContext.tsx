@@ -40,23 +40,38 @@ export const mapBackendUser = (bu: BackendUser): User => ({
     isVerified: bu.is_verified,
 });
 
+const clearLocalAuth = () => {
+    localStorage.removeItem('nile_user');
+    localStorage.removeItem('nile_token');
+    // Also clear the extended profile so it resets on next login
+    localStorage.removeItem('nile_extended_profile');
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [token, setToken] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
+    // Hydrate from localStorage on mount
     useEffect(() => {
-        const savedUser = localStorage.getItem('nile_user');
+        const savedUser  = localStorage.getItem('nile_user');
         const savedToken = localStorage.getItem('nile_token');
         if (savedUser) {
-            try { setUser(JSON.parse(savedUser)); } catch { /* corrupt data, ignore */ }
+            try { setUser(JSON.parse(savedUser)); } catch { clearLocalAuth(); }
         }
         if (savedToken) setToken(savedToken);
         setIsLoading(false);
     }, []);
 
+    // Handle token expiry / role mismatch (403) — hard-redirect to /login
     useEffect(() => {
-        const handleExpiry = () => logout();
+        const handleExpiry = () => {
+            clearLocalAuth();
+            setUser(null);
+            setToken(null);
+            // Hard redirect clears all React state and forces fresh login
+            window.location.replace('/login?reason=session_expired');
+        };
         window.addEventListener('auth:expired', handleExpiry);
         return () => window.removeEventListener('auth:expired', handleExpiry);
     }, []);
@@ -75,10 +90,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, []);
 
     const logout = useCallback(() => {
+        clearLocalAuth();
         setUser(null);
         setToken(null);
-        localStorage.removeItem('nile_user');
-        localStorage.removeItem('nile_token');
     }, []);
 
     return (

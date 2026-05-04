@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import InputField from '../../components/InputField';
@@ -8,6 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import AuthLayout from '../../layouts/AuthLayout';
 import { login as apiLogin } from '../../services/authService';
+import { apiClient } from '../../services/api';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -18,6 +19,16 @@ const Login = () => {
     const [password,  setPassword]  = useState('');
     const [showPw,    setShowPw]    = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [sessionMsg, setSessionMsg] = useState('');
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('reason') === 'session_expired') {
+            setSessionMsg('Your session expired. Please sign in again to continue.');
+        }
+        // Ensure demo accounts exist for presentation
+        apiClient.post('/api/auth/seed-demo').catch(() => {});
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -57,6 +68,12 @@ const Login = () => {
     return (
         <AuthLayout leftContent={leftPanelContent}>
             <div className="max-w-sm mx-auto w-full space-y-8 anime-fade-in text-left">
+                {sessionMsg && (
+                    <div className="p-3 bg-yellow-50 border-[2px] border-yellow-300 rounded-xl flex items-start gap-2">
+                        <span className="text-yellow-500 text-sm flex-shrink-0">⚠</span>
+                        <p className="text-[9px] font-bold text-yellow-700 leading-snug">{sessionMsg}</p>
+                    </div>
+                )}
                 <div className="space-y-1.5">
                     <h1 className="text-4xl font-black text-black uppercase tracking-tight leading-none">Welcome Back.</h1>
                     <p className="text-[9px] font-black text-nile-blue/50 uppercase tracking-[0.2em]">SIGN IN TO YOUR ACCOUNT</p>
@@ -101,10 +118,28 @@ const Login = () => {
                     </Button>
                 </form>
 
-                <div className="pt-4 border-t-[2px] border-black/5 text-center">
-                    <button onClick={() => navigate('/join-as')} className="text-[9px] font-black text-nile-blue/40 hover:text-black transition-colors uppercase tracking-widest">
-                        NEW? CREATE AN ACCOUNT →
-                    </button>
+                <div className="pt-4 border-t-[2px] border-black/5 space-y-3">
+                    <div className="text-center">
+                        <button onClick={() => navigate('/join-as')} className="text-[9px] font-black text-nile-blue/40 hover:text-black transition-colors uppercase tracking-widest">
+                            NEW? CREATE AN ACCOUNT →
+                        </button>
+                    </div>
+                    {/* Demo accounts - remove before production */}
+                    <div className="p-3 bg-nile-white border border-black/10 rounded-xl space-y-1.5">
+                        <p className="text-[7px] font-black text-black/30 uppercase tracking-widest">DEMO ACCOUNTS</p>
+                        {[
+                            { role: 'STUDENT', email: 'student@demo.nileconnect.com' },
+                            { role: 'STAFF',   email: 'staff@demo.nileconnect.com'   },
+                            { role: 'EMPLOYER',email: 'employer@demo.nileconnect.com' },
+                        ].map(d => (
+                            <button key={d.role} onClick={() => { setEmail(d.email); setPassword('NileDemo2025!'); }}
+                                className="w-full text-left flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-white transition-colors group">
+                                <span className="text-[8px] font-black text-black/50 uppercase group-hover:text-black">{d.role}</span>
+                                <span className="text-[7px] font-bold text-black/30 group-hover:text-nile-blue">{d.email}</span>
+                            </button>
+                        ))}
+                        <p className="text-[7px] font-black text-black/20 uppercase">Password: NileDemo2025!</p>
+                    </div>
                 </div>
             </div>
         </AuthLayout>
