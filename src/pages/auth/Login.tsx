@@ -8,7 +8,6 @@ import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import AuthLayout from '../../layouts/AuthLayout';
 import { login as apiLogin } from '../../services/authService';
-import { getSubdomain, getPortalUrl, SUBDOMAINS } from '../../utils/subdomain';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -31,17 +30,8 @@ const Login = () => {
             const resp = await apiLogin({ email, password });
             loginWithResponse(resp);
             showToast(`Welcome back, ${resp.user.full_name.split(' ')[0]}!`, 'success');
-            
-            const role = resp.user.role;
-            const targetSubdomain = role === 'student' ? SUBDOMAINS.STUDENT : role === 'staff' ? SUBDOMAINS.STAFF : SUBDOMAINS.EMPLOYER;
-            
-            // If we are already on the correct subdomain, just navigate internally to root
-            if (getSubdomain() === targetSubdomain) {
-                navigate('/');
-            } else {
-                // Redirect to the correct subdomain
-                window.location.href = getPortalUrl(targetSubdomain);
-            }
+            const route = resp.user.role === 'student' ? '/student' : resp.user.role === 'staff' ? '/staff' : '/employer';
+            navigate(route);
         } catch (err: any) {
             const msg = err?.response?.data?.error || 'Login failed. Please check your credentials.';
             showToast(msg, 'error');

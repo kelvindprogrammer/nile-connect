@@ -142,16 +142,9 @@ const EmployerApplications = () => {
                                 </div>
                             </div>
                             <div className="flex items-center gap-2 w-full sm:w-auto flex-shrink-0">
-                                <button onClick={() => navigate('/messages')}
-                                    className="p-2 border-[2px] border-black/10 rounded-xl text-black/40 hover:border-black hover:text-nile-blue transition-all"
-                                    title="Message Candidate"
-                                >
+                                <button onClick={() => navigate('/employer/messages')}
+                                    className="p-2 border-[2px] border-black/10 rounded-xl text-black/40 hover:border-black hover:text-nile-blue transition-all">
                                     <MessageSquare size={14} />
-                                </button>
-                                <button onClick={() => navigate(`/candidates/${app.student_id || app.id}`)}
-                                    className="px-3 py-2 bg-black text-white border-[2px] border-black rounded-xl font-black text-[8px] uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-px hover:translate-y-px transition-all"
-                                >
-                                    REVIEW
                                 </button>
                                 <StatusSelect current={app.status} loading={!!actionLoading[app.id]} onChange={s => handleStatusChange(app, s)} />
                             </div>

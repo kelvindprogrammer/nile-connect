@@ -211,7 +211,7 @@ const Network = () => {
                                 isFollowing={followingIds.has(person.id)}
                                 onConnect={() => handleConnect(person)}
                                 onFollow={() => handleFollow(person)}
-                                onMessage={() => navigate('/messages')}
+                                onMessage={() => navigate('/student/messages')}
                             />
                         ))}
                     </div>

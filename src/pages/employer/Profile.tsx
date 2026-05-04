@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Building2, Link2, Pencil, X, Mail, Globe, LogOut, Loader2, ShieldCheck, ShieldAlert, Trash2 } from 'lucide-react';
+import { Settings, Building2, Link2, UserRound, Pencil, X, Mail, Globe, LogOut, Loader2, ShieldCheck, ShieldAlert } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Avatar from '../../components/Avatar';
 import Button from '../../components/Button';
 import Card from '../../components/Card';
 import { useToast } from '../../context/ToastContext';
-import { getHomeUrl } from '../../utils/subdomain';
 import { getEmployerProfile, updateEmployerProfile, EmployerProfile as EProfile } from '../../services/employerService';
-import { deleteAccount } from '../../services/authService';
 
 const EmployerProfile = () => {
     const { user, logout } = useAuth();
@@ -125,28 +123,10 @@ const EmployerProfile = () => {
                 </div>
             </div>
 
-            {/* Logout & Delete */}
-            <div className="flex flex-col sm:flex-row gap-3">
-                <Button variant="outline" size="sm" className="text-red-500 border-red-500/20" onClick={() => { logout(); window.location.href = getHomeUrl('/login'); }}>
-                    <LogOut size={16} className="mr-2" /> EXIT RECRUITER HUB
-                </Button>
-                
-                <button
-                    onClick={async () => {
-                        if (!window.confirm('Delete your employer account? All job listings and application data will be permanently removed. This cannot be undone.')) return;
-                        try {
-                            await deleteAccount();
-                            logout();
-                            window.location.href = getHomeUrl('/');
-                        } catch {
-                            showToast('Failed to delete account. Please try again.', 'error');
-                        }
-                    }}
-                    className="flex items-center gap-2 px-4 py-2 border-[2px] border-red-200 rounded-xl text-red-500 text-[9px] font-black uppercase hover:bg-red-50 transition-all"
-                >
-                    <Trash2 size={14} /> DELETE ACCOUNT
-                </button>
-            </div>
+            {/* Logout */}
+            <Button variant="outline" size="sm" className="text-red-500 border-red-500/20" onClick={() => { logout(); navigate('/login'); }}>
+                <LogOut size={16} className="mr-2" /> EXIT RECRUITER HUB
+            </Button>
 
             {/* Body Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">

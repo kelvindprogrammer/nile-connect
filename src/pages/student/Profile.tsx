@@ -8,7 +8,6 @@ import {
 } from 'lucide-react';
 import Avatar from '../../components/Avatar';
 import { useAuth } from '../../context/AuthContext';
-import { getHomeUrl } from '../../utils/subdomain';
 import Button from '../../components/Button';
 import { apiClient } from '../../services/api';
 import { useProfile, calculateProfileStrength } from '../../hooks/useProfile';
@@ -29,7 +28,7 @@ interface ApiEnvelope<T> { data: T; }
 const Profile = () => {
     const navigate = useNavigate();
     const { user, logout } = useAuth();
-    const { profile } = useProfile();
+    const { profile } = useProfile(user?.id);
     const { picture: profilePic } = useProfilePicture();
     const [apiProfile, setApiProfile] = useState<StudentProfile | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -117,7 +116,7 @@ const Profile = () => {
                                 <Button variant="outline" size="sm" onClick={() => setShowCvModal(true)}>
                                     <Download size={14} className="mr-2" /> CV
                                 </Button>
-                                <Button variant="primary" size="sm" onClick={() => navigate('/profile/edit')}>
+                                <Button variant="primary" size="sm" onClick={() => navigate('/student/profile/edit')}>
                                     <Edit2 size={14} className="mr-2" /> EDIT
                                 </Button>
                             </div>
@@ -138,7 +137,7 @@ const Profile = () => {
                         <p className="text-[9px] font-black text-nile-blue uppercase tracking-widest">
                             Profile at {strength}% — {strength < 50 ? 'Add your bio, skills and experience to unlock more opportunities' : 'Add LinkedIn and portfolio to reach 100%'}
                         </p>
-                        <Button size="xs" variant="primary" onClick={() => navigate('/profile/edit')}>
+                        <Button size="xs" variant="primary" onClick={() => navigate('/student/profile/edit')}>
                             COMPLETE
                         </Button>
                     </div>
@@ -152,7 +151,7 @@ const Profile = () => {
                                 <p className="font-bold text-black/70 leading-relaxed text-sm">{bio}</p>
                             ) : (
                                 <button
-                                    onClick={() => navigate('/profile/edit')}
+                                    onClick={() => navigate('/student/profile/edit')}
                                     className="text-[10px] font-black text-nile-blue/40 uppercase tracking-widest hover:text-nile-blue transition-colors flex items-center gap-2"
                                 >
                                     <Plus size={12} strokeWidth={3} /> ADD A BIO
@@ -176,7 +175,7 @@ const Profile = () => {
                                         </div>
                                     ))}
                                     <button
-                                        onClick={() => navigate('/profile/edit')}
+                                        onClick={() => navigate('/student/profile/edit')}
                                         className="w-full py-3 border-[2px] border-dashed border-black/20 rounded-[14px] text-[9px] font-black text-black/30 hover:bg-black/5 hover:text-black transition-all flex items-center justify-center gap-2"
                                     >
                                         <Plus size={12} strokeWidth={3} /> ADD EXPERIENCE
@@ -184,7 +183,7 @@ const Profile = () => {
                                 </div>
                             ) : (
                                 <button
-                                    onClick={() => navigate('/profile/edit')}
+                                    onClick={() => navigate('/student/profile/edit')}
                                     className="w-full py-6 border-[2px] border-dashed border-black/20 rounded-[16px] text-[10px] font-black text-black/30 hover:bg-black/5 hover:text-black transition-all flex items-center justify-center gap-2"
                                 >
                                     <Plus size={14} strokeWidth={4} /> ADD EXPERIENCE
@@ -225,14 +224,14 @@ const Profile = () => {
                                 {profile.linkedIn ? (
                                     <ContactRow icon={<Link2 size={14} strokeWidth={3} />} label={profile.linkedIn} href={`https://${profile.linkedIn.replace('https://', '')}`} />
                                 ) : (
-                                    <button onClick={() => navigate('/profile/edit')} className="w-full flex items-center gap-3 p-3 border-[2px] border-dashed border-black/20 rounded-xl text-[9px] font-black text-black/30 hover:border-black hover:text-black transition-all">
+                                    <button onClick={() => navigate('/student/profile/edit')} className="w-full flex items-center gap-3 p-3 border-[2px] border-dashed border-black/20 rounded-xl text-[9px] font-black text-black/30 hover:border-black hover:text-black transition-all">
                                         <Link2 size={14} strokeWidth={3} /> ADD LINKEDIN
                                     </button>
                                 )}
                                 {profile.portfolio ? (
                                     <ContactRow icon={<ExternalLink size={14} strokeWidth={3} />} label={profile.portfolio} href={`https://${profile.portfolio.replace('https://', '')}`} />
                                 ) : (
-                                    <button onClick={() => navigate('/profile/edit')} className="w-full flex items-center gap-3 p-3 border-[2px] border-dashed border-black/20 rounded-xl text-[9px] font-black text-black/30 hover:border-black hover:text-black transition-all">
+                                    <button onClick={() => navigate('/student/profile/edit')} className="w-full flex items-center gap-3 p-3 border-[2px] border-dashed border-black/20 rounded-xl text-[9px] font-black text-black/30 hover:border-black hover:text-black transition-all">
                                         <ExternalLink size={14} strokeWidth={3} /> ADD PORTFOLIO
                                     </button>
                                 )}
@@ -245,7 +244,7 @@ const Profile = () => {
                             </div>
                         </SectionCard>
 
-                        <Button variant="outline" fullWidth className="border-red-500/20 text-red-500 hover:bg-red-50 hover:border-red-500" onClick={() => { logout(); window.location.href = getHomeUrl('/login'); }}>
+                        <Button variant="outline" fullWidth className="border-red-500/20 text-red-500 hover:bg-red-50 hover:border-red-500" onClick={() => { logout(); navigate('/login'); }}>
                             <LogOut size={16} className="mr-2" /> LOG OUT
                         </Button>
                     </div>
@@ -284,7 +283,7 @@ const Profile = () => {
                         </div>
                         {strength < 70 && (
                             <p className="text-[9px] font-black text-nile-blue/60 uppercase tracking-widest text-center">
-                                <button onClick={() => { setShowCvModal(false); navigate('/profile/edit'); }} className="underline hover:text-nile-blue">Complete your profile</button> to get a better CV
+                                <button onClick={() => { setShowCvModal(false); navigate('/student/profile/edit'); }} className="underline hover:text-nile-blue">Complete your profile</button> to get a better CV
                             </p>
                         )}
                     </div>

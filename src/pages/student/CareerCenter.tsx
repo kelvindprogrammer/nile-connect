@@ -24,7 +24,7 @@ const CareerCenter = () => {
     const navigate = useNavigate();
     const { showToast } = useToast();
     const { user } = useAuth();
-    const { profile } = useProfile();
+    const { profile } = useProfile(user?.id);
     const strength = calculateProfileStrength(profile, !!user?.name, !!user?.email);
 
     const [showAllAdvisors, setShowAllAdvisors] = useState(false);
@@ -89,7 +89,7 @@ const CareerCenter = () => {
                             </div>
                         </div>
                         <div
-                            onClick={() => navigate('/career/ai')}
+                            onClick={() => navigate('/student/career/ai')}
                             className="aspect-video border-[2px] border-dashed border-black rounded-[20px] flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-nile-green/5 transition-all group"
                         >
                             <Sparkles size={36} strokeWidth={2} className="text-nile-blue/30 group-hover:text-nile-green group-hover:scale-110 transition-all" />
@@ -128,7 +128,7 @@ const CareerCenter = () => {
                                 ))}
                             </div>
                             <button
-                                onClick={() => navigate('/career/mock-interview')}
+                                onClick={() => navigate('/student/career/mock-interview')}
                                 className="w-full bg-nile-blue text-white font-black py-3.5 rounded-full border-[2px] border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all uppercase text-[10px] tracking-widest flex items-center justify-center gap-2"
                             >
                                 <span>START SESSION</span>

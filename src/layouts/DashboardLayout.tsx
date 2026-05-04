@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Navigate } from 'react-router-dom';
 import {
     Home, MessageSquare, Briefcase, GraduationCap, LayoutList,
     Calendar, User, LogOut, Mail, Bell, Search, Users, ChevronRight,
@@ -10,22 +10,21 @@ import NileConnectLogo from '../components/NileConnectLogo';
 import NotificationTray from '../components/NotificationTray';
 import { useAuth } from '../context/AuthContext';
 import { useProfilePicture } from '../hooks/useProfilePicture';
-import { getRelativePath, getHomeUrl } from '../utils/subdomain';
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
 }
 
 const navItems = [
-    { to: '/',              icon: <Home />,         label: 'HOME',    exact: true },
-    { to: '/feed',         icon: <MessageSquare />,label: 'FEED' },
-    { to: '/network',      icon: <Users />,        label: 'NET' },
-    { to: '/messages',     icon: <Mail />,         label: 'MAIL' },
-    { to: '/jobs',         icon: <Briefcase />,    label: 'JOBS' },
-    { to: '/career',       icon: <GraduationCap />,label: 'GROW' },
-    { to: '/applications', icon: <LayoutList />,   label: 'APPS' },
-    { to: '/events',       icon: <Calendar />,     label: 'LIVE' },
-    { to: '/profile',      icon: <User />,         label: 'PROFILE' },
+    { to: '/student',              icon: <Home />,         label: 'HOME',    exact: true },
+    { to: '/student/feed',         icon: <MessageSquare />,label: 'FEED' },
+    { to: '/student/network',      icon: <Users />,        label: 'NET' },
+    { to: '/student/messages',     icon: <Mail />,         label: 'MAIL' },
+    { to: '/student/jobs',         icon: <Briefcase />,    label: 'JOBS' },
+    { to: '/student/career',       icon: <GraduationCap />,label: 'GROW' },
+    { to: '/student/applications', icon: <LayoutList />,   label: 'APPS' },
+    { to: '/student/events',       icon: <Calendar />,     label: 'LIVE' },
+    { to: '/student/profile',      icon: <User />,         label: 'PROFILE' },
 ];
 
 const isActive = (to: string, pathname: string, exact = false) =>
@@ -93,6 +92,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { user, logout } = useAuth();
+
+    // Auth guard: redirect to login if not authenticated
+    if (!user) return <Navigate to="/login" replace />;
     const { picture: profilePic } = useProfilePicture();
     const [showNotifications, setShowNotifications] = useState(false);
     const [showMoreMenu, setShowMoreMenu] = useState(false);
@@ -133,20 +135,20 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
     const breadcrumbs = location.pathname.split('/').filter(x => x && x !== 'student');
 
-    const handleLogout = () => { logout(); window.location.href = getHomeUrl('/login'); };
+    const handleLogout = () => { logout(); navigate('/login', { replace: true }); };
 
     const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter' && searchQuery.trim()) {
-            navigate(`/network?q=${encodeURIComponent(searchQuery.trim())}`);
+            navigate(`/student/network?q=${encodeURIComponent(searchQuery.trim())}`);
             setShowSearchResults(false);
             setSearchQuery('');
         }
     };
 
     const searchSuggestions = searchQuery.trim().length > 0 ? [
-        { label: `People: "${searchQuery}"`, icon: <Users size={12} />, to: `/network?q=${encodeURIComponent(searchQuery)}` },
-        { label: `Jobs: "${searchQuery}"`, icon: <Briefcase size={12} />, to: `/jobs?q=${encodeURIComponent(searchQuery)}` },
-        { label: `Events: "${searchQuery}"`, icon: <Calendar size={12} />, to: `/events?q=${encodeURIComponent(searchQuery)}` },
+        { label: `People: "${searchQuery}"`, icon: <Users size={12} />, to: `/student/network?q=${encodeURIComponent(searchQuery)}` },
+        { label: `Jobs: "${searchQuery}"`, icon: <Briefcase size={12} />, to: `/student/jobs?q=${encodeURIComponent(searchQuery)}` },
+        { label: `Events: "${searchQuery}"`, icon: <Calendar size={12} />, to: `/student/events?q=${encodeURIComponent(searchQuery)}` },
     ] : [];
 
     const mobileNavLeft = navItems.slice(0, 2);
@@ -163,7 +165,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             {/* Desktop Sidebar */}
             <aside className="hidden md:flex w-[84px] bg-white border-r-[2px] border-black flex-col items-center py-6 z-30 flex-shrink-0">
                 <div
-                    onClick={() => navigate('/')}
+                    onClick={() => navigate('/student')}
                     className="mb-6 cursor-pointer hover:scale-105 transition-transform flex-shrink-0"
                 >
                     <NileConnectLogo size="xs" showText={false} showTagline={false} animated />
@@ -187,7 +189,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                     </button>
                     <div
                         className="w-9 h-9 rounded-full border-[2px] border-black/10 overflow-hidden cursor-pointer hover:border-nile-blue transition-colors"
-                        onClick={() => navigate('/profile')}
+                        onClick={() => navigate('/student/profile')}
                     >
                         <Avatar name={userName} size="sm" src={profilePic || undefined} />
                     </div>
@@ -276,13 +278,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                     {/* Left: Logo / Breadcrumb */}
                     <div className="flex items-center gap-2 flex-shrink-0">
                         <div
-                            onClick={() => navigate('/profile')}
+                            onClick={() => navigate('/student')}
                             className="md:hidden w-8 h-8 rounded-lg border-2 border-black overflow-hidden cursor-pointer"
                         >
                             <Avatar name={userName} size="sm" src={profilePic || undefined} />
                         </div>
                         <div className="hidden sm:flex items-center text-[9px] font-black uppercase tracking-widest text-black/40">
-                            <span className="hover:text-nile-blue cursor-pointer transition-colors" onClick={() => navigate('/')}>
+                            <span className="hover:text-nile-blue cursor-pointer transition-colors" onClick={() => navigate('/student')}>
                                 STUDENT HUB
                             </span>
                             {breadcrumbs.length > 0 && breadcrumbs.map((crumb, i) => (
@@ -334,7 +336,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                     <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
                         {/* Mail - visible on all sizes */}
                         <button
-                            onClick={() => navigate('/messages')}
+                            onClick={() => navigate('/student/messages')}
                             className="relative p-2 text-black/40 hover:text-black transition-colors rounded-lg hover:bg-nile-white"
                         >
                             <Mail size={17} />
@@ -364,7 +366,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                         {/* User Info (desktop) */}
                         <div
                             className="hidden md:flex items-center gap-2 cursor-pointer group"
-                            onClick={() => navigate('/profile')}
+                            onClick={() => navigate('/student/profile')}
                         >
                             <div className="text-right">
                                 <p className="text-[9px] font-black uppercase leading-none">{userName}</p>

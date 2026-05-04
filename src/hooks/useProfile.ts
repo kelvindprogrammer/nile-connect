@@ -20,7 +20,9 @@ export interface ExtendedProfile {
     skills: string[];
 }
 
-const STORAGE_KEY = 'nile_extended_profile';
+const STORAGE_KEY_PREFIX = 'nile_extended_profile';
+
+const getStorageKey = (userId?: string) => userId ? `${STORAGE_KEY_PREFIX}_${userId}` : STORAGE_KEY_PREFIX;
 
 const defaults: ExtendedProfile = {
     bio: 'Professional student at Nile University, passionate about developing impactful solutions and exploring new technologies. Seeking opportunities to grow and contribute to the industry.',
@@ -42,10 +44,12 @@ const defaults: ExtendedProfile = {
     skills: ['Teamwork', 'Communication', 'Problem Solving', 'Leadership'],
 };
 
-export function useProfile() {
+export function useProfile(userId?: string) {
+    const storageKey = getStorageKey(userId);
+
     const [profile, setProfile] = useState<ExtendedProfile>(() => {
         try {
-            const stored = localStorage.getItem(STORAGE_KEY);
+            const stored = localStorage.getItem(storageKey);
             return stored ? { ...defaults, ...JSON.parse(stored) } : defaults;
         } catch {
             return defaults;
@@ -55,10 +59,10 @@ export function useProfile() {
     const updateProfile = useCallback((updates: Partial<ExtendedProfile>) => {
         setProfile(prev => {
             const next = { ...prev, ...updates };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+            localStorage.setItem(storageKey, JSON.stringify(next));
             return next;
         });
-    }, []);
+    }, [storageKey]);
 
     return { profile, updateProfile };
 }

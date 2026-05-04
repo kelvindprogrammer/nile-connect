@@ -5,20 +5,11 @@ import {
     XCircle, ShieldCheck, FileText, BarChart2, MessageSquare,
     Loader2, CalendarDays, TrendingUp
 } from 'lucide-react';
+import Card from '../../components/Card';
+import Button from '../../components/Button';
 import Avatar from '../../components/Avatar';
 import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../hooks/useAuth';
-import { Button } from '../../components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/card';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from "../../components/ui/dialog";
 import {
     getDashboardStats,
     getStaffEmployers,
@@ -151,10 +142,10 @@ const StaffDashboard = () => {
                         <CalendarDays size={12} /> {today}
                     </p>
                     <div className="flex flex-wrap gap-3 pt-1">
-                        <Button onClick={() => navigate('/services')} size="sm">
+                        <Button onClick={() => navigate('/staff/services')} size="sm">
                             <FileText size={14} className="mr-1.5" /> CV REVIEW
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => navigate('/applications')}>
+                        <Button variant="outline" size="sm" onClick={() => navigate('/staff/applications')}>
                             <ShieldCheck size={14} className="mr-1.5" /> VERIFICATIONS
                         </Button>
                     </div>
@@ -226,44 +217,17 @@ const StaffDashboard = () => {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2 w-full sm:w-auto justify-end shrink-0">
-                                    <Dialog>
-                                        <DialogTrigger asChild>
-                                            <button className="px-3 py-2 border-[2px] border-black rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-black hover:text-white transition-all">
-                                                REVIEW
-                                            </button>
-                                        </DialogTrigger>
-                                        <DialogContent className="max-w-2xl">
-                                            <DialogHeader>
-                                                <DialogTitle>{emp.company_name}</DialogTitle>
-                                                <DialogDescription>{emp.industry} &bull; {emp.location}</DialogDescription>
-                                            </DialogHeader>
-                                            <div className="space-y-4 py-4 text-left">
-                                                <div>
-                                                    <p className="text-[7px] font-black text-black/30 uppercase tracking-[0.2em] mb-1">COMPANY PROFILE</p>
-                                                    <p className="text-xs font-bold text-black leading-relaxed">{emp.about || 'No description provided.'}</p>
-                                                </div>
-                                                <div className="grid grid-cols-2 gap-4">
-                                                    <div>
-                                                        <p className="text-[7px] font-black text-black/30 uppercase tracking-[0.2em] mb-1">CONTACT EMAIL</p>
-                                                        <p className="text-[10px] font-black text-nile-blue">{emp.contact_email}</p>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-[7px] font-black text-black/30 uppercase tracking-[0.2em] mb-1">WEBSITE</p>
-                                                        <p className="text-[10px] font-black text-nile-blue">{emp.website || 'N/A'}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <DialogFooter className="gap-2">
-                                                <Button variant="nile-green" onClick={() => handleEmployerAction(emp.id, emp.company_name, 'approved')}>APPROVE</Button>
-                                                <Button variant="outline" className="text-red-500 border-red-500" onClick={() => handleEmployerAction(emp.id, emp.company_name, 'rejected')}>REJECT</Button>
-                                            </DialogFooter>
-                                        </DialogContent>
-                                    </Dialog>
                                     <ActionButton
                                         label="APPROVE"
                                         isLoading={actionLoading[`emp-${emp.id}`]}
                                         onClick={() => handleEmployerAction(emp.id, emp.company_name, 'approved')}
                                         variant="approve"
+                                    />
+                                    <ActionButton
+                                        label="REJECT"
+                                        isLoading={actionLoading[`emp-${emp.id}`]}
+                                        onClick={() => handleEmployerAction(emp.id, emp.company_name, 'rejected')}
+                                        variant="reject"
                                     />
                                 </div>
                             </div>
@@ -291,48 +255,17 @@ const StaffDashboard = () => {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2 w-full sm:w-auto justify-end shrink-0">
-                                    <Dialog>
-                                        <DialogTrigger asChild>
-                                            <button className="px-3 py-2 border-[2px] border-black rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-black hover:text-white transition-all">
-                                                REVIEW
-                                            </button>
-                                        </DialogTrigger>
-                                        <DialogContent className="max-w-2xl">
-                                            <DialogHeader>
-                                                <DialogTitle>{job.title}</DialogTitle>
-                                                <DialogDescription>{job.company} &bull; {job.type} &bull; {job.location}</DialogDescription>
-                                            </DialogHeader>
-                                            <div className="space-y-4 py-4 text-left max-h-[60vh] overflow-y-auto custom-scrollbar pr-2">
-                                                <div>
-                                                    <p className="text-[7px] font-black text-black/30 uppercase tracking-[0.2em] mb-1">DESCRIPTION</p>
-                                                    <p className="text-xs font-bold text-black leading-relaxed whitespace-pre-wrap">{job.description}</p>
-                                                </div>
-                                                <div>
-                                                    <p className="text-[7px] font-black text-black/30 uppercase tracking-[0.2em] mb-1">REQUIREMENTS</p>
-                                                    <p className="text-[10px] font-bold text-black/60 leading-relaxed whitespace-pre-wrap">{job.requirements}</p>
-                                                </div>
-                                                <div className="grid grid-cols-2 gap-4">
-                                                    <div>
-                                                        <p className="text-[7px] font-black text-black/30 uppercase tracking-[0.2em] mb-1">SALARY</p>
-                                                        <p className="text-[10px] font-black text-nile-blue">{job.salary || 'NOT SPECIFIED'}</p>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-[7px] font-black text-black/30 uppercase tracking-[0.2em] mb-1">SKILLS</p>
-                                                        <p className="text-[10px] font-black text-nile-blue">{job.skills || 'N/A'}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <DialogFooter className="gap-2">
-                                                <Button variant="nile-green" onClick={() => handleJobAction(job.id, job.title, 'active')}>APPROVE JOB</Button>
-                                                <Button variant="outline" className="text-red-500 border-red-500" onClick={() => handleJobAction(job.id, job.title, 'rejected')}>REJECT</Button>
-                                            </DialogFooter>
-                                        </DialogContent>
-                                    </Dialog>
                                     <ActionButton
                                         label="APPROVE"
                                         isLoading={actionLoading[`job-${job.id}`]}
                                         onClick={() => handleJobAction(job.id, job.title, 'active')}
                                         variant="approve"
+                                    />
+                                    <ActionButton
+                                        label="REJECT"
+                                        isLoading={actionLoading[`job-${job.id}`]}
+                                        onClick={() => handleJobAction(job.id, job.title, 'rejected')}
+                                        variant="reject"
                                     />
                                 </div>
                             </div>
@@ -351,7 +284,6 @@ const StaffDashboard = () => {
                                 { label: 'ALL STUDENTS', icon: <Users size={18} />, path: '/staff/services?tab=students', color: 'bg-nile-green/20 text-nile-green' },
                                 { label: 'GENERATE REPORT', icon: <BarChart2 size={18} />, path: '/staff/services?tab=reporting', color: 'bg-nile-blue/10 text-nile-blue' },
                                 { label: 'CRM', icon: <MessageSquare size={18} />, path: '/staff/crm', color: 'bg-black/5 text-black' },
-                                { label: 'ACTIVITY FEED', icon: <TrendingUp size={18} />, path: '/staff/activity', color: 'bg-nile-blue/10 text-nile-blue' },
                             ].map(qa => (
                                 <button
                                     key={qa.label}

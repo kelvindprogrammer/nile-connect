@@ -69,7 +69,7 @@ const LearningPath = () => {
                                     <p className="font-black text-sm uppercase text-black">Your learning path is empty</p>
                                     <p className="text-[10px] font-bold text-black/40 uppercase tracking-widest">Upload your CV to the AI Architect to get recommendations</p>
                                 </div>
-                                <Button variant="outline" size="sm" onClick={() => window.location.href = '/career/ai'}>
+                                <Button variant="outline" size="sm" onClick={() => window.location.href = '/student/career/ai'}>
                                     GO TO AI ARCHITECT
                                 </Button>
                             </div>

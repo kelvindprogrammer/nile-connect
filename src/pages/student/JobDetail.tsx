@@ -72,7 +72,7 @@ const JobDetail = () => {
         try {
             await apiClient.post('/api/jobs', { job_id: id });
             showToast('Application submitted!', 'success');
-            navigate('/applications');
+            navigate('/student/applications');
         } catch (err: any) {
             const msg = err?.response?.data?.error || 'Failed to apply. Please try again.';
             showToast(msg, 'error');
@@ -99,7 +99,7 @@ const JobDetail = () => {
             <div className="p-8 flex flex-col items-center justify-center h-[60vh] gap-4">
                 <AlertCircle size={40} className="text-red-400" />
                 <p className="text-[10px] font-black text-black/40 uppercase tracking-widest">Job not found</p>
-                <Button variant="outline" size="sm" onClick={() => navigate('/jobs')}>
+                <Button variant="outline" size="sm" onClick={() => navigate('/student/jobs')}>
                     <ArrowLeft size={14} className="mr-2" /> BACK TO JOB BOARD
                 </Button>
             </div>
@@ -122,7 +122,7 @@ const JobDetail = () => {
 
                 {/* Back */}
                 <button
-                    onClick={() => navigate('/jobs')}
+                    onClick={() => navigate('/student/jobs')}
                     className="flex items-center gap-2 text-black/40 font-black uppercase tracking-widest text-[9px] hover:text-black transition-colors group"
                 >
                     <ArrowLeft size={14} strokeWidth={3} className="group-hover:-translate-x-1 transition-transform" />

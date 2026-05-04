@@ -94,7 +94,7 @@ const CandidateDetail = () => {
         <div className="p-4 md:p-8 space-y-6 anime-fade-in font-sans pb-20 text-left min-h-full">
 
             {/* Nav */}
-            <button onClick={() => navigate('/candidates')}
+            <button onClick={() => navigate('/employer/candidates')}
                 className="flex items-center gap-2 text-black/40 font-black uppercase tracking-widest text-[9px] hover:text-black transition-colors">
                 <ArrowLeft size={14} strokeWidth={3} /> BACK TO TALENT POOL
             </button>

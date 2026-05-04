@@ -4,9 +4,8 @@ import DashboardLayout from '../../layouts/DashboardLayout';
 import {
     User, Mail, MapPin, Camera, Save, ArrowLeft,
     Link as LinkIcon, Link2, GraduationCap, Phone,
-    Code2, Plus, Trash2, Briefcase, Loader2, AlertCircle
+    Code2, Plus, Trash2, Briefcase, Loader2,
 } from 'lucide-react';
-import { getHomeUrl } from '../../utils/subdomain';
 import Card from '../../components/Card';
 import InputField from '../../components/InputField';
 import Button from '../../components/Button';
@@ -15,31 +14,29 @@ import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { useProfile, type Experience } from '../../hooks/useProfile';
 import { useProfilePicture } from '../../hooks/useProfilePicture';
-import { deleteAccount } from '../../services/authService';
+
 
 const EditProfile = () => {
     const navigate = useNavigate();
     const { user, login, logout } = useAuth();
     const { showToast } = useToast();
-    const { profile, updateProfile } = useProfile();
+    const { profile, updateProfile } = useProfile(user?.id);
     const { picture, uploadPicture, removePicture } = useProfilePicture();
     const picInputRef = useRef<HTMLInputElement>(null);
     const [uploadingPic, setUploadingPic] = useState(false);
 
     const [name, setName] = useState(user?.name || '');
     const [email, setEmail] = useState(user?.email || '');
-    const [bio, setBio] = useState(profile.bio || 'Professional student at Nile University, passionate about developing impactful solutions.');
-    const [major, setMajor] = useState(profile.major || user?.major || 'Computer Science');
+    const [bio, setBio] = useState(profile.bio || '');
+    const [major, setMajor] = useState(profile.major || user?.major || '');
     const [location, setLocation] = useState(profile.location || 'Abuja, Nigeria');
-    const [linkedIn, setLinkedIn] = useState(profile.linkedIn || 'linkedin.com/in/');
+    const [linkedIn, setLinkedIn] = useState(profile.linkedIn || '');
     const [portfolio, setPortfolio] = useState(profile.portfolio || '');
-    const [github, setGithub] = useState(profile.github || 'github.com/');
-    const [phone, setPhone] = useState(profile.phone || user?.phone || '');
-    const [skills, setSkills] = useState<string[]>(profile.skills.length > 0 ? profile.skills : ['Teamwork', 'Communication', 'Problem Solving']);
+    const [github, setGithub] = useState(profile.github || '');
+    const [phone, setPhone] = useState(profile.phone || '');
+    const [skills, setSkills] = useState<string[]>(profile.skills || []);
     const [skillInput, setSkillInput] = useState('');
-    const [experiences, setExperiences] = useState<Experience[]>(profile.experiences.length > 0 ? profile.experiences : [
-        { id: '1', title: 'Undergraduate Researcher', company: 'Nile University', duration: '2023 - Present', description: 'Working on academic projects.' }
-    ]);
+    const [experiences, setExperiences] = useState<Experience[]>(profile.experiences || []);
     const [showAddExp, setShowAddExp] = useState(false);
     const [newExp, setNewExp] = useState<Omit<Experience, 'id'>>({
         title: '', company: '', duration: '', description: '',
@@ -69,7 +66,7 @@ const EditProfile = () => {
         login({ ...user!, name, email });
         updateProfile({ bio, major, location, linkedIn, portfolio, github, phone, skills, experiences });
         showToast('Profile updated successfully!', 'success');
-        navigate('/profile');
+        navigate('/student/profile');
     };
 
     return (
@@ -81,7 +78,7 @@ const EditProfile = () => {
                         <h2 className="text-2xl md:text-4xl font-black text-black leading-none uppercase tracking-tighter">Edit Profile .</h2>
                         <p className="text-[9px] font-black text-nile-blue/50 uppercase tracking-[0.2em]">UPDATE YOUR PUBLIC PORTFOLIO</p>
                     </div>
-                    <Button variant="ghost" size="sm" onClick={() => navigate('/profile')}>
+                    <Button variant="ghost" size="sm" onClick={() => navigate('/student/profile')}>
                         <ArrowLeft size={14} className="mr-2" /> CANCEL
                     </Button>
                 </div>
@@ -277,36 +274,6 @@ const EditProfile = () => {
                         <Button fullWidth size="md" type="submit">
                             <Save size={14} className="mr-2" /> SAVE PROFILE
                         </Button>
-                    </div>
-
-                    {/* Danger Zone */}
-                    <div className="pt-12">
-                        <div className="bg-red-50 border-[2px] border-red-200 rounded-[24px] p-6 md:p-8 space-y-4">
-                            <div className="flex items-center gap-3 text-red-600">
-                                <AlertCircle size={20} />
-                                <h3 className="text-sm font-black uppercase tracking-widest">Danger Zone</h3>
-                            </div>
-                            <p className="text-[10px] font-bold text-red-800/60 uppercase leading-relaxed">
-                                Once you delete your account, there is no going back. Please be certain.
-                            </p>
-                            <Button 
-                                type="button" 
-                                variant="outline" 
-                                className="border-red-500 text-red-600 hover:bg-red-600 hover:text-white transition-all shadow-[3px_3px_0px_0px_rgba(220,38,38,1)] hover:shadow-none"
-                                onClick={async () => {
-                                    if (!window.confirm('Are you absolutely sure you want to delete your account? This action cannot be undone.')) return;
-                                    try {
-                                        await deleteAccount();
-                                        logout();
-                                        window.location.href = getHomeUrl('/');
-                                    } catch {
-                                        showToast('Deletion failed. Please try again.', 'error');
-                                    }
-                                }}
-                            >
-                                DELETE ACCOUNT
-                            </Button>
-                        </div>
                     </div>
                 </form>
             </div>
