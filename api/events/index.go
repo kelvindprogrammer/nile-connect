@@ -9,6 +9,8 @@ import (
 	"nile-connect/lib/models"
 	"nile-connect/lib/mw"
 	"nile-connect/lib/respond"
+
+	"gorm.io/gorm"
 )
 
 type eventResponse struct {
@@ -37,6 +39,15 @@ type createEventRequest struct {
 	Capacity    int       `json:"capacity"`
 }
 
+// liveRole fetches the user's real role from the database, bypassing JWT claims.
+func liveRole(database *gorm.DB, userID string) string {
+	var u models.User
+	if err := database.Where("id = ? AND deleted_at IS NULL", userID).First(&u).Error; err != nil {
+		return ""
+	}
+	return u.Role
+}
+
 func Handler(w http.ResponseWriter, r *http.Request) {
 	if mw.HandlePreflight(w, r) {
 		return
@@ -51,7 +62,16 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodDelete:
 		auth, err := mw.Auth(r)
-		if err != nil || auth.Role != "staff" {
+		if err != nil {
+			respond.Error(w, http.StatusUnauthorized, "authentication required")
+			return
+		}
+		// Verify staff access via DB (not JWT claim)
+		role := liveRole(database, auth.UserID)
+		if role == "" {
+			role = auth.Role
+		}
+		if role != "staff" {
 			respond.Error(w, http.StatusForbidden, "staff access required")
 			return
 		}
@@ -65,7 +85,15 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	case http.MethodPut:
 		auth, err := mw.Auth(r)
-		if err != nil || auth.Role != "staff" {
+		if err != nil {
+			respond.Error(w, http.StatusUnauthorized, "authentication required")
+			return
+		}
+		role := liveRole(database, auth.UserID)
+		if role == "" {
+			role = auth.Role
+		}
+		if role != "staff" {
 			respond.Error(w, http.StatusForbidden, "staff access required")
 			return
 		}
@@ -117,7 +145,12 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 			respond.Error(w, http.StatusUnauthorized, "authentication required")
 			return
 		}
-		if auth.Role != "staff" && auth.Role != "employer" {
+		// Get live role from DB, fall back to JWT claim
+		role := liveRole(database, auth.UserID)
+		if role == "" {
+			role = auth.Role
+		}
+		if role != "staff" && role != "employer" {
 			respond.Error(w, http.StatusForbidden, "only staff and employers can create events")
 			return
 		}
@@ -132,7 +165,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		}
 		event := models.Event{
 			OrganiserID:   auth.UserID,
-			OrganiserType: auth.Role,
+			OrganiserType: role,
 			Title:         req.Title,
 			Category:      req.Category,
 			Date:          req.Date,

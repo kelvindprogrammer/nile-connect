@@ -21,7 +21,23 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		respond.Error(w, http.StatusUnauthorized, "authentication required")
 		return
 	}
-	if auth.Role != "staff" {
+
+	database, err := db.Get()
+	if err != nil {
+		respond.Error(w, http.StatusInternalServerError, "database unavailable")
+		return
+	}
+
+	// Resolve the live role: trust mw.Auth result first, but if role is
+	// missing/wrong (stale JWT), fetch directly from the users table.
+	role := auth.Role
+	if role != "staff" {
+		var u models.User
+		if dbErr := database.Where("id = ? AND deleted_at IS NULL", auth.UserID).First(&u).Error; dbErr == nil {
+			role = u.Role
+		}
+	}
+	if role != "staff" {
 		respond.Error(w, http.StatusForbidden, "staff access required")
 		return
 	}
