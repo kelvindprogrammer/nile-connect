@@ -8,7 +8,6 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -27,41 +26,35 @@ import (
 	"nile-connect/lib/respond"
 )
 
-// ── Campus One OIDC constants ─────────────────────────────────────────────────
+// ── Campus One OIDC constants (hardcoded — no discovery request needed) ───────
+// Discovery URL path differs from the standard /.well-known/openid-configuration
+// so we skip oidc.NewProvider() and reference endpoints from the docs directly.
 
-const campusOneIssuer = "https://auth.campusone.com.ng"
-
-// ── Package-level OIDC state (initialised once per cold start) ────────────────
-
-var (
-	oidcProvider    *oidc.Provider
-	baseOAuthConfig oauth2.Config
-	oidcInitErr     error
+const (
+	campusOneIssuer   = "https://auth.campusone.com.ng"
+	campusOneAuthURL  = "https://auth.campusone.com.ng/api/auth/oauth2/authorize"
+	campusOneTokenURL = "https://auth.campusone.com.ng/api/auth/oauth2/token"
+	campusOneJWKSURL  = "https://auth.campusone.com.ng/api/auth/jwks"
 )
 
-func init() {
-	ctx := context.Background()
-	oidcProvider, oidcInitErr = oidc.NewProvider(ctx, campusOneIssuer)
-	if oidcInitErr != nil {
-		fmt.Fprintf(os.Stderr, "campus-one: OIDC provider init error: %v\n", oidcInitErr)
-		return
-	}
-	baseOAuthConfig = oauth2.Config{
+// campusOneKeySet fetches and caches Campus One's public keys lazily on first
+// token verification. No network call happens at init time.
+var campusOneKeySet = oidc.NewRemoteKeySet(context.Background(), campusOneJWKSURL)
+
+// oauthConfig builds a per-request oauth2.Config with the correct RedirectURL.
+// Credentials are read from env vars at call time so they always reflect the
+// current Vercel environment (no stale values from init).
+func oauthConfig(r *http.Request) oauth2.Config {
+	return oauth2.Config{
 		ClientID:     os.Getenv("CAMPUS_ONE_CLIENT_ID"),
 		ClientSecret: os.Getenv("CAMPUS_ONE_CLIENT_SECRET"),
-		Endpoint:     oidcProvider.Endpoint(),
-		Scopes: []string{
-			oidc.ScopeOpenID, "profile", "email",
-			"academic", "roles", "offline_access",
+		RedirectURL:  appBaseURL(r) + "/api/auth/callback",
+		Endpoint: oauth2.Endpoint{
+			AuthURL:  campusOneAuthURL,
+			TokenURL: campusOneTokenURL,
 		},
+		Scopes: []string{"openid", "profile", "email", "academic", "roles", "offline_access"},
 	}
-}
-
-// oauthConfig returns a per-request oauth2.Config with the correct RedirectURL.
-func oauthConfig(r *http.Request) oauth2.Config {
-	cfg := baseOAuthConfig
-	cfg.RedirectURL = appBaseURL(r) + "/api/auth/callback"
-	return cfg
 }
 
 // appBaseURL infers the application root URL from the request or APP_URL env var.
@@ -85,9 +78,9 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if oidcInitErr != nil {
+	if os.Getenv("CAMPUS_ONE_CLIENT_ID") == "" {
 		respond.Error(w, http.StatusServiceUnavailable,
-			"Campus One OIDC is not configured — check server logs")
+			"CAMPUS_ONE_CLIENT_ID is not set — add it to your environment variables")
 		return
 	}
 
@@ -205,7 +198,7 @@ func callback(w http.ResponseWriter, r *http.Request) {
 		respond.Error(w, http.StatusInternalServerError, "no id_token in token response")
 		return
 	}
-	verifier := oidcProvider.Verifier(&oidc.Config{
+	verifier := oidc.NewVerifier(campusOneIssuer, &campusOneKeySet, &oidc.Config{
 		ClientID: os.Getenv("CAMPUS_ONE_CLIENT_ID"),
 	})
 	idToken, err := verifier.Verify(ctx, rawIDToken)
