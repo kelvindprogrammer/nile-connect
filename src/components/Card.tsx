@@ -1,29 +1,46 @@
 import React from 'react';
+import { cn } from '../lib/utils';
 
 interface CardProps {
     title?: string;
+    subtitle?: string;
+    action?: React.ReactNode;
     children: React.ReactNode;
     className?: string;
-    variant?: 'default' | 'elevated' | 'flat';
+    bodyClassName?: string;
+    variant?: 'default' | 'elevated' | 'flat' | 'tinted';
+    noPadding?: boolean;
 }
 
-const Card: React.FC<CardProps> = ({ title, children, className = '', variant = 'elevated' }) => {
-    const baseStyles = "bg-white border-[2px] border-black rounded-[24px] overflow-hidden transition-all duration-300";
-    
+const Card: React.FC<CardProps> = ({
+    title,
+    subtitle,
+    action,
+    children,
+    className = '',
+    bodyClassName = '',
+    variant = 'default',
+    noPadding = false,
+}) => {
     const variants = {
-        elevated: "shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(30,73,157,0.1)]",
-        flat: "shadow-none",
-        default: "shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+        default:  'bg-white border border-gray-100 shadow-card',
+        elevated: 'bg-white border border-gray-100 shadow-soft hover:shadow-card-hover transition-shadow duration-300',
+        flat:     'bg-white border border-gray-100',
+        tinted:   'bg-nile-blue-50/40 border border-nile-blue-100/60',
     };
 
     return (
-        <div className={`${baseStyles} ${variants[variant]} ${className}`}>
-            {title && (
-                <div className="px-4 md:px-6 pt-4 md:pt-6 pb-2 md:pb-3 border-b-[2px] border-black/5">
-                    <h3 className="text-[9px] md:text-[11px] font-black text-black uppercase tracking-[0.1em]">{title}</h3>
+        <div className={cn('rounded-2xl overflow-hidden', variants[variant], className)}>
+            {(title || action) && (
+                <div className="px-5 py-4 flex items-center justify-between border-b border-gray-50">
+                    <div>
+                        <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
+                        {subtitle && <p className="text-xs text-gray-400 mt-0.5">{subtitle}</p>}
+                    </div>
+                    {action && <div className="flex-shrink-0">{action}</div>}
                 </div>
             )}
-            <div className={title ? "p-4 md:p-6 pt-2 md:pt-3" : "p-4 md:p-6"}>
+            <div className={cn(!noPadding && 'p-5', bodyClassName)}>
                 {children}
             </div>
         </div>
