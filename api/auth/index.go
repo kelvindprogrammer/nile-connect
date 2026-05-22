@@ -200,7 +200,8 @@ func callback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	verifier := oidc.NewVerifier(campusOneIssuer, campusOneKeySet, &oidc.Config{
-		ClientID: os.Getenv("CAMPUS_ONE_CLIENT_ID"),
+		ClientID:             os.Getenv("CAMPUS_ONE_CLIENT_ID"),
+		SupportedSigningAlgs: []string{"EdDSA", "RS256"},
 	})
 	idToken, err := verifier.Verify(ctx, rawIDToken)
 	if err != nil {
