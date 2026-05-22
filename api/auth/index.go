@@ -8,6 +8,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -198,7 +199,7 @@ func callback(w http.ResponseWriter, r *http.Request) {
 		respond.Error(w, http.StatusInternalServerError, "no id_token in token response")
 		return
 	}
-	verifier := oidc.NewVerifier(campusOneIssuer, &campusOneKeySet, &oidc.Config{
+	verifier := oidc.NewVerifier(campusOneIssuer, campusOneKeySet, &oidc.Config{
 		ClientID: os.Getenv("CAMPUS_ONE_CLIENT_ID"),
 	})
 	idToken, err := verifier.Verify(ctx, rawIDToken)
