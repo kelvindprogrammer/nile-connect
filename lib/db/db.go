@@ -74,6 +74,8 @@ func dsn() string {
 
 func migrate(db *gorm.DB) {
 	db.Exec(`CREATE EXTENSION IF NOT EXISTS "pgcrypto"`)
+
+	// AutoMigrate creates new tables and adds missing columns.
 	db.AutoMigrate(
 		&models.User{},
 		&models.EmployerProfile{},
@@ -86,4 +88,22 @@ func migrate(db *gorm.DB) {
 		&models.Message{},
 		&models.PasswordReset{},
 	)
+
+	// Explicit column additions for Campus One fields.
+	// IF NOT EXISTS makes these safe to run on every cold start.
+	// AutoMigrate can silently skip columns on warm/cached DB instances,
+	// so we enforce the schema here as a belt-and-suspenders measure.
+	for _, stmt := range []string{
+		`ALTER TABLE users ADD COLUMN IF NOT EXISTS campus_one_sub TEXT`,
+		`ALTER TABLE users ADD COLUMN IF NOT EXISTS student_id TEXT`,
+		`ALTER TABLE users ADD COLUMN IF NOT EXISTS study_level TEXT`,
+		`ALTER TABLE users ADD COLUMN IF NOT EXISTS level INTEGER`,
+		`ALTER TABLE users ADD COLUMN IF NOT EXISTS faculty_id TEXT`,
+		`ALTER TABLE users ADD COLUMN IF NOT EXISTS department_id TEXT`,
+		`CREATE INDEX IF NOT EXISTS idx_users_campus_one_sub ON users(campus_one_sub)`,
+		// Make password_hash nullable so SSO users can exist without a password.
+		`ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL`,
+	} {
+		db.Exec(stmt)
+	}
 }
