@@ -28,16 +28,11 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Resolve the live role: trust mw.Auth result first, but if role is
-	// missing/wrong (stale JWT), fetch directly from the users table.
-	role := auth.Role
-	if role != "employer" {
-		var u models.User
-		if dbErr := database.Where("id = ? AND deleted_at IS NULL", auth.UserID).First(&u).Error; dbErr == nil {
-			role = u.Role
-		}
-	}
-	if role != "employer" {
+	// Use employer_profiles as the definitive access proof.
+	// If an approved profile exists for this user ID they ARE an employer —
+	// regardless of what the JWT role claim says.
+	var empProfile models.EmployerProfile
+	if err := database.Where("user_id = ? AND deleted_at IS NULL AND status = ?", auth.UserID, "approved").First(&empProfile).Error; err != nil {
 		respond.Error(w, http.StatusForbidden, "employer access required")
 		return
 	}

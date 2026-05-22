@@ -28,16 +28,9 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Resolve the live role: trust mw.Auth result first, but if role is
-	// missing/wrong (stale JWT), fetch directly from the users table.
-	role := auth.Role
-	if role != "staff" {
-		var u models.User
-		if dbErr := database.Where("id = ? AND deleted_at IS NULL", auth.UserID).First(&u).Error; dbErr == nil {
-			role = u.Role
-		}
-	}
-	if role != "staff" {
+	// Look up the user's live role directly — zero trust in JWT role claim.
+	var staffUser models.User
+	if err := database.Where("id = ? AND role = ? AND deleted_at IS NULL", auth.UserID, "staff").First(&staffUser).Error; err != nil {
 		respond.Error(w, http.StatusForbidden, "staff access required")
 		return
 	}

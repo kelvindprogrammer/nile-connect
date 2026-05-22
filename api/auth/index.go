@@ -1,474 +1,313 @@
 package handler
 
 import (
+	"context"
+	"crypto/hmac"
 	"crypto/rand"
+	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
+	"os"
+	"regexp"
 	"strings"
 	"time"
+
+	"github.com/coreos/go-oidc/v3/oidc"
+	"golang.org/x/oauth2"
+	"gorm.io/gorm"
 
 	"nile-connect/lib/db"
 	"nile-connect/lib/jwtutil"
 	"nile-connect/lib/models"
 	"nile-connect/lib/mw"
 	"nile-connect/lib/respond"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
+// ── Campus One OIDC constants ─────────────────────────────────────────────────
+
+const campusOneIssuer = "https://auth.campusone.com.ng"
+
+// ── Package-level OIDC state (initialised once per cold start) ────────────────
+
+var (
+	oidcProvider    *oidc.Provider
+	baseOAuthConfig oauth2.Config
+	oidcInitErr     error
+)
+
+func init() {
+	ctx := context.Background()
+	oidcProvider, oidcInitErr = oidc.NewProvider(ctx, campusOneIssuer)
+	if oidcInitErr != nil {
+		fmt.Fprintf(os.Stderr, "campus-one: OIDC provider init error: %v\n", oidcInitErr)
+		return
+	}
+	baseOAuthConfig = oauth2.Config{
+		ClientID:     os.Getenv("CAMPUS_ONE_CLIENT_ID"),
+		ClientSecret: os.Getenv("CAMPUS_ONE_CLIENT_SECRET"),
+		Endpoint:     oidcProvider.Endpoint(),
+		Scopes: []string{
+			oidc.ScopeOpenID, "profile", "email",
+			"academic", "roles", "offline_access",
+		},
+	}
+}
+
+// oauthConfig returns a per-request oauth2.Config with the correct RedirectURL.
+func oauthConfig(r *http.Request) oauth2.Config {
+	cfg := baseOAuthConfig
+	cfg.RedirectURL = appBaseURL(r) + "/api/auth/callback"
+	return cfg
+}
+
+// appBaseURL infers the application root URL from the request or APP_URL env var.
+func appBaseURL(r *http.Request) string {
+	if u := os.Getenv("APP_URL"); u != "" {
+		return strings.TrimRight(u, "/")
+	}
+	scheme := "https"
+	if r.Header.Get("X-Forwarded-Proto") == "" && r.TLS == nil {
+		scheme = "http"
+	}
+	return scheme + "://" + r.Host
+}
+
+// ── Main handler ──────────────────────────────────────────────────────────────
+
 // Handler is the single entrypoint for all /api/auth/* routes.
-// The vercel.json rewrites pass the sub-path as ?path=<value>.
+// vercel.json rewrites pass the sub-path as ?path=<value>.
 func Handler(w http.ResponseWriter, r *http.Request) {
 	if mw.HandlePreflight(w, r) {
 		return
 	}
+
+	if oidcInitErr != nil {
+		respond.Error(w, http.StatusServiceUnavailable,
+			"Campus One OIDC is not configured — check server logs")
+		return
+	}
+
 	switch r.URL.Query().Get("path") {
 	case "login":
 		login(w, r)
-	case "register-student":
-		registerStudent(w, r)
-	case "register-employer":
-		registerEmployer(w, r)
-	case "complete-profile":
-		completeProfile(w, r)
-	case "forgot-password":
-		forgotPassword(w, r)
-	case "reset-password":
-		resetPassword(w, r)
-	case "seed-demo":
-		seedDemo(w, r)
+	case "callback":
+		callback(w, r)
+	case "logout":
+		logout(w, r)
+	case "me":
+		me(w, r)
 	case "delete-account":
 		deleteAccount(w, r)
+	case "webhook":
+		webhook(w, r)
 	default:
 		respond.Error(w, http.StatusNotFound, "not found")
 	}
 }
 
-// ── shared response type ──────────────────────────────────────────────────────
-
-type userResp struct {
-	ID             string  `json:"id"`
-	FullName       string  `json:"full_name"`
-	Username       string  `json:"username"`
-	Email          string  `json:"email"`
-	Role           string  `json:"role"`
-	StudentSubtype *string `json:"student_subtype,omitempty"`
-	Major          *string `json:"major,omitempty"`
-	GraduationYear *int    `json:"graduation_year,omitempty"`
-	IsVerified     bool    `json:"is_verified"`
-}
-
-func buildUserResp(u *models.User) userResp {
-	resp := userResp{
-		ID:         u.ID,
-		FullName:   u.FullName,
-		Username:   u.Username,
-		Email:      u.Email,
-		Role:       u.Role,
-		IsVerified: u.IsVerified,
-	}
-	if u.StudentSubtype != "" {
-		st := u.StudentSubtype
-		resp.StudentSubtype = &st
-	}
-	if u.Major != "" {
-		m := u.Major
-		resp.Major = &m
-	}
-	if u.GraduationYear != 0 {
-		gy := u.GraduationYear
-		resp.GraduationYear = &gy
-	}
-	return resp
-}
-
-func tokenResponse(u *models.User) (map[string]any, error) {
-	token, err := jwtutil.Generate(u.ID, u.Role, u.StudentSubtype)
-	if err != nil {
-		return nil, err
-	}
-	return map[string]any{"token": token, "user": buildUserResp(u)}, nil
-}
-
 // ── login ─────────────────────────────────────────────────────────────────────
 
+// login initiates the Campus One OIDC PKCE authorization code flow.
+// The browser is redirected to Campus One's consent screen.
 func login(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		respond.Error(w, http.StatusMethodNotAllowed, "method not allowed")
-		return
-	}
-	var req struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		respond.Error(w, http.StatusBadRequest, "invalid request body")
-		return
-	}
-	req.Email = strings.TrimSpace(strings.ToLower(req.Email))
-	if req.Email == "" || req.Password == "" {
-		respond.Error(w, http.StatusBadRequest, "email and password are required")
-		return
+	// Remember where to send the user after a successful login.
+	next := r.URL.Query().Get("next")
+	if next == "" || !strings.HasPrefix(next, "/") {
+		next = ""
 	}
 
-	database, err := db.Get()
-	if err != nil {
-		respond.Error(w, http.StatusInternalServerError, "database unavailable")
-		return
+	state := randBase64(16)
+	verifier := randBase64(32)
+	challenge := pkceChallenge(verifier)
+
+	secure := isSecureContext(r)
+	setTempCookie(w, "c1_state", state, 600, secure)
+	setTempCookie(w, "c1_verifier", verifier, 600, secure)
+	if next != "" {
+		setTempCookie(w, "c1_next", next, 600, secure)
 	}
 
-	var user models.User
-	if err := database.Where("email = ? AND deleted_at IS NULL", req.Email).First(&user).Error; err != nil {
-		respond.Error(w, http.StatusUnauthorized, "invalid credentials")
-		return
-	}
-	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
-		respond.Error(w, http.StatusUnauthorized, "invalid credentials")
-		return
-	}
-
-	if user.Role == "employer" {
-		var profile models.EmployerProfile
-		if err := database.Where("user_id = ? AND deleted_at IS NULL", user.ID).First(&profile).Error; err != nil {
-			respond.Error(w, http.StatusUnauthorized, "employer profile not found")
-			return
-		}
-		if profile.Status != "approved" {
-			respond.Error(w, http.StatusForbidden, "your account is pending verification by staff")
-			return
-		}
-	}
-
-	body, err := tokenResponse(&user)
-	if err != nil {
-		respond.Error(w, http.StatusInternalServerError, "could not generate token")
-		return
-	}
-	respond.OK(w, body)
+	cfg := oauthConfig(r)
+	authURL := cfg.AuthCodeURL(
+		state,
+		oauth2.SetAuthURLParam("code_challenge", challenge),
+		oauth2.SetAuthURLParam("code_challenge_method", "S256"),
+	)
+	http.Redirect(w, r, authURL, http.StatusFound)
 }
 
-// ── register student ──────────────────────────────────────────────────────────
+// ── callback ──────────────────────────────────────────────────────────────────
 
-func registerStudent(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		respond.Error(w, http.StatusMethodNotAllowed, "method not allowed")
-		return
-	}
-	var req struct {
-		FullName string `json:"full_name"`
-		Username string `json:"username"`
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		respond.Error(w, http.StatusBadRequest, "invalid request body")
-		return
-	}
-	req.Email = strings.TrimSpace(strings.ToLower(req.Email))
-	req.Username = strings.TrimSpace(req.Username)
-	if req.FullName == "" || req.Username == "" || req.Email == "" || req.Password == "" {
-		respond.Error(w, http.StatusBadRequest, "all fields are required")
-		return
-	}
-	if len(req.Password) < 8 {
-		respond.Error(w, http.StatusBadRequest, "password must be at least 8 characters")
-		return
-	}
-
-	database, err := db.Get()
-	if err != nil {
-		respond.Error(w, http.StatusInternalServerError, "database unavailable")
-		return
-	}
-
-	var count int64
-	database.Model(&models.User{}).
-		Where("(email = ? OR username = ?) AND deleted_at IS NULL", req.Email, req.Username).
-		Count(&count)
-	if count > 0 {
-		respond.Error(w, http.StatusConflict, "email or username already exists")
-		return
-	}
-
-	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
-	if err != nil {
-		respond.Error(w, http.StatusInternalServerError, "could not hash password")
-		return
-	}
-
-	subtype := "alumni"
-	if isEduEmail(req.Email) {
-		subtype = "current"
-	}
-	user := models.User{
-		FullName:       req.FullName,
-		Username:       req.Username,
-		Email:          req.Email,
-		PasswordHash:   string(hash),
-		Role:           "student",
-		StudentSubtype: subtype,
-		IsVerified:     true,
-	}
-	if err := database.Create(&user).Error; err != nil {
-		respond.Error(w, http.StatusInternalServerError, "could not create user")
-		return
-	}
-
-	body, err := tokenResponse(&user)
-	if err != nil {
-		respond.Error(w, http.StatusInternalServerError, "could not generate token")
-		return
-	}
-	respond.Created(w, body)
+// campusOneClaims mirrors the id_token payload from Campus One.
+type campusOneClaims struct {
+	Sub          string   `json:"sub"`
+	Email        string   `json:"email"`
+	Name         string   `json:"name"`
+	Role         string   `json:"role"`
+	Roles        []string `json:"roles"`
+	StudentID    string   `json:"student_id"`
+	StudyLevel   string   `json:"study_level"`
+	Level        int      `json:"level"`
+	FacultyID    string   `json:"faculty_id"`
+	DepartmentID string   `json:"department_id"`
 }
 
-// ── register employer ─────────────────────────────────────────────────────────
-
-func registerEmployer(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		respond.Error(w, http.StatusMethodNotAllowed, "method not allowed")
+// callback handles the redirect from Campus One after the user consents.
+// It exchanges the authorisation code for tokens, verifies the id_token,
+// upserts the local user row, and sets a signed session cookie.
+func callback(w http.ResponseWriter, r *http.Request) {
+	// ── 1. Retrieve and validate PKCE / state cookies ─────────────────────────
+	stateCookie, err := r.Cookie("c1_state")
+	if err != nil || stateCookie.Value == "" {
+		respond.Error(w, http.StatusBadRequest, "missing state cookie — restart sign-in")
 		return
 	}
-	var req struct {
-		FullName     string `json:"full_name"`
-		Username     string `json:"username"`
-		Email        string `json:"email"`
-		Password     string `json:"password"`
-		CompanyName  string `json:"company_name"`
-		Industry     string `json:"industry"`
-		Location     string `json:"location"`
-		About        string `json:"about"`
-		ContactEmail string `json:"contact_email"`
-		Website      string `json:"website"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		respond.Error(w, http.StatusBadRequest, "invalid request body")
+	verifierCookie, err := r.Cookie("c1_verifier")
+	if err != nil || verifierCookie.Value == "" {
+		respond.Error(w, http.StatusBadRequest, "missing verifier cookie — restart sign-in")
 		return
 	}
-	req.Email = strings.TrimSpace(strings.ToLower(req.Email))
-	req.Username = strings.TrimSpace(req.Username)
-	if req.FullName == "" || req.Username == "" || req.Email == "" || req.Password == "" ||
-		req.CompanyName == "" || req.Industry == "" || req.Location == "" || req.ContactEmail == "" {
-		respond.Error(w, http.StatusBadRequest, "all required fields must be provided")
+	if r.URL.Query().Get("state") != stateCookie.Value {
+		respond.Error(w, http.StatusBadRequest, "state mismatch — possible CSRF")
 		return
 	}
-	if len(req.Password) < 8 {
-		respond.Error(w, http.StatusBadRequest, "password must be at least 8 characters")
+	// Handle authorisation errors returned by Campus One (e.g. user cancelled).
+	if errParam := r.URL.Query().Get("error"); errParam != "" {
+		desc := r.URL.Query().Get("error_description")
+		http.Redirect(w, r, "/login?error="+errParam+"&desc="+desc, http.StatusFound)
 		return
 	}
 
-	database, err := db.Get()
+	code := r.URL.Query().Get("code")
+	if code == "" {
+		respond.Error(w, http.StatusBadRequest, "no authorization code in callback")
+		return
+	}
+
+	// ── 2. Exchange code for tokens ───────────────────────────────────────────
+	ctx := r.Context()
+	cfg := oauthConfig(r)
+	token, err := cfg.Exchange(ctx, code,
+		oauth2.SetAuthURLParam("code_verifier", verifierCookie.Value),
+	)
 	if err != nil {
-		respond.Error(w, http.StatusInternalServerError, "database unavailable")
+		respond.Error(w, http.StatusUnauthorized, "token exchange failed: "+err.Error())
 		return
 	}
 
-	var count int64
-	database.Model(&models.User{}).
-		Where("(email = ? OR username = ?) AND deleted_at IS NULL", req.Email, req.Username).
-		Count(&count)
-	if count > 0 {
-		respond.Error(w, http.StatusConflict, "email or username already exists")
+	// ── 3. Verify id_token signature against Campus One JWKS ─────────────────
+	rawIDToken, ok := token.Extra("id_token").(string)
+	if !ok || rawIDToken == "" {
+		respond.Error(w, http.StatusInternalServerError, "no id_token in token response")
 		return
 	}
-
-	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
-	if err != nil {
-		respond.Error(w, http.StatusInternalServerError, "could not hash password")
-		return
-	}
-
-	user := models.User{
-		FullName:     req.FullName,
-		Username:     req.Username,
-		Email:        req.Email,
-		PasswordHash: string(hash),
-		Role:         "employer",
-		IsVerified:   false,
-	}
-	if err := database.Create(&user).Error; err != nil {
-		respond.Error(w, http.StatusInternalServerError, "could not create user")
-		return
-	}
-
-	profile := models.EmployerProfile{
-		UserID:       user.ID,
-		CompanyName:  req.CompanyName,
-		Industry:     req.Industry,
-		Location:     req.Location,
-		About:        req.About,
-		ContactEmail: req.ContactEmail,
-		Website:      req.Website,
-		Status:       "pending",
-	}
-	if err := database.Create(&profile).Error; err != nil {
-		respond.Error(w, http.StatusInternalServerError, "could not create employer profile")
-		return
-	}
-
-	body, err := tokenResponse(&user)
-	if err != nil {
-		respond.Error(w, http.StatusInternalServerError, "could not generate token")
-		return
-	}
-	body["message"] = "Account created. Awaiting staff verification before you can log in."
-	respond.Created(w, body)
-}
-
-// ── complete profile ──────────────────────────────────────────────────────────
-
-func completeProfile(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		respond.Error(w, http.StatusMethodNotAllowed, "method not allowed")
-		return
-	}
-	var req struct {
-		UserID         string `json:"user_id"`
-		Major          string `json:"major"`
-		GraduationYear int    `json:"graduation_year"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		respond.Error(w, http.StatusBadRequest, "invalid request body")
-		return
-	}
-	if req.UserID == "" || req.Major == "" || req.GraduationYear == 0 {
-		respond.Error(w, http.StatusBadRequest, "user_id, major and graduation_year are required")
-		return
-	}
-
-	database, err := db.Get()
-	if err != nil {
-		respond.Error(w, http.StatusInternalServerError, "database unavailable")
-		return
-	}
-
-	var user models.User
-	if err := database.Where("id = ? AND deleted_at IS NULL", req.UserID).First(&user).Error; err != nil {
-		respond.Error(w, http.StatusNotFound, "user not found")
-		return
-	}
-	user.Major = req.Major
-	user.GraduationYear = req.GraduationYear
-	if err := database.Save(&user).Error; err != nil {
-		respond.Error(w, http.StatusInternalServerError, "could not update profile")
-		return
-	}
-
-	body, err := tokenResponse(&user)
-	if err != nil {
-		respond.Error(w, http.StatusInternalServerError, "could not generate token")
-		return
-	}
-	respond.OK(w, body)
-}
-
-// ── helpers ───────────────────────────────────────────────────────────────────
-
-// ── forgot password ───────────────────────────────────────────────────────────
-
-func forgotPassword(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		respond.Error(w, http.StatusMethodNotAllowed, "method not allowed")
-		return
-	}
-	var req struct {
-		Email string `json:"email"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.Email == "" {
-		respond.Error(w, http.StatusBadRequest, "email is required")
-		return
-	}
-
-	database, err := db.Get()
-	if err != nil {
-		respond.Error(w, http.StatusInternalServerError, "database unavailable")
-		return
-	}
-
-	var user models.User
-	if err := database.Where("email = ? AND deleted_at IS NULL", strings.ToLower(req.Email)).First(&user).Error; err != nil {
-		// Don't reveal whether email exists
-		respond.OK(w, map[string]any{"message": "If that email is registered, a reset link has been sent."})
-		return
-	}
-
-	// Generate a secure token
-	b := make([]byte, 20)
-	if _, err := rand.Read(b); err != nil {
-		respond.Error(w, http.StatusInternalServerError, "could not generate token")
-		return
-	}
-	token := hex.EncodeToString(b)
-
-	// Invalidate previous tokens for this user
-	database.Model(&models.PasswordReset{}).Where("user_id = ? AND used = false", user.ID).Update("used", true)
-
-	reset := models.PasswordReset{
-		UserID:    user.ID,
-		Token:     token,
-		ExpiresAt: time.Now().Add(1 * time.Hour),
-	}
-	database.Create(&reset)
-
-	// In production: send token via email. For demo, return in response.
-	respond.OK(w, map[string]any{
-		"message": "Reset token generated. In production this would be emailed.",
-		"token":   token,
+	verifier := oidcProvider.Verifier(&oidc.Config{
+		ClientID: os.Getenv("CAMPUS_ONE_CLIENT_ID"),
 	})
-}
-
-// ── reset password ────────────────────────────────────────────────────────────
-
-func resetPassword(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		respond.Error(w, http.StatusMethodNotAllowed, "method not allowed")
-		return
-	}
-	var req struct {
-		Token       string `json:"token"`
-		NewPassword string `json:"new_password"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		respond.Error(w, http.StatusBadRequest, "invalid request body")
-		return
-	}
-	if req.Token == "" || req.NewPassword == "" {
-		respond.Error(w, http.StatusBadRequest, "token and new_password are required")
-		return
-	}
-	if len(req.NewPassword) < 8 {
-		respond.Error(w, http.StatusBadRequest, "password must be at least 8 characters")
+	idToken, err := verifier.Verify(ctx, rawIDToken)
+	if err != nil {
+		respond.Error(w, http.StatusUnauthorized, "id_token verification failed: "+err.Error())
 		return
 	}
 
+	// ── 4. Extract claims ─────────────────────────────────────────────────────
+	var claims campusOneClaims
+	if err := idToken.Claims(&claims); err != nil {
+		respond.Error(w, http.StatusInternalServerError, "could not decode id_token claims")
+		return
+	}
+	if claims.Sub == "" {
+		respond.Error(w, http.StatusInternalServerError, "id_token missing sub claim")
+		return
+	}
+
+	// ── 5. Upsert local user ──────────────────────────────────────────────────
 	database, err := db.Get()
 	if err != nil {
 		respond.Error(w, http.StatusInternalServerError, "database unavailable")
 		return
 	}
-
-	var reset models.PasswordReset
-	if err := database.Where("token = ? AND used = false AND expires_at > NOW() AND deleted_at IS NULL", req.Token).First(&reset).Error; err != nil {
-		respond.Error(w, http.StatusBadRequest, "invalid or expired reset token")
-		return
-	}
-
-	hash, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+	user, err := upsertUser(database, &claims)
 	if err != nil {
-		respond.Error(w, http.StatusInternalServerError, "could not hash password")
+		respond.Error(w, http.StatusInternalServerError, "could not save user: "+err.Error())
 		return
 	}
 
-	database.Model(&models.User{}).Where("id = ?", reset.UserID).Update("password_hash", string(hash))
-	database.Model(&models.PasswordReset{}).Where("token = ?", req.Token).Update("used", true)
+	// ── 6. Issue session cookie ───────────────────────────────────────────────
+	if err := setSessionCookie(w, r, user); err != nil {
+		respond.Error(w, http.StatusInternalServerError, "could not create session")
+		return
+	}
 
-	respond.OK(w, map[string]any{"message": "Password reset successfully"})
+	// Clear PKCE cookies.
+	secure := isSecureContext(r)
+	clearCookie(w, "c1_state", secure)
+	clearCookie(w, "c1_verifier", secure)
+
+	// ── 7. Redirect to dashboard ──────────────────────────────────────────────
+	next := ""
+	if c, err := r.Cookie("c1_next"); err == nil {
+		next = c.Value
+		clearCookie(w, "c1_next", secure)
+	}
+	if next == "" {
+		next = roleDashboard(user.Role)
+	}
+	http.Redirect(w, r, appBaseURL(r)+next, http.StatusFound)
 }
 
-func isEduEmail(email string) bool {
-	lower := strings.ToLower(email)
-	return strings.HasSuffix(lower, ".edu") || strings.HasSuffix(lower, ".edu.ng")
+// ── logout ────────────────────────────────────────────────────────────────────
+
+func logout(w http.ResponseWriter, r *http.Request) {
+	secure := isSecureContext(r)
+	clearCookie(w, "nile_session", secure)
+
+	// Accept both GET (link click) and POST (programmatic call).
+	if r.Header.Get("Accept") == "application/json" ||
+		r.Header.Get("Content-Type") == "application/json" {
+		respond.OK(w, map[string]string{"message": "signed out"})
+		return
+	}
+	http.Redirect(w, r, "/login", http.StatusFound)
+}
+
+// ── me ────────────────────────────────────────────────────────────────────────
+
+func me(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		respond.Error(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+
+	cookie, err := r.Cookie("nile_session")
+	if err != nil || cookie.Value == "" {
+		respond.Error(w, http.StatusUnauthorized, "not signed in")
+		return
+	}
+	sessionClaims, err := jwtutil.ParseSession(cookie.Value)
+	if err != nil {
+		respond.Error(w, http.StatusUnauthorized, "invalid session")
+		return
+	}
+
+	// Refresh from DB to pick up any role / profile changes since last login.
+	database, dbErr := db.Get()
+	if dbErr != nil {
+		// DB unavailable — serve cached session claims rather than blocking.
+		respond.OK(w, sessionClaimsToResponse(sessionClaims))
+		return
+	}
+	var user models.User
+	if err := database.Where("id = ? AND deleted_at IS NULL", sessionClaims.UserID).
+		First(&user).Error; err != nil {
+		respond.Error(w, http.StatusUnauthorized, "user not found")
+		return
+	}
+	respond.OK(w, userToResponse(&user))
 }
 
 // ── delete account ────────────────────────────────────────────────────────────
@@ -488,95 +327,328 @@ func deleteAccount(w http.ResponseWriter, r *http.Request) {
 		respond.Error(w, http.StatusInternalServerError, "database unavailable")
 		return
 	}
-	// Soft-delete: set deleted_at so existing rows are kept for audit
-	if err := database.Model(&models.User{}).Where("id = ?", auth.UserID).Update("deleted_at", time.Now()).Error; err != nil {
+	if err := database.Model(&models.User{}).
+		Where("id = ?", auth.UserID).
+		Update("deleted_at", time.Now()).Error; err != nil {
 		respond.Error(w, http.StatusInternalServerError, "could not delete account")
 		return
 	}
-	respond.OK(w, map[string]string{"message": "Account deleted successfully"})
+	// Clear the session so the browser is immediately signed out.
+	clearCookie(w, "nile_session", isSecureContext(r))
+	respond.OK(w, map[string]string{"message": "account deleted"})
 }
 
-// ── seed demo accounts ────────────────────────────────────────────────────────
+// ── webhook ───────────────────────────────────────────────────────────────────
 
-func seedDemo(w http.ResponseWriter, r *http.Request) {
-	database, err := db.Get()
-	if err != nil {
-		respond.Error(w, http.StatusInternalServerError, "database unavailable")
+// webhook receives Campus One lifecycle events (user.role_changed, user.deleted, etc.).
+// Signature: HMAC-SHA256 of the raw body, keyed with CAMPUS_ONE_WEBHOOK_SECRET.
+func webhook(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		respond.Error(w, http.StatusMethodNotAllowed, "method not allowed")
 		return
 	}
 
-	const pw = "NileDemo2025!"
-	hash, _ := bcrypt.GenerateFromPassword([]byte(pw), bcrypt.DefaultCost)
-	h := string(hash)
-
-	type account struct {
-		Role     string `json:"role"`
-		Email    string `json:"email"`
-		Password string `json:"password"`
-		Status   string `json:"status"`
-	}
-	var results []account
-
-	// Student
-	var n int64
-	database.Model(&models.User{}).Where("email = ?", "student@demo.nileconnect.com").Count(&n)
-	if n == 0 {
-		sub := "current"
-		database.Create(&models.User{
-			FullName: "Demo Student", Username: "demo_student",
-			Email: "student@demo.nileconnect.com", PasswordHash: h,
-			Role: "student", StudentSubtype: sub,
-			Major: "Computer Science", GraduationYear: 2026, IsVerified: true,
-		})
-		results = append(results, account{"student", "student@demo.nileconnect.com", pw, "created"})
-	} else {
-		database.Model(&models.User{}).Where("email = ?", "student@demo.nileconnect.com").Update("password_hash", h)
-		results = append(results, account{"student", "student@demo.nileconnect.com", pw, "already exists"})
+	// Read raw body first — must happen before any parsing.
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		respond.Error(w, http.StatusBadRequest, "could not read body")
+		return
 	}
 
-	// Staff
-	database.Model(&models.User{}).Where("email = ?", "staff@demo.nileconnect.com").Count(&n)
-	if n == 0 {
-		database.Create(&models.User{
-			FullName: "Demo Staff", Username: "demo_staff",
-			Email: "staff@demo.nileconnect.com", PasswordHash: h,
-			Role: "staff", IsVerified: true,
-		})
-		results = append(results, account{"staff", "staff@demo.nileconnect.com", pw, "created"})
-	} else {
-		database.Model(&models.User{}).Where("email = ?", "staff@demo.nileconnect.com").Update("password_hash", h)
-		results = append(results, account{"staff", "staff@demo.nileconnect.com", pw, "already exists"})
+	// Verify HMAC-SHA256 signature.
+	secret := os.Getenv("CAMPUS_ONE_WEBHOOK_SECRET")
+	if secret == "" {
+		respond.Error(w, http.StatusInternalServerError, "webhook secret not configured")
+		return
+	}
+	sig := r.Header.Get("X-Campus-One-Signature")
+	mac := hmac.New(sha256.New, []byte(secret))
+	mac.Write(body)
+	expected := "sha256=" + hex.EncodeToString(mac.Sum(nil))
+
+	sigBytes := []byte(sig)
+	expBytes := []byte(expected)
+	if len(sigBytes) != len(expBytes) || !hmac.Equal(sigBytes, expBytes) {
+		respond.Error(w, http.StatusUnauthorized, "invalid webhook signature")
+		return
 	}
 
-	// Employer
-	database.Model(&models.User{}).Where("email = ?", "employer@demo.nileconnect.com").Count(&n)
-	if n == 0 {
-		emp := models.User{
-			FullName: "Demo Employer", Username: "demo_employer",
-			Email: "employer@demo.nileconnect.com", PasswordHash: h,
-			Role: "employer", IsVerified: true,
+	// Parse event envelope.
+	var event struct {
+		Event string                 `json:"event"`
+		Data  map[string]interface{} `json:"data"`
+	}
+	if err := json.Unmarshal(body, &event); err != nil {
+		respond.Error(w, http.StatusBadRequest, "invalid event payload")
+		return
+	}
+
+	database, err := db.Get()
+	if err != nil {
+		// Log and return 200 so Campus One doesn't retry a permanent error.
+		fmt.Fprintf(os.Stderr, "campus-one webhook: DB unavailable for event %s\n", event.Event)
+		respond.OK(w, map[string]string{"status": "queued"})
+		return
+	}
+
+	switch event.Event {
+	case "user.role_changed":
+		if userID, ok := event.Data["user_id"].(string); ok {
+			newRole, _ := event.Data["new_role"].(string)
+			appRole, appSubtype := mapCampusOneRole(newRole)
+			database.Model(&models.User{}).
+				Where("campus_one_sub = ?", userID).
+				Updates(map[string]interface{}{
+					"role":            appRole,
+					"student_subtype": appSubtype,
+				})
 		}
-		database.Create(&emp)
-		// Fetch created user to get ID
-		var created models.User
-		database.Where("email = ?", "employer@demo.nileconnect.com").First(&created)
-		database.Create(&models.EmployerProfile{
-			UserID: created.ID, CompanyName: "Demo Company",
-			Industry: "Technology", Location: "Abuja, Nigeria",
-			About: "Demo employer for testing.", ContactEmail: "employer@demo.nileconnect.com",
-			Status: "approved",
-		})
-		results = append(results, account{"employer", "employer@demo.nileconnect.com", pw, "created"})
-	} else {
-		database.Model(&models.User{}).Where("email = ?", "employer@demo.nileconnect.com").Update("password_hash", h)
-		var existing models.User
-		database.Where("email = ?", "employer@demo.nileconnect.com").First(&existing)
-		database.Model(&models.EmployerProfile{}).Where("user_id = ?", existing.ID).Update("status", "approved")
-		results = append(results, account{"employer", "employer@demo.nileconnect.com", pw, "already exists"})
+	case "user.updated":
+		if userID, ok := event.Data["user_id"].(string); ok {
+			updates := map[string]interface{}{}
+			if email, ok := event.Data["email"].(string); ok && email != "" {
+				updates["email"] = email
+			}
+			if name, ok := event.Data["name"].(string); ok && name != "" {
+				updates["full_name"] = name
+			}
+			if len(updates) > 0 {
+				database.Model(&models.User{}).
+					Where("campus_one_sub = ?", userID).
+					Updates(updates)
+			}
+		}
+	case "user.deleted":
+		if userID, ok := event.Data["user_id"].(string); ok {
+			database.Model(&models.User{}).
+				Where("campus_one_sub = ?", userID).
+				Update("deleted_at", time.Now())
+		}
 	}
 
-	respond.OK(w, map[string]any{
-		"message":  "Demo accounts ready. Use these on the login page.",
-		"accounts": results,
+	respond.OK(w, map[string]string{"status": "ok"})
+}
+
+// ── helpers ───────────────────────────────────────────────────────────────────
+
+var nonAlphanumRe = regexp.MustCompile(`[^a-z0-9_]`)
+
+// upsertUser finds an existing user by Campus One sub (or by email for users
+// who pre-dated the OIDC migration) and creates one if neither exists.
+func upsertUser(database *gorm.DB, c *campusOneClaims) (*models.User, error) {
+	role, subtype := mapCampusOneRole(c.Role)
+
+	updates := map[string]interface{}{
+		"campus_one_sub":  c.Sub,
+		"full_name":       c.Name,
+		"email":           c.Email,
+		"role":            role,
+		"student_subtype": subtype,
+		"is_verified":     true,
+		"student_id":      c.StudentID,
+		"study_level":     c.StudyLevel,
+		"level":           c.Level,
+		"faculty_id":      c.FacultyID,
+		"department_id":   c.DepartmentID,
+	}
+
+	// 1. Look up by Campus One sub (stable across logins).
+	var user models.User
+	err := database.Where("campus_one_sub = ? AND deleted_at IS NULL", c.Sub).First(&user).Error
+	if err == nil {
+		database.Model(&user).Updates(updates)
+		return &user, nil
+	}
+
+	// 2. Fall back to email (covers users who registered before OIDC migration).
+	err = database.Where("email = ? AND deleted_at IS NULL", c.Email).First(&user).Error
+	if err == nil {
+		database.Model(&user).Updates(updates)
+		return &user, nil
+	}
+
+	// 3. New user — create a unique username derived from the email prefix.
+	username := generateUsername(database, c)
+	user = models.User{
+		CampusOneSub:   c.Sub,
+		FullName:       c.Name,
+		Username:       username,
+		Email:          c.Email,
+		Role:           role,
+		StudentSubtype: subtype,
+		IsVerified:     true,
+		StudentID:      c.StudentID,
+		StudyLevel:     c.StudyLevel,
+		Level:          c.Level,
+		FacultyID:      c.FacultyID,
+		DepartmentID:   c.DepartmentID,
+	}
+	if err := database.Create(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func generateUsername(database *gorm.DB, c *campusOneClaims) string {
+	base := strings.ToLower(strings.SplitN(c.Email, "@", 2)[0])
+	base = nonAlphanumRe.ReplaceAllString(base, "_")
+	if base == "" {
+		base = "user"
+	}
+
+	candidate := base
+	var count int64
+	database.Model(&models.User{}).Where("username = ?", candidate).Count(&count)
+	if count == 0 {
+		return candidate
+	}
+
+	// Try appending the student ID digits.
+	if c.StudentID != "" {
+		suffix := strings.ReplaceAll(c.StudentID, "/", "")
+		candidate = base + "_" + suffix
+		database.Model(&models.User{}).Where("username = ?", candidate).Count(&count)
+		if count == 0 {
+			return candidate
+		}
+	}
+
+	// Last resort: random 6-char hex suffix.
+	b := make([]byte, 4)
+	rand.Read(b)
+	return base + "_" + hex.EncodeToString(b)[:6]
+}
+
+// mapCampusOneRole converts a Campus One role string to the Nile Connect
+// (role, studentSubtype) pair stored in the database.
+func mapCampusOneRole(campusOneRole string) (role, subtype string) {
+	switch campusOneRole {
+	case "student":
+		return "student", "current"
+	case "alumni", "mentor":
+		return "student", "alumni"
+	case "staff", "admin", "auditor":
+		return "staff", ""
+	case "employer", "founder", "consultant":
+		return "employer", ""
+	default:
+		return "student", "current"
+	}
+}
+
+// roleDashboard returns the frontend path for a given role.
+func roleDashboard(role string) string {
+	switch role {
+	case "staff":
+		return "/staff"
+	case "employer":
+		return "/employer"
+	default:
+		return "/student"
+	}
+}
+
+// setSessionCookie writes a signed session JWT as an httponly cookie.
+func setSessionCookie(w http.ResponseWriter, r *http.Request, user *models.User) error {
+	sessionToken, err := jwtutil.GenerateSession(
+		user.ID, user.Role, user.StudentSubtype,
+		user.Email, user.FullName, user.Username, user.StudentID,
+	)
+	if err != nil {
+		return err
+	}
+	http.SetCookie(w, &http.Cookie{
+		Name:     "nile_session",
+		Value:    sessionToken,
+		Path:     "/",
+		MaxAge:   7 * 24 * 60 * 60, // 7 days
+		HttpOnly: true,
+		Secure:   isSecureContext(r),
+		SameSite: http.SameSiteLaxMode,
 	})
+	return nil
+}
+
+// setTempCookie sets a short-lived httponly cookie used during the PKCE flow.
+func setTempCookie(w http.ResponseWriter, name, value string, maxAge int, secure bool) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     name,
+		Value:    value,
+		Path:     "/",
+		MaxAge:   maxAge,
+		HttpOnly: true,
+		Secure:   secure,
+		SameSite: http.SameSiteLaxMode,
+	})
+}
+
+// clearCookie expires a cookie by setting MaxAge to -1.
+func clearCookie(w http.ResponseWriter, name string, secure bool) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     name,
+		Value:    "",
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+		Secure:   secure,
+		SameSite: http.SameSiteLaxMode,
+	})
+}
+
+// isSecureContext returns true when the request arrived over HTTPS.
+func isSecureContext(r *http.Request) bool {
+	if r.TLS != nil {
+		return true
+	}
+	if r.Header.Get("X-Forwarded-Proto") == "https" {
+		return true
+	}
+	host := r.Host
+	return !strings.HasPrefix(host, "localhost") && !strings.HasPrefix(host, "127.0.0.1")
+}
+
+// randBase64 returns n random bytes encoded as base64url (no padding).
+func randBase64(n int) string {
+	b := make([]byte, n)
+	rand.Read(b)
+	return base64.RawURLEncoding.EncodeToString(b)
+}
+
+// pkceChallenge computes the S256 PKCE code challenge from a verifier.
+func pkceChallenge(verifier string) string {
+	sum := sha256.Sum256([]byte(verifier))
+	return base64.RawURLEncoding.EncodeToString(sum[:])
+}
+
+// userToResponse converts a DB User to the JSON shape returned by /api/auth/me.
+func userToResponse(u *models.User) map[string]any {
+	return map[string]any{
+		"id":              u.ID,
+		"name":            u.FullName,
+		"username":        u.Username,
+		"email":           u.Email,
+		"role":            u.Role,
+		"student_subtype": u.StudentSubtype,
+		"student_id":      u.StudentID,
+		"study_level":     u.StudyLevel,
+		"level":           u.Level,
+		"faculty_id":      u.FacultyID,
+		"department_id":   u.DepartmentID,
+		"is_verified":     u.IsVerified,
+	}
+}
+
+// sessionClaimsToResponse converts cached session JWT claims to the /me shape
+// when the database is temporarily unavailable.
+func sessionClaimsToResponse(c *jwtutil.SessionClaims) map[string]any {
+	return map[string]any{
+		"id":         c.UserID,
+		"name":       c.FullName,
+		"username":   c.Username,
+		"email":      c.Email,
+		"role":       c.Role,
+		"student_subtype": c.Subtype,
+		"student_id": c.StudentID,
+		"is_verified": true,
+	}
 }

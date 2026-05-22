@@ -10,15 +10,24 @@ import (
 	"nile-connect/lib/models"
 )
 
-func CORS(w http.ResponseWriter) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+// CORS sets Access-Control-Allow-* headers.
+// We echo the request Origin (rather than "*") so that session cookies are
+// accepted by the browser when credentials:include is set on fetch requests.
+func CORS(w http.ResponseWriter, r *http.Request) {
+	origin := r.Header.Get("Origin")
+	if origin == "" {
+		origin = "*"
+	}
+	w.Header().Set("Access-Control-Allow-Origin", origin)
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+	w.Header().Set("Vary", "Origin")
 }
 
-// HandlePreflight writes CORS headers and returns true if the request was an OPTIONS preflight.
+// HandlePreflight writes CORS headers and returns true if this was an OPTIONS preflight.
 func HandlePreflight(w http.ResponseWriter, r *http.Request) bool {
-	CORS(w)
+	CORS(w, r)
 	if r.Method == http.MethodOptions {
 		w.WriteHeader(http.StatusNoContent)
 		return true
@@ -32,39 +41,53 @@ type AuthCtx struct {
 	Subtype string
 }
 
-// Auth validates the Bearer JWT and looks up the user's current role in the
-// database. Using the DB role (not the JWT role claim) means stale or
-// legacy tokens with a missing/wrong role still work — the source of truth
-// is always the database row, not the signed claim.
+// Auth resolves the caller's identity.
+//
+// Priority order:
+//  1. nile_session httponly cookie (set by Campus One OIDC callback)
+//  2. Authorization: Bearer <token> header (legacy / API-client fallback)
+//
+// After extracting claims from either source the user row is validated in the
+// database so that role changes or soft-deletes take effect immediately.
 func Auth(r *http.Request) (*AuthCtx, error) {
-	authHeader := r.Header.Get("Authorization")
-	if !strings.HasPrefix(authHeader, "Bearer ") {
+	var userID, role, subtype string
+
+	// 1. Session cookie (Campus One OIDC)
+	if cookie, err := r.Cookie("nile_session"); err == nil && cookie.Value != "" {
+		if claims, err := jwtutil.ParseSession(cookie.Value); err == nil {
+			userID = claims.UserID
+			role = claims.Role
+			subtype = claims.Subtype
+		}
+	}
+
+	// 2. Bearer token fallback
+	if userID == "" {
+		authHeader := r.Header.Get("Authorization")
+		if strings.HasPrefix(authHeader, "Bearer ") {
+			tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
+			if claims, err := jwtutil.Parse(tokenStr); err == nil {
+				userID = claims.Subject
+				role = claims.Role
+				subtype = claims.Subtype
+			}
+		}
+	}
+
+	if userID == "" {
 		return nil, errors.New("unauthorized")
 	}
-	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 
-	// Validate signature and extract subject (user ID)
-	claims, err := jwtutil.Parse(tokenString)
-	if err != nil {
-		return nil, errors.New("unauthorized")
-	}
-
-	// Look up the user in the database to get the live role.
-	// This is the authoritative check — the JWT role claim can be stale.
+	// Validate against the database so that role changes / deletes take effect.
 	database, dbErr := db.Get()
 	if dbErr != nil {
-		// If DB is unavailable, fall back to JWT claims so auth doesn't
-		// block every request during a DB cold-start.
-		return &AuthCtx{
-			UserID:  claims.Subject,
-			Role:    claims.Role,
-			Subtype: claims.Subtype,
-		}, nil
+		// DB cold-start tolerance: trust the JWT claims temporarily.
+		return &AuthCtx{UserID: userID, Role: role, Subtype: subtype}, nil
 	}
 
 	var user models.User
 	if err := database.
-		Where("id = ? AND deleted_at IS NULL", claims.Subject).
+		Where("id = ? AND deleted_at IS NULL", userID).
 		First(&user).Error; err != nil {
 		return nil, errors.New("unauthorized")
 	}

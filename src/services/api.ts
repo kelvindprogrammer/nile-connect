@@ -1,57 +1,40 @@
 import axios from 'axios';
 
+// Both clients send cookies automatically (session-based auth via nile_session
+// httponly cookie set by /api/auth/callback).
 export const apiClient = axios.create({
     baseURL: '',
     headers: { 'Content-Type': 'application/json' },
     timeout: 15_000,
+    withCredentials: true,
 });
 
 export const aiClient = axios.create({
     baseURL: '',
     timeout: 60_000,
+    withCredentials: true,
 });
 
 // ---------------------------------------------------------------------------
-// Attach JWT on every request
-// ---------------------------------------------------------------------------
-const attachToken = (config: any) => {
-    const token = localStorage.getItem('nile_token');
-    if (token) {
-        config.headers = config.headers || {};
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-};
-
-apiClient.interceptors.request.use(attachToken, (err) => Promise.reject(err));
-aiClient.interceptors.request.use(attachToken, (err) => Promise.reject(err));
-
-// ---------------------------------------------------------------------------
-// Clear stale auth and dispatch logout event
-// ---------------------------------------------------------------------------
-const clearAuth = () => {
-    localStorage.removeItem('nile_token');
-    localStorage.removeItem('nile_user');
-    window.dispatchEvent(new CustomEvent('auth:expired'));
-};
-
-// ---------------------------------------------------------------------------
-// Response interceptor
-// 401 = invalid/expired token       → force re-login
-// 403 on role-protected endpoints   = JWT has wrong role (stale SSO token)
-//                                    → force re-login so user gets fresh JWT
-// We do NOT clear auth on 403 for /api/auth/login (employer pending approval)
+// Response interceptor — redirect to /login on 401 (session expired / gone)
 // ---------------------------------------------------------------------------
 const handleAuthError = (error: any) => {
     const status = error.response?.status;
     const url: string = error.config?.url || '';
 
     if (status === 401) {
-        clearAuth();
+        // Only redirect for authenticated API routes, not the me/logout endpoints
+        // themselves (which legitimately return 401 when not signed in).
+        const isAuthEndpoint =
+            url.includes('/api/auth/me') ||
+            url.includes('/api/auth/logout');
+        if (!isAuthEndpoint) {
+            window.location.replace('/login?reason=session_expired');
+        }
         return Promise.reject(error);
     }
 
-    // 403 on role-gated API routes = stale JWT with wrong/missing role
+    // 403 on role-gated routes means the session role doesn't match the portal.
     const isRoleGated =
         url.includes('/api/staff/') ||
         url.includes('/api/employer/') ||
@@ -61,7 +44,7 @@ const handleAuthError = (error: any) => {
         url.includes('/api/feed');
 
     if (status === 403 && isRoleGated) {
-        clearAuth();
+        window.location.replace('/login?reason=session_expired');
         return Promise.reject(error);
     }
 

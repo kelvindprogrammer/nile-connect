@@ -14,14 +14,13 @@
     { "source": "/api/ai/chat",   "destination": "/api/ai/chat.py" },
     { "source": "/api/ai/review", "destination": "/api/ai/review.py" },
 
-    { "source": "/api/auth/login",              "destination": "/api/auth?path=login" },
-    { "source": "/api/auth/register/student",   "destination": "/api/auth?path=register-student" },
-    { "source": "/api/auth/register/employer",  "destination": "/api/auth?path=register-employer" },
-    { "source": "/api/auth/profile/complete",   "destination": "/api/auth?path=complete-profile" },
-    { "source": "/api/auth/forgot-password",    "destination": "/api/auth?path=forgot-password" },
-    { "source": "/api/auth/reset-password",     "destination": "/api/auth?path=reset-password" },
-    { "source": "/api/auth/seed-demo",          "destination": "/api/auth?path=seed-demo" },
-    { "source": "/api/auth/delete-account",     "destination": "/api/auth?path=delete-account" },
+    { "source": "/api/auth/login",     "destination": "/api/auth?path=login" },
+    { "source": "/api/auth/callback",  "destination": "/api/auth?path=callback" },
+    { "source": "/api/auth/logout",    "destination": "/api/auth?path=logout" },
+    { "source": "/api/auth/me",        "destination": "/api/auth?path=me" },
+    { "source": "/api/auth/delete-account", "destination": "/api/auth?path=delete-account" },
+
+    { "source": "/api/webhooks/campus-one", "destination": "/api/auth?path=webhook" },
 
     { "source": "/api/student/profile",         "destination": "/api/student?path=profile" },
     { "source": "/api/student/applications",    "destination": "/api/student?path=applications" },
@@ -51,7 +50,6 @@
     {
       "source": "/api/(.*)",
       "headers": [
-        { "key": "Access-Control-Allow-Origin",  "value": "*" },
         { "key": "Access-Control-Allow-Methods", "value": "GET, POST, PUT, DELETE, OPTIONS" },
         { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
       ]

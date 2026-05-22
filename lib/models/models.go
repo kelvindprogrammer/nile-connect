@@ -14,12 +14,21 @@ type User struct {
 	FullName       string         `gorm:"not null"`
 	Username       string         `gorm:"uniqueIndex;not null"`
 	Email          string         `gorm:"uniqueIndex;not null"`
-	PasswordHash   string         `gorm:"not null"`
+	// PasswordHash is empty for Campus One SSO users.
+	PasswordHash   string         `gorm:"type:text"`
 	Role           string         `gorm:"type:text;not null"`
 	StudentSubtype string         `gorm:"type:text"`
 	Major          string
 	GraduationYear int
 	IsVerified     bool           `gorm:"default:false"`
+
+	// Campus One identity fields — populated on first OIDC login.
+	CampusOneSub string `gorm:"type:text;index"` // stable `sub` from id_token
+	StudentID    string `gorm:"type:text"`        // e.g. "21/0542"
+	StudyLevel   string `gorm:"type:text"`        // "undergraduate" | "postgraduate"
+	Level        int                               // 100, 200, 300, 400, 500
+	FacultyID    string `gorm:"type:text"`        // "fac_eng"
+	DepartmentID string `gorm:"type:text"`        // "dept_cs"
 }
 
 type EmployerProfile struct {

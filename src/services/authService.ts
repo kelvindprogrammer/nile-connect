@@ -1,51 +1,58 @@
-import { apiClient } from './api';
-
-export interface LoginRequest { email: string; password: string; }
-
-export interface StudentRegisterRequest {
-    full_name: string; username: string; email: string; password: string;
-}
-
-export interface EmployerRegisterRequest {
-    full_name: string; username: string; email: string; password: string;
-    company_name: string; industry: string; location: string;
-    about: string; contact_email: string; website?: string;
-}
-
-export interface ProfileCompletionRequest {
-    user_id: string; major: string; graduation_year: number;
-}
+// Auth is now fully session-based via Campus One OIDC.
+// The nile_session httponly cookie is set by /api/auth/callback and read
+// server-side by every protected Go handler.
 
 export interface BackendUser {
-    id: string; full_name: string; username: string; email: string;
-    role: 'student' | 'staff' | 'employer'; student_subtype?: string | null;
-    major?: string | null; graduation_year?: number | null; is_verified: boolean;
+    id: string;
+    name: string;
+    username: string;
+    email: string;
+    role: 'student' | 'staff' | 'employer';
+    student_subtype?: string | null;
+    student_id?: string | null;
+    study_level?: string | null;
+    level?: number | null;
+    faculty_id?: string | null;
+    department_id?: string | null;
+    is_verified: boolean;
 }
-
-export interface AuthResponse { user: BackendUser; token: string; }
 
 interface ApiEnvelope<T> { data: T; }
 
-export const login = async (req: LoginRequest): Promise<AuthResponse> => {
-    const { data } = await apiClient.post<ApiEnvelope<AuthResponse>>('/api/auth/login', req);
-    return data.data;
+/** Fetch the currently signed-in user from the session cookie. */
+export const getCurrentUser = async (): Promise<BackendUser | null> => {
+    try {
+        const res = await fetch('/api/auth/me', { credentials: 'include' });
+        if (!res.ok) return null;
+        const body: ApiEnvelope<BackendUser> = await res.json();
+        return body.data ?? null;
+    } catch {
+        return null;
+    }
 };
 
-export const registerStudent = async (req: StudentRegisterRequest): Promise<AuthResponse> => {
-    const { data } = await apiClient.post<ApiEnvelope<AuthResponse>>('/api/auth/register/student', req);
-    return data.data;
+/** Initiate the Campus One OIDC sign-in flow. */
+export const signIn = (next?: string): void => {
+    const url = new URL('/api/auth/login', window.location.origin);
+    if (next && next.startsWith('/')) url.searchParams.set('next', next);
+    window.location.assign(url.toString());
 };
 
-export const registerEmployer = async (req: EmployerRegisterRequest): Promise<AuthResponse> => {
-    const { data } = await apiClient.post<ApiEnvelope<AuthResponse>>('/api/auth/register/employer', req);
-    return data.data;
+/** Sign out by clearing the session cookie. */
+export const signOut = async (): Promise<void> => {
+    try {
+        await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    } catch {
+        // Ignore network errors — the redirect below will clear the UI.
+    }
 };
 
-export const completeStudentProfile = async (req: ProfileCompletionRequest): Promise<AuthResponse> => {
-    const { data } = await apiClient.post<ApiEnvelope<AuthResponse>>('/api/auth/profile/complete', req);
-    return data.data;
-};
+// ---------------------------------------------------------------------------
+// Legacy exports kept for backward compatibility with any remaining callers.
+// These are no-ops; actual auth is handled by Campus One OIDC.
+// ---------------------------------------------------------------------------
+export interface AuthResponse { user: BackendUser; token: string; }
 
 export const deleteAccount = async (): Promise<void> => {
-    await apiClient.post('/api/auth/delete-account');
+    await fetch('/api/auth/delete-account', { method: 'POST', credentials: 'include' });
 };

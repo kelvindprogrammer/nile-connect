@@ -7,17 +7,7 @@ import { AuthProvider } from './context/AuthContext';
 // ── Entry & Auth Pages ────────────────────────────────────────────────────
 import Onboarding         from './pages/auth/Onboarding';
 import Login              from './pages/auth/Login';
-import Register           from './pages/auth/Register';
-import JoinAs             from './pages/auth/JoinAs';
-import ForgotPassword     from './pages/auth/ForgotPassword';
 
-// ── Onboarding Flow ───────────────────────────────────────────────────────
-import StudentStatus       from './pages/onboarding/StudentStatus';
-import AlumniLogin         from './pages/onboarding/AlumniLogin';
-import StudentPortal       from './pages/onboarding/StudentPortal';
-import ProfileCompletion   from './pages/onboarding/ProfileCompletion';
-import EmployerRegistration from './pages/onboarding/EmployerRegistration';
-import AwaitingVerification from './pages/onboarding/AwaitingVerification';
 
 // ── Layouts ───────────────────────────────────────────────────────────────
 import StaffLayout    from './layouts/StaffLayout';
@@ -80,18 +70,17 @@ const App = () => (
                     {/* Public entry */}
                     <Route path="/"           element={<Navigate to="/onboarding" replace />} />
                     <Route path="/onboarding" element={<T><Onboarding /></T>} />
-                    <Route path="/login"            element={<T><Login /></T>} />
-                    <Route path="/register"         element={<T><Register /></T>} />
-                    <Route path="/join-as"          element={<T><JoinAs /></T>} />
-                    <Route path="/forgot-password"  element={<T><ForgotPassword /></T>} />
-
-                    {/* Onboarding / setup flow */}
-                    <Route path="/student-status"        element={<T><StudentStatus /></T>} />
-                    <Route path="/alumni-login"          element={<T><AlumniLogin /></T>} />
-                    <Route path="/student-portal"        element={<T><StudentPortal /></T>} />
-                    <Route path="/profile-completion"    element={<T><ProfileCompletion /></T>} />
-                    <Route path="/employer-registration" element={<EmployerRegistration />} />
-                    <Route path="/awaiting-verification" element={<AwaitingVerification />} />
+                    <Route path="/login"           element={<T><Login /></T>} />
+                    {/* Legacy auth routes redirect to login — Campus One SSO handles registration */}
+                    <Route path="/register"        element={<Navigate to="/login" replace />} />
+                    <Route path="/join-as"         element={<Navigate to="/login" replace />} />
+                    <Route path="/forgot-password" element={<Navigate to="/login" replace />} />
+                    <Route path="/student-status"        element={<Navigate to="/login" replace />} />
+                    <Route path="/alumni-login"          element={<Navigate to="/login" replace />} />
+                    <Route path="/student-portal"        element={<Navigate to="/login" replace />} />
+                    <Route path="/profile-completion"    element={<Navigate to="/login" replace />} />
+                    <Route path="/employer-registration" element={<Navigate to="/login" replace />} />
+                    <Route path="/awaiting-verification" element={<Navigate to="/login" replace />} />
 
                     {/* Student (authenticated) */}
                     <Route path="/student">

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import type { BackendUser, AuthResponse } from '../services/authService';
+import { getCurrentUser, signIn as ssoSignIn, signOut as ssoSignOut } from '../services/authService';
+import type { BackendUser } from '../services/authService';
 
 export interface User {
     id: string;
@@ -8,96 +9,83 @@ export interface User {
     email: string;
     role: 'student' | 'staff' | 'employer';
     type?: 'alumni' | 'current';
-    avatar?: string;
-    company?: string;
-    department?: string;
-    major?: string;
-    graduationYear?: number;
+    studentId?: string;
+    studyLevel?: string;
+    level?: number;
+    facultyId?: string;
+    departmentId?: string;
     isVerified?: boolean;
 }
 
 interface AuthContextType {
     user: User | null;
-    token: string | null;
     isLoading: boolean;
     isAuthenticated: boolean;
-    loginWithResponse: (resp: AuthResponse) => void;
+    /** Full-page redirect to Campus One SSO. Pass `next` to return to a specific path. */
+    signIn: (next?: string) => void;
+    logout: () => Promise<void>;
+    // Kept for backward compatibility — these are no-ops in the OIDC flow.
+    token: string | null;
     login: (user: User) => void;
-    logout: () => void;
+    loginWithResponse: (resp: any) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const mapBackendUser = (bu: BackendUser): User => ({
     id: bu.id,
-    name: bu.full_name,
+    name: bu.name,
     username: bu.username,
     email: bu.email,
-    role: bu.role as User['role'],
+    role: bu.role,
     type: bu.student_subtype === 'alumni' ? 'alumni' : 'current',
-    major: bu.major ?? undefined,
-    graduationYear: bu.graduation_year ?? undefined,
+    studentId: bu.student_id ?? undefined,
+    studyLevel: bu.study_level ?? undefined,
+    level: bu.level ?? undefined,
+    facultyId: bu.faculty_id ?? undefined,
+    departmentId: bu.department_id ?? undefined,
     isVerified: bu.is_verified,
 });
 
-const clearLocalAuth = () => {
-    localStorage.removeItem('nile_user');
-    localStorage.removeItem('nile_token');
-    // Also clear the extended profile so it resets on next login
-    localStorage.removeItem('nile_extended_profile');
-};
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
-    const [token, setToken] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Hydrate from localStorage on mount
+    // On mount, resolve the current user from the session cookie via /api/auth/me.
     useEffect(() => {
-        const savedUser  = localStorage.getItem('nile_user');
-        const savedToken = localStorage.getItem('nile_token');
-        if (savedUser) {
-            try { setUser(JSON.parse(savedUser)); } catch { clearLocalAuth(); }
-        }
-        if (savedToken) setToken(savedToken);
-        setIsLoading(false);
+        getCurrentUser()
+            .then((bu) => { if (bu) setUser(mapBackendUser(bu)); })
+            .finally(() => setIsLoading(false));
     }, []);
 
-    // Handle token expiry / role mismatch (403) — hard-redirect to /login
-    useEffect(() => {
-        const handleExpiry = () => {
-            clearLocalAuth();
-            setUser(null);
-            setToken(null);
-            // Hard redirect clears all React state and forces fresh login
-            window.location.replace('/login?reason=session_expired');
-        };
-        window.addEventListener('auth:expired', handleExpiry);
-        return () => window.removeEventListener('auth:expired', handleExpiry);
+    const signIn = useCallback((next?: string) => {
+        ssoSignIn(next);
     }, []);
 
-    const loginWithResponse = useCallback((resp: AuthResponse) => {
-        const mapped = mapBackendUser(resp.user);
-        setUser(mapped);
-        setToken(resp.token);
-        localStorage.setItem('nile_user', JSON.stringify(mapped));
-        localStorage.setItem('nile_token', resp.token);
-    }, []);
-
-    const login = useCallback((userData: User) => {
-        setUser(userData);
-        localStorage.setItem('nile_user', JSON.stringify(userData));
-    }, []);
-
-    const logout = useCallback(() => {
-        clearLocalAuth();
+    const logout = useCallback(async () => {
+        await ssoSignOut();
         setUser(null);
-        setToken(null);
+        window.location.replace('/login');
     }, []);
+
+    // ── Backward-compat no-ops ────────────────────────────────────────────────
+    // These were used by the old email/password flow. They are left in place so
+    // any page that still imports them compiles without errors.
+    const login = useCallback((_userData: User) => {}, []);
+    const loginWithResponse = useCallback((_resp: any) => {}, []);
 
     return (
         <AuthContext.Provider
-            value={{ user, token, isLoading, isAuthenticated: !!user, loginWithResponse, login, logout }}
+            value={{
+                user,
+                isLoading,
+                isAuthenticated: !!user,
+                signIn,
+                logout,
+                token: null,
+                login,
+                loginWithResponse,
+            }}
         >
             {children}
         </AuthContext.Provider>
