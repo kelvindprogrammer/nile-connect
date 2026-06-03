@@ -177,6 +177,7 @@ type campusOneClaims struct {
 	Name         string   `json:"name"`
 	Role         string   `json:"role"`
 	Roles        []string `json:"roles"`
+	CustomRoles  []string `json:"custom_roles"`
 	StudentID    string   `json:"student_id"`
 	StudyLevel   string   `json:"study_level"`
 	Level        int      `json:"level"`
@@ -273,7 +274,7 @@ func callback(w http.ResponseWriter, r *http.Request) {
 		respond.Error(w, http.StatusInternalServerError, "id_token missing sub claim")
 		return
 	}
-	fmt.Printf("[CALLBACK] Claim role: '%s', normalized roles: %v\n", claims.Role, claims.Roles)
+	fmt.Printf("[CALLBACK] Claim role: '%s', normalized roles: %v, custom_roles: %v\n", claims.Role, claims.Roles, claims.CustomRoles)
 
 	// ── 5. Upsert local user ──────────────────────────────────────────────────
 	database, err := db.Get()
@@ -574,25 +575,44 @@ func generateUsername(database *gorm.DB, c *campusOneClaims) string {
 // mapCampusOneRole converts a Campus One role string to the Nile Connect
 // (role, studentSubtype) pair stored in the database.
 func mapCampusOneRoleFromClaims(c *campusOneClaims) (role, subtype string) {
-	// Prefer explicit role membership from Campus One's `roles[]` claim.
+	// PRIORITY 1: Check custom_roles for app-specific assignments (e.g., "employer_partners").
+	// Custom roles are the strongest signal and override global roles.
+	for _, cr := range c.CustomRoles {
+		if isCampusOneEmployerRole(cr) {
+			fmt.Printf("[CALLBACK] Matched employer role in custom_roles: %s\n", cr)
+			return "employer", ""
+		}
+	}
+	for _, cr := range c.CustomRoles {
+		if isCampusOneStaffRole(cr) {
+			fmt.Printf("[CALLBACK] Matched staff role in custom_roles: %s\n", cr)
+			return "staff", ""
+		}
+	}
+
+	// PRIORITY 2: Prefer explicit role membership from Campus One's `roles[]` claim.
 	// This avoids cases where `role` is a default value like "student"
 	// while `roles` includes a valid employer or staff membership.
 	for _, r := range c.Roles {
 		if isCampusOneEmployerRole(r) {
+			fmt.Printf("[CALLBACK] Matched employer role in roles[]: %s\n", r)
 			return "employer", ""
 		}
 	}
 	for _, r := range c.Roles {
 		if isCampusOneStaffRole(r) {
+			fmt.Printf("[CALLBACK] Matched staff role in roles[]: %s\n", r)
 			return "staff", ""
 		}
 	}
 	for _, r := range c.Roles {
 		if strings.EqualFold(r, "alumni") || strings.EqualFold(r, "mentor") {
+			fmt.Printf("[CALLBACK] Matched alumni/mentor in roles[]: %s\n", r)
 			return "student", "alumni"
 		}
 	}
 
+	// PRIORITY 3: Fall back to primary role claim.
 	if c.Role != "" {
 		return mapCampusOneRole(c.Role)
 	}
