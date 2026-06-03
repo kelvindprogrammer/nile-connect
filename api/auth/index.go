@@ -261,11 +261,19 @@ func callback(w http.ResponseWriter, r *http.Request) {
 		respond.Error(w, http.StatusInternalServerError, "could not decode id_token claims")
 		return
 	}
+	var rawClaims map[string]any
+	if err := idToken.Claims(&rawClaims); err == nil {
+		if len(claims.Roles) == 0 {
+			claims.Roles = normalizeRolesClaim(rawClaims["roles"])
+		}
+		fmt.Printf("[CALLBACK] raw claim role=%v (%T), raw claim roles=%v (%T)\n",
+			rawClaims["role"], rawClaims["role"], rawClaims["roles"], rawClaims["roles"])
+	}
 	if claims.Sub == "" {
 		respond.Error(w, http.StatusInternalServerError, "id_token missing sub claim")
 		return
 	}
-	fmt.Printf("[CALLBACK] Claim role: '%s', roles: %v\n", claims.Role, claims.Roles)
+	fmt.Printf("[CALLBACK] Claim role: '%s', normalized roles: %v\n", claims.Role, claims.Roles)
 
 	// ── 5. Upsert local user ──────────────────────────────────────────────────
 	database, err := db.Get()
@@ -627,6 +635,35 @@ func mapCampusOneRole(campusOneRole string) (role, subtype string) {
 		}
 		return "student", "current"
 	}
+}
+
+func normalizeRolesClaim(value any) []string {
+	var out []string
+	switch v := value.(type) {
+	case []interface{}:
+		for _, item := range v {
+			if s, ok := item.(string); ok {
+				out = append(out, s)
+			}
+		}
+	case []string:
+		out = append(out, v...)
+	case string:
+		trimmed := strings.TrimSpace(v)
+		if trimmed == "" {
+			return nil
+		}
+		if strings.HasPrefix(trimmed, "[") && strings.HasSuffix(trimmed, "]") {
+			trimmed = strings.Trim(trimmed, "[]")
+		}
+		for _, item := range strings.Split(trimmed, ",") {
+			s := strings.TrimSpace(strings.Trim(item, `"'`))
+			if s != "" {
+				out = append(out, s)
+			}
+		}
+	}
+	return out
 }
 
 // roleDashboard returns the frontend path for a given role.
