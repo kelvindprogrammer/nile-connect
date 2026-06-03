@@ -144,6 +144,12 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 	secure := isSecureContext(r)
 	domain := cookieDomain(r)
+	
+	// DEBUG: Log domain calculation and request info
+	fmt.Printf("[LOGIN] Request Host: %s, TLS: %v, X-Forwarded-Proto: %s\n", r.Host, r.TLS != nil, r.Header.Get("X-Forwarded-Proto"))
+	fmt.Printf("[LOGIN] APP_URL env: %s\n", os.Getenv("APP_URL"))
+	fmt.Printf("[LOGIN] appBaseURL: %s\n", appBaseURL(r))
+	fmt.Printf("[LOGIN] Calculated domain: '%s', secure: %v\n", domain, secure)
 
 	// Set temporary PKCE cookies that will be validated in /callback
 	// CRITICAL: These cookies MUST be re-sent by the browser when Campus One redirects back
@@ -182,17 +188,29 @@ type campusOneClaims struct {
 // It exchanges the authorisation code for tokens, verifies the id_token,
 // upserts the local user row, and sets a signed session cookie.
 func callback(w http.ResponseWriter, r *http.Request) {
+	// DEBUG: Log request info and all received cookies
+	fmt.Printf("[CALLBACK] Request Host: %s, Referer: %s\n", r.Host, r.Referer())
+	fmt.Printf("[CALLBACK] All cookies received: ")
+	for _, c := range r.Cookies() {
+		fmt.Printf("%s ", c.Name)
+	}
+	fmt.Printf("\n")
+	
 	// ── 1. Retrieve and validate PKCE / state cookies ─────────────────────────
 	stateCookie, err := r.Cookie("c1_state")
 	if err != nil || stateCookie.Value == "" {
+		fmt.Printf("[CALLBACK] ERROR: state cookie not found (err: %v)\n", err)
 		respond.Error(w, http.StatusBadRequest, "missing state cookie — restart sign-in")
 		return
 	}
+	fmt.Printf("[CALLBACK] state cookie found: %s\n", stateCookie.Value[:8])
 	verifierCookie, err := r.Cookie("c1_verifier")
 	if err != nil || verifierCookie.Value == "" {
+		fmt.Printf("[CALLBACK] ERROR: verifier cookie not found\n")
 		respond.Error(w, http.StatusBadRequest, "missing verifier cookie — restart sign-in")
 		return
 	}
+	fmt.Printf("[CALLBACK] verifier cookie found\n")
 	if r.URL.Query().Get("state") != stateCookie.Value {
 		respond.Error(w, http.StatusBadRequest, "state mismatch — possible CSRF")
 		return
@@ -599,6 +617,7 @@ func setSessionCookie(w http.ResponseWriter, r *http.Request, user *models.User)
 // setTempCookie sets a short-lived httponly cookie used during the PKCE flow.
 // CRITICAL: Must include Domain for cookies to be re-sent from Campus One's redirect.
 func setTempCookie(w http.ResponseWriter, name, value string, maxAge int, secure bool, domain string) {
+	fmt.Printf("[COOKIE] Setting %s with domain='%s', secure=%v, httpOnly=true\n", name, domain, secure)
 	http.SetCookie(w, &http.Cookie{
 		Name:     name,
 		Value:    value,
