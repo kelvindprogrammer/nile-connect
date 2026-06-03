@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"regexp"
 	"strings"
@@ -70,6 +71,29 @@ func appBaseURL(r *http.Request) string {
 	return scheme + "://" + r.Host
 }
 
+// cookieDomain extracts the domain from the application's base URL for proper cookie scoping.
+// Ensures cookies set during /login are re-sent by browser from Campus One's redirect.
+func cookieDomain(r *http.Request) string {
+	baseURL := appBaseURL(r)
+	u, err := url.Parse(baseURL)
+	if err != nil {
+		// Fallback to raw Host header
+		host := r.Host
+		if strings.Contains(host, ":") {
+			host = strings.Split(host, ":")[0]
+		}
+		if host == "localhost" || strings.HasPrefix(host, "127.") {
+			return "" // localhost cookies: no domain needed
+		}
+		return host
+	}
+	hostname := u.Hostname()
+	if hostname == "localhost" || strings.HasPrefix(hostname, "127.") {
+		return "" // localhost cookies: no domain needed
+	}
+	return hostname
+}
+
 // ── Main handler ──────────────────────────────────────────────────────────────
 
 // Handler is the single entrypoint for all /api/auth/* routes.
@@ -119,10 +143,14 @@ func login(w http.ResponseWriter, r *http.Request) {
 	challenge := pkceChallenge(verifier)
 
 	secure := isSecureContext(r)
-	setTempCookie(w, "c1_state", state, 600, secure)
-	setTempCookie(w, "c1_verifier", verifier, 600, secure)
+	domain := cookieDomain(r)
+
+	// Set temporary PKCE cookies that will be validated in /callback
+	// CRITICAL: These cookies MUST be re-sent by the browser when Campus One redirects back
+	setTempCookie(w, "c1_state", state, 600, secure, domain)
+	setTempCookie(w, "c1_verifier", verifier, 600, secure, domain)
 	if next != "" {
-		setTempCookie(w, "c1_next", next, 600, secure)
+		setTempCookie(w, "c1_next", next, 600, secure, domain)
 	}
 
 	cfg := oauthConfig(r)
@@ -240,14 +268,15 @@ func callback(w http.ResponseWriter, r *http.Request) {
 
 	// Clear PKCE cookies.
 	secure := isSecureContext(r)
-	clearCookie(w, "c1_state", secure)
-	clearCookie(w, "c1_verifier", secure)
+	domain := cookieDomain(r)
+	clearCookie(w, "c1_state", secure, domain)
+	clearCookie(w, "c1_verifier", secure, domain)
 
 	// ── 7. Redirect to dashboard ──────────────────────────────────────────────
 	next := ""
 	if c, err := r.Cookie("c1_next"); err == nil {
 		next = c.Value
-		clearCookie(w, "c1_next", secure)
+		clearCookie(w, "c1_next", secure, domain)
 	}
 	if next == "" {
 		next = roleDashboard(user.Role)
@@ -259,7 +288,8 @@ func callback(w http.ResponseWriter, r *http.Request) {
 
 func logout(w http.ResponseWriter, r *http.Request) {
 	secure := isSecureContext(r)
-	clearCookie(w, "nile_session", secure)
+	domain := cookieDomain(r)
+	clearCookie(w, "nile_session", secure, domain)
 
 	// Accept both GET (link click) and POST (programmatic call).
 	if r.Header.Get("Accept") == "application/json" ||
@@ -329,7 +359,7 @@ func deleteAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Clear the session so the browser is immediately signed out.
-	clearCookie(w, "nile_session", isSecureContext(r))
+	clearCookie(w, "nile_session", isSecureContext(r), cookieDomain(r))
 	respond.OK(w, map[string]string{"message": "account deleted"})
 }
 
@@ -552,6 +582,7 @@ func setSessionCookie(w http.ResponseWriter, r *http.Request, user *models.User)
 	if err != nil {
 		return err
 	}
+	domain := cookieDomain(r)
 	http.SetCookie(w, &http.Cookie{
 		Name:     "nile_session",
 		Value:    sessionToken,
@@ -560,12 +591,14 @@ func setSessionCookie(w http.ResponseWriter, r *http.Request, user *models.User)
 		HttpOnly: true,
 		Secure:   isSecureContext(r),
 		SameSite: http.SameSiteLaxMode,
+		Domain:   domain,
 	})
 	return nil
 }
 
 // setTempCookie sets a short-lived httponly cookie used during the PKCE flow.
-func setTempCookie(w http.ResponseWriter, name, value string, maxAge int, secure bool) {
+// CRITICAL: Must include Domain for cookies to be re-sent from Campus One's redirect.
+func setTempCookie(w http.ResponseWriter, name, value string, maxAge int, secure bool, domain string) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     name,
 		Value:    value,
@@ -574,11 +607,12 @@ func setTempCookie(w http.ResponseWriter, name, value string, maxAge int, secure
 		HttpOnly: true,
 		Secure:   secure,
 		SameSite: http.SameSiteLaxMode,
+		Domain:   domain, // Critical for cross-origin Campus One redirect
 	})
 }
 
 // clearCookie expires a cookie by setting MaxAge to -1.
-func clearCookie(w http.ResponseWriter, name string, secure bool) {
+func clearCookie(w http.ResponseWriter, name string, secure bool, domain string) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     name,
 		Value:    "",
@@ -587,6 +621,7 @@ func clearCookie(w http.ResponseWriter, name string, secure bool) {
 		HttpOnly: true,
 		Secure:   secure,
 		SameSite: http.SameSiteLaxMode,
+		Domain:   domain,
 	})
 }
 
