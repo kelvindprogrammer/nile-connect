@@ -566,10 +566,9 @@ func generateUsername(database *gorm.DB, c *campusOneClaims) string {
 // mapCampusOneRole converts a Campus One role string to the Nile Connect
 // (role, studentSubtype) pair stored in the database.
 func mapCampusOneRoleFromClaims(c *campusOneClaims) (role, subtype string) {
-	if c.Role != "" {
-		return mapCampusOneRole(c.Role)
-	}
-
+	// Prefer explicit role membership from Campus One's `roles[]` claim.
+	// This avoids cases where `role` is a default value like "student"
+	// while `roles` includes a valid employer or staff membership.
 	for _, r := range c.Roles {
 		if isCampusOneEmployerRole(r) {
 			return "employer", ""
@@ -585,6 +584,11 @@ func mapCampusOneRoleFromClaims(c *campusOneClaims) (role, subtype string) {
 			return "student", "alumni"
 		}
 	}
+
+	if c.Role != "" {
+		return mapCampusOneRole(c.Role)
+	}
+
 	return "student", "current"
 }
 
