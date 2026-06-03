@@ -265,6 +265,7 @@ func callback(w http.ResponseWriter, r *http.Request) {
 		respond.Error(w, http.StatusInternalServerError, "id_token missing sub claim")
 		return
 	}
+	fmt.Printf("[CALLBACK] Claim role: '%s', roles: %v\n", claims.Role, claims.Roles)
 
 	// ── 5. Upsert local user ──────────────────────────────────────────────────
 	database, err := db.Get()
@@ -479,7 +480,7 @@ var nonAlphanumRe = regexp.MustCompile(`[^a-z0-9_]`)
 // upsertUser finds an existing user by Campus One sub (or by email for users
 // who pre-dated the OIDC migration) and creates one if neither exists.
 func upsertUser(database *gorm.DB, c *campusOneClaims) (*models.User, error) {
-	role, subtype := mapCampusOneRole(c.Role)
+	role, subtype := mapCampusOneRoleFromClaims(c)
 
 	updates := map[string]interface{}{
 		"campus_one_sub":  c.Sub,
@@ -564,15 +565,56 @@ func generateUsername(database *gorm.DB, c *campusOneClaims) string {
 
 // mapCampusOneRole converts a Campus One role string to the Nile Connect
 // (role, studentSubtype) pair stored in the database.
+func mapCampusOneRoleFromClaims(c *campusOneClaims) (role, subtype string) {
+	if c.Role != "" {
+		return mapCampusOneRole(c.Role)
+	}
+
+	for _, r := range c.Roles {
+		if isCampusOneEmployerRole(r) {
+			return "employer", ""
+		}
+	}
+	for _, r := range c.Roles {
+		if isCampusOneStaffRole(r) {
+			return "staff", ""
+		}
+	}
+	for _, r := range c.Roles {
+		if strings.EqualFold(r, "alumni") || strings.EqualFold(r, "mentor") {
+			return "student", "alumni"
+		}
+	}
+	return "student", "current"
+}
+
+func isCampusOneEmployerRole(role string) bool {
+	r := strings.ToLower(strings.TrimSpace(role))
+	switch r {
+	case "employer", "founder", "consultant", "partner", "employer_partner", "company_partner", "campus_partner" :
+		return true
+	}
+	return strings.Contains(r, "employer") || strings.Contains(r, "partner")
+}
+
+func isCampusOneStaffRole(role string) bool {
+	r := strings.ToLower(strings.TrimSpace(role))
+	switch r {
+	case "staff", "admin", "auditor", "career_service", "career_services":
+		return true
+	}
+	return strings.Contains(r, "staff") || strings.Contains(r, "admin") || strings.Contains(r, "auditor")
+}
+
 func mapCampusOneRole(campusOneRole string) (role, subtype string) {
-	switch campusOneRole {
+	switch strings.ToLower(strings.TrimSpace(campusOneRole)) {
 	case "student":
 		return "student", "current"
 	case "alumni", "mentor":
 		return "student", "alumni"
 	case "staff", "admin", "auditor":
 		return "staff", ""
-	case "employer", "founder", "consultant":
+	case "employer", "founder", "consultant", "partner", "employer_partner", "company_partner", "campus_partner":
 		return "employer", ""
 	default:
 		return "student", "current"
