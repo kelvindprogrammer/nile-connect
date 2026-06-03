@@ -591,10 +591,10 @@ func mapCampusOneRoleFromClaims(c *campusOneClaims) (role, subtype string) {
 func isCampusOneEmployerRole(role string) bool {
 	r := strings.ToLower(strings.TrimSpace(role))
 	switch r {
-	case "employer", "founder", "consultant", "partner", "employer_partner", "company_partner", "campus_partner" :
+	case "employer", "founder", "consultant", "partner", "employer_partner", "company_partner", "campus_partner", "external", "external_partner", "external_employer", "employer_external":
 		return true
 	}
-	return strings.Contains(r, "employer") || strings.Contains(r, "partner")
+	return strings.Contains(r, "employer") || strings.Contains(r, "partner") || strings.Contains(r, "external")
 }
 
 func isCampusOneStaffRole(role string) bool {
@@ -607,16 +607,20 @@ func isCampusOneStaffRole(role string) bool {
 }
 
 func mapCampusOneRole(campusOneRole string) (role, subtype string) {
-	switch strings.ToLower(strings.TrimSpace(campusOneRole)) {
+	clean := strings.ToLower(strings.TrimSpace(campusOneRole))
+	switch clean {
 	case "student":
 		return "student", "current"
 	case "alumni", "mentor":
 		return "student", "alumni"
 	case "staff", "admin", "auditor":
 		return "staff", ""
-	case "employer", "founder", "consultant", "partner", "employer_partner", "company_partner", "campus_partner":
+	case "employer", "founder", "consultant", "partner", "employer_partner", "company_partner", "campus_partner", "external", "external_partner", "external_employer", "employer_external":
 		return "employer", ""
 	default:
+		if strings.Contains(clean, "employ") || strings.Contains(clean, "partner") || strings.Contains(clean, "external") {
+			return "employer", ""
+		}
 		return "student", "current"
 	}
 }
