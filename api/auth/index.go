@@ -288,6 +288,27 @@ func callback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// ── 5b. Auto-create EmployerProfile on first employer login ────────────────
+	// Employers need a profile record to access /api/employer/* endpoints.
+	// On first login, create an empty profile so they can set it up.
+	if user.Role == "employer" {
+		var empProfile models.EmployerProfile
+		err := database.Where("user_id = ? AND deleted_at IS NULL", user.ID).First(&empProfile).Error
+		if err != nil && err == gorm.ErrRecordNotFound {
+			// Profile doesn't exist — create an empty one for first-time employers.
+			empProfile = models.EmployerProfile{
+				UserID: user.ID,
+				Status: "pending", // Default to pending approval
+			}
+			if err := database.Create(&empProfile).Error; err != nil {
+				fmt.Printf("[CALLBACK] Warning: could not auto-create employer profile: %v\n", err)
+				// Don't fail the login — let them sign in and create it via API if needed.
+			} else {
+				fmt.Printf("[CALLBACK] Auto-created empty employer profile for user %s\n", user.ID)
+			}
+		}
+	}
+
 	// ── 6. Issue session cookie ───────────────────────────────────────────────
 	if err := setSessionCookie(w, r, user); err != nil {
 		respond.Error(w, http.StatusInternalServerError, "could not create session")
@@ -791,6 +812,8 @@ func userToResponse(u *models.User) map[string]any {
 		"faculty_id":      u.FacultyID,
 		"department_id":   u.DepartmentID,
 		"is_verified":     u.IsVerified,
+		"major":           u.Major,
+		"graduation_year": u.GraduationYear,
 	}
 }
 

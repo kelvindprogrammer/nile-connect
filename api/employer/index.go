@@ -28,12 +28,12 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Use employer_profiles as the definitive access proof.
-	// If an approved profile exists for this user ID they ARE an employer —
-	// regardless of what the JWT role claim says.
+	// Require that an employer profile exists for this user (any status).
+	// Newly-SSO'd employers start with status='pending' and must be able to
+	// view/update their own profile before it is approved by staff.
 	var empProfile models.EmployerProfile
-	if err := database.Where("user_id = ? AND deleted_at IS NULL AND status = ?", auth.UserID, "approved").First(&empProfile).Error; err != nil {
-		respond.Error(w, http.StatusForbidden, "employer access required")
+	if err := database.Where("user_id = ? AND deleted_at IS NULL", auth.UserID).First(&empProfile).Error; err != nil {
+		respond.Error(w, http.StatusForbidden, "employer profile not found — contact support")
 		return
 	}
 

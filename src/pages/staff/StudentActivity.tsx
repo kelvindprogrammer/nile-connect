@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import StaffLayout from '../../layouts/StaffLayout';
-import { 
-    Users, Briefcase, Activity, Search, Filter, 
+import {
+    Users, Briefcase, Activity, Search, Filter,
     ChevronRight, ExternalLink, Calendar, MessageSquare,
     Eye, CheckCircle2, Clock
 } from 'lucide-react';
 import { Button } from '../../components/Button';
 import InputField from '../../components/InputField';
-import Badge from '../../components/ui/badge';
 
 interface ActivityLog {
     id: string;
@@ -52,8 +50,7 @@ const StudentActivity = () => {
     };
 
     return (
-        <StaffLayout>
-            <div className="p-4 md:p-8 space-y-8 anime-fade-in text-left">
+        <div className="p-4 md:p-8 space-y-8 anime-fade-in text-left">
                 <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b-[2px] border-black pb-6">
                     <div className="space-y-1">
                         <h2 className="text-3xl md:text-5xl font-black text-black uppercase tracking-tighter">Activity Monitor .</h2>
@@ -154,7 +151,6 @@ const StudentActivity = () => {
                     </div>
                 </div>
             </div>
-        </StaffLayout>
     );
 };
 

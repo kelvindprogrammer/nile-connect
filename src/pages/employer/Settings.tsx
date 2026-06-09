@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, Bell, Lock, Eye, Sphere, Globe, ChevronRight, Save } from 'lucide-react';
+import { Shield, Bell, Lock, Eye, Globe, ChevronRight, Save } from 'lucide-react';
 import Button from '../../components/Button';
 import { useToast } from '../../context/ToastContext';
 

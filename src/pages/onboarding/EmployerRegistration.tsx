@@ -44,12 +44,14 @@ const EmployerRegistration = () => {
 
     const handleSubmit = async () => {
         setIsSubmitting(true);
-        // Persist the detailed data to the mock session
+        // Persist the detailed data to the mock session (no-op in SSO flow)
         login({
+            id: '',
             name: form.contactPerson,
+            username: '',
             email: form.email,
             role: 'employer',
-            company: form.companyName
+            company: form.companyName,
         });
         
         await new Promise(r => setTimeout(r, 1500));

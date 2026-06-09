@@ -37,11 +37,11 @@ type EmployerProfile struct {
 	UpdatedAt    time.Time
 	DeletedAt    gorm.DeletedAt `gorm:"index"`
 	UserID       string         `gorm:"not null;index"`
-	CompanyName  string         `gorm:"not null"`
-	Industry     string         `gorm:"not null"`
-	Location     string         `gorm:"not null"`
+	CompanyName  string         `gorm:"type:text"`
+	Industry     string         `gorm:"type:text"`
+	Location     string         `gorm:"type:text"`
 	About        string         `gorm:"type:text"`
-	ContactEmail string         `gorm:"not null"`
+	ContactEmail string         `gorm:"type:text"`
 	Website      string
 	LinkedIn     string
 	Status       string         `gorm:"type:text;default:'pending'"`

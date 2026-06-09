@@ -96,7 +96,7 @@ const StaffMessages = () => {
 
                         <div className="flex-1 p-4 md:p-8 overflow-y-auto space-y-6 md:space-y-8 bg-nile-white/10 flex flex-col justify-end">
                             <div className="flex gap-4 max-w-[85%] text-left">
-                                <Avatar name={selected.name} size="xs" />
+                                <Avatar name={selected.name} size="sm" />
                                 <div className="p-4 bg-white border-2 border-black rounded-[20px] rounded-tl-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                                     <p className="text-[11px] md:text-xs font-bold text-black uppercase leading-relaxed">{selected.lastMsg}</p>
                                     <span className="text-[7px] font-black text-nile-blue/20 mt-2 block">12:45 PM • SYSTEM READ</span>

@@ -31,7 +31,7 @@ const StudentFeed = () => {
                             <p className="text-[10px] md:text-sm font-black text-nile-blue uppercase mt-1 md:mt-2 tracking-widest">Connect with your community</p>
                         </div>
                     </div>
-                    <Button onClick={() => setPostModalOpen(true)} variant="secondary" fullWidth className="sm:w-auto">
+                    <Button onClick={() => setPostModalOpen(true)} variant="outline" fullWidth className="sm:w-auto">
                         <Plus size={18} strokeWidth={2.5} /> NEW POST
                     </Button>
                 </div>

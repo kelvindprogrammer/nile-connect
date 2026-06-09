@@ -15,6 +15,12 @@ export interface User {
     facultyId?: string;
     departmentId?: string;
     isVerified?: boolean;
+    major?: string;
+    graduationYear?: number;
+    /** Resolved from departmentId for display only; may be undefined. */
+    department?: string;
+    /** Employer company name — populated from EmployerProfile, not auth/me. */
+    company?: string;
 }
 
 interface AuthContextType {
@@ -45,6 +51,8 @@ export const mapBackendUser = (bu: BackendUser): User => ({
     facultyId: bu.faculty_id ?? undefined,
     departmentId: bu.department_id ?? undefined,
     isVerified: bu.is_verified,
+    major: bu.major ?? undefined,
+    graduationYear: bu.graduation_year ?? undefined,
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {

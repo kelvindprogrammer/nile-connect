@@ -15,6 +15,8 @@ export interface BackendUser {
     faculty_id?: string | null;
     department_id?: string | null;
     is_verified: boolean;
+    major?: string | null;
+    graduation_year?: number | null;
 }
 
 interface ApiEnvelope<T> { data: T; }
