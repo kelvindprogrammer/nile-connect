@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { MessageCircle, Plus, Heart, Send, Loader2, X } from 'lucide-react';
+import { MessageCircle, Plus, Heart, Send, Loader2, X, Building2, GraduationCap, User } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { apiClient } from '../../services/api';
@@ -133,8 +133,8 @@ const EmployerFeed = () => {
                             <div className="p-5 md:p-6">
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 bg-nile-blue text-white rounded-xl flex items-center justify-center font-black text-sm flex-shrink-0">
-                                            {post.author_type === 'employer' ? '🏢' : post.author_type === 'staff' ? '🎓' : '👤'}
+                                        <div className={`w-10 h-10 text-white rounded-xl flex items-center justify-center flex-shrink-0 border-2 border-black ${post.author_type === 'employer' ? 'bg-nile-blue' : post.author_type === 'staff' ? 'bg-black' : 'bg-nile-green'}`}>
+                                            {post.author_type === 'employer' ? <Building2 size={16} /> : post.author_type === 'staff' ? <GraduationCap size={16} /> : <User size={16} />}
                                         </div>
                                         <div>
                                             <p className="font-black text-[10px] uppercase text-black">

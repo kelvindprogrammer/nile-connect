@@ -1,76 +1,247 @@
 import React, { useState } from 'react';
-import { Shield, Bell, Lock, Eye, Globe, ChevronRight, Save, Layout, Database } from 'lucide-react';
+import {
+    Shield, Bell, Database, Layout, Save, LogOut,
+    ChevronRight, CheckCircle2, Loader2, Users,
+    BarChart2, Lock, Eye, Trash2, ShieldCheck,
+} from 'lucide-react';
 import Button from '../../components/Button';
 import { useToast } from '../../context/ToastContext';
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+
+type Toggle = { label: string; desc: string; key: string };
 
 const StaffSettings = () => {
     const { showToast } = useToast();
-    const [adminMode, setAdminMode] = useState(true);
+    const { user, logout } = useAuth();
+    const navigate = useNavigate();
 
-    const handleSave = () => {
+    const [saving, setSaving] = useState(false);
+    const [toggles, setToggles] = useState<Record<string, boolean>>({
+        admin_mode:         true,
+        audit_logging:      true,
+        email_digest:       true,
+        employer_alerts:    true,
+        student_alerts:     false,
+        public_dashboard:   false,
+    });
+
+    const flip = (key: string) => setToggles(p => ({ ...p, [key]: !p[key] }));
+
+    const handleSave = async () => {
+        setSaving(true);
+        await new Promise(r => setTimeout(r, 800));
+        setSaving(false);
         showToast('Administrative settings updated', 'success');
     };
 
+    const staffName = user?.name || 'ADMIN';
+    const email     = user?.email || '';
+
     return (
-        <div className="p-4 md:p-10 space-y-8 md:space-y-12 font-sans bg-nile-white min-h-full anime-fade-in text-left">
-            <div className="border-b-3 border-black pb-8">
-                <h2 className="text-4xl md:text-6xl font-black text-black leading-none uppercase tracking-tighter">System Config .</h2>
-                <p className="text-sm md:text-xl font-bold text-nile-blue/70 uppercase tracking-widest mt-2">Administrative controls and platform security protocols.</p>
+        <div className="p-4 md:p-8 space-y-8 font-sans bg-nile-white min-h-full anime-fade-in text-left pb-24 md:pb-8">
+
+            {/* Hero Header */}
+            <div className="bg-white border-[2px] border-black rounded-[24px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-1/3 h-full bg-black/[0.03] -skew-x-12 translate-x-1/4 pointer-events-none" />
+                <div className="space-y-2 z-10">
+                    <span className="px-3 py-1 bg-black text-white text-[8px] font-black uppercase tracking-widest rounded-full">ADMIN CONFIG</span>
+                    <h2 className="text-3xl md:text-5xl font-black text-black leading-none uppercase tracking-tighter">System Config .</h2>
+                    <p className="text-[10px] font-bold text-black/40 uppercase tracking-widest">Administrative controls and platform security protocols.</p>
+                </div>
+                <div className="hidden md:flex items-center gap-4 z-10">
+                    <div className="w-14 h-14 bg-black text-nile-green rounded-[18px] border-[2px] border-black flex items-center justify-center shadow-[3px_3px_0px_0px_rgba(108,187,86,1)]">
+                        <ShieldCheck size={26} />
+                    </div>
+                    <div>
+                        <p className="font-black text-sm uppercase text-black">{staffName}</p>
+                        <p className="text-[9px] font-black text-black/30 uppercase">STAFF ADMINISTRATOR</p>
+                        <p className="text-[8px] font-bold text-nile-blue/60 truncate max-w-[180px]">{email}</p>
+                    </div>
+                </div>
             </div>
 
-            <div className="max-w-3xl space-y-8">
-                {/* Platform Section */}
-                <section className="space-y-4">
-                    <h3 className="text-xs font-black text-black/40 uppercase tracking-[0.3em] flex items-center">
-                        <Layout className="mr-2" size={14} /> INTERFACE PREFERENCES
-                    </h3>
-                    <div className="bg-white border-3 border-black rounded-3xl p-6 md:p-8 shadow-brutalist-sm space-y-6">
-                        <div className="flex items-center justify-between">
-                            <div className="space-y-1">
-                                <p className="text-sm font-black text-black uppercase">Advanced Admin Mode</p>
-                                <p className="text-[10px] font-bold text-nile-blue/40 uppercase">Enable deep-access analytics and system logs.</p>
-                            </div>
-                            <div 
-                                onClick={() => setAdminMode(!adminMode)}
-                                className={`w-12 h-6 rounded-full relative p-1 transition-all cursor-pointer ${adminMode ? 'bg-black' : 'bg-black/10'}`}
-                            >
-                                <div className={`w-4 h-4 bg-white rounded-full transition-all absolute ${adminMode ? 'right-1' : 'left-1'}`}></div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+            {/* Quick Actions */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {[
+                    { label: 'Students', icon: <Users size={16} />, path: '/staff/services', color: 'hover:bg-black hover:text-white' },
+                    { label: 'Reports', icon: <BarChart2 size={16} />, path: '/staff/reports', color: 'hover:bg-nile-blue hover:text-white' },
+                    { label: 'Audit Log', icon: <Eye size={16} />, path: '/staff/applications', color: 'hover:bg-nile-green hover:text-white' },
+                    { label: 'CRM', icon: <Bell size={16} />, path: '/staff/crm', color: 'hover:bg-yellow-400 hover:text-black' },
+                ].map(a => (
+                    <button
+                        key={a.label}
+                        onClick={() => navigate(a.path)}
+                        className={`bg-white border-[2px] border-black rounded-[16px] p-4 flex flex-col items-start gap-2.5 transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,0.08)] hover:shadow-none hover:translate-x-px hover:translate-y-px ${a.color}`}
+                    >
+                        {a.icon}
+                        <span className="text-[9px] font-black uppercase tracking-widest leading-none">{a.label}</span>
+                    </button>
+                ))}
+            </div>
 
-                {/* Security Section */}
-                <section className="space-y-4">
-                    <h3 className="text-xs font-black text-black/40 uppercase tracking-[0.3em] flex items-center">
-                        <Shield className="mr-2" size={14} /> SECURITY & AUDIT
-                    </h3>
-                    <div className="bg-white border-3 border-black rounded-3xl p-6 md:p-8 shadow-brutalist-sm space-y-6">
-                        <div className="flex items-center justify-between group cursor-pointer hover:bg-nile-white transition-all rounded-xl p-2 -m-2">
-                             <div className="space-y-1">
-                                <p className="text-sm font-black text-black uppercase">Login Audit Logs</p>
-                                <p className="text-[10px] font-bold text-nile-blue/40 uppercase">View last 30 days of system access history.</p>
-                            </div>
-                            <Database size={20} className="text-black/20 group-hover:text-black transition-all" />
-                        </div>
-                        <div className="border-t-2 border-dashed border-black/5 pt-6 flex items-center justify-between group cursor-pointer">
-                            <div className="space-y-1">
-                                <p className="text-sm font-black text-black uppercase">Password Policy</p>
-                                <p className="text-[10px] font-bold text-nile-blue/40 uppercase">Enforce 12-character alphanumeric requirements.</p>
-                            </div>
-                            <Lock size={20} className="text-black/20" />
-                        </div>
-                    </div>
-                </section>
+            <div className="max-w-3xl space-y-6">
 
-                <div className="pt-8 flex justify-end">
-                    <Button onClick={handleSave} size="lg" className="px-12 shadow-[6px_6px_0px_0px_#1E499D]">
-                       <Save size={18} className="mr-2" /> COMMIT CHANGES
-                    </Button>
+                {/* Interface Preferences */}
+                <Section icon={<Layout size={14} />} label="INTERFACE PREFERENCES">
+                    <ToggleRow
+                        label="Advanced Admin Mode"
+                        desc="Enable deep-access analytics, system logs, and raw data views."
+                        on={toggles.admin_mode}
+                        onFlip={() => flip('admin_mode')}
+                    />
+                    <Divider />
+                    <div className="flex items-center justify-between py-1">
+                        <div className="space-y-0.5">
+                            <p className="text-[11px] font-black text-black uppercase">Platform Status</p>
+                            <p className="text-[9px] font-bold text-black/30 uppercase">Nile Connect is fully operational.</p>
+                        </div>
+                        <span className="flex items-center gap-1 px-2.5 py-1 bg-nile-green/10 text-nile-green text-[8px] font-black uppercase rounded-full border border-nile-green/20">
+                            <CheckCircle2 size={10} strokeWidth={3} /> LIVE
+                        </span>
+                    </div>
+                    <Divider />
+                    <div className="flex items-center justify-between py-1">
+                        <div className="space-y-0.5">
+                            <p className="text-[11px] font-black text-black uppercase">Dashboard Overview</p>
+                            <p className="text-[9px] font-bold text-black/30 uppercase">View platform-wide metrics and engagement reports.</p>
+                        </div>
+                        <button
+                            onClick={() => navigate('/staff')}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-black text-white border-[2px] border-black rounded-lg font-black text-[8px] uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-px hover:translate-y-px transition-all"
+                        >
+                            VIEW
+                        </button>
+                    </div>
+                </Section>
+
+                {/* Security & Audit */}
+                <Section icon={<Shield size={14} />} label="SECURITY & AUDIT">
+                    <ToggleRow
+                        label="Login Audit Logging"
+                        desc="Record all staff login events and suspicious access patterns."
+                        on={toggles.audit_logging}
+                        onFlip={() => flip('audit_logging')}
+                    />
+                    <Divider />
+                    <div className="flex items-center justify-between py-1">
+                        <div className="space-y-0.5">
+                            <p className="text-[11px] font-black text-black uppercase">Campus One SSO</p>
+                            <p className="text-[9px] font-bold text-black/30 uppercase">Authentication handled by Nile University SSO.</p>
+                        </div>
+                        <span className="flex items-center gap-1 px-2.5 py-1 bg-nile-blue/10 text-nile-blue text-[8px] font-black uppercase rounded-full border border-nile-blue/20">
+                            <Lock size={10} strokeWidth={3} /> SECURED
+                        </span>
+                    </div>
+                    <Divider />
+                    <div className="flex items-center justify-between py-1">
+                        <div className="space-y-0.5">
+                            <p className="text-[11px] font-black text-black uppercase">Active Admin Sessions</p>
+                            <p className="text-[9px] font-bold text-black/30 uppercase">You are signed in on this device.</p>
+                        </div>
+                        <ChevronRight size={16} className="text-black/20" />
+                    </div>
+                </Section>
+
+                {/* Notifications */}
+                <Section icon={<Bell size={14} />} label="NOTIFICATION CENTER">
+                    {([
+                        { label: 'Daily Email Digest', desc: 'Receive a daily summary of platform activity.', key: 'email_digest' },
+                        { label: 'Employer Verification Alerts', desc: 'Notify me when new employers submit for approval.', key: 'employer_alerts' },
+                        { label: 'Student Activity Alerts', desc: 'Receive alerts for unusual student activity patterns.', key: 'student_alerts' },
+                    ] as Toggle[]).map((t, i) => (
+                        <React.Fragment key={t.key}>
+                            {i > 0 && <Divider />}
+                            <ToggleRow label={t.label} desc={t.desc} on={toggles[t.key]} onFlip={() => flip(t.key)} />
+                        </React.Fragment>
+                    ))}
+                </Section>
+
+                {/* Data & Reports */}
+                <Section icon={<Database size={14} />} label="DATA & REPORTS">
+                    <ToggleRow
+                        label="Public Dashboard"
+                        desc="Allow students to view aggregated platform statistics."
+                        on={toggles.public_dashboard}
+                        onFlip={() => flip('public_dashboard')}
+                    />
+                    <Divider />
+                    <div className="flex items-center justify-between py-1">
+                        <div className="space-y-0.5">
+                            <p className="text-[11px] font-black text-black uppercase">Export Platform Data</p>
+                            <p className="text-[9px] font-bold text-black/30 uppercase">Download CSV reports for students, jobs and applications.</p>
+                        </div>
+                        <button
+                            onClick={() => navigate('/staff/reports')}
+                            className="flex items-center gap-1.5 px-3 py-1.5 border-[2px] border-black rounded-lg font-black text-[8px] uppercase hover:bg-black hover:text-white transition-all"
+                        >
+                            <BarChart2 size={10} /> REPORTS
+                        </button>
+                    </div>
+                </Section>
+
+                {/* Save */}
+                <div className="flex justify-end">
+                    <button
+                        onClick={handleSave}
+                        disabled={saving}
+                        className="flex items-center gap-2 px-8 py-3 bg-black text-white border-[2px] border-black rounded-xl font-black text-[10px] uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-px hover:translate-y-px hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all disabled:opacity-50 disabled:pointer-events-none"
+                    >
+                        {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                        {saving ? 'COMMITTING...' : 'COMMIT CHANGES'}
+                    </button>
                 </div>
+
+                {/* Danger Zone */}
+                <Section icon={<Trash2 size={14} />} label="DANGER ZONE" danger>
+                    <div className="flex items-center justify-between py-1">
+                        <div className="space-y-0.5">
+                            <p className="text-[11px] font-black text-black uppercase">Sign Out</p>
+                            <p className="text-[9px] font-bold text-black/30 uppercase">End your admin session securely.</p>
+                        </div>
+                        <button
+                            onClick={logout}
+                            className="flex items-center gap-1.5 px-3 py-1.5 border-[2px] border-black rounded-lg font-black text-[8px] uppercase text-black hover:bg-black hover:text-white transition-all"
+                        >
+                            <LogOut size={10} /> SIGN OUT
+                        </button>
+                    </div>
+                </Section>
             </div>
         </div>
     );
 };
+
+// ── Sub-components ────────────────────────────────────────────────────────────
+
+const Section = ({ icon, label, children, danger = false }: {
+    icon: React.ReactNode; label: string; children: React.ReactNode; danger?: boolean;
+}) => (
+    <section className="space-y-3">
+        <h3 className={`text-[9px] font-black uppercase tracking-[0.3em] flex items-center gap-2 ${danger ? 'text-red-500' : 'text-black/40'}`}>
+            {icon} {label}
+        </h3>
+        <div className={`bg-white border-[2px] border-black rounded-[20px] p-5 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] space-y-3 ${danger ? 'border-red-200' : ''}`}>
+            {children}
+        </div>
+    </section>
+);
+
+const Divider = () => <div className="border-t border-dashed border-black/5" />;
+
+const ToggleRow = ({ label, desc, on, onFlip }: { label: string; desc: string; on: boolean; onFlip: () => void }) => (
+    <div className="flex items-center justify-between py-1">
+        <div className="space-y-0.5 mr-4">
+            <p className="text-[11px] font-black text-black uppercase">{label}</p>
+            <p className="text-[9px] font-bold text-black/30 uppercase">{desc}</p>
+        </div>
+        <button
+            onClick={onFlip}
+            className={`w-11 h-6 rounded-full relative p-1 transition-all flex-shrink-0 ${on ? 'bg-black' : 'bg-black/10'}`}
+        >
+            <div className={`w-4 h-4 bg-white rounded-full transition-all absolute top-1 ${on ? 'right-1' : 'left-1'}`} />
+        </button>
+    </div>
+);
 
 export default StaffSettings;
