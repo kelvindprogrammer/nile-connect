@@ -4,7 +4,7 @@ import Button from './Button';
 import InputField from './InputField';
 import { useToast } from '../context/ToastContext';
 import { Upload, CheckCircle2 } from 'lucide-react';
-import { apiClient } from '../services/api';
+import { apiClient, getErrorMessage } from '../services/api';
 
 interface QuickApplyModalProps {
     isOpen: boolean;
@@ -27,9 +27,8 @@ const QuickApplyModal: React.FC<QuickApplyModalProps> = ({ isOpen, onClose, jobT
             await apiClient.post('/api/jobs', { job_id: jobId, cover_letter: coverLetter });
             setStep(2);
             showToast(`Successfully applied to ${company}!`, 'success');
-        } catch (err: any) {
-            const msg = err?.response?.data?.error || 'Application failed. Please try again.';
-            showToast(msg, 'error');
+        } catch (err) {
+            showToast(getErrorMessage(err, 'Application failed. Please try again.'), 'error');
         } finally {
             setIsSubmitting(false);
         }

@@ -61,7 +61,10 @@ const StaffReports = () => {
         finally { setLoadingStats(false); }
     }, [showToast]);
 
-    useEffect(() => { loadStats(); }, [loadStats]);
+    useEffect(() => {
+        const t = setTimeout(loadStats, 0);
+        return () => clearTimeout(t);
+    }, [loadStats]);
 
     const kpis = useMemo(() => stats ? [
         { label: 'STUDENTS', value: stats.total_students, icon: <Users size={16} />, color: 'bg-nile-blue/10 text-nile-blue' },
@@ -189,9 +192,9 @@ const StaffReports = () => {
         <div className="p-4 md:p-8 space-y-8 anime-fade-in font-sans pb-20 text-left min-h-full">
 
             {/* Header */}
-            <div className="border-b-[2px] border-black pb-6">
-                <h2 className="text-3xl md:text-5xl font-black text-black uppercase leading-none tracking-tighter">Reports .</h2>
-                <p className="text-[9px] font-black text-black/40 uppercase tracking-[0.2em] mt-1">REAL DATA · CSV EXPORTS · PLATFORM ANALYTICS</p>
+            <div className="border-b border-gray-100 pb-6">
+                <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">Reports .</h2>
+                <p className="text-[9px] font-semibold text-black/40 mt-1">REAL DATA · CSV EXPORTS · PLATFORM ANALYTICS</p>
             </div>
 
             {/* KPI Strip */}
@@ -202,10 +205,10 @@ const StaffReports = () => {
             ) : (
                 <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
                     {kpis.map(k => (
-                        <div key={k.label} className={`border-[2px] border-black rounded-[16px] p-4 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${k.color.includes('bg-') ? k.color : `bg-white ${k.color}`}`}>
+                        <div key={k.label} className={`border border-gray-100 rounded-[16px] p-4 shadow-card ${k.color.includes('bg-') ? k.color : `bg-white ${k.color}`}`}>
                             <div className="flex items-center gap-2 mb-2 opacity-60">{k.icon}</div>
-                            <p className="text-2xl font-black leading-none">{k.value.toLocaleString()}</p>
-                            <p className="text-[7px] font-black uppercase tracking-[0.15em] mt-1 opacity-60">{k.label}</p>
+                            <p className="text-2xl font-semibold leading-none">{k.value.toLocaleString()}</p>
+                            <p className="text-[7px] font-semibold mt-1 opacity-60">{k.label}</p>
                         </div>
                     ))}
                 </div>
@@ -215,21 +218,21 @@ const StaffReports = () => {
 
                 {/* Left: Report builder */}
                 <div className="xl:col-span-7 space-y-6">
-                    <div className="bg-white border-[2px] border-black rounded-[28px] p-6 md:p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-                        <h3 className="text-[10px] font-black uppercase tracking-widest text-black/50 mb-5">REPORT BUILDER</h3>
+                    <div className="bg-white border border-gray-100 rounded-[28px] p-6 md:p-8 shadow-card">
+                        <h3 className="text-[10px] font-semibold text-black/50 mb-5">REPORT BUILDER</h3>
 
                         {/* Report type selection */}
                         <div className="space-y-3 mb-6">
                             {(Object.entries(reportMeta) as [ReportType, typeof reportMeta[ReportType]][]).map(([type, m]) => (
                                 <button key={type} onClick={() => { setReportType(type); setSummary(null); }}
-                                    className={`w-full flex items-center gap-4 p-4 border-[2px] border-black rounded-[16px] transition-all text-left
-                                        ${reportType === type ? 'shadow-[3px_3px_0px_0px_#6CBB56] bg-black text-white' : 'bg-nile-white hover:bg-white hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.2)]'}`}>
+                                    className={`w-full flex items-center gap-4 p-4 border border-gray-100 rounded-[16px] transition-all text-left
+                                        ${reportType === type ? 'shadow-green bg-black text-white' : 'bg-nile-white hover:bg-white hover:shadow-card'}`}>
                                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 border-2 ${reportType === type ? 'bg-white/10 border-white/20' : `${m.color} border-black/10`}`}>
                                         {m.icon}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className={`font-black text-xs uppercase tracking-wider ${reportType === type ? 'text-white' : 'text-black'}`}>{m.label}</p>
-                                        <p className={`text-[8px] font-bold uppercase mt-0.5 truncate ${reportType === type ? 'text-white/50' : 'text-black/40'}`}>{m.desc}</p>
+                                        <p className={`font-semibold text-xs tracking-wider ${reportType === type ? 'text-white' : 'text-black'}`}>{m.label}</p>
+                                        <p className={`text-[8px] font-bold mt-0.5 truncate ${reportType === type ? 'text-white/50' : 'text-black/40'}`}>{m.desc}</p>
                                     </div>
                                     {reportType === type && <FileText size={14} className="text-nile-green flex-shrink-0" />}
                                 </button>
@@ -237,14 +240,14 @@ const StaffReports = () => {
                         </div>
 
                         {/* Action buttons */}
-                        <div className="flex flex-col sm:flex-row gap-3 pt-2 border-t-[2px] border-black/5">
+                        <div className="flex flex-col sm:flex-row gap-3 pt-2 border-t border-gray-100/5">
                             <button onClick={downloadCSV} disabled={isDownloading}
-                                className="flex-1 py-4 bg-black text-white border-[2px] border-black rounded-xl font-black text-[9px] uppercase tracking-widest shadow-[4px_4px_0px_0px_#6CBB56] hover:translate-x-px hover:translate-y-px hover:shadow-[3px_3px_0px_0px_#6CBB56] transition-all disabled:opacity-40 flex items-center justify-center gap-2">
+                                className="flex-1 py-4 bg-black text-white border border-gray-100 rounded-xl font-semibold text-[9px] shadow-green transition-all disabled:opacity-40 flex items-center justify-center gap-2">
                                 {isDownloading ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
                                 {isDownloading ? 'GENERATING...' : 'DOWNLOAD CSV'}
                             </button>
                             <button onClick={generateSummary} disabled={generating || loadingStats}
-                                className="flex-1 py-4 bg-white text-black border-[2px] border-black rounded-xl font-black text-[9px] uppercase tracking-widest shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-px hover:translate-y-px hover:shadow-none transition-all disabled:opacity-40 flex items-center justify-center gap-2">
+                                className="flex-1 py-4 bg-white text-black border border-gray-100 rounded-xl font-semibold text-[9px] shadow-card transition-all disabled:opacity-40 flex items-center justify-center gap-2">
                                 {generating ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
                                 {generating ? 'GENERATING...' : 'TEXT SUMMARY'}
                             </button>
@@ -253,12 +256,12 @@ const StaffReports = () => {
 
                     {/* Summary output */}
                     {summary && (
-                        <div className="bg-white border-[2px] border-black rounded-[24px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6 anime-fade-in">
+                        <div className="bg-white border border-gray-100 rounded-[24px] shadow-card p-6 anime-fade-in">
                             <div className="flex items-center gap-2 mb-4">
                                 <BarChart3 size={14} className="text-nile-blue" />
-                                <h4 className="text-[9px] font-black uppercase tracking-[0.2em] text-black/50">GENERATED SUMMARY</h4>
+                                <h4 className="text-[9px] font-semibold text-black/50">GENERATED SUMMARY</h4>
                             </div>
-                            <pre className="font-mono text-[10px] text-black whitespace-pre-wrap leading-relaxed bg-nile-white/60 border-[2px] border-black/10 rounded-xl p-5">
+                            <pre className="font-mono text-[10px] text-black whitespace-pre-wrap leading-relaxed bg-nile-white/60 border border-gray-100/10 rounded-xl p-5">
                                 {summary}
                             </pre>
                         </div>
@@ -268,14 +271,14 @@ const StaffReports = () => {
                 {/* Right: Export info + stats */}
                 <div className="xl:col-span-5 space-y-5">
                     {/* Export preview */}
-                    <div className="bg-nile-blue text-white border-[2px] border-black rounded-[24px] p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 ${meta.color} border-2 border-white/20`}>
+                    <div className="bg-nile-blue text-white border border-gray-100 rounded-[24px] p-6 shadow-card">
+                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 ${meta.color} border border-white/20`}>
                             {meta.icon}
                         </div>
-                        <h3 className="text-sm font-black uppercase tracking-tight">{meta.label}</h3>
-                        <p className="text-[9px] font-bold text-white/50 uppercase mt-1 leading-relaxed">{meta.desc}</p>
+                        <h3 className="text-sm font-semibold tracking-tight">{meta.label}</h3>
+                        <p className="text-[9px] font-bold text-white/50 mt-1 leading-relaxed">{meta.desc}</p>
                         <div className="mt-4 pt-4 border-t border-white/10 space-y-2">
-                            <p className="text-[8px] font-black text-white/40 uppercase tracking-widest">WHAT YOU GET</p>
+                            <p className="text-[8px] font-semibold text-white/40">WHAT YOU GET</p>
                             <p className="text-[9px] font-bold text-white/70 leading-relaxed">
                                 A CSV file with all live platform data — ready for Excel, Google Sheets or further analysis.
                             </p>
@@ -284,8 +287,8 @@ const StaffReports = () => {
 
                     {/* Quick stats */}
                     {stats && (
-                        <div className="bg-white border-[2px] border-black rounded-[24px] p-5 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] space-y-4">
-                            <h3 className="text-[10px] font-black uppercase tracking-widest text-black/40 pb-3 border-b-[2px] border-black/5">PLATFORM SNAPSHOT</h3>
+                        <div className="bg-white border border-gray-100 rounded-[24px] p-5 shadow-card space-y-4">
+                            <h3 className="text-[10px] font-semibold text-black/40 pb-3 border-b border-gray-100/5">PLATFORM SNAPSHOT</h3>
                             {[
                                 { label: 'Placement activity', value: `${stats.active_jobs} active jobs`, bar: Math.min(100, stats.active_jobs * 5) },
                                 { label: 'Employer pipeline', value: `${stats.total_employers - stats.pending_employers}/${stats.total_employers} verified`, bar: stats.total_employers > 0 ? Math.round(((stats.total_employers - stats.pending_employers) / stats.total_employers) * 100) : 0 },
@@ -293,11 +296,11 @@ const StaffReports = () => {
                                 { label: 'Upcoming events', value: `${stats.upcoming_events} events`, bar: Math.min(100, stats.upcoming_events * 10) },
                             ].map(item => (
                                 <div key={item.label}>
-                                    <div className="flex justify-between text-[8px] font-black uppercase text-black/50 mb-1.5">
+                                    <div className="flex justify-between text-[8px] font-semibold text-black/50 mb-1.5">
                                         <span>{item.label}</span>
                                         <span className="text-black">{item.value}</span>
                                     </div>
-                                    <div className="h-2 bg-nile-white border-[1.5px] border-black rounded-full overflow-hidden p-0.5">
+                                    <div className="h-2 bg-nile-white border border-gray-100 rounded-full overflow-hidden p-0.5">
                                         <div className="h-full bg-black rounded-full transition-all duration-700" style={{ width: `${item.bar}%` }} />
                                     </div>
                                 </div>

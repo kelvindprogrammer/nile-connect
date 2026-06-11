@@ -8,6 +8,8 @@ import Avatar from '../components/Avatar';
 import NileConnectLogo from '../components/NileConnectLogo';
 import NotificationTray from '../components/NotificationTray';
 import { useAuth } from '../context/AuthContext';
+import { useNotifications } from '../hooks/useNotifications';
+import { useUnreadMessages } from '../hooks/useUnreadMessages';
 
 const menuItems = [
     { name: 'Dashboard',    path: '/employer',              icon: Home,      exact: true },
@@ -22,8 +24,8 @@ const menuItems = [
 const isActive = (path: string, pathname: string, exact?: boolean) =>
     exact ? pathname === path : pathname === path || pathname.startsWith(path + '/');
 
-const NavItem = ({ path, Icon, label, active, mobile = false }: {
-    path: string; Icon: React.ElementType; label: string; active: boolean; mobile?: boolean;
+const NavItem = ({ path, Icon, label, active, mobile = false, badge }: {
+    path: string; Icon: React.ElementType; label: string; active: boolean; mobile?: boolean; badge?: number;
 }) => {
     const navigate = useNavigate();
     return (
@@ -38,8 +40,13 @@ const NavItem = ({ path, Icon, label, active, mobile = false }: {
                     : mobile ? 'opacity-50 hover:opacity-80' : 'text-gray-400 hover:bg-gray-50 hover:text-gray-700'}
             `}
         >
-            <div className={`flex items-center justify-center rounded-lg ${mobile ? 'w-6 h-6' : 'w-9 h-9'}`}>
+            <div className={`relative flex items-center justify-center rounded-lg ${mobile ? 'w-6 h-6' : 'w-9 h-9'}`}>
                 <Icon size={mobile ? 18 : 19} strokeWidth={active ? 2.2 : 1.8} />
+                {!!badge && badge > 0 && (
+                    <span className="absolute -top-1 -right-1 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1">
+                        {badge > 9 ? '9+' : badge}
+                    </span>
+                )}
             </div>
             <span className={`mt-1 leading-none text-[10px] font-medium transition-colors ${active ? (mobile ? 'text-nile-green-600' : 'text-nile-green-600 font-semibold') : 'text-gray-400'}`}>
                 {label}
@@ -52,6 +59,8 @@ const EmployerLayout = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { user, logout, isLoading } = useAuth();
+    const { notifications, unreadCount: unreadNotifCount, loaded: notifsLoaded, refreshNotifications, markRead, markAllRead } = useNotifications();
+    const { unreadCount: unreadMsgCount } = useUnreadMessages();
 
     const [showNotifications, setShowNotifications] = useState(false);
     const [showMoreMenu, setShowMoreMenu] = useState(false);
@@ -62,10 +71,20 @@ const EmployerLayout = () => {
 
     const handleLogout = () => { logout(); navigate('/login', { replace: true }); };
 
+    const toggleNotifications = () => {
+        setShowNotifications(v => {
+            const next = !v;
+            if (next) refreshNotifications();
+            return next;
+        });
+    };
+
+    const navBadge = (name: string) => (name === 'Messages' ? unreadMsgCount : undefined);
+
     useEffect(() => {
-        setProgress(40);
+        const start = setTimeout(() => setProgress(40), 0);
         const t = setTimeout(() => setProgress(100), 350);
-        return () => { clearTimeout(t); setProgress(0); };
+        return () => { clearTimeout(start); clearTimeout(t); setProgress(0); };
     }, [location.pathname]);
 
     const crumbs = location.pathname.split('/').filter(x => x && x !== 'employer');
@@ -93,7 +112,7 @@ const EmployerLayout = () => {
                 <nav className="flex-1 flex flex-col items-center gap-0.5 w-full overflow-y-auto px-2">
                     {menuItems.map(item => (
                         <NavItem key={item.path} path={item.path} Icon={item.icon} label={item.name}
-                            active={isActive(item.path, location.pathname, item.exact)} />
+                            active={isActive(item.path, location.pathname, item.exact)} badge={navBadge(item.name)} />
                     ))}
                 </nav>
 
@@ -113,7 +132,7 @@ const EmployerLayout = () => {
             <nav className="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-100 h-[62px] flex items-center z-40 shadow-[0_-1px_12px_rgba(0,0,0,0.06)] px-1">
                 {mobileLeft.map(item => (
                     <NavItem key={item.path} path={item.path} Icon={item.icon} label={item.name}
-                        active={isActive(item.path, location.pathname, item.exact)} mobile />
+                        active={isActive(item.path, location.pathname, item.exact)} mobile badge={navBadge(item.name)} />
                 ))}
                 <button onClick={() => setShowMoreMenu(true)} className="flex-1 flex flex-col items-center justify-center -mt-5">
                     <div className="w-12 h-12 bg-nile-green rounded-2xl flex items-center justify-center shadow-green hover:shadow-soft-md transition-all active:scale-95">
@@ -123,7 +142,7 @@ const EmployerLayout = () => {
                 </button>
                 {mobileRight.map(item => (
                     <NavItem key={item.path} path={item.path} Icon={item.icon} label={item.name}
-                        active={isActive(item.path, location.pathname, item.exact)} mobile />
+                        active={isActive(item.path, location.pathname, item.exact)} mobile badge={navBadge(item.name)} />
                 ))}
             </nav>
 
@@ -144,12 +163,18 @@ const EmployerLayout = () => {
                             {menuItems.map(item => {
                                 const active = isActive(item.path, location.pathname, item.exact);
                                 const Icon = item.icon;
+                                const badge = navBadge(item.name);
                                 return (
                                     <button key={item.path} onClick={() => { navigate(item.path); setShowMoreMenu(false); }}
-                                        className={`flex flex-col items-center gap-2 p-3 rounded-2xl transition-all
+                                        className={`relative flex flex-col items-center gap-2 p-3 rounded-2xl transition-all
                                             ${active ? 'bg-nile-green text-white' : 'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}>
                                         <Icon size={20} strokeWidth={active ? 2.2 : 1.8} />
                                         <span className="text-[10px] font-medium leading-none">{item.name}</span>
+                                        {!!badge && badge > 0 && (
+                                            <span className="absolute top-1.5 right-1.5 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1">
+                                                {badge > 9 ? '9+' : badge}
+                                            </span>
+                                        )}
                                     </button>
                                 );
                             })}
@@ -195,21 +220,37 @@ const EmployerLayout = () => {
 
                     <div className="flex items-center gap-1 flex-shrink-0">
                         <button onClick={() => navigate('/employer/messages')}
-                            className="p-2 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors">
+                            className="relative p-2 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors">
                             <Mail size={18} />
+                            {unreadMsgCount > 0 && (
+                                <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1">
+                                    {unreadMsgCount > 9 ? '9+' : unreadMsgCount}
+                                </span>
+                            )}
                         </button>
                         <button onClick={() => navigate('/employer/settings')}
                             className="p-2 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors hidden sm:flex">
                             <Settings size={18} />
                         </button>
                         <div className="relative">
-                            <button onClick={() => setShowNotifications(v => !v)}
-                                className={`p-2 rounded-xl transition-colors ${showNotifications ? 'text-nile-green bg-nile-green-50' : 'text-gray-400 hover:text-gray-700 hover:bg-gray-50'}`}>
+                            <button onClick={toggleNotifications}
+                                className={`relative p-2 rounded-xl transition-colors ${showNotifications ? 'text-nile-green bg-nile-green-50' : 'text-gray-400 hover:text-gray-700 hover:bg-gray-50'}`}>
                                 <Bell size={18} />
+                                {unreadNotifCount > 0 && (
+                                    <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1">
+                                        {unreadNotifCount > 9 ? '9+' : unreadNotifCount}
+                                    </span>
+                                )}
                             </button>
                             {showNotifications && (
                                 <div className="absolute top-full right-0 mt-2 z-50 w-80 max-w-[calc(100vw-16px)] animate-in fade-in slide-in-from-top-1">
-                                    <NotificationTray onClose={() => setShowNotifications(false)} />
+                                    <NotificationTray
+                                        notifications={notifications}
+                                        loaded={notifsLoaded}
+                                        onMarkRead={markRead}
+                                        onMarkAllRead={markAllRead}
+                                        onClose={() => setShowNotifications(false)}
+                                    />
                                 </div>
                             )}
                         </div>

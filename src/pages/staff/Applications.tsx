@@ -78,7 +78,10 @@ const StaffApplications = () => {
         }
     }, [showToast]);
 
-    useEffect(() => { fetchAll(); }, [fetchAll]);
+    useEffect(() => {
+        const t = setTimeout(fetchAll, 0);
+        return () => clearTimeout(t);
+    }, [fetchAll]);
 
     const pendingEmployers = useMemo(() => employers.filter(e => e.status === 'pending'), [employers]);
 
@@ -126,28 +129,28 @@ const StaffApplications = () => {
         <div className="p-4 md:p-8 space-y-8 anime-fade-in font-sans pb-20 text-left min-h-full">
 
             {/* Header */}
-            <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 border-b-[2px] border-black pb-6">
+            <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 border-b border-gray-100 pb-6">
                 <div className="space-y-1">
-                    <h2 className="text-3xl md:text-4xl font-black text-black leading-none uppercase tracking-tighter">
+                    <h2 className="text-3xl md:text-4xl font-semibold text-black leading-none">
                         Pipeline Hub
                     </h2>
-                    <p className="text-[9px] md:text-[10px] font-black text-black/40 uppercase tracking-[0.2em]">
+                    <p className="text-[9px] md:text-[10px] font-semibold text-black/40">
                         APPLICATIONS &amp; EMPLOYER MANAGEMENT
                     </p>
                 </div>
 
-                <div className="flex flex-wrap gap-1 bg-white p-1 border-[2px] border-black rounded-2xl shadow-sm">
+                <div className="flex flex-wrap gap-1 bg-white p-1 border border-gray-100 rounded-2xl shadow-sm">
                     {(['PIPELINE', 'EMPLOYER VERIFICATION'] as MainTab[]).map(tab => (
                         <button
                             key={tab}
                             onClick={() => setMainTab(tab)}
-                            className={`px-4 py-2 rounded-xl font-black text-[9px] tracking-widest uppercase transition-all flex items-center gap-2 whitespace-nowrap
-                                ${mainTab === tab ? 'bg-black text-white shadow-[2px_2px_0px_0px_#6CBB56]' : 'text-black/40 hover:text-black'}`}
+                            className={`px-4 py-2 rounded-xl font-semibold text-[9px] transition-all flex items-center gap-2 whitespace-nowrap
+                                ${mainTab === tab ? 'bg-black text-white shadow-green' : 'text-black/40 hover:text-black'}`}
                         >
                             {tab === 'PIPELINE' ? <ClipboardList size={13} /> : <ShieldCheck size={13} />}
                             <span>{tab}</span>
                             {tab === 'EMPLOYER VERIFICATION' && pendingEmployers.length > 0 && (
-                                <span className={`w-5 h-5 flex items-center justify-center rounded-full text-[7px] font-black
+                                <span className={`w-5 h-5 flex items-center justify-center rounded-full text-[7px] font-semibold
                                     ${mainTab === tab ? 'bg-red-500 text-white' : 'bg-red-100 text-red-500'}`}>
                                     {pendingEmployers.length}
                                 </span>
@@ -162,13 +165,13 @@ const StaffApplications = () => {
                 <div className="space-y-6 anime-fade-in">
                     {/* Count */}
                     <div className="flex flex-wrap gap-3 items-center">
-                        <span className="px-4 py-2 bg-black text-white border-[2px] border-black rounded-xl font-black text-[9px] uppercase tracking-widest">
+                        <span className="px-4 py-2 bg-black text-white border border-gray-100 rounded-xl font-semibold text-[9px]">
                             {filteredApps.length} {filteredApps.length === 1 ? 'APPLICATION' : 'APPLICATIONS'}
                         </span>
                         {statusFilter !== 'ALL' && (
                             <button
                                 onClick={() => setStatusFilter('ALL')}
-                                className="text-[8px] font-black text-black/40 uppercase tracking-widest underline"
+                                className="text-[8px] font-semibold text-black/40 underline"
                             >
                                 CLEAR FILTER
                             </button>
@@ -183,7 +186,7 @@ const StaffApplications = () => {
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                             placeholder="SEARCH BY STUDENT, JOB TITLE, OR COMPANY..."
-                            className="w-full pl-10 pr-4 py-3 rounded-xl border-[2px] border-black font-black text-[9px] tracking-widest uppercase outline-none focus:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all bg-nile-white/60 focus:bg-white"
+                            className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-100 font-semibold text-[9px] outline-none focus:shadow-card transition-all bg-nile-white/60 focus:bg-white"
                         />
                     </div>
 
@@ -196,7 +199,7 @@ const StaffApplications = () => {
                                 <button
                                     key={sf}
                                     onClick={() => setStatusFilter(sf)}
-                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-[2px] border-black font-black text-[8px] uppercase tracking-widest transition-all
+                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-100 font-semibold text-[8px] transition-all
                                         ${statusFilter === sf ? 'bg-black text-white' : 'bg-white text-black hover:bg-black/5'}`}
                                 >
                                     {sf}
@@ -216,23 +219,23 @@ const StaffApplications = () => {
                             {filteredApps.map(app => {
                                 const sc = getStatusConfig(app.status);
                                 return (
-                                    <div key={app.id} className="bg-white border-[2px] border-black rounded-[20px] p-4 md:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all">
+                                    <div key={app.id} className="bg-white border border-gray-100 rounded-[20px] p-4 md:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 hover:shadow-card transition-all">
                                         <div className="flex items-center gap-4 min-w-0 flex-1">
                                             <Avatar name={app.student_name || '?'} size="sm" />
                                             <div className="min-w-0">
-                                                <p className="font-black text-sm uppercase text-black leading-none mb-1 truncate">{app.student_name || 'Unknown Student'}</p>
-                                                <p className="text-[8px] font-black text-black/40 uppercase tracking-wider truncate">
+                                                <p className="font-semibold text-sm text-black leading-none mb-1 truncate">{app.student_name || 'Unknown Student'}</p>
+                                                <p className="text-[8px] font-semibold text-black/40 tracking-wider truncate">
                                                     {app.job_title || 'N/A'} &bull; {app.company || 'N/A'}
                                                 </p>
                                                 {app.applied_at && (
-                                                    <p className="text-[7px] font-bold text-black/20 uppercase flex items-center gap-1 mt-0.5">
+                                                    <p className="text-[7px] font-bold text-black/20 flex items-center gap-1 mt-0.5">
                                                         <Clock size={9} />
                                                         {new Date(app.applied_at).toLocaleDateString()}
                                                     </p>
                                                 )}
                                             </div>
                                         </div>
-                                        <span className={`shrink-0 text-[8px] font-black px-3 py-1.5 rounded-xl border-[2px] border-black uppercase tracking-widest ${sc.bg} ${sc.text}`}>
+                                        <span className={`shrink-0 text-[8px] font-semibold px-3 py-1.5 rounded-xl border border-gray-100 ${sc.bg} ${sc.text}`}>
                                             {sc.label}
                                         </span>
                                     </div>
@@ -247,7 +250,7 @@ const StaffApplications = () => {
             {mainTab === 'EMPLOYER VERIFICATION' && (
                 <div className="space-y-6 anime-fade-in">
                     {/* Sub-tab bar */}
-                    <div className="flex flex-wrap gap-1 bg-white p-1 border-[2px] border-black rounded-2xl shadow-sm w-fit">
+                    <div className="flex flex-wrap gap-1 bg-white p-1 border border-gray-100 rounded-2xl shadow-sm w-fit">
                         {(['PENDING', 'APPROVED', 'REJECTED'] as EmployerSubTab[]).map(sub => {
                             const counts: Record<EmployerSubTab, number> = {
                                 PENDING: pendingEmployers.length,
@@ -258,11 +261,11 @@ const StaffApplications = () => {
                                 <button
                                     key={sub}
                                     onClick={() => setEmpSubTab(sub)}
-                                    className={`px-4 py-2 rounded-xl font-black text-[9px] tracking-widest uppercase transition-all flex items-center gap-2
+                                    className={`px-4 py-2 rounded-xl font-semibold text-[9px] transition-all flex items-center gap-2
                                         ${empSubTab === sub ? 'bg-black text-white' : 'text-black/40 hover:text-black'}`}
                                 >
                                     {sub}
-                                    <span className={`w-5 h-5 flex items-center justify-center rounded-full text-[7px] font-black
+                                    <span className={`w-5 h-5 flex items-center justify-center rounded-full text-[7px] font-semibold
                                         ${empSubTab === sub
                                             ? sub === 'PENDING' ? 'bg-red-500 text-white' : 'bg-white/20 text-white'
                                             : sub === 'PENDING' ? 'bg-red-100 text-red-500' : 'bg-black/10 text-black/60'}`}>
@@ -282,21 +285,21 @@ const StaffApplications = () => {
                     ) : (
                         <div className="space-y-3">
                             {empsBySubTab.map(emp => (
-                                <div key={emp.id} className="bg-white border-[2px] border-black rounded-[20px] shadow-[3px_3px_0px_0px_rgba(0,0,0,0.08)] p-4 md:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all">
+                                <div key={emp.id} className="bg-white border border-gray-100 rounded-[20px] shadow-card p-4 md:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:shadow-card transition-all">
                                     <div className="flex items-center gap-4 min-w-0 flex-1">
-                                        <div className="w-11 h-11 bg-black text-white rounded-xl flex items-center justify-center font-black text-lg flex-shrink-0 border-2 border-black">
+                                        <div className="w-11 h-11 bg-black text-white rounded-xl flex items-center justify-center font-semibold text-lg flex-shrink-0 border border-gray-100">
                                             {emp.company_name.charAt(0).toUpperCase()}
                                         </div>
                                         <div className="min-w-0 flex-1">
                                             <div className="flex flex-wrap items-center gap-2 mb-1">
-                                                <p className="font-black text-sm uppercase text-black leading-none truncate">{emp.company_name}</p>
+                                                <p className="font-semibold text-sm text-black leading-none truncate">{emp.company_name}</p>
                                                 <StatusBadge status={emp.status} />
                                             </div>
-                                            <p className="text-[8px] font-black text-black/40 uppercase tracking-wider truncate">
+                                            <p className="text-[8px] font-semibold text-black/40 tracking-wider truncate">
                                                 {emp.industry} &bull; {emp.location}
                                             </p>
                                             <p className="text-[8px] font-bold text-nile-blue/50 truncate">{emp.contact_email}</p>
-                                            <p className="text-[7px] font-black text-black/20 uppercase flex items-center gap-1 mt-0.5">
+                                            <p className="text-[7px] font-semibold text-black/20 flex items-center gap-1 mt-0.5">
                                                 <Clock size={9} />
                                                 REGISTERED {new Date(emp.created_at).toLocaleDateString()}
                                             </p>
@@ -308,7 +311,7 @@ const StaffApplications = () => {
                                             <button
                                                 onClick={() => handleEmployerAction(emp, 'approved')}
                                                 disabled={actionLoading[emp.id]}
-                                                className="flex items-center gap-1.5 px-3 py-2 bg-nile-green text-white border-[2px] border-black rounded-xl font-black text-[9px] uppercase tracking-widest shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all disabled:opacity-50"
+                                                className="flex items-center gap-1.5 px-3 py-2 bg-nile-green text-white border border-gray-100 rounded-xl font-semibold text-[9px] shadow-card transition-all disabled:opacity-50"
                                             >
                                                 {actionLoading[emp.id] ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle2 size={12} strokeWidth={3} />}
                                                 <span className="hidden sm:inline">APPROVE</span>
@@ -316,7 +319,7 @@ const StaffApplications = () => {
                                             <button
                                                 onClick={() => handleEmployerAction(emp, 'rejected')}
                                                 disabled={actionLoading[emp.id]}
-                                                className="flex items-center gap-1.5 px-3 py-2 bg-white text-red-500 border-[2px] border-black rounded-xl font-black text-[9px] uppercase tracking-widest shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all disabled:opacity-50 hover:bg-red-50"
+                                                className="flex items-center gap-1.5 px-3 py-2 bg-white text-red-500 border border-gray-100 rounded-xl font-semibold text-[9px] shadow-card transition-all disabled:opacity-50 hover:bg-red-50"
                                             >
                                                 {actionLoading[emp.id] ? <Loader2 size={12} className="animate-spin" /> : <XCircle size={12} strokeWidth={3} />}
                                                 <span className="hidden sm:inline">REJECT</span>
@@ -338,7 +341,7 @@ const StaffApplications = () => {
 const EmptyState = ({ label, icon }: { label: string; icon: React.ReactNode }) => (
     <div className="py-20 text-center border-2 border-dashed border-black/10 rounded-[28px]">
         <div className="text-black/20 mx-auto mb-3 flex justify-center">{icon}</div>
-        <p className="text-[9px] font-black text-black/30 uppercase tracking-[0.2em]">{label}</p>
+        <p className="text-[9px] font-semibold text-black/30">{label}</p>
     </div>
 );
 
@@ -350,7 +353,7 @@ const StatusBadge = ({ status }: { status: string }) => {
     };
     const cls = configs[status] ?? 'bg-black/5 text-black/60';
     return (
-        <span className={`text-[7px] font-black px-2 py-0.5 rounded border-[1.5px] border-black uppercase ${cls}`}>
+        <span className={`text-[7px] font-semibold px-2 py-0.5 rounded border border-gray-100 ${cls}`}>
             {status.toUpperCase()}
         </span>
     );

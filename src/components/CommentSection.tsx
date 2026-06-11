@@ -1,71 +1,92 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Avatar from './Avatar';
-import { Send } from 'lucide-react';
+import { Send, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
+import { getComments, addComment, type PostComment } from '../services/feedService';
+import { timeAgo } from '../utils/formatDate';
 
-interface Comment {
-    id: number;
-    user: string;
-    content: string;
-    time: string;
+interface CommentSectionProps {
+    postId: string;
+    onCommentAdded?: () => void;
 }
 
-const CommentSection: React.FC = () => {
+const CommentSection: React.FC<CommentSectionProps> = ({ postId, onCommentAdded }) => {
     const { user } = useAuth();
-    const currentUser = user?.name || 'USER';
+    const { showToast } = useToast();
+    const currentUser = user?.name || 'You';
 
-    const [comments, setComments] = useState<Comment[]>([
-        { id: 1, user: 'John Doe', content: 'This is amazing! Definitely looking forward to it.', time: '1h ago' }
-    ]);
+    const [comments, setComments] = useState<PostComment[]>([]);
+    const [loading, setLoading] = useState(true);
     const [newComment, setNewComment] = useState('');
+    const [submitting, setSubmitting] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    useEffect(() => {
+        let cancelled = false;
+        getComments(postId)
+            .then(list => { if (!cancelled) setComments(list); })
+            .catch(() => { if (!cancelled) setComments([]); })
+            .finally(() => { if (!cancelled) setLoading(false); });
+        return () => { cancelled = true; };
+    }, [postId]);
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newComment.trim()) return;
+        const content = newComment.trim();
+        if (!content || submitting) return;
 
-        const comment: Comment = {
-            id: Date.now(),
-            user: currentUser,
-            content: newComment,
-            time: 'Just now'
-        };
-
-        setComments([...comments, comment]);
-        setNewComment('');
+        setSubmitting(true);
+        try {
+            const comment = await addComment(postId, content);
+            setComments(prev => [...prev, comment]);
+            setNewComment('');
+            onCommentAdded?.();
+        } catch {
+            showToast('Could not post comment.', 'error');
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     return (
-        <div className="px-6 py-4 bg-nile-white/40 border-t-2 border-black/5 space-y-4 font-sans anime-fade-in">
-            <div className="space-y-4 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
-                {comments.map((c) => (
-                    <div key={c.id} className="flex space-x-3 items-start">
-                        <Avatar name={c.user} size="sm" />
-                        <div className="flex-1 bg-white border-[2px] border-black rounded-2xl p-3 shadow-sm">
-                            <div className="flex justify-between items-center mb-1">
-                                <span className="text-[10px] font-black uppercase text-black">{c.user}</span>
-                                <span className="text-[8px] font-bold text-nile-blue/50 uppercase">{c.time}</span>
+        <div className="px-4 py-4 bg-gray-50/60 border-t border-gray-100 space-y-3">
+            <div className="space-y-3 max-h-72 overflow-y-auto pr-1 custom-scrollbar">
+                {loading ? (
+                    <div className="flex items-center justify-center py-4">
+                        <Loader2 size={18} className="animate-spin text-gray-300" />
+                    </div>
+                ) : comments.length === 0 ? (
+                    <p className="text-xs text-gray-400 text-center py-2">No comments yet — start the conversation.</p>
+                ) : comments.map(c => (
+                    <div key={c.id} className="flex gap-2.5 items-start">
+                        <Avatar name={c.author_name} size="sm" />
+                        <div className="flex-1 bg-white border border-gray-100 rounded-2xl px-3 py-2 shadow-soft-xs">
+                            <div className="flex items-center justify-between gap-2 mb-0.5">
+                                <span className="text-xs font-semibold text-gray-900 truncate">{c.author_name}</span>
+                                <span className="text-[11px] text-gray-400 flex-shrink-0">{timeAgo(c.created_at)}</span>
                             </div>
-                            <p className="text-[11px] font-bold text-nile-blue uppercase leading-tight">{c.content}</p>
+                            <p className="text-sm text-gray-700 leading-relaxed">{c.content}</p>
                         </div>
                     </div>
                 ))}
             </div>
 
-            <form onSubmit={handleSubmit} className="relative flex items-center space-x-3 pt-2">
+            <form onSubmit={handleSubmit} className="flex items-center gap-2.5 pt-1">
                 <Avatar name={currentUser} size="sm" />
                 <div className="flex-1 relative">
-                    <input 
+                    <input
                         type="text"
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
-                        placeholder="ADD A COMMENT..."
-                        className="w-full bg-white border-[2px] border-black rounded-full py-3 pl-5 pr-12 font-bold text-[10px] uppercase outline-none focus:shadow-[2px_2px_0px_0px_#1E499D] transition-all"
+                        placeholder="Add a comment..."
+                        className="w-full bg-white border border-gray-200 rounded-full py-2.5 pl-4 pr-11 text-sm text-gray-800 placeholder:text-gray-400 outline-none focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10 transition-all"
                     />
-                    <button 
+                    <button
                         type="submit"
-                        className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-nile-blue text-white rounded-full border-2 border-black shadow-sm active:scale-90 transition-all ${!newComment.trim() ? 'opacity-50 cursor-not-allowed' : 'hover:rotate-12'}`}
+                        disabled={!newComment.trim() || submitting}
+                        className="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center bg-nile-blue text-white rounded-full transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:bg-nile-blue-600"
                     >
-                        <Send size={12} strokeWidth={3} />
+                        {submitting ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
                     </button>
                 </div>
             </form>

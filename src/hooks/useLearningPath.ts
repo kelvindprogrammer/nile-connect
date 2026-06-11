@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 
 export interface LearningTask {
     id: string;
@@ -15,14 +15,13 @@ export interface LearningTask {
 const STORAGE_KEY = 'nile_learning_path';
 
 export function useLearningPath() {
-    const [tasks, setTasks] = useState<LearningTask[]>([]);
-
-    useEffect(() => {
+    const [tasks, setTasks] = useState<LearningTask[]>(() => {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
-            try { setTasks(JSON.parse(stored)); } catch { /* ignore */ }
+            try { return JSON.parse(stored); } catch { /* ignore */ }
         }
-    }, []);
+        return [];
+    });
 
     const saveTasks = (newTasks: LearningTask[]) => {
         setTasks(newTasks);

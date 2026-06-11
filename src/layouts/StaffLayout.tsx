@@ -9,6 +9,8 @@ import Avatar from '../components/Avatar';
 import NileConnectLogo from '../components/NileConnectLogo';
 import NotificationTray from '../components/NotificationTray';
 import { useAuth } from '../context/AuthContext';
+import { useNotifications } from '../hooks/useNotifications';
+import { useUnreadMessages } from '../hooks/useUnreadMessages';
 
 const navItems = [
     { to: '/staff',          label: 'Dashboard', icon: Home,          exact: true },
@@ -58,6 +60,8 @@ const StaffLayout = () => {
     const navigate  = useNavigate();
     const location  = useLocation();
     const { user, logout, isLoading } = useAuth();
+    const { notifications, unreadCount: unreadNotifCount, loaded: notifsLoaded, refreshNotifications, markRead, markAllRead } = useNotifications();
+    const { unreadCount: unreadMsgCount } = useUnreadMessages();
 
     const [showNotifications, setShowNotifications] = useState(false);
     const [showMoreMenu, setShowMoreMenu] = useState(false);
@@ -68,10 +72,18 @@ const StaffLayout = () => {
 
     const handleLogout = () => { logout(); navigate('/login', { replace: true }); };
 
+    const toggleNotifications = () => {
+        setShowNotifications(v => {
+            const next = !v;
+            if (next) refreshNotifications();
+            return next;
+        });
+    };
+
     useEffect(() => {
-        setProgress(40);
+        const start = setTimeout(() => setProgress(40), 0);
         const t = setTimeout(() => setProgress(100), 350);
-        return () => { clearTimeout(t); setProgress(0); };
+        return () => { clearTimeout(start); clearTimeout(t); setProgress(0); };
     }, [location.pathname]);
 
     const crumbs = location.pathname.split('/').filter(x => x && x !== 'staff');
@@ -200,22 +212,37 @@ const StaffLayout = () => {
 
                     <div className="flex items-center gap-1 flex-shrink-0">
                         <button onClick={() => navigate('/staff/messages')}
-                            className="p-2 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors">
+                            className="relative p-2 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors">
                             <Mail size={18} />
+                            {unreadMsgCount > 0 && (
+                                <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1">
+                                    {unreadMsgCount > 9 ? '9+' : unreadMsgCount}
+                                </span>
+                            )}
                         </button>
                         <button onClick={() => navigate('/staff/settings')}
                             className="p-2 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors hidden sm:flex">
                             <Settings size={18} />
                         </button>
                         <div className="relative">
-                            <button onClick={() => setShowNotifications(v => !v)}
+                            <button onClick={toggleNotifications}
                                 className={`relative p-2 rounded-xl transition-colors ${showNotifications ? 'text-gray-900 bg-gray-100' : 'text-gray-400 hover:text-gray-700 hover:bg-gray-50'}`}>
                                 <Bell size={18} />
-                                <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-red-400 rounded-full" />
+                                {unreadNotifCount > 0 && (
+                                    <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1">
+                                        {unreadNotifCount > 9 ? '9+' : unreadNotifCount}
+                                    </span>
+                                )}
                             </button>
                             {showNotifications && (
                                 <div className="absolute top-full right-0 mt-2 z-50 w-80 max-w-[calc(100vw-16px)] animate-in fade-in slide-in-from-top-1">
-                                    <NotificationTray onClose={() => setShowNotifications(false)} />
+                                    <NotificationTray
+                                        notifications={notifications}
+                                        loaded={notifsLoaded}
+                                        onMarkRead={markRead}
+                                        onMarkAllRead={markAllRead}
+                                        onClose={() => setShowNotifications(false)}
+                                    />
                                 </div>
                             )}
                         </div>

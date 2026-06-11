@@ -34,11 +34,14 @@ const CandidateDetail = () => {
     const [advancing, setAdvancing] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!id) { setIsLoading(false); return; }
-        getEmployerApplications()
-            .then(all => setApps(all.filter(a => a.student_id === id)))
-            .catch(() => showToast('Failed to load candidate details.', 'error'))
-            .finally(() => setIsLoading(false));
+        const t = setTimeout(() => {
+            if (!id) { setIsLoading(false); return; }
+            getEmployerApplications()
+                .then(all => setApps(all.filter(a => a.student_id === id)))
+                .catch(() => showToast('Failed to load candidate details.', 'error'))
+                .finally(() => setIsLoading(false));
+        }, 0);
+        return () => clearTimeout(t);
     }, [id, showToast]);
 
     if (isLoading) return (
@@ -50,12 +53,12 @@ const CandidateDetail = () => {
     if (apps.length === 0) return (
         <div className="p-8 anime-fade-in text-left space-y-6">
             <button onClick={() => navigate('/candidates')}
-                className="flex items-center gap-2 text-black/40 font-black uppercase tracking-widest text-[9px] hover:text-black transition-colors">
+                className="flex items-center gap-2 text-black/40 font-semibold text-[9px] hover:text-black transition-colors">
                 <ArrowLeft size={14} strokeWidth={3} /> BACK TO TALENT POOL
             </button>
             <div className="py-24 text-center border-[2px] border-dashed border-black/10 rounded-[32px]">
                 <AlertCircle size={32} className="text-black/20 mx-auto mb-4" />
-                <p className="text-[9px] font-black text-black/30 uppercase tracking-[0.2em]">Candidate not found or no applications</p>
+                <p className="text-[9px] font-semibold text-black/30">Candidate not found or no applications</p>
             </div>
         </div>
     );
@@ -95,7 +98,7 @@ const CandidateDetail = () => {
 
             {/* Nav */}
             <button onClick={() => navigate('/employer/candidates')}
-                className="flex items-center gap-2 text-black/40 font-black uppercase tracking-widest text-[9px] hover:text-black transition-colors">
+                className="flex items-center gap-2 text-black/40 font-semibold text-[9px] hover:text-black transition-colors">
                 <ArrowLeft size={14} strokeWidth={3} /> BACK TO TALENT POOL
             </button>
 
@@ -103,28 +106,28 @@ const CandidateDetail = () => {
             <Card className="!p-6 md:!p-8 border-nile-green/30">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div className="flex items-center gap-5">
-                        <div className="w-20 h-20 md:w-24 md:h-24 rounded-[28px] border-[2px] border-black shadow-[4px_4px_0px_0px_rgba(30,73,157,1)] overflow-hidden flex-shrink-0">
+                        <div className="w-20 h-20 md:w-24 md:h-24 rounded-[28px] border border-gray-100 shadow-blue overflow-hidden flex-shrink-0">
                             <Avatar name={candidate.student_name || 'Candidate'} size="lg" />
                         </div>
                         <div className="space-y-1.5">
                             <div className="flex items-center gap-2 flex-wrap">
-                                <h1 className="text-2xl md:text-3xl font-black text-black uppercase leading-none tracking-tighter">
+                                <h1 className="text-2xl md:text-3xl font-semibold text-black leading-none">
                                     {candidate.student_name || 'Unknown Candidate'}
                                 </h1>
                                 {candidate.is_verified && (
                                     <ShieldCheck size={16} className="text-nile-green flex-shrink-0" strokeWidth={2.5} />
                                 )}
                             </div>
-                            <p className="text-[9px] font-black text-nile-blue/50 uppercase tracking-widest">
+                            <p className="text-[9px] font-semibold text-nile-blue/50">
                                 {candidate.major || 'Student'}{candidate.graduation_year ? ` · Class of ${candidate.graduation_year}` : ''}
                             </p>
                             <div className="flex flex-wrap items-center gap-2 pt-1">
                                 {candidate.student_email && (
-                                    <span className="flex items-center gap-1 text-[8px] font-black text-black/40 uppercase">
+                                    <span className="flex items-center gap-1 text-[8px] font-semibold text-black/40">
                                         <Mail size={10} className="text-nile-blue" /> {candidate.student_email}
                                     </span>
                                 )}
-                                <span className={`text-[7px] font-black px-2.5 py-0.5 rounded-full border ${badge}`}>
+                                <span className={`text-[7px] font-semibold px-2.5 py-0.5 rounded-full border ${badge}`}>
                                     {candidate.status.toUpperCase()}
                                 </span>
                             </div>
@@ -148,7 +151,7 @@ const CandidateDetail = () => {
 
             {/* Applications */}
             <div className="space-y-4">
-                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40">
+                <h3 className="text-[10px] font-semibold text-black/40">
                     APPLICATIONS ({apps.length})
                 </h3>
                 {apps.map(app => {
@@ -160,15 +163,15 @@ const CandidateDetail = () => {
                                 <div>
                                     <div className="flex items-center gap-2">
                                         <Briefcase size={14} className="text-nile-blue flex-shrink-0" />
-                                        <h4 className="font-black text-sm uppercase tracking-tight">{app.job_title}</h4>
+                                        <h4 className="font-semibold text-sm tracking-tight">{app.job_title}</h4>
                                     </div>
                                     {app.applied_at && (
-                                        <p className="text-[8px] font-black text-black/30 uppercase tracking-widest mt-1">
+                                        <p className="text-[8px] font-semibold text-black/30 mt-1">
                                             Applied {new Date(app.applied_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                                         </p>
                                     )}
                                 </div>
-                                <span className={`text-[7px] font-black px-2.5 py-1 rounded-full border flex-shrink-0 ${appBadge}`}>
+                                <span className={`text-[7px] font-semibold px-2.5 py-1 rounded-full border flex-shrink-0 ${appBadge}`}>
                                     {app.status.toUpperCase()}
                                 </span>
                             </div>
@@ -198,26 +201,26 @@ const CandidateDetail = () => {
             {/* Academic info */}
             {(candidate.major || candidate.graduation_year) && (
                 <Card className="!p-5 space-y-3">
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40">ACADEMIC PROFILE</h3>
+                    <h3 className="text-[10px] font-semibold text-black/40">ACADEMIC PROFILE</h3>
                     <div className="grid grid-cols-2 gap-4">
                         {candidate.major && (
                             <div>
-                                <p className="text-[8px] font-black text-black/30 uppercase tracking-widest mb-0.5">Major</p>
-                                <p className="font-black text-sm uppercase">{candidate.major}</p>
+                                <p className="text-[8px] font-semibold text-black/30 mb-0.5">Major</p>
+                                <p className="font-semibold text-sm">{candidate.major}</p>
                             </div>
                         )}
                         {candidate.graduation_year > 0 && (
                             <div>
-                                <p className="text-[8px] font-black text-black/30 uppercase tracking-widest mb-0.5">Graduation</p>
-                                <p className="font-black text-sm uppercase">{candidate.graduation_year}</p>
+                                <p className="text-[8px] font-semibold text-black/30 mb-0.5">Graduation</p>
+                                <p className="font-semibold text-sm">{candidate.graduation_year}</p>
                             </div>
                         )}
                         <div>
-                            <p className="text-[8px] font-black text-black/30 uppercase tracking-widest mb-0.5">Verification</p>
+                            <p className="text-[8px] font-semibold text-black/30 mb-0.5">Verification</p>
                             <div className="flex items-center gap-1.5">
                                 {candidate.is_verified
-                                    ? <><ShieldCheck size={13} className="text-nile-green" strokeWidth={2.5} /> <span className="font-black text-xs text-nile-green uppercase">Verified</span></>
-                                    : <><AlertCircle size={13} className="text-black/30" /> <span className="font-black text-xs text-black/30 uppercase">Unverified</span></>
+                                    ? <><ShieldCheck size={13} className="text-nile-green" strokeWidth={2.5} /> <span className="font-semibold text-xs text-nile-green">Verified</span></>
+                                    : <><AlertCircle size={13} className="text-black/30" /> <span className="font-semibold text-xs text-black/30">Unverified</span></>
                                 }
                             </div>
                         </div>

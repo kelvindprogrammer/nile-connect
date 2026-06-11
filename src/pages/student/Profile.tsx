@@ -69,8 +69,8 @@ const Profile = () => {
             <div className="p-4 md:p-8 space-y-6 md:space-y-8 anime-fade-in font-sans pb-24 text-left">
 
                 {/* Banner */}
-                <div className="bg-white border-[2px] border-black rounded-[24px] md:rounded-[32px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
-                    <div className="h-28 md:h-36 bg-nile-blue border-b-[2px] border-black relative overflow-hidden">
+                <div className="social-card overflow-hidden">
+                    <div className="h-28 md:h-36 bg-nile-blue relative overflow-hidden">
                         <div className="absolute inset-0 opacity-10">
                             <svg width="100%" height="100%">
                                 <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
@@ -81,33 +81,33 @@ const Profile = () => {
                         </div>
                         {/* Profile strength indicator on banner */}
                         <div className="absolute top-4 right-4 flex flex-col items-end gap-1">
-                            <span className="text-[7px] font-black text-white/50 uppercase tracking-widest">PROFILE STRENGTH</span>
+                            <span className="text-xs text-white/60 font-medium">Profile strength</span>
                             <div className="w-28 h-2 bg-white/20 rounded-full overflow-hidden border border-white/20">
                                 <div className={`h-full ${strengthBg} rounded-full transition-all duration-700`} style={{ width: `${strength}%` }} />
                             </div>
-                            <span className={`text-xs font-black ${strengthColor === 'text-nile-green' ? 'text-nile-green' : 'text-white'}`}>{strength}%</span>
+                            <span className={`text-xs font-semibold ${strengthColor === 'text-nile-green' ? 'text-nile-green' : 'text-white'}`}>{strength}%</span>
                         </div>
                     </div>
 
                     <div className="px-4 md:px-8 pb-6 md:pb-8 relative">
-                        <div className="absolute -top-8 md:-top-12 left-4 md:left-8 w-16 h-16 md:w-24 md:h-24 rounded-[16px] md:rounded-[20px] border-[2px] border-black bg-white shadow-[3px_3px_0px_0px_#1E499D] md:shadow-[4px_4px_0px_0px_#1E499D] flex items-center justify-center overflow-hidden">
+                        <div className="absolute -top-8 md:-top-12 left-4 md:left-8 w-16 h-16 md:w-24 md:h-24 rounded-2xl border border-gray-100 bg-white shadow-card flex items-center justify-center overflow-hidden">
                             <Avatar name={displayName} size="lg" src={profilePic || undefined} />
                         </div>
 
                         <div className="pt-10 md:pt-16 flex flex-col sm:flex-row justify-between sm:items-end gap-4">
                             <div className="space-y-1 flex-grow min-w-0">
                                 <div className="flex items-center gap-2 flex-wrap">
-                                    <h3 className="text-2xl md:text-3xl font-black text-black uppercase leading-none tracking-tighter truncate">{displayName} .</h3>
+                                    <h3 className="text-2xl md:text-3xl font-semibold text-gray-900 leading-tight truncate">{displayName}</h3>
                                     {isVerified && (
-                                        <span className="flex items-center gap-1 bg-nile-green text-white text-[7px] font-black px-2 py-0.5 rounded-full border border-black flex-shrink-0">
-                                            <ShieldCheck size={9} strokeWidth={3} /> VERIFIED
+                                        <span className="flex items-center gap-1 bg-nile-green text-white text-xs font-medium px-2.5 py-1 rounded-full flex-shrink-0">
+                                            <ShieldCheck size={9} strokeWidth={3} /> Verified
                                         </span>
                                     )}
                                 </div>
-                                <p className="font-black text-nile-blue/50 uppercase tracking-widest text-[9px]">
+                                <p className="font-medium text-nile-blue text-sm">
                                     {major} • Nile University{gradYear ? ` • ${gradYear}` : ''}
                                 </p>
-                                <div className="flex items-center gap-2 text-[9px] font-black text-black/30 uppercase pt-1">
+                                <div className="flex items-center gap-2 text-xs text-gray-400 pt-1">
                                     <MapPin size={12} strokeWidth={3} />
                                     <span>{location}</span>
                                 </div>
@@ -117,28 +117,28 @@ const Profile = () => {
                                     <Download size={14} className="mr-2" /> CV
                                 </Button>
                                 <Button variant="primary" size="sm" onClick={() => navigate('/student/profile/edit')}>
-                                    <Edit2 size={14} className="mr-2" /> EDIT
+                                    <Edit2 size={14} className="mr-2" /> Edit
                                 </Button>
                             </div>
                         </div>
 
-                        <div className="flex flex-wrap gap-6 md:gap-10 mt-5 pt-5 md:pt-6 border-t-[2px] border-black/5">
-                            <StatBadge value="—" label="APPS" />
-                            <StatBadge value="—" label="HITS" />
-                            <StatBadge value="—" label="OFFERS" />
-                            <StatBadge value={`${strength}%`} label="STRENGTH" highlight />
+                        <div className="flex flex-wrap gap-6 md:gap-10 mt-5 pt-5 md:pt-6 border-t border-gray-100">
+                            <StatBadge value="—" label="Apps" />
+                            <StatBadge value="—" label="Hits" />
+                            <StatBadge value="—" label="Offers" />
+                            <StatBadge value={`${strength}%`} label="Strength" highlight />
                         </div>
                     </div>
                 </div>
 
                 {/* Strength tip banner */}
                 {strength < 80 && (
-                    <div className="bg-nile-blue/5 border-[2px] border-dashed border-nile-blue/20 rounded-[16px] p-4 flex items-center justify-between gap-4">
-                        <p className="text-[9px] font-black text-nile-blue uppercase tracking-widest">
+                    <div className="bg-nile-blue/5 border border-dashed border-nile-blue/20 rounded-2xl p-4 flex items-center justify-between gap-4">
+                        <p className="text-sm font-medium text-nile-blue">
                             Profile at {strength}% — {strength < 50 ? 'Add your bio, skills and experience to unlock more opportunities' : 'Add LinkedIn and portfolio to reach 100%'}
                         </p>
                         <Button size="xs" variant="primary" onClick={() => navigate('/student/profile/edit')}>
-                            COMPLETE
+                            Complete
                         </Button>
                     </div>
                 )}
@@ -146,56 +146,56 @@ const Profile = () => {
                 {/* Body Grid */}
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 md:gap-8">
                     <div className="xl:col-span-2 space-y-6 md:space-y-8">
-                        <SectionCard title="About Me .">
+                        <SectionCard title="About me">
                             {bio ? (
-                                <p className="font-bold text-black/70 leading-relaxed text-sm">{bio}</p>
+                                <p className="text-sm text-gray-800 leading-relaxed">{bio}</p>
                             ) : (
                                 <button
                                     onClick={() => navigate('/student/profile/edit')}
-                                    className="text-[10px] font-black text-nile-blue/40 uppercase tracking-widest hover:text-nile-blue transition-colors flex items-center gap-2"
+                                    className="text-xs text-nile-blue/60 hover:text-nile-blue transition-colors flex items-center gap-2 font-medium"
                                 >
-                                    <Plus size={12} strokeWidth={3} /> ADD A BIO
+                                    <Plus size={12} strokeWidth={3} /> Add a bio
                                 </button>
                             )}
                         </SectionCard>
 
-                        <SectionCard title="Experience .">
+                        <SectionCard title="Experience">
                             {profile.experiences.length > 0 ? (
                                 <div className="space-y-4">
                                     {profile.experiences.map(exp => (
-                                        <div key={exp.id} className="flex items-start gap-4 p-4 bg-nile-white/50 border-[2px] border-black rounded-[16px]">
-                                            <div className="w-10 h-10 rounded-xl bg-nile-blue text-white flex items-center justify-center flex-shrink-0 border-2 border-black">
+                                        <div key={exp.id} className="flex items-start gap-4 p-4 bg-gray-50 border border-gray-100 rounded-2xl">
+                                            <div className="w-10 h-10 rounded-xl bg-nile-blue text-white flex items-center justify-center flex-shrink-0">
                                                 <Briefcase size={16} />
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <p className="font-black text-sm uppercase leading-none">{exp.title}</p>
-                                                <p className="text-[9px] font-black text-nile-blue/60 uppercase mt-1">{exp.company} • {exp.duration}</p>
-                                                {exp.description && <p className="text-[10px] font-bold text-black/60 mt-2 leading-relaxed">{exp.description}</p>}
+                                                <p className="font-semibold text-sm text-gray-900 leading-none">{exp.title}</p>
+                                                <p className="text-xs text-nile-blue mt-1">{exp.company} • {exp.duration}</p>
+                                                {exp.description && <p className="text-xs text-gray-600 mt-2 leading-relaxed">{exp.description}</p>}
                                             </div>
                                         </div>
                                     ))}
                                     <button
                                         onClick={() => navigate('/student/profile/edit')}
-                                        className="w-full py-3 border-[2px] border-dashed border-black/20 rounded-[14px] text-[9px] font-black text-black/30 hover:bg-black/5 hover:text-black transition-all flex items-center justify-center gap-2"
+                                        className="w-full py-3 border border-dashed border-gray-200 rounded-2xl text-xs font-medium text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-all flex items-center justify-center gap-2"
                                     >
-                                        <Plus size={12} strokeWidth={3} /> ADD EXPERIENCE
+                                        <Plus size={12} strokeWidth={3} /> Add experience
                                     </button>
                                 </div>
                             ) : (
                                 <button
                                     onClick={() => navigate('/student/profile/edit')}
-                                    className="w-full py-6 border-[2px] border-dashed border-black/20 rounded-[16px] text-[10px] font-black text-black/30 hover:bg-black/5 hover:text-black transition-all flex items-center justify-center gap-2"
+                                    className="w-full py-6 border border-dashed border-gray-200 rounded-2xl text-xs font-medium text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-all flex items-center justify-center gap-2"
                                 >
-                                    <Plus size={14} strokeWidth={4} /> ADD EXPERIENCE
+                                    <Plus size={14} strokeWidth={4} /> Add experience
                                 </button>
                             )}
                         </SectionCard>
 
                         {profile.skills.length > 0 && (
-                            <SectionCard title="Skills .">
+                            <SectionCard title="Skills">
                                 <div className="flex flex-wrap gap-2">
                                     {profile.skills.map(s => (
-                                        <span key={s} className="px-3 py-1.5 bg-nile-white border-[2px] border-black rounded-lg text-[9px] font-black uppercase tracking-widest shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                                        <span key={s} className="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">
                                             {s}
                                         </span>
                                     ))}
@@ -205,34 +205,34 @@ const Profile = () => {
                     </div>
 
                     <div className="space-y-6 md:space-y-8">
-                        <SectionCard title="Education .">
+                        <SectionCard title="Education">
                             <div className="flex items-start gap-4">
-                                <div className="w-10 h-10 bg-nile-blue text-white rounded-xl flex items-center justify-center flex-shrink-0 border-[2px] border-black shadow-sm">
+                                <div className="w-10 h-10 bg-nile-blue text-white rounded-xl flex items-center justify-center flex-shrink-0">
                                     <GraduationCap size={18} />
                                 </div>
                                 <div className="min-w-0">
-                                    <p className="font-black text-black uppercase text-sm leading-none truncate">Nile University</p>
-                                    <p className="text-[9px] font-bold text-nile-blue/70 uppercase mt-1">B.Sc. {major}</p>
-                                    {gradYear && <p className="text-[8px] font-black text-nile-blue/30 uppercase mt-2 tracking-widest">CLASS OF {gradYear}</p>}
+                                    <p className="font-semibold text-gray-900 text-sm leading-none truncate">Nile University</p>
+                                    <p className="text-xs text-nile-blue mt-1">B.Sc. {major}</p>
+                                    {gradYear && <p className="text-xs text-gray-400 mt-2">Class of {gradYear}</p>}
                                 </div>
                             </div>
                         </SectionCard>
 
-                        <SectionCard title="Connect .">
+                        <SectionCard title="Connect">
                             <div className="space-y-2">
                                 <ContactRow icon={<Mail size={14} strokeWidth={3} />} label={email || 'No email'} href={email ? `mailto:${email}` : undefined} />
                                 {profile.linkedIn ? (
                                     <ContactRow icon={<Link2 size={14} strokeWidth={3} />} label={profile.linkedIn} href={`https://${profile.linkedIn.replace('https://', '')}`} />
                                 ) : (
-                                    <button onClick={() => navigate('/student/profile/edit')} className="w-full flex items-center gap-3 p-3 border-[2px] border-dashed border-black/20 rounded-xl text-[9px] font-black text-black/30 hover:border-black hover:text-black transition-all">
-                                        <Link2 size={14} strokeWidth={3} /> ADD LINKEDIN
+                                    <button onClick={() => navigate('/student/profile/edit')} className="w-full flex items-center gap-3 p-3 border border-dashed border-gray-200 rounded-xl text-xs font-medium text-gray-400 hover:border-nile-blue hover:text-nile-blue transition-all">
+                                        <Link2 size={14} strokeWidth={3} /> Add LinkedIn
                                     </button>
                                 )}
                                 {profile.portfolio ? (
                                     <ContactRow icon={<ExternalLink size={14} strokeWidth={3} />} label={profile.portfolio} href={`https://${profile.portfolio.replace('https://', '')}`} />
                                 ) : (
-                                    <button onClick={() => navigate('/student/profile/edit')} className="w-full flex items-center gap-3 p-3 border-[2px] border-dashed border-black/20 rounded-xl text-[9px] font-black text-black/30 hover:border-black hover:text-black transition-all">
-                                        <ExternalLink size={14} strokeWidth={3} /> ADD PORTFOLIO
+                                    <button onClick={() => navigate('/student/profile/edit')} className="w-full flex items-center gap-3 p-3 border border-dashed border-gray-200 rounded-xl text-xs font-medium text-gray-400 hover:border-nile-blue hover:text-nile-blue transition-all">
+                                        <ExternalLink size={14} strokeWidth={3} /> Add portfolio
                                     </button>
                                 )}
                                 {profile.github && (
@@ -245,7 +245,7 @@ const Profile = () => {
                         </SectionCard>
 
                         <Button variant="outline" fullWidth className="border-red-500/20 text-red-500 hover:bg-red-50 hover:border-red-500" onClick={() => { logout(); navigate('/login'); }}>
-                            <LogOut size={16} className="mr-2" /> LOG OUT
+                            <LogOut size={16} className="mr-2" /> Log out
                         </Button>
                     </div>
                 </div>
@@ -254,35 +254,35 @@ const Profile = () => {
             {/* CV Modal */}
             {showCvModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setShowCvModal(false)}>
-                    <div className="bg-white border-[3px] border-black rounded-[28px] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] max-w-sm w-full p-8 space-y-6" onClick={e => e.stopPropagation()}>
+                    <div className="bg-white border border-gray-100 rounded-[28px] shadow-card max-w-sm w-full p-8 space-y-6" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center justify-between">
-                            <h3 className="text-xl font-black uppercase tracking-tighter">Download CV</h3>
-                            <button onClick={() => setShowCvModal(false)} className="p-1.5 border-2 border-black/10 rounded-lg hover:bg-black/5">
+                            <h3 className="text-xl font-semibold">Download CV</h3>
+                            <button onClick={() => setShowCvModal(false)} className="p-1.5 border border-gray-100/10 rounded-lg hover:bg-black/5">
                                 <X size={16} strokeWidth={3} />
                             </button>
                         </div>
-                        <p className="text-[10px] font-bold text-black/60 uppercase leading-relaxed">
+                        <p className="text-[10px] font-bold text-black/60 leading-relaxed">
                             Your CV is auto-generated from your profile data. Complete your profile to improve CV quality.
                         </p>
-                        <div className="p-5 bg-nile-white rounded-[16px] border-[2px] border-black space-y-3">
+                        <div className="p-5 bg-nile-white rounded-[16px] border border-gray-100 space-y-3">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-nile-blue text-white rounded-xl flex items-center justify-center border-2 border-black">
+                                <div className="w-10 h-10 bg-nile-blue text-white rounded-xl flex items-center justify-center border border-gray-100">
                                     <FileText size={18} />
                                 </div>
                                 <div>
-                                    <p className="font-black text-sm uppercase">{displayName.replace(' ', '_')}_CV.pdf</p>
-                                    <p className="text-[8px] font-black text-black/40 uppercase">PROFILE STRENGTH: {strength}%</p>
+                                    <p className="font-semibold text-sm">{displayName.replace(' ', '_')}_CV.pdf</p>
+                                    <p className="text-[8px] font-semibold text-black/40">PROFILE STRENGTH: {strength}%</p>
                                 </div>
                             </div>
                         </div>
                         <div className="flex gap-3">
                             <Button fullWidth variant="outline" onClick={() => setShowCvModal(false)}>CANCEL</Button>
-                            <Button fullWidth onClick={() => { showCvModal && setShowCvModal(false); }}>
+                            <Button fullWidth onClick={() => setShowCvModal(false)}>
                                 <Download size={14} className="mr-2" /> DOWNLOAD
                             </Button>
                         </div>
                         {strength < 70 && (
-                            <p className="text-[9px] font-black text-nile-blue/60 uppercase tracking-widest text-center">
+                            <p className="text-[9px] font-semibold text-nile-blue/60 text-center">
                                 <button onClick={() => { setShowCvModal(false); navigate('/student/profile/edit'); }} className="underline hover:text-nile-blue">Complete your profile</button> to get a better CV
                             </p>
                         )}
@@ -294,16 +294,16 @@ const Profile = () => {
 };
 
 const SectionCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
-    <div className="bg-white p-5 md:p-6 rounded-[20px] md:rounded-[24px] border-[2px] border-black shadow-sm">
-        <h3 className="text-base md:text-lg font-black text-black uppercase mb-4 md:mb-5 pb-2 border-b-[2px] border-black tracking-tighter">{title}</h3>
+    <div className="bg-white p-5 md:p-6 rounded-[20px] md:rounded-[24px] border border-gray-100 shadow-sm">
+        <h3 className="text-base md:text-lg font-semibold text-black mb-4 md:mb-5 pb-2 border-b border-gray-100">{title}</h3>
         {children}
     </div>
 );
 
 const StatBadge = ({ value, label, highlight = false }: { value: string; label: string; highlight?: boolean }) => (
     <div className="text-left">
-        <p className={`text-xl md:text-2xl font-black leading-none ${highlight ? 'text-nile-green' : 'text-black'}`}>{value}</p>
-        <p className="text-[7px] font-black text-nile-blue/40 uppercase tracking-[0.2em] mt-1">{label}</p>
+        <p className={`text-xl md:text-2xl font-semibold leading-none ${highlight ? 'text-nile-green' : 'text-black'}`}>{value}</p>
+        <p className="text-[7px] font-semibold text-nile-blue/40 mt-1">{label}</p>
     </div>
 );
 
@@ -312,11 +312,11 @@ const ContactRow = ({ icon, label, href }: { icon: React.ReactNode; label: strin
         href={href}
         target={href?.startsWith('http') ? '_blank' : undefined}
         rel="noreferrer"
-        className="flex items-center gap-3 p-3 border-[2px] border-black rounded-xl hover:translate-y-[-1px] transition-all cursor-pointer shadow-sm group hover:bg-nile-blue hover:text-white"
+        className="flex items-center gap-3 p-3 border border-gray-100 rounded-xl hover:translate-y-[-1px] transition-all cursor-pointer shadow-sm group hover:bg-nile-blue hover:text-white"
         onClick={e => !href && e.preventDefault()}
     >
         <span className="flex-shrink-0">{icon}</span>
-        <span className="text-[9px] font-black uppercase truncate tracking-widest">{label}</span>
+        <span className="text-[9px] font-semibold truncate">{label}</span>
     </a>
 );
 

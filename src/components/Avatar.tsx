@@ -4,9 +4,10 @@ interface AvatarProps {
     src?: string;
     name: string;
     size?: 'sm' | 'md' | 'lg' | 'xl';
-    borderColor?: string;
     /** Pass true when this avatar represents the logged-in user to auto-use uploaded photo */
     isSelf?: boolean;
+    /** Show a small status dot in the corner — 'online' (green) or 'offline' (gray) */
+    presence?: 'online' | 'offline';
 }
 
 const AVATAR_KEY = 'nile_profile_picture';
@@ -19,12 +20,19 @@ const sizeMap = {
     xl: 'w-32 h-32 text-3xl',
 };
 
+const dotSizeMap = {
+    sm: 'w-2 h-2',
+    md: 'w-2.5 h-2.5',
+    lg: 'w-3.5 h-3.5',
+    xl: 'w-5 h-5',
+};
+
 const Avatar: React.FC<AvatarProps> = ({
     src,
     name,
     size = 'md',
-    borderColor = 'border-black',
     isSelf = false,
+    presence,
 }) => {
     const initials = name
         .split(' ')
@@ -58,18 +66,25 @@ const Avatar: React.FC<AvatarProps> = ({
     const [bg, fg] = colorPairs[colorIdx];
 
     return (
-        <div
-            className={`${sizeMap[size]} rounded-full border-[2px] ${borderColor} shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center overflow-hidden flex-shrink-0`}
-        >
-            {displaySrc ? (
-                <img src={displaySrc} alt={name} className="w-full h-full object-cover" />
-            ) : (
-                <div
-                    className="w-full h-full flex items-center justify-center"
-                    style={{ background: bg }}
-                >
-                    <span className="font-black" style={{ color: fg }}>{initials}</span>
-                </div>
+        <div className="relative inline-flex flex-shrink-0">
+            <div
+                className={`${sizeMap[size]} rounded-full ring-2 ring-white shadow-soft-xs flex items-center justify-center overflow-hidden flex-shrink-0`}
+            >
+                {displaySrc ? (
+                    <img src={displaySrc} alt={name} className="w-full h-full object-cover" />
+                ) : (
+                    <div
+                        className="w-full h-full flex items-center justify-center"
+                        style={{ background: bg }}
+                    >
+                        <span className="font-semibold" style={{ color: fg }}>{initials}</span>
+                    </div>
+                )}
+            </div>
+            {presence && (
+                <span
+                    className={`absolute bottom-0 right-0 ${dotSizeMap[size]} rounded-full ring-2 ring-white ${presence === 'online' ? 'bg-nile-green' : 'bg-gray-300'}`}
+                />
             )}
         </div>
     );

@@ -43,20 +43,20 @@ const EmployerSettings = () => {
         <div className="p-4 md:p-8 space-y-8 font-sans bg-nile-white min-h-full anime-fade-in text-left pb-24 md:pb-8">
 
             {/* Header */}
-            <div className="bg-white border-[2px] border-black rounded-[24px] shadow-[4px_4px_0px_0px_rgba(108,187,86,1)] p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+            <div className="bg-white border border-gray-100 rounded-[24px] shadow-green p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-1/3 h-full bg-nile-green/5 -skew-x-12 translate-x-1/4 pointer-events-none" />
                 <div className="space-y-2 z-10">
-                    <span className="px-3 py-1 bg-nile-green text-white text-[8px] font-black uppercase tracking-widest rounded-full">RECRUITER SETTINGS</span>
-                    <h2 className="text-3xl md:text-5xl font-black text-black leading-none uppercase tracking-tighter">Preferences .</h2>
-                    <p className="text-[10px] font-bold text-black/40 uppercase tracking-widest">Manage your account, notifications & privacy.</p>
+                    <span className="px-3 py-1 bg-nile-green text-white text-[8px] font-semibold rounded-full">RECRUITER SETTINGS</span>
+                    <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">Preferences .</h2>
+                    <p className="text-[10px] font-bold text-black/40">Manage your account, notifications & privacy.</p>
                 </div>
                 <div className="hidden md:flex items-center gap-4 z-10">
-                    <div className="w-14 h-14 bg-nile-blue text-white rounded-[18px] border-[2px] border-black flex items-center justify-center font-black text-2xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+                    <div className="w-14 h-14 bg-nile-blue text-white rounded-[18px] border border-gray-100 flex items-center justify-center font-semibold text-2xl shadow-card">
                         {recruiterName.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                        <p className="font-black text-sm uppercase text-black">{recruiterName}</p>
-                        <p className="text-[9px] font-black text-black/30 uppercase">{companyName}</p>
+                        <p className="font-semibold text-sm text-black">{recruiterName}</p>
+                        <p className="text-[9px] font-semibold text-black/30">{companyName}</p>
                         <p className="text-[8px] font-bold text-nile-blue/60 truncate max-w-[180px]">{email}</p>
                     </div>
                 </div>
@@ -74,12 +74,12 @@ const EmployerSettings = () => {
                     <Divider />
                     <div className="flex items-center justify-between py-1">
                         <div className="space-y-0.5">
-                            <p className="text-[11px] font-black text-black uppercase">Edit Company Profile</p>
-                            <p className="text-[9px] font-bold text-black/30 uppercase">Update branding, description, industry &amp; links.</p>
+                            <p className="text-[11px] font-semibold text-black">Edit Company Profile</p>
+                            <p className="text-[9px] font-bold text-black/30">Update branding, description, industry &amp; links.</p>
                         </div>
                         <button
                             onClick={() => navigate('/employer/profile')}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-nile-blue text-white border-[2px] border-black rounded-lg font-black text-[8px] uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-px hover:translate-y-px transition-all"
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-nile-blue text-white border border-gray-100 rounded-lg font-semibold text-[8px] shadow-card transition-all"
                         >
                             <Building2 size={11} /> EDIT
                         </button>
@@ -118,30 +118,30 @@ const EmployerSettings = () => {
                 <Section icon={<Shield size={14} />} label="SECURITY & ACCESS">
                     <div className="flex items-center justify-between py-1">
                         <div className="space-y-0.5">
-                            <p className="text-[11px] font-black text-black uppercase">Single Sign-On</p>
-                            <p className="text-[9px] font-bold text-black/30 uppercase">Authenticated via Campus One SSO.</p>
+                            <p className="text-[11px] font-semibold text-black">Single Sign-On</p>
+                            <p className="text-[9px] font-bold text-black/30">Authenticated via Campus One SSO.</p>
                         </div>
-                        <span className="flex items-center gap-1 px-2.5 py-1 bg-nile-green/10 text-nile-green text-[8px] font-black uppercase rounded-full border border-nile-green/20">
+                        <span className="flex items-center gap-1 px-2.5 py-1 bg-nile-green/10 text-nile-green text-[8px] font-semibold rounded-full border border-nile-green/20">
                             <CheckCircle2 size={10} strokeWidth={3} /> ACTIVE
                         </span>
                     </div>
                     <Divider />
                     <div className="flex items-center justify-between py-1">
                         <div className="space-y-0.5">
-                            <p className="text-[11px] font-black text-black uppercase">Active Sessions</p>
-                            <p className="text-[9px] font-bold text-black/30 uppercase">You are currently signed in on this device.</p>
+                            <p className="text-[11px] font-semibold text-black">Active Sessions</p>
+                            <p className="text-[9px] font-bold text-black/30">You are currently signed in on this device.</p>
                         </div>
                         <ChevronRight size={16} className="text-black/20" />
                     </div>
                     <Divider />
                     <div className="flex items-center justify-between py-1">
                         <div className="space-y-0.5">
-                            <p className="text-[11px] font-black text-black uppercase">Linked Jobs</p>
-                            <p className="text-[9px] font-bold text-black/30 uppercase">Manage all your job postings from the Job Console.</p>
+                            <p className="text-[11px] font-semibold text-black">Linked Jobs</p>
+                            <p className="text-[9px] font-bold text-black/30">Manage all your job postings from the Job Console.</p>
                         </div>
                         <button
                             onClick={() => navigate('/employer/jobs')}
-                            className="flex items-center gap-1.5 px-3 py-1.5 border-[2px] border-black rounded-lg font-black text-[8px] uppercase hover:bg-black hover:text-white transition-all"
+                            className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-100 rounded-lg font-semibold text-[8px] hover:bg-black hover:text-white transition-all"
                         >
                             <Briefcase size={10} /> MANAGE
                         </button>
@@ -153,7 +153,7 @@ const EmployerSettings = () => {
                     <button
                         onClick={handleSave}
                         disabled={saving}
-                        className="flex items-center gap-2 px-8 py-3 bg-black text-white border-[2px] border-black rounded-xl font-black text-[10px] uppercase shadow-[4px_4px_0px_0px_rgba(108,187,86,1)] hover:translate-x-px hover:translate-y-px hover:shadow-[3px_3px_0px_0px_rgba(108,187,86,1)] transition-all disabled:opacity-50 disabled:pointer-events-none"
+                        className="flex items-center gap-2 px-8 py-3 bg-black text-white border border-gray-100 rounded-xl font-semibold text-[10px] shadow-green transition-all disabled:opacity-50 disabled:pointer-events-none"
                     >
                         {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                         {saving ? 'SAVING...' : 'SAVE CHANGES'}
@@ -164,12 +164,12 @@ const EmployerSettings = () => {
                 <Section icon={<Trash2 size={14} />} label="DANGER ZONE" danger>
                     <div className="flex items-center justify-between py-1">
                         <div className="space-y-0.5">
-                            <p className="text-[11px] font-black text-black uppercase">Sign Out</p>
-                            <p className="text-[9px] font-bold text-black/30 uppercase">End your current session securely.</p>
+                            <p className="text-[11px] font-semibold text-black">Sign Out</p>
+                            <p className="text-[9px] font-bold text-black/30">End your current session securely.</p>
                         </div>
                         <button
                             onClick={logout}
-                            className="flex items-center gap-1.5 px-3 py-1.5 border-[2px] border-black rounded-lg font-black text-[8px] uppercase text-black hover:bg-black hover:text-white transition-all"
+                            className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-100 rounded-lg font-semibold text-[8px] text-black hover:bg-black hover:text-white transition-all"
                         >
                             <LogOut size={10} /> SIGN OUT
                         </button>
@@ -186,10 +186,10 @@ const Section = ({ icon, label, children, danger = false }: {
     icon: React.ReactNode; label: string; children: React.ReactNode; danger?: boolean;
 }) => (
     <section className="space-y-3">
-        <h3 className={`text-[9px] font-black uppercase tracking-[0.3em] flex items-center gap-2 ${danger ? 'text-red-500' : 'text-black/40'}`}>
+        <h3 className={`text-[9px] font-semibold flex items-center gap-2 ${danger ? 'text-red-500' : 'text-black/40'}`}>
             {icon} {label}
         </h3>
-        <div className={`bg-white border-[2px] border-black rounded-[20px] p-5 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] space-y-3 ${danger ? 'border-red-200' : ''}`}>
+        <div className={`bg-white border border-gray-100 rounded-[20px] p-5 shadow-card space-y-3 ${danger ? 'border-red-200' : ''}`}>
             {children}
         </div>
     </section>
@@ -202,9 +202,9 @@ const Row = ({ label, value, onClick }: { label: string; value: string; onClick?
         className={`flex items-center justify-between py-1 ${onClick ? 'cursor-pointer group' : ''}`}
         onClick={onClick}
     >
-        <p className="text-[9px] font-black text-black/40 uppercase tracking-widest">{label}</p>
+        <p className="text-[9px] font-semibold text-black/40">{label}</p>
         <div className="flex items-center gap-1.5">
-            <p className="text-[10px] font-black text-black uppercase truncate max-w-[180px]">{value}</p>
+            <p className="text-[10px] font-semibold text-black truncate max-w-[180px]">{value}</p>
             {onClick && <ChevronRight size={12} className="text-black/20 group-hover:text-black transition-colors" />}
         </div>
     </div>
@@ -213,8 +213,8 @@ const Row = ({ label, value, onClick }: { label: string; value: string; onClick?
 const ToggleRow = ({ label, desc, on, onFlip }: { label: string; desc: string; on: boolean; onFlip: () => void }) => (
     <div className="flex items-center justify-between py-1">
         <div className="space-y-0.5 mr-4">
-            <p className="text-[11px] font-black text-black uppercase">{label}</p>
-            <p className="text-[9px] font-bold text-black/30 uppercase">{desc}</p>
+            <p className="text-[11px] font-semibold text-black">{label}</p>
+            <p className="text-[9px] font-bold text-black/30">{desc}</p>
         </div>
         <button
             onClick={onFlip}

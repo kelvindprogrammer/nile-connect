@@ -93,7 +93,10 @@ const StudentActivity = () => {
         }
     }, [showToast]);
 
-    useEffect(() => { load(); }, [load]);
+    useEffect(() => {
+        const t = setTimeout(load, 0);
+        return () => clearTimeout(t);
+    }, [load]);
 
     const rows: ActivityRow[] = useMemo(() => apps.map(a => ({
         id:          a.id,
@@ -118,14 +121,14 @@ const StudentActivity = () => {
         <div className="p-4 md:p-8 space-y-8 anime-fade-in font-sans text-left pb-24 md:pb-8">
 
             {/* Header */}
-            <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b-[2px] border-black pb-6">
+            <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-100 pb-6">
                 <div className="space-y-1">
-                    <h2 className="text-3xl md:text-5xl font-black text-black uppercase tracking-tighter">Activity Monitor .</h2>
-                    <p className="text-[10px] font-black text-nile-blue/50 uppercase tracking-[0.2em]">OVERSIGHT OF STUDENT-EMPLOYER INTERACTIONS</p>
+                    <h2 className="text-3xl md:text-5xl font-semibold text-black">Activity Monitor .</h2>
+                    <p className="text-[10px] font-semibold text-nile-blue/50">OVERSIGHT OF STUDENT-EMPLOYER INTERACTIONS</p>
                 </div>
                 <button
                     onClick={() => {}}
-                    className="flex items-center gap-2 px-4 py-2.5 border-[2px] border-black rounded-xl font-black text-[9px] uppercase hover:bg-black hover:text-white transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:shadow-none"
+                    className="flex items-center gap-2 px-4 py-2.5 border border-gray-100 rounded-xl font-semibold text-[9px] hover:bg-black hover:text-white transition-all shadow-card hover:shadow-none"
                 >
                     <Download size={13} /> EXPORT REPORT
                 </button>
@@ -156,12 +159,12 @@ const StudentActivity = () => {
                         textColor: 'text-nile-green',
                     },
                 ].map(c => (
-                    <div key={c.label} className={`bg-white border-[2px] border-black rounded-[24px] p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-between`}>
+                    <div key={c.label} className={`bg-white border border-gray-100 rounded-[24px] p-5 shadow-card flex items-center justify-between`}>
                         <div className="space-y-1.5">
-                            <p className="text-[8px] font-black text-black/30 uppercase tracking-widest">{c.label}</p>
-                            <h4 className="text-3xl font-black text-black leading-none">{c.value}</h4>
+                            <p className="text-[8px] font-semibold text-black/30">{c.label}</p>
+                            <h4 className="text-3xl font-semibold text-black leading-none">{c.value}</h4>
                         </div>
-                        <div className={`w-12 h-12 rounded-[16px] border-[2px] border-black flex items-center justify-center ${c.color} ${c.textColor}`}>
+                        <div className={`w-12 h-12 rounded-[16px] border border-gray-100 flex items-center justify-center ${c.color} ${c.textColor}`}>
                             {c.icon}
                         </div>
                     </div>
@@ -169,10 +172,10 @@ const StudentActivity = () => {
             </div>
 
             {/* Table */}
-            <div className="bg-white border-[2px] border-black rounded-[24px] overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <div className="bg-white border border-gray-100 rounded-[24px] overflow-hidden shadow-card">
 
                 {/* Search bar */}
-                <div className="p-5 border-b-[2px] border-black/5 bg-nile-white/30 flex flex-col sm:flex-row gap-3">
+                <div className="p-5 border-b border-gray-100/5 bg-nile-white/30 flex flex-col sm:flex-row gap-3">
                     <div className="relative flex-1">
                         <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-black/30" />
                         <input
@@ -180,10 +183,10 @@ const StudentActivity = () => {
                             placeholder="SEARCH BY STUDENT OR COMPANY..."
                             value={search}
                             onChange={e => setSearch(e.target.value)}
-                            className="w-full pl-9 pr-4 py-2.5 bg-white border-[2px] border-black rounded-xl font-black text-[9px] uppercase outline-none focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
+                            className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-100 rounded-xl font-semibold text-[9px] outline-none focus:shadow-card transition-all"
                         />
                     </div>
-                    <div className="text-[8px] font-black text-black/30 uppercase self-center whitespace-nowrap">
+                    <div className="text-[8px] font-semibold text-black/30 self-center whitespace-nowrap">
                         {filtered.length} RECORD{filtered.length !== 1 ? 'S' : ''}
                     </div>
                 </div>
@@ -191,9 +194,9 @@ const StudentActivity = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead>
-                            <tr className="border-b-[2px] border-black/5 bg-nile-white/50">
+                            <tr className="border-b border-gray-100/5 bg-nile-white/50">
                                 {['STUDENT', 'ACTION', 'EMPLOYER', 'TIMESTAMP', 'STATUS', ''].map(h => (
-                                    <th key={h} className="px-5 py-3.5 text-[8px] font-black uppercase tracking-[0.2em] text-black/30">{h}</th>
+                                    <th key={h} className="px-5 py-3.5 text-[8px] font-semibold text-black/30">{h}</th>
                                 ))}
                             </tr>
                         </thead>
@@ -208,7 +211,7 @@ const StudentActivity = () => {
                                 <tr>
                                     <td colSpan={6} className="px-6 py-16 text-center">
                                         <Users size={28} className="mx-auto text-black/10 mb-2" />
-                                        <p className="text-[9px] font-black text-black/25 uppercase">
+                                        <p className="text-[9px] font-semibold text-black/25">
                                             {search ? 'No matching records' : 'No applications to show yet'}
                                         </p>
                                     </td>
@@ -217,10 +220,10 @@ const StudentActivity = () => {
                                 <tr key={row.id} className="border-b border-black/5 hover:bg-nile-white/30 transition-colors">
                                     <td className="px-5 py-4">
                                         <div className="flex items-center gap-2.5">
-                                            <div className="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center font-black text-[10px] flex-shrink-0">
+                                            <div className="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center font-semibold text-[10px] flex-shrink-0">
                                                 {row.studentName.charAt(0).toUpperCase()}
                                             </div>
-                                            <p className="font-black text-[10px] uppercase text-black truncate max-w-[120px]">{row.studentName}</p>
+                                            <p className="font-semibold text-[10px] text-black truncate max-w-[120px]">{row.studentName}</p>
                                         </div>
                                     </td>
                                     <td className="px-5 py-4">
@@ -228,17 +231,17 @@ const StudentActivity = () => {
                                             <div className="p-1.5 rounded-lg bg-white border border-black/10 flex-shrink-0">
                                                 {actionIcon[row.action]}
                                             </div>
-                                            <p className="text-[9px] font-black uppercase text-black/50 tracking-wider">{actionLabel[row.action]}</p>
+                                            <p className="text-[9px] font-semibold text-black/50 tracking-wider">{actionLabel[row.action]}</p>
                                         </div>
                                     </td>
                                     <td className="px-5 py-4">
-                                        <p className="font-black text-[10px] uppercase text-nile-blue truncate max-w-[120px]">{row.companyName}</p>
+                                        <p className="font-semibold text-[10px] text-nile-blue truncate max-w-[120px]">{row.companyName}</p>
                                     </td>
                                     <td className="px-5 py-4">
-                                        <p className="text-[9px] font-bold text-black/35 uppercase whitespace-nowrap">{row.timestamp}</p>
+                                        <p className="text-[9px] font-bold text-black/35 whitespace-nowrap">{row.timestamp}</p>
                                     </td>
                                     <td className="px-5 py-4">
-                                        <span className={`text-[7px] font-black px-2 py-0.5 rounded-full border uppercase ${badgeClasses[row.status]}`}>
+                                        <span className={`text-[7px] font-semibold px-2 py-0.5 rounded-full border ${badgeClasses[row.status]}`}>
                                             {row.status}
                                         </span>
                                     </td>

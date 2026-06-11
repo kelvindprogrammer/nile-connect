@@ -27,6 +27,9 @@
 
     { "source": "/api/jobs/:id",                "destination": "/api/jobs?id=:id" },
 
+    { "source": "/api/feed/:id/like",           "destination": "/api/feed?path=like&id=:id" },
+    { "source": "/api/feed/:id/comments",       "destination": "/api/feed?path=comments&id=:id" },
+
     { "source": "/api/staff/dashboard",         "destination": "/api/staff?path=dashboard" },
     { "source": "/api/staff/applications",      "destination": "/api/staff?path=applications" },
     { "source": "/api/staff/jobs",              "destination": "/api/staff?path=jobs" },
@@ -40,8 +43,22 @@
     { "source": "/api/messages/conversations",  "destination": "/api/messages?path=conversations" },
     { "source": "/api/messages/thread/:toId",   "destination": "/api/messages?path=thread&toId=:toId" },
     { "source": "/api/messages/send/:toId",     "destination": "/api/messages?path=send&toId=:toId" },
+    { "source": "/api/messages/presence",       "destination": "/api/messages?path=presence" },
+    { "source": "/api/messages/typing/:toId",   "destination": "/api/messages?path=typing&toId=:toId" },
 
     { "source": "/api/users/search",            "destination": "/api/messages?path=users-search" },
+    { "source": "/api/users/:id/presence",      "destination": "/api/messages?path=presence-status&userId=:id" },
+
+    { "source": "/api/upload",                  "destination": "/api/messages?path=upload" },
+
+    { "source": "/api/notifications",               "destination": "/api/messages?path=notifications" },
+    { "source": "/api/notifications/unread-count",  "destination": "/api/messages?path=notifications-unread-count" },
+    { "source": "/api/notifications/mark-all-read", "destination": "/api/messages?path=notifications-mark-all-read" },
+    { "source": "/api/notifications/:id/read",      "destination": "/api/messages?path=notifications-read&id=:id" },
+
+    { "source": "/api/connections",                 "destination": "/api/messages?path=connections" },
+    { "source": "/api/connections/request/:toId",   "destination": "/api/messages?path=connections-request&toId=:toId" },
+    { "source": "/api/connections/:id/respond",     "destination": "/api/messages?path=connections-respond&id=:id" },
 
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],

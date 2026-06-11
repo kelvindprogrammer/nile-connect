@@ -7,6 +7,7 @@ import {
 import NileConnectLogo from '../../components/NileConnectLogo';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
+import type { Peer, MediaConnection } from 'peerjs';
 
 const LiveSession = () => {
     const { roomId } = useParams<{ roomId: string }>();
@@ -24,9 +25,9 @@ const LiveSession = () => {
 
     const localVideoRef  = useRef<HTMLVideoElement>(null);
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
-    const peerRef        = useRef<any>(null);
+    const peerRef        = useRef<Peer | null>(null);
     const localStream    = useRef<MediaStream | null>(null);
-    const currentCall    = useRef<any>(null);
+    const currentCall    = useRef<MediaConnection | null>(null);
     const timerRef       = useRef<ReturnType<typeof setInterval> | null>(null);
 
     const sessionUrl = `${window.location.origin}/student/session/${roomId}`;
@@ -99,7 +100,7 @@ const LiveSession = () => {
             });
 
             // Answer incoming calls
-            peer.on('call', (call: any) => {
+            peer.on('call', (call) => {
                 call.answer(stream);
                 currentCall.current = call;
                 call.on('stream', (remoteStream: MediaStream) => {
@@ -115,7 +116,7 @@ const LiveSession = () => {
                 });
             });
 
-            peer.on('error', (err: any) => {
+            peer.on('error', (err) => {
                 if (err.type === 'peer-unavailable') {
                     // Other peer not in room yet — that's fine, we wait
                 } else {
@@ -123,9 +124,9 @@ const LiveSession = () => {
                 }
             });
 
-        } catch (err: any) {
+        } catch (err) {
             setPhase('lobby');
-            if (err.name === 'NotAllowedError') {
+            if (err instanceof Error && err.name === 'NotAllowedError') {
                 setPeerError('Camera/microphone access denied. Please allow permissions and try again.');
             } else {
                 setPeerError('Could not start session. Please check your camera and microphone.');
@@ -165,21 +166,21 @@ const LiveSession = () => {
     // ── ENDED ─────────────────────────────────────────────────────────────────
     if (phase === 'ended') return (
         <div className="min-h-screen bg-black flex items-center justify-center p-6">
-            <div className="bg-white border-[3px] border-black rounded-[32px] p-8 md:p-12 text-center max-w-md w-full shadow-[8px_8px_0px_0px_rgba(108,187,86,1)]">
+            <div className="bg-white border border-gray-100 rounded-[32px] p-8 md:p-12 text-center max-w-md w-full shadow-green">
                 <NileConnectLogo size="sm" showText showTagline={false} animated={false} className="mb-6 justify-center" />
                 <CheckCircle2 size={48} className="text-nile-green mx-auto mb-4" strokeWidth={1.5} />
-                <h2 className="text-2xl font-black uppercase tracking-tight mb-2">Session Complete</h2>
-                <p className="text-[9px] font-black text-black/40 uppercase tracking-widest mb-2">Duration: {formatTime(duration)}</p>
+                <h2 className="text-2xl font-semibold tracking-tight mb-2">Session Complete</h2>
+                <p className="text-[9px] font-semibold text-black/40 mb-2">Duration: {formatTime(duration)}</p>
                 <p className="text-sm font-bold text-black/60 leading-relaxed mb-8">
                     Your live career advisory session has ended. Check your messages for any follow-up notes.
                 </p>
                 <div className="flex gap-3">
                     <button onClick={() => navigate('/student/career')}
-                        className="flex-1 py-3 border-[2px] border-black rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-black hover:text-white transition-all">
+                        className="flex-1 py-3 border border-gray-100 rounded-xl font-semibold text-[9px] hover:bg-black hover:text-white transition-all">
                         CAREER CENTER
                     </button>
                     <button onClick={() => navigate('/student')}
-                        className="flex-1 py-3 bg-nile-blue text-white border-[2px] border-black rounded-xl font-black text-[9px] uppercase tracking-widest shadow-[3px_3px_0px_0px_#6CBB56] hover:shadow-none hover:translate-x-px hover:translate-y-px transition-all">
+                        className="flex-1 py-3 bg-nile-blue text-white border border-gray-100 rounded-xl font-semibold text-[9px] shadow-green transition-all">
                         DASHBOARD
                     </button>
                 </div>
@@ -195,9 +196,9 @@ const LiveSession = () => {
                 <div className="flex items-center gap-3">
                     <NileConnectLogo size="xs" showText={false} showTagline={false} animated={false} />
                     <div>
-                        <p className="text-[9px] font-black uppercase tracking-widest text-white/50">LIVE CAREER SESSION</p>
+                        <p className="text-[9px] font-semibold text-white/50">LIVE CAREER SESSION</p>
                         {phase === 'live' && (
-                            <p className="text-[8px] font-black text-nile-green uppercase flex items-center gap-1">
+                            <p className="text-[8px] font-semibold text-nile-green flex items-center gap-1">
                                 <span className="w-1.5 h-1.5 bg-nile-green rounded-full animate-pulse" />
                                 {formatTime(duration)} · {peerCount > 0 ? `${peerCount + 1} PEOPLE` : 'WAITING FOR ADVISOR'}
                             </p>
@@ -205,7 +206,7 @@ const LiveSession = () => {
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-[7px] font-black uppercase tracking-widest text-white/40">
+                    <div className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-[7px] font-semibold text-white/40">
                         ROOM: {roomId?.slice(0, 8).toUpperCase()}
                     </div>
                 </div>
@@ -225,7 +226,7 @@ const LiveSession = () => {
                                 <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center">
                                     <Users size={28} className="text-white/30" />
                                 </div>
-                                <p className="text-[9px] font-black text-white/30 uppercase tracking-widest">
+                                <p className="text-[9px] font-semibold text-white/30">
                                     {phase === 'live' ? 'WAITING FOR OTHER PARTICIPANT...' : 'START SESSION TO BEGIN'}
                                 </p>
                                 {phase === 'live' && (
@@ -237,14 +238,14 @@ const LiveSession = () => {
 
                     {/* Local video (PiP) */}
                     {phase === 'live' && (
-                        <div className="absolute bottom-6 right-6 w-32 md:w-44 aspect-video rounded-[12px] overflow-hidden border-[2px] border-white/20 shadow-[4px_4px_20px_rgba(0,0,0,0.5)] bg-[#1a1a1a]">
+                        <div className="absolute bottom-6 right-6 w-32 md:w-44 aspect-video rounded-[12px] overflow-hidden border border-white/20 shadow-[4px_4px_20px_rgba(0,0,0,0.5)] bg-[#1a1a1a]">
                             <video ref={localVideoRef} autoPlay playsInline muted className={`w-full h-full object-cover ${isVideoOff ? 'opacity-0' : ''}`} />
                             {isVideoOff && (
                                 <div className="absolute inset-0 flex items-center justify-center bg-[#1a1a1a]">
                                     <VideoOff size={20} className="text-white/30" />
                                 </div>
                             )}
-                            <div className="absolute bottom-1.5 left-2 text-[7px] font-black text-white/60 uppercase">YOU</div>
+                            <div className="absolute bottom-1.5 left-2 text-[7px] font-semibold text-white/60">YOU</div>
                         </div>
                     )}
                 </div>
@@ -254,8 +255,8 @@ const LiveSession = () => {
 
                     {/* Session info */}
                     <div className="p-5 border-b border-white/10 space-y-4">
-                        <h3 className="text-[10px] font-black uppercase tracking-widest text-white/40">SESSION DETAILS</h3>
-                        <div className="space-y-2 text-[9px] font-black text-white/60 uppercase">
+                        <h3 className="text-[10px] font-semibold text-white/40">SESSION DETAILS</h3>
+                        <div className="space-y-2 text-[9px] font-semibold text-white/60">
                             <div className="flex justify-between"><span>PARTICIPANT</span><span className="text-white">{user?.name?.split(' ')[0] || 'STUDENT'}</span></div>
                             <div className="flex justify-between"><span>TYPE</span><span className="text-nile-green">CAREER ADVISORY</span></div>
                             <div className="flex justify-between"><span>STATUS</span>
@@ -267,13 +268,13 @@ const LiveSession = () => {
 
                         {/* Share link */}
                         <div className="space-y-1.5">
-                            <p className="text-[8px] font-black text-white/30 uppercase tracking-widest">SHARE LINK WITH ADVISOR</p>
+                            <p className="text-[8px] font-semibold text-white/30">SHARE LINK WITH ADVISOR</p>
                             <div className="flex gap-2">
-                                <div className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-[8px] font-black text-white/40 truncate">
+                                <div className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-[8px] font-semibold text-white/40 truncate">
                                     {sessionUrl}
                                 </div>
                                 <button onClick={copyLink}
-                                    className={`px-3 py-2 rounded-lg border font-black text-[8px] uppercase transition-all flex-shrink-0 ${linkCopied ? 'bg-nile-green border-nile-green text-white' : 'bg-white/5 border-white/10 text-white/60 hover:border-white/30'}`}>
+                                    className={`px-3 py-2 rounded-lg border font-semibold text-[8px] transition-all flex-shrink-0 ${linkCopied ? 'bg-nile-green border-nile-green text-white' : 'bg-white/5 border-white/10 text-white/60 hover:border-white/30'}`}>
                                     {linkCopied ? <CheckCircle2 size={13} /> : <Copy size={13} />}
                                 </button>
                             </div>
@@ -291,13 +292,13 @@ const LiveSession = () => {
                     <div className="p-5 mt-auto space-y-3">
                         {phase === 'lobby' && (
                             <button onClick={startSession}
-                                className="w-full py-4 bg-nile-green border-[2px] border-white/20 rounded-[16px] font-black text-[10px] uppercase tracking-widest text-white shadow-[0_4px_20px_rgba(108,187,86,0.4)] hover:bg-nile-green/90 transition-all flex items-center justify-center gap-2">
+                                className="w-full py-4 bg-nile-green border border-white/20 rounded-[16px] font-semibold text-[10px] text-white shadow-[0_4px_20px_rgba(108,187,86,0.4)] hover:bg-nile-green/90 transition-all flex items-center justify-center gap-2">
                                 <Video size={16} /> START SESSION
                             </button>
                         )}
 
                         {phase === 'connecting' && (
-                            <div className="w-full py-4 bg-white/5 border border-white/10 rounded-[16px] font-black text-[10px] uppercase tracking-widest text-white/40 flex items-center justify-center gap-2">
+                            <div className="w-full py-4 bg-white/5 border border-white/10 rounded-[16px] font-semibold text-[10px] text-white/40 flex items-center justify-center gap-2">
                                 <Loader2 size={16} className="animate-spin" /> CONNECTING...
                             </div>
                         )}
@@ -306,23 +307,23 @@ const LiveSession = () => {
                             <div className="space-y-3">
                                 <div className="grid grid-cols-3 gap-2">
                                     <button onClick={toggleMute}
-                                        className={`py-3 rounded-[12px] border font-black text-[8px] uppercase flex flex-col items-center gap-1 transition-all ${isMuted ? 'bg-red-600 border-red-600 text-white' : 'bg-white/5 border-white/10 text-white/60 hover:border-white/30'}`}>
+                                        className={`py-3 rounded-[12px] border font-semibold text-[8px] flex flex-col items-center gap-1 transition-all ${isMuted ? 'bg-red-600 border-red-600 text-white' : 'bg-white/5 border-white/10 text-white/60 hover:border-white/30'}`}>
                                         {isMuted ? <MicOff size={18} /> : <Mic size={18} />}
                                         {isMuted ? 'UNMUTE' : 'MUTE'}
                                     </button>
                                     <button onClick={toggleVideo}
-                                        className={`py-3 rounded-[12px] border font-black text-[8px] uppercase flex flex-col items-center gap-1 transition-all ${isVideoOff ? 'bg-red-600 border-red-600 text-white' : 'bg-white/5 border-white/10 text-white/60 hover:border-white/30'}`}>
+                                        className={`py-3 rounded-[12px] border font-semibold text-[8px] flex flex-col items-center gap-1 transition-all ${isVideoOff ? 'bg-red-600 border-red-600 text-white' : 'bg-white/5 border-white/10 text-white/60 hover:border-white/30'}`}>
                                         {isVideoOff ? <VideoOff size={18} /> : <Video size={18} />}
                                         {isVideoOff ? 'SHOW' : 'HIDE'}
                                     </button>
                                     <button
-                                        className="py-3 rounded-[12px] border border-white/10 bg-white/5 font-black text-[8px] uppercase flex flex-col items-center gap-1 text-white/60 hover:border-white/30 transition-all">
+                                        className="py-3 rounded-[12px] border border-white/10 bg-white/5 font-semibold text-[8px] flex flex-col items-center gap-1 text-white/60 hover:border-white/30 transition-all">
                                         <Monitor size={18} />
                                         SHARE
                                     </button>
                                 </div>
                                 <button onClick={endCall}
-                                    className="w-full py-3.5 bg-red-600 border-[2px] border-red-500 rounded-[14px] font-black text-[10px] uppercase tracking-widest text-white hover:bg-red-700 transition-all flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(239,68,68,0.3)]">
+                                    className="w-full py-3.5 bg-red-600 border-[2px] border-red-500 rounded-[14px] font-semibold text-[10px] text-white hover:bg-red-700 transition-all flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(239,68,68,0.3)]">
                                     <PhoneOff size={16} /> END SESSION
                                 </button>
                             </div>

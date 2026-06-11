@@ -68,40 +68,40 @@ const EmployerProfile = () => {
         <div className="p-4 md:p-8 space-y-6 md:space-y-10 anime-fade-in font-sans pb-24 md:pb-20 text-left max-w-4xl mx-auto">
 
             {/* Banner Header */}
-            <div className="bg-white border-[2px] border-black rounded-[24px] md:rounded-[32px] shadow-[4px_4px_0px_0px_rgba(108,187,86,1)] md:shadow-[6px_6px_0px_0px_rgba(108,187,86,1)] overflow-hidden">
-                <div className="h-24 md:h-36 bg-black border-b-[2px] border-black relative overflow-hidden">
+            <div className="bg-white border border-gray-100 rounded-[24px] md:rounded-[32px] shadow-green md:shadow-green overflow-hidden">
+                <div className="h-24 md:h-36 bg-black border-b border-gray-100 relative overflow-hidden">
                     <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px]" />
                     <button
                         onClick={() => setEditing(!editing)}
-                        className="absolute top-4 right-4 w-10 h-10 bg-white border-[2px] border-black rounded-lg hidden md:flex items-center justify-center shadow-sm hover:bg-nile-green transition-colors"
+                        className="absolute top-4 right-4 w-10 h-10 bg-white border border-gray-100 rounded-lg hidden md:flex items-center justify-center shadow-sm hover:bg-nile-green transition-colors"
                     >
                         {editing ? <X size={16} strokeWidth={2.5} /> : <Settings size={16} strokeWidth={2.5} />}
                     </button>
                 </div>
 
                 <div className="px-4 md:px-8 pb-6 md:pb-8 relative">
-                    <div className="absolute -top-8 md:-top-10 left-4 md:left-8 w-16 h-16 md:w-20 md:h-20 bg-white border-[2px] border-black rounded-[12px] md:rounded-[16px] shadow-[3px_3px_0px_0px_rgba(108,187,86,1)] flex items-center justify-center overflow-hidden">
+                    <div className="absolute -top-8 md:-top-10 left-4 md:left-8 w-16 h-16 md:w-20 md:h-20 bg-white border border-gray-100 rounded-[12px] md:rounded-[16px] shadow-green flex items-center justify-center overflow-hidden">
                         <Building2 size={32} strokeWidth={1.5} className="text-black/40" />
                     </div>
 
                     <div className="pt-10 md:pt-14 flex flex-col sm:flex-row justify-between sm:items-end gap-4">
                         <div className="space-y-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap mb-1">
-                                <h1 className="text-xl md:text-3xl font-black text-black uppercase leading-none tracking-tighter truncate">{companyName} .</h1>
+                                <h1 className="text-xl md:text-3xl font-semibold text-black leading-none truncate">{companyName} .</h1>
                                 {isVerified ? (
-                                    <span className="flex items-center gap-1 bg-nile-green text-white text-[6px] md:text-[7px] font-black px-2 py-0.5 rounded border border-black flex-shrink-0">
+                                    <span className="flex items-center gap-1 bg-nile-green text-white text-[6px] md:text-[7px] font-semibold px-2 py-0.5 rounded border border-black flex-shrink-0">
                                         <ShieldCheck size={8} strokeWidth={3} /> VERIFIED
                                     </span>
                                 ) : (
-                                    <span className="flex items-center gap-1 bg-yellow-100 text-yellow-700 text-[6px] md:text-[7px] font-black px-2 py-0.5 rounded border border-black flex-shrink-0">
+                                    <span className="flex items-center gap-1 bg-yellow-100 text-yellow-700 text-[6px] md:text-[7px] font-semibold px-2 py-0.5 rounded border border-black flex-shrink-0">
                                         <ShieldAlert size={8} strokeWidth={3} /> PENDING
                                     </span>
                                 )}
                             </div>
-                            <p className="text-[8px] md:text-[9px] font-black text-nile-blue/50 uppercase tracking-[0.2em]">
+                            <p className="text-[8px] md:text-[9px] font-semibold text-nile-blue/50">
                                 {profile?.industry || 'SOFTWARE & TECHNOLOGY'} • {profile?.location || 'NIGERIA'}
                             </p>
-                            <div className="flex items-center space-x-2 text-[7px] md:text-[8px] font-black text-black/30 uppercase pt-1 truncate max-w-[250px]">
+                            <div className="flex items-center space-x-2 text-[7px] md:text-[8px] font-semibold text-black/30 pt-1 truncate max-w-[250px]">
                                 <Mail size={10} strokeWidth={3} />
                                 <span>{email}</span>
                             </div>
@@ -136,11 +136,11 @@ const EmployerProfile = () => {
                             <textarea
                                 value={editForm.about ?? ''}
                                 onChange={(e) => setEditForm(p => ({ ...p, about: e.target.value }))}
-                                className="w-full h-28 border-[2px] border-black rounded-xl p-4 font-bold text-xs outline-none focus:shadow-[4px_4px_0px_0px_#1E499D] transition-all bg-nile-white/40 resize-none"
+                                className="w-full h-28 border border-gray-100 rounded-xl p-4 font-bold text-xs outline-none focus:shadow-blue transition-all bg-nile-white/40 resize-none"
                                 placeholder="Describe your company..."
                             />
                         ) : (
-                            <p className="font-bold text-nile-blue/80 leading-relaxed text-[10px] md:text-[11px] uppercase text-left">
+                            <p className="font-bold text-nile-blue/80 leading-relaxed text-[10px] md:text-[11px] text-left">
                                 {profile?.about || 'No company description yet. Click Edit Profile to add one.'}
                             </p>
                         )}
@@ -151,20 +151,20 @@ const EmployerProfile = () => {
                             <div className="space-y-4">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="text-[9px] font-black text-black/40 uppercase tracking-widest block mb-1">COMPANY NAME</label>
-                                        <input value={editForm.company_name ?? ''} onChange={e => setEditForm(p => ({ ...p, company_name: e.target.value }))} className="w-full border-[2px] border-black rounded-xl p-3 font-black text-xs uppercase outline-none focus:shadow-[3px_3px_0px_0px_#1E499D] bg-nile-white/40" />
+                                        <label className="text-[9px] font-semibold text-black/40 block mb-1">COMPANY NAME</label>
+                                        <input value={editForm.company_name ?? ''} onChange={e => setEditForm(p => ({ ...p, company_name: e.target.value }))} className="w-full border border-gray-100 rounded-xl p-3 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40" />
                                     </div>
                                     <div>
-                                        <label className="text-[9px] font-black text-black/40 uppercase tracking-widest block mb-1">INDUSTRY</label>
-                                        <input value={editForm.industry ?? ''} onChange={e => setEditForm(p => ({ ...p, industry: e.target.value }))} className="w-full border-[2px] border-black rounded-xl p-3 font-black text-xs uppercase outline-none focus:shadow-[3px_3px_0px_0px_#1E499D] bg-nile-white/40" />
+                                        <label className="text-[9px] font-semibold text-black/40 block mb-1">INDUSTRY</label>
+                                        <input value={editForm.industry ?? ''} onChange={e => setEditForm(p => ({ ...p, industry: e.target.value }))} className="w-full border border-gray-100 rounded-xl p-3 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40" />
                                     </div>
                                     <div>
-                                        <label className="text-[9px] font-black text-black/40 uppercase tracking-widest block mb-1">LOCATION</label>
-                                        <input value={editForm.location ?? ''} onChange={e => setEditForm(p => ({ ...p, location: e.target.value }))} className="w-full border-[2px] border-black rounded-xl p-3 font-black text-xs uppercase outline-none focus:shadow-[3px_3px_0px_0px_#1E499D] bg-nile-white/40" />
+                                        <label className="text-[9px] font-semibold text-black/40 block mb-1">LOCATION</label>
+                                        <input value={editForm.location ?? ''} onChange={e => setEditForm(p => ({ ...p, location: e.target.value }))} className="w-full border border-gray-100 rounded-xl p-3 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40" />
                                     </div>
                                     <div>
-                                        <label className="text-[9px] font-black text-black/40 uppercase tracking-widest block mb-1">CONTACT EMAIL</label>
-                                        <input type="email" value={editForm.contact_email ?? ''} onChange={e => setEditForm(p => ({ ...p, contact_email: e.target.value }))} className="w-full border-[2px] border-black rounded-xl p-3 font-black text-xs outline-none focus:shadow-[3px_3px_0px_0px_#1E499D] bg-nile-white/40" />
+                                        <label className="text-[9px] font-semibold text-black/40 block mb-1">CONTACT EMAIL</label>
+                                        <input type="email" value={editForm.contact_email ?? ''} onChange={e => setEditForm(p => ({ ...p, contact_email: e.target.value }))} className="w-full border border-gray-100 rounded-xl p-3 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40" />
                                     </div>
                                 </div>
                             </div>
@@ -178,23 +178,23 @@ const EmployerProfile = () => {
                             {editing ? (
                                 <>
                                     <div>
-                                        <label className="text-[7px] font-black text-black/30 uppercase tracking-[0.2em] flex items-center gap-1.5 mb-1.5"><Globe size={14} /> WEBSITE</label>
-                                        <input value={editForm.website ?? ''} onChange={e => setEditForm(p => ({ ...p, website: e.target.value }))} placeholder="company.io" className="w-full border-[2px] border-black rounded-lg p-2 font-black text-xs outline-none" />
+                                        <label className="text-[7px] font-semibold text-black/30 flex items-center gap-1.5 mb-1.5"><Globe size={14} /> WEBSITE</label>
+                                        <input value={editForm.website ?? ''} onChange={e => setEditForm(p => ({ ...p, website: e.target.value }))} placeholder="company.io" className="w-full border border-gray-100 rounded-lg p-2 font-semibold text-xs outline-none" />
                                     </div>
                                     <div>
-                                        <label className="text-[7px] font-black text-black/30 uppercase tracking-[0.2em] flex items-center gap-1.5 mb-1.5"><Link2 size={14} /> LINKEDIN</label>
-                                        <input value={editForm.linkedin ?? ''} onChange={e => setEditForm(p => ({ ...p, linkedin: e.target.value }))} placeholder="linkedin.com/company/..." className="w-full border-[2px] border-black rounded-lg p-2 font-black text-xs outline-none" />
+                                        <label className="text-[7px] font-semibold text-black/30 flex items-center gap-1.5 mb-1.5"><Link2 size={14} /> LINKEDIN</label>
+                                        <input value={editForm.linkedin ?? ''} onChange={e => setEditForm(p => ({ ...p, linkedin: e.target.value }))} placeholder="linkedin.com/company/..." className="w-full border border-gray-100 rounded-lg p-2 font-semibold text-xs outline-none" />
                                     </div>
                                 </>
                             ) : (
                                 <>
                                     <div>
-                                        <p className="text-[7px] font-black text-black/30 uppercase tracking-[0.2em] flex items-center gap-1.5 mb-1.5"><Globe size={14} /> WEBSITE</p>
-                                        {profile?.website ? <a href={`https://${profile.website}`} target="_blank" rel="noreferrer" className="text-[9px] font-black text-nile-blue underline truncate block">{profile.website}</a> : <p className="text-[9px] font-black text-black/20 uppercase">Not set</p>}
+                                        <p className="text-[7px] font-semibold text-black/30 flex items-center gap-1.5 mb-1.5"><Globe size={14} /> WEBSITE</p>
+                                        {profile?.website ? <a href={`https://${profile.website}`} target="_blank" rel="noreferrer" className="text-[9px] font-semibold text-nile-blue underline truncate block">{profile.website}</a> : <p className="text-[9px] font-semibold text-black/20">Not set</p>}
                                     </div>
                                     <div>
-                                        <p className="text-[7px] font-black text-black/30 uppercase tracking-[0.2em] flex items-center gap-1.5 mb-1.5"><Link2 size={14} /> LINKEDIN</p>
-                                        {profile?.linkedin ? <a href={`https://${profile.linkedin}`} target="_blank" rel="noreferrer" className="text-[9px] font-black text-nile-blue underline truncate block">{profile.linkedin}</a> : <p className="text-[9px] font-black text-black/20 uppercase">Not set</p>}
+                                        <p className="text-[7px] font-semibold text-black/30 flex items-center gap-1.5 mb-1.5"><Link2 size={14} /> LINKEDIN</p>
+                                        {profile?.linkedin ? <a href={`https://${profile.linkedin}`} target="_blank" rel="noreferrer" className="text-[9px] font-semibold text-nile-blue underline truncate block">{profile.linkedin}</a> : <p className="text-[9px] font-semibold text-black/20">Not set</p>}
                                     </div>
                                 </>
                             )}
@@ -205,8 +205,8 @@ const EmployerProfile = () => {
                         <div className="flex items-center space-x-3 text-left">
                             <Avatar name={recruiterName} size="sm" />
                             <div>
-                                <p className="text-[9px] font-black text-black uppercase">{recruiterName}</p>
-                                <p className="text-[7px] font-black text-nile-blue/40 uppercase">LEAD RECRUITER</p>
+                                <p className="text-[9px] font-semibold text-black">{recruiterName}</p>
+                                <p className="text-[7px] font-semibold text-nile-blue/40">LEAD RECRUITER</p>
                             </div>
                         </div>
                     </Card>

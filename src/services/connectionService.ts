@@ -1,0 +1,33 @@
+import { apiClient } from './api';
+
+export interface ConnectionItem {
+    id: string;
+    user_id: string;
+    full_name: string;
+    role: string;
+    status: string;
+    created_at: string;
+}
+
+export interface ConnectionsResponse {
+    accepted: ConnectionItem[];
+    incoming: ConnectionItem[];
+    outgoing: ConnectionItem[];
+}
+
+interface Envelope<T> { data: T; }
+
+export const getConnections = async (): Promise<ConnectionsResponse> => {
+    const { data } = await apiClient.get<Envelope<ConnectionsResponse>>('/api/connections');
+    return data.data;
+};
+
+export const requestConnection = async (toUserId: string): Promise<ConnectionItem> => {
+    const { data } = await apiClient.post<Envelope<ConnectionItem>>(`/api/connections/request/${toUserId}`);
+    return data.data;
+};
+
+export const respondConnection = async (id: string, action: 'accept' | 'decline'): Promise<{ id: string; status: string }> => {
+    const { data } = await apiClient.post<Envelope<{ id: string; status: string }>>(`/api/connections/${id}/respond`, { action });
+    return data.data;
+};

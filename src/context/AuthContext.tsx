@@ -33,7 +33,6 @@ interface AuthContextType {
     // Kept for backward compatibility — these are no-ops in the OIDC flow.
     token: string | null;
     login: (user: User) => void;
-    loginWithResponse: (resp: any) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -76,11 +75,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         window.location.replace('/login');
     }, []);
 
-    // ── Backward-compat no-ops ────────────────────────────────────────────────
-    // These were used by the old email/password flow. They are left in place so
-    // any page that still imports them compiles without errors.
+    // ── Backward-compat no-op ─────────────────────────────────────────────────
+    // Used by the old email/password flow. Left in place so any page that
+    // still imports it compiles without errors.
     const login = useCallback((_userData: User) => {}, []);
-    const loginWithResponse = useCallback((_resp: any) => {}, []);
 
     return (
         <AuthContext.Provider
@@ -92,7 +90,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 logout,
                 token: null,
                 login,
-                loginWithResponse,
             }}
         >
             {children}

@@ -28,9 +28,9 @@ interface ApiEnvelope<T> { data: T; }
 const typeColors: Record<string, string> = {
     'full-time': 'bg-nile-green text-black',
     'remote': 'bg-nile-blue text-white',
-    'hybrid': 'bg-nile-white text-black border-[1.5px] border-black',
+    'hybrid': 'bg-nile-white text-black border border-gray-100',
     'internship': 'bg-black text-white',
-    'part-time': 'bg-yellow-100 text-yellow-700 border-[1.5px] border-black',
+    'part-time': 'bg-yellow-100 text-yellow-700 border border-gray-100',
 };
 
 const typeLabel: Record<string, string> = {
@@ -90,10 +90,10 @@ const JobBoard = () => {
             <div className="p-4 md:p-8 space-y-6 anime-fade-in font-sans pb-24 text-left">
 
                 {/* Header */}
-                <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 border-b-[2px] border-black pb-6">
+                <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 border-b border-gray-100 pb-6">
                     <div>
-                        <h2 className="text-2xl md:text-4xl font-black text-black leading-none uppercase tracking-tighter">Job Board .</h2>
-                        <p className="text-[8px] md:text-[10px] font-black text-nile-blue/50 uppercase tracking-[0.2em] mt-1">BROWSE ACTIVE CAREER OPPORTUNITIES</p>
+                        <h2 className="text-2xl md:text-4xl font-semibold text-black leading-none">Job Board .</h2>
+                        <p className="text-[8px] md:text-[10px] font-semibold text-nile-blue/50 mt-1">BROWSE ACTIVE CAREER OPPORTUNITIES</p>
                     </div>
 
                     <div className="flex items-center gap-2 w-full xl:w-auto">
@@ -105,7 +105,7 @@ const JobBoard = () => {
                                 value={search}
                                 onChange={e => setSearch(e.target.value)}
                                 placeholder="SEARCH ROLES..."
-                                className="w-full bg-nile-white/40 border-[2px] border-black rounded-xl py-2.5 pl-10 pr-4 font-black text-[9px] uppercase outline-none focus:bg-white focus:shadow-[3px_3px_0px_0px_#1E499D] transition-all"
+                                className="w-full bg-nile-white/40 border border-gray-100 rounded-xl py-2.5 pl-10 pr-4 font-semibold text-[9px] outline-none focus:bg-white focus:shadow-blue transition-all"
                             />
                         </div>
 
@@ -113,15 +113,15 @@ const JobBoard = () => {
                         <div className="relative" ref={filterRef}>
                             <button
                                 onClick={() => setShowFilters(v => !v)}
-                                className={`flex items-center gap-2 px-4 py-2.5 border-[2px] border-black rounded-xl font-black text-[9px] uppercase transition-all
+                                className={`flex items-center gap-2 px-4 py-2.5 border border-gray-100 rounded-xl font-semibold text-[9px] transition-all
                                     ${showFilters || hasFilters
-                                        ? 'bg-nile-blue text-white shadow-[2px_2px_0px_0px_rgba(108,187,86,1)]'
+                                        ? 'bg-nile-blue text-white shadow-green'
                                         : 'bg-white hover:bg-nile-white'}`}
                             >
                                 <SlidersHorizontal size={13} strokeWidth={3} />
                                 FILTER
                                 {hasFilters && (
-                                    <span className="w-4 h-4 bg-nile-green text-black rounded-full text-[7px] flex items-center justify-center font-black">
+                                    <span className="w-4 h-4 bg-nile-green text-black rounded-full text-[7px] flex items-center justify-center font-semibold">
                                         {(typeFilter !== 'ALL' ? 1 : 0) + (locationFilter !== 'ALL' ? 1 : 0)}
                                     </span>
                                 )}
@@ -129,24 +129,24 @@ const JobBoard = () => {
                             </button>
 
                             {showFilters && (
-                                <div className="absolute top-full right-0 mt-2 w-72 bg-white border-[2px] border-black rounded-[20px] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-5 z-50 space-y-5 animate-in fade-in slide-in-from-top-2">
+                                <div className="absolute top-full right-0 mt-2 w-72 bg-white border border-gray-100 rounded-[20px] shadow-card p-5 z-50 space-y-5 animate-in fade-in slide-in-from-top-2">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-[9px] font-black uppercase tracking-widest">FILTERS</span>
+                                        <span className="text-[9px] font-semibold">FILTERS</span>
                                         {hasFilters && (
-                                            <button onClick={clearFilters} className="text-[8px] font-black text-red-400 uppercase hover:text-red-600 transition-colors flex items-center gap-1">
+                                            <button onClick={clearFilters} className="text-[8px] font-semibold text-red-400 hover:text-red-600 transition-colors flex items-center gap-1">
                                                 <X size={10} strokeWidth={3} /> CLEAR ALL
                                             </button>
                                         )}
                                     </div>
 
                                     <div className="space-y-2">
-                                        <p className="text-[8px] font-black text-black/40 uppercase tracking-widest">JOB TYPE</p>
+                                        <p className="text-[8px] font-semibold text-black/40">JOB TYPE</p>
                                         <div className="grid grid-cols-2 gap-1.5">
                                             {JOB_TYPES.map(t => (
                                                 <button
                                                     key={t}
                                                     onClick={() => setTypeFilter(t)}
-                                                    className={`flex items-center justify-between px-3 py-2 border-[1.5px] border-black rounded-lg font-black text-[8px] uppercase transition-all
+                                                    className={`flex items-center justify-between px-3 py-2 border border-gray-100 rounded-lg font-semibold text-[8px] transition-all
                                                         ${typeFilter === t ? 'bg-nile-blue text-white' : 'bg-nile-white hover:bg-white'}`}
                                                 >
                                                     {t}
@@ -157,13 +157,13 @@ const JobBoard = () => {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <p className="text-[8px] font-black text-black/40 uppercase tracking-widest">LOCATION</p>
+                                        <p className="text-[8px] font-semibold text-black/40">LOCATION</p>
                                         <div className="grid grid-cols-2 gap-1.5">
                                             {LOCATIONS.map(l => (
                                                 <button
                                                     key={l}
                                                     onClick={() => setLocationFilter(l)}
-                                                    className={`flex items-center justify-between px-3 py-2 border-[1.5px] border-black rounded-lg font-black text-[8px] uppercase transition-all
+                                                    className={`flex items-center justify-between px-3 py-2 border border-gray-100 rounded-lg font-semibold text-[8px] transition-all
                                                         ${locationFilter === l ? 'bg-nile-blue text-white' : 'bg-nile-white hover:bg-white'}`}
                                                 >
                                                     {l}
@@ -186,13 +186,13 @@ const JobBoard = () => {
                 {hasFilters && (
                     <div className="flex flex-wrap gap-2">
                         {typeFilter !== 'ALL' && (
-                            <span className="flex items-center gap-1.5 px-3 py-1.5 bg-nile-blue text-white border-[2px] border-black rounded-lg text-[8px] font-black uppercase shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
+                            <span className="flex items-center gap-1.5 px-3 py-1.5 bg-nile-blue text-white border border-gray-100 rounded-lg text-[8px] font-semibold shadow-card">
                                 TYPE: {typeFilter}
                                 <button onClick={() => setTypeFilter('ALL')}><X size={9} strokeWidth={3} /></button>
                             </span>
                         )}
                         {locationFilter !== 'ALL' && (
-                            <span className="flex items-center gap-1.5 px-3 py-1.5 bg-nile-blue text-white border-[2px] border-black rounded-lg text-[8px] font-black uppercase shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
+                            <span className="flex items-center gap-1.5 px-3 py-1.5 bg-nile-blue text-white border border-gray-100 rounded-lg text-[8px] font-semibold shadow-card">
                                 LOCATION: {locationFilter}
                                 <button onClick={() => setLocationFilter('ALL')}><X size={9} strokeWidth={3} /></button>
                             </span>
@@ -206,9 +206,9 @@ const JobBoard = () => {
                     </div>
                 ) : filtered.length === 0 ? (
                     <div className="py-20 text-center border-[2px] border-dashed border-black/10 rounded-[24px] space-y-3">
-                        <p className="text-[10px] font-black text-black/20 uppercase tracking-[0.2em]">NO JOBS FOUND</p>
+                        <p className="text-[10px] font-semibold text-black/20">NO JOBS FOUND</p>
                         {hasFilters && (
-                            <button onClick={clearFilters} className="text-[9px] font-black text-nile-blue uppercase underline hover:text-nile-green transition-colors">
+                            <button onClick={clearFilters} className="text-[9px] font-semibold text-nile-blue underline hover:text-nile-green transition-colors">
                                 CLEAR FILTERS
                             </button>
                         )}
@@ -255,24 +255,24 @@ const JobCard = ({ job, onNavigate, onApply }: { job: Job; onNavigate: () => voi
 
     const tags = job.skills ? job.skills.split(',').map(s => s.trim()).filter(Boolean).slice(0, 3) : [];
     const jobTypeKey = (job.type || '').toLowerCase();
-    const typeClass = typeColors[jobTypeKey] || 'bg-nile-white text-black border-[1.5px] border-black';
+    const typeClass = typeColors[jobTypeKey] || 'bg-nile-white text-black border border-gray-100';
     const typeName = typeLabel[jobTypeKey] || job.type?.toUpperCase() || 'ROLE';
 
     return (
-        <div className="bg-white p-5 md:p-6 rounded-[20px] border-[2px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[-2px] transition-all group flex flex-col text-left">
+        <div className="bg-white p-5 md:p-6 rounded-[20px] border border-gray-100 shadow-card hover:translate-y-[-2px] transition-all group flex flex-col text-left">
             <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-nile-blue text-white flex items-center justify-center text-sm font-black border-[2px] border-black shadow-[2px_2px_0px_0px_#6CBB56] flex-shrink-0">
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-nile-blue text-white flex items-center justify-center text-sm font-semibold border border-gray-100 shadow-green flex-shrink-0">
                         {initials}
                     </div>
                     <div className="min-w-0">
-                        <h3 className="text-base md:text-lg font-black text-black uppercase leading-none tracking-tighter truncate">{job.title}</h3>
-                        <p className="text-[9px] font-bold text-nile-blue/50 uppercase mt-1 tracking-widest truncate">{job.company_name}</p>
+                        <h3 className="text-base md:text-lg font-semibold text-black leading-none truncate">{job.title}</h3>
+                        <p className="text-[9px] font-bold text-nile-blue/50 mt-1 truncate">{job.company_name}</p>
                     </div>
                 </div>
                 <button
                     onClick={handleSave}
-                    className={`p-2 border-[2px] border-black rounded-lg transition-all flex-shrink-0 ${isSaved ? 'bg-nile-green text-black' : 'bg-white hover:bg-black/5'}`}
+                    className={`p-2 border border-gray-100 rounded-lg transition-all flex-shrink-0 ${isSaved ? 'bg-nile-green text-black' : 'bg-white hover:bg-black/5'}`}
                 >
                     <Bookmark size={13} strokeWidth={3} fill={isSaved ? 'currentColor' : 'none'} />
                 </button>
@@ -280,24 +280,24 @@ const JobCard = ({ job, onNavigate, onApply }: { job: Job; onNavigate: () => voi
 
             <div className="flex flex-wrap gap-3 mb-4">
                 {job.location && (
-                    <div className="flex items-center gap-1.5 text-[8px] font-black text-black/60 uppercase">
+                    <div className="flex items-center gap-1.5 text-[8px] font-semibold text-black/60">
                         <MapPin size={10} strokeWidth={3} className="text-nile-blue" />
                         <span>{job.location}</span>
                     </div>
                 )}
                 {job.salary && (
-                    <div className="flex items-center gap-1.5 text-[8px] font-black text-black/60 uppercase">
+                    <div className="flex items-center gap-1.5 text-[8px] font-semibold text-black/60">
                         <DollarSign size={10} strokeWidth={3} className="text-nile-green" />
                         <span>{job.salary}</span>
                     </div>
                 )}
-                <span className={`text-[7px] font-black px-2 py-0.5 rounded-full border-[1.5px] border-black ${typeClass}`}>{typeName}</span>
+                <span className={`text-[7px] font-semibold px-2 py-0.5 rounded-full border border-gray-100 ${typeClass}`}>{typeName}</span>
             </div>
 
             {tags.length > 0 && (
                 <div className="flex flex-wrap gap-1 mb-5">
                     {tags.map(tag => (
-                        <span key={tag} className="text-[7px] font-black uppercase px-2 py-1 bg-nile-white border border-black/10 rounded-md">{tag}</span>
+                        <span key={tag} className="text-[7px] font-semibold px-2 py-1 bg-nile-white border border-black/10 rounded-md">{tag}</span>
                     ))}
                 </div>
             )}

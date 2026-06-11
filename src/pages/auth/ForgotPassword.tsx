@@ -6,7 +6,7 @@ import InputField from '../../components/InputField';
 import Button from '../../components/Button';
 import NileConnectLogo from '../../components/NileConnectLogo';
 import { useToast } from '../../context/ToastContext';
-import { apiClient } from '../../services/api';
+import { apiClient, getErrorMessage } from '../../services/api';
 
 type Step = 'email' | 'sent' | 'reset' | 'done';
 
@@ -32,9 +32,8 @@ const ForgotPassword = () => {
         try {
             await apiClient.post('/api/auth/forgot-password', { email });
             setStep('sent');
-        } catch (err: any) {
-            const msg = err?.response?.data?.error || 'Failed to send reset link. Please try again.';
-            showToast(msg, 'error');
+        } catch (err) {
+            showToast(getErrorMessage(err, 'Failed to send reset link. Please try again.'), 'error');
         } finally {
             setIsLoading(false);
         }
@@ -50,9 +49,8 @@ const ForgotPassword = () => {
             await apiClient.post('/api/auth/reset-password', { token, new_password: newPassword });
             setStep('done');
             showToast('Password reset successfully!', 'success');
-        } catch (err: any) {
-            const msg = err?.response?.data?.error || 'Reset failed. The token may have expired.';
-            showToast(msg, 'error');
+        } catch (err) {
+            showToast(getErrorMessage(err, 'Reset failed. The token may have expired.'), 'error');
         } finally {
             setIsLoading(false);
         }

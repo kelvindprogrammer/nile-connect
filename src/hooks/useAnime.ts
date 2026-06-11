@@ -15,6 +15,7 @@ export function useFadeUp(deps: unknown[] = []) {
             duration: 700,
             easing: 'outExpo',
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, deps);
     return ref;
 }
@@ -33,6 +34,7 @@ export function useStaggerFadeUp(selector: string, deps: unknown[] = []) {
             duration: 600,
             easing: 'outExpo',
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, deps);
     return ref;
 }
@@ -51,6 +53,7 @@ export function useCountUp(target: number, deps: unknown[] = []) {
                 if (ref.current) ref.current.innerText = Math.round(obj.val).toLocaleString();
             },
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, deps);
     return ref;
 }
@@ -67,6 +70,7 @@ export function useSlideInLeft(deps: unknown[] = []) {
             duration: 700,
             easing: 'outExpo',
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, deps);
     return ref;
 }
@@ -83,6 +87,7 @@ export function usePopIn(deps: unknown[] = []) {
             duration: 500,
             easing: 'outBack(2)',
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, deps);
     return ref;
 }

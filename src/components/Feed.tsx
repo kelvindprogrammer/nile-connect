@@ -1,78 +1,70 @@
-import React, { useState, useEffect } from 'react';
-import Card from './Card';
+import React, { useEffect, useState } from 'react';
 import Avatar from './Avatar';
-import { MessageSquare, RefreshCcw, Send, MoreHorizontal, ThumbsUp, Loader2 } from 'lucide-react';
+import PostBar from './PostBar';
+import CommentSection from './CommentSection';
+import SharePostModal from './SharePostModal';
+import { MessageCircle, RefreshCcw, Send, ThumbsUp, Loader2 } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
-import CommentSection from './CommentSection';
-import { apiClient } from '../services/api';
+import { getPosts, toggleLike, type Post } from '../services/feedService';
+import { timeAgo } from '../utils/formatDate';
 
-interface ApiPost {
-    id: string;
-    author_id: string;
-    author_type: string;
-    content: string;
-    likes_count: number;
-    comments_count: number;
-    created_at: string;
-}
+const ROLE_LABELS: Record<string, string> = {
+    student: 'Student',
+    staff: 'Career Services',
+    employer: 'Employer',
+};
 
-interface ApiEnvelope<T> { data: T; }
-
-function timeAgo(dateStr: string): string {
-    const diff = Date.now() - new Date(dateStr).getTime();
-    const mins = Math.floor(diff / 60000);
-    if (mins < 1) return 'just now';
-    if (mins < 60) return `${mins}m ago`;
-    const hrs = Math.floor(mins / 60);
-    if (hrs < 24) return `${hrs}h ago`;
-    return `${Math.floor(hrs / 24)}d ago`;
-}
-
-interface FeedProps {
-    newPost?: { content: string } | null;
-    onPostConsumed?: () => void;
-}
-
-const Feed: React.FC<FeedProps> = ({ newPost, onPostConsumed }) => {
+const Feed: React.FC = () => {
     const { showToast } = useToast();
     const { user } = useAuth();
-    const [posts, setPosts] = useState<ApiPost[]>([]);
-    const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
+    const [posts, setPosts] = useState<Post[]>([]);
     const [openComments, setOpenComments] = useState<Set<string>>(new Set());
+    const [sharePost, setSharePost] = useState<Post | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
 
-    const fetchPosts = () => {
-        apiClient
-            .get<ApiEnvelope<{ posts: ApiPost[] }>>('/api/feed')
-            .then(({ data }) => setPosts(data.data.posts ?? []))
+    const fetchPosts = (showSpinner = false) => {
+        if (showSpinner) setRefreshing(true);
+        getPosts()
+            .then(setPosts)
             .catch(() => setPosts([]))
-            .finally(() => setIsLoading(false));
+            .finally(() => { setIsLoading(false); setRefreshing(false); });
     };
 
-    useEffect(() => { fetchPosts(); }, []);
-
     useEffect(() => {
-        if (!newPost) return;
-        apiClient
-            .post<ApiEnvelope<ApiPost>>('/api/feed', { content: newPost.content })
-            .then(({ data }) => {
-                setPosts(prev => [data.data, ...prev]);
-                showToast('Post published!', 'success');
-            })
-            .catch(() => showToast('Could not publish post.', 'error'))
-            .finally(() => onPostConsumed?.());
-    }, [newPost]);
+        let cancelled = false;
+        getPosts()
+            .then(list => { if (!cancelled) setPosts(list); })
+            .catch(() => { if (!cancelled) setPosts([]); })
+            .finally(() => { if (!cancelled) setIsLoading(false); });
+        return () => { cancelled = true; };
+    }, []);
 
-    const toggleLike = (id: string) => {
-        setLikedIds(prev => {
-            const next = new Set(prev);
-            if (next.has(id)) next.delete(id); else next.add(id);
-            return next;
-        });
+    const handlePostCreated = (post: Post) => {
+        setPosts(prev => [post, ...prev]);
+    };
+
+    const handleToggleLike = async (id: string) => {
+        const target = posts.find(p => p.id === id);
+        if (!target) return;
+        const wasLiked = target.liked;
+
         setPosts(prev => prev.map(p =>
-            p.id === id ? { ...p, likes_count: likedIds.has(id) ? p.likes_count - 1 : p.likes_count + 1 } : p
+            p.id === id ? { ...p, liked: !wasLiked, likes_count: wasLiked ? p.likes_count - 1 : p.likes_count + 1 } : p
         ));
+
+        try {
+            const result = await toggleLike(id);
+            setPosts(prev => prev.map(p =>
+                p.id === id ? { ...p, liked: result.liked, likes_count: result.likes_count } : p
+            ));
+        } catch {
+            setPosts(prev => prev.map(p =>
+                p.id === id ? { ...p, liked: wasLiked, likes_count: target.likes_count } : p
+            ));
+            showToast('Could not update like.', 'error');
+        }
     };
 
     const toggleComments = (id: string) => {
@@ -83,122 +75,117 @@ const Feed: React.FC<FeedProps> = ({ newPost, onPostConsumed }) => {
         });
     };
 
-    const authorLabel = (p: ApiPost) => {
-        if (user && p.author_id === user.id) return user.name;
-        const roleMap: Record<string, string> = { student: 'STUDENT', staff: 'CAREER SERVICES', employer: 'EMPLOYER' };
-        return roleMap[p.author_type] || 'COMMUNITY';
+    const handleCommentAdded = (postId: string) => {
+        setPosts(prev => prev.map(p => p.id === postId ? { ...p, comments_count: p.comments_count + 1 } : p));
     };
 
-    const roleTag = (p: ApiPost) => {
-        if (user && p.author_id === user.id) return `${(user.role || 'USER').toUpperCase()} • YOU`;
-        const tagMap: Record<string, string> = { student: 'STUDENT • NILE UNIVERSITY', staff: 'STAFF • CAREER SERVICES', employer: 'EMPLOYER • PARTNER' };
-        return tagMap[p.author_type] || 'NILE COMMUNITY';
+    const authorName = (p: Post) => {
+        if (user && p.author_id === user.id) return 'You';
+        return p.author_name || ROLE_LABELS[p.author_type] || 'Community member';
     };
 
-    if (isLoading) {
-        return (
-            <div className="flex items-center justify-center py-16">
-                <Loader2 size={28} className="animate-spin text-nile-blue/40" />
-            </div>
-        );
-    }
-
-    if (posts.length === 0) {
-        return (
-            <div className="py-16 text-center border-[2px] border-dashed border-black/10 rounded-[24px]">
-                <p className="text-[9px] font-black text-black/20 uppercase tracking-[0.2em]">NO POSTS YET — BE THE FIRST!</p>
-            </div>
-        );
-    }
+    const roleTag = (p: Post) => {
+        if (user && p.author_id === user.id) return ROLE_LABELS[user.role || ''] || 'You';
+        return ROLE_LABELS[p.author_type] || 'Nile Connect';
+    };
 
     return (
-        <div className="space-y-6 w-full max-w-lg mx-auto pb-10 font-sans">
-            {posts.map((post) => (
-                <Card key={post.id} variant="flat" className="p-0 border-[2px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none transition-all">
+        <div className="space-y-4 w-full max-w-2xl mx-auto pb-10">
+            <PostBar onPostCreated={handlePostCreated} />
+
+            {isLoading ? (
+                <div className="flex items-center justify-center py-16">
+                    <Loader2 size={24} className="animate-spin text-gray-300" />
+                </div>
+            ) : posts.length === 0 ? (
+                <div className="social-card py-14 text-center">
+                    <MessageCircle size={28} className="text-gray-200 mx-auto mb-3" />
+                    <p className="text-sm text-gray-400">No posts yet — be the first to share something.</p>
+                </div>
+            ) : posts.map((post) => (
+                <div key={post.id} className="social-card overflow-hidden">
                     <div className="p-4 pb-2 flex justify-between items-start">
-                        <div className="flex space-x-3">
-                            <div className="relative">
-                                <Avatar name={authorLabel(post)} size="sm" />
-                                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-white border border-black rounded-full flex items-center justify-center">
-                                    <div className="w-1.5 h-1.5 bg-nile-green rounded-full pulse-green"></div>
-                                </div>
+                        <div className="flex gap-3">
+                            <Avatar name={authorName(post)} size="sm" isSelf={user?.id === post.author_id} />
+                            <div className="text-left min-w-0">
+                                <h4 className="font-semibold text-gray-900 text-sm leading-tight truncate">{authorName(post)}</h4>
+                                <p className="text-xs text-gray-400 mt-0.5">{roleTag(post)} · {timeAgo(post.created_at)}</p>
                             </div>
-                            <div className="text-left">
-                                <h4 className="font-black text-black uppercase tracking-tight text-xs hover:text-nile-blue cursor-pointer leading-none">{authorLabel(post)}</h4>
-                                <p className="text-[8px] font-black text-nile-blue/40 uppercase tracking-widest mt-0.5">{roleTag(post)}</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <span className="text-[7px] font-black text-black/20 uppercase">{timeAgo(post.created_at)}</span>
-                            <button className="text-black/30 hover:text-black transition-colors">
-                                <MoreHorizontal size={18} />
-                            </button>
                         </div>
                     </div>
 
-                    <div className="px-4 py-3 text-left">
-                        <p className="text-xs font-bold text-nile-blue leading-relaxed uppercase tracking-wide">{post.content}</p>
+                    <div className="px-4 py-2">
+                        <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">{post.content}</p>
                     </div>
 
-                    <div className="px-4 py-2 flex justify-between items-center border-y-[2px] border-black/5 bg-nile-white/20">
-                        <div className="flex items-center space-x-1.5">
-                            <div className="z-10 bg-nile-blue text-white rounded-full p-1 border border-white">
-                                <ThumbsUp size={7} strokeWidth={3} />
-                            </div>
-                            <span className="text-[9px] font-black text-black/50 uppercase tracking-widest">
-                                {post.likes_count + (likedIds.has(post.id) ? 1 : 0)} REPS
-                            </span>
+                    {post.media_url && (
+                        <div className="social-media mx-4 mb-1">
+                            <img src={post.media_url} alt="Post attachment" loading="lazy" />
                         </div>
-                        <button onClick={() => toggleComments(post.id)} className="text-[9px] font-black text-nile-blue/30 uppercase tracking-widest hover:text-black">
-                            {post.comments_count} REPLIES
-                        </button>
-                    </div>
+                    )}
 
-                    <div className="px-3 py-1.5 grid grid-cols-4 gap-1.5 bg-white">
+                    {(post.likes_count > 0 || post.comments_count > 0) && (
+                        <div className="px-4 py-2 flex justify-between items-center text-xs text-gray-400">
+                            <div className="flex items-center gap-1.5">
+                                {post.likes_count > 0 && (
+                                    <>
+                                        <span className="w-4 h-4 rounded-full bg-nile-blue text-white flex items-center justify-center flex-shrink-0">
+                                            <ThumbsUp size={9} strokeWidth={3} />
+                                        </span>
+                                        <span>{post.likes_count}</span>
+                                    </>
+                                )}
+                            </div>
+                            {post.comments_count > 0 && (
+                                <button onClick={() => toggleComments(post.id)} className="hover:text-gray-700 transition-colors">
+                                    {post.comments_count} {post.comments_count === 1 ? 'comment' : 'comments'}
+                                </button>
+                            )}
+                        </div>
+                    )}
+
+                    <div className="px-2 py-1 grid grid-cols-3 gap-1 border-t border-gray-100">
                         <button
-                            onClick={() => toggleLike(post.id)}
-                            className={`flex flex-col items-center py-2 rounded-xl transition-all ${likedIds.has(post.id) ? 'text-nile-blue bg-nile-blue/5' : 'text-black/30 hover:bg-nile-white'}`}
+                            onClick={() => handleToggleLike(post.id)}
+                            className={`action-btn ${post.liked ? 'active' : ''}`}
                         >
-                            <ThumbsUp size={16} strokeWidth={likedIds.has(post.id) ? 3 : 2} />
-                            <span className="text-[7px] font-black uppercase mt-1">Like</span>
+                            <ThumbsUp size={16} strokeWidth={post.liked ? 2.5 : 2} />
+                            Like
                         </button>
                         <button
                             onClick={() => toggleComments(post.id)}
-                            className={`flex flex-col items-center py-2 rounded-xl transition-all ${openComments.has(post.id) ? 'text-nile-blue bg-nile-blue/5' : 'text-black/30 hover:bg-nile-white'}`}
+                            className={`action-btn ${openComments.has(post.id) ? 'active' : ''}`}
                         >
-                            <MessageSquare size={16} strokeWidth={2} />
-                            <span className="text-[7px] font-black uppercase mt-1">Comment</span>
+                            <MessageCircle size={16} />
+                            Comment
                         </button>
                         <button
-                            onClick={() => showToast('Repost coming soon!', 'success')}
-                            className="flex flex-col items-center py-2 rounded-xl text-black/30 hover:bg-nile-white transition-all"
+                            onClick={() => setSharePost(post)}
+                            className="action-btn"
                         >
-                            <RefreshCcw size={16} strokeWidth={2} />
-                            <span className="text-[7px] font-black uppercase mt-1">Repost</span>
-                        </button>
-                        <button
-                            onClick={() => showToast('Messaging coming soon!', 'success')}
-                            className="flex flex-col items-center py-2 rounded-xl text-black/30 hover:bg-nile-white transition-all"
-                        >
-                            <Send size={16} strokeWidth={2} />
-                            <span className="text-[7px] font-black uppercase mt-1">Send</span>
+                            <Send size={16} />
+                            Send
                         </button>
                     </div>
 
                     {openComments.has(post.id) && (
-                        <div className="border-t-[2px] border-black/5 bg-nile-white/10 animate-in slide-in-from-top-1">
-                            <CommentSection />
-                        </div>
+                        <CommentSection postId={post.id} onCommentAdded={() => handleCommentAdded(post.id)} />
                     )}
-                </Card>
+                </div>
             ))}
 
             <button
-                onClick={fetchPosts}
-                className="w-full py-6 border-[2px] border-dashed border-black/10 rounded-3xl text-[9px] font-black text-black/20 hover:border-black hover:text-black transition-all uppercase tracking-[0.2em]"
+                onClick={() => fetchPosts(true)}
+                disabled={refreshing}
+                className="w-full py-3 border border-dashed border-gray-200 rounded-2xl text-xs font-medium text-gray-400 hover:border-gray-300 hover:text-gray-600 transition-all flex items-center justify-center gap-2 disabled:opacity-60"
             >
-                Refresh Feed
+                {refreshing ? <Loader2 size={14} className="animate-spin" /> : <RefreshCcw size={14} />}
+                Refresh feed
             </button>
+
+            {sharePost && (
+                <SharePostModal isOpen={!!sharePost} onClose={() => setSharePost(null)} post={sharePost} />
+            )}
         </div>
     );
 };

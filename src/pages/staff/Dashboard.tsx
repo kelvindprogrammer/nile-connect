@@ -25,18 +25,18 @@ import {
 
 const LoadingSkeleton = () => (
     <div className="p-4 md:p-8 space-y-6 md:space-y-10 animate-pulse bg-nile-white min-h-full">
-        <div className="h-44 md:h-52 bg-black/5 rounded-[24px] md:rounded-[40px] border-[2px] border-black/5" />
+        <div className="h-44 md:h-52 bg-black/5 rounded-3xl" />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {[1, 2, 3, 4].map(i => <div key={i} className="h-28 md:h-36 bg-black/5 rounded-[20px]" />)}
+            {[1, 2, 3, 4].map(i => <div key={i} className="h-28 md:h-36 bg-black/5 rounded-2xl" />)}
         </div>
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 md:gap-10">
             <div className="xl:col-span-8 space-y-6">
-                <div className="h-80 bg-black/5 rounded-[28px]" />
-                <div className="h-80 bg-black/5 rounded-[28px]" />
+                <div className="h-80 bg-black/5 rounded-2xl" />
+                <div className="h-80 bg-black/5 rounded-2xl" />
             </div>
             <div className="xl:col-span-4 space-y-6">
-                <div className="h-60 bg-black/5 rounded-[28px]" />
-                <div className="h-72 bg-black/5 rounded-[28px]" />
+                <div className="h-60 bg-black/5 rounded-2xl" />
+                <div className="h-72 bg-black/5 rounded-2xl" />
             </div>
         </div>
     </div>
@@ -55,7 +55,7 @@ const StaffDashboard = () => {
     const [jobs, setJobs] = useState<StaffJob[]>([]);
     const [actionLoading, setActionLoading] = useState<Record<string, boolean>>({});
 
-    const staffName = (user as any)?.full_name || (user as any)?.name || 'ADMIN';
+    const staffName = user?.name || 'ADMIN';
     const today = new Date().toLocaleDateString('en-NG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
 
     const fetchAll = useCallback(async () => {
@@ -75,7 +75,10 @@ const StaffDashboard = () => {
         }
     }, [showToast]);
 
-    useEffect(() => { fetchAll(); }, [fetchAll]);
+    useEffect(() => {
+        const t = setTimeout(fetchAll, 0);
+        return () => clearTimeout(t);
+    }, [fetchAll]);
 
     const pendingEmployers = employers.filter(e => e.status === 'pending');
     const pendingJobs = jobs.filter(j => j.status === 'pending');
@@ -120,25 +123,25 @@ const StaffDashboard = () => {
         <div className="p-4 md:p-8 space-y-8 md:space-y-12 anime-fade-in font-sans bg-nile-white min-h-full pb-20 md:pb-8 text-left">
 
             {/* ── Hero ─────────────────────────────────────────────── */}
-            <section className="bg-white border-[2px] md:border-[3px] border-black rounded-[24px] md:rounded-[40px] shadow-[4px_4px_0px_0px_#000] md:shadow-[8px_8px_0px_0px_#000] p-6 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+            <section className="bg-white border border-gray-100 rounded-[24px] md:rounded-[40px] shadow-card md:shadow-card p-6 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-1/3 h-full bg-black/[0.03] -skew-x-12 translate-x-1/2 pointer-events-none" />
 
                 <div className="space-y-4 z-10 w-full md:max-w-lg">
                     <div className="flex flex-wrap items-center gap-2">
-                        <span className="px-3 py-1 bg-black text-white text-[8px] md:text-[10px] font-black uppercase tracking-widest rounded-full">
+                        <span className="px-3 py-1 bg-black text-white text-[8px] md:text-[10px] font-semibold rounded-full">
                             STAFF CONSOLE
                         </span>
                         {totalPending > 0 && (
-                            <span className="px-3 py-1 bg-red-500 text-white text-[8px] md:text-[10px] font-black uppercase tracking-widest rounded-full animate-pulse">
+                            <span className="px-3 py-1 bg-red-500 text-white text-[8px] md:text-[10px] font-semibold rounded-full animate-pulse">
                                 {totalPending} PENDING
                             </span>
                         )}
                     </div>
-                    <h2 className="text-3xl md:text-5xl font-black text-black leading-none uppercase tracking-tighter">
+                    <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">
                         WELCOME,<br />
                         <span className="text-nile-green">{staffName}</span>
                     </h2>
-                    <p className="text-[10px] md:text-xs font-bold text-black/40 uppercase tracking-widest flex items-center gap-2">
+                    <p className="text-[10px] md:text-xs font-bold text-black/40 flex items-center gap-2">
                         <CalendarDays size={12} /> {today}
                     </p>
                     <div className="flex flex-wrap gap-3 pt-1">
@@ -151,20 +154,20 @@ const StaffDashboard = () => {
                     </div>
                 </div>
 
-                <div className="hidden md:flex flex-col justify-between w-64 h-44 bg-white border-[3px] border-black rounded-[28px] p-6 shadow-[4px_4px_0px_0px_rgba(108,187,86,1)] z-10 flex-shrink-0">
+                <div className="hidden md:flex flex-col justify-between w-64 h-44 bg-white border border-gray-100 rounded-[28px] p-6 shadow-green z-10 flex-shrink-0">
                     <div className="flex justify-between items-start">
                         <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center text-white">
                             <TrendingUp size={18} />
                         </div>
-                        <span className="text-[9px] font-black text-black/30 uppercase tracking-widest">LIVE METRICS</span>
+                        <span className="text-[9px] font-semibold text-black/30">LIVE METRICS</span>
                     </div>
                     <div className="space-y-1">
-                        <h4 className="text-4xl font-black text-black leading-none">
+                        <h4 className="text-4xl font-semibold text-black leading-none">
                             {stats ? (stats.pending_employers + stats.pending_jobs) : '—'}
                         </h4>
-                        <p className="text-[9px] font-black text-black/40 uppercase tracking-widest">ITEMS AWAITING ACTION</p>
+                        <p className="text-[9px] font-semibold text-black/40">ITEMS AWAITING ACTION</p>
                     </div>
-                    <div className="flex items-center gap-2 text-[9px] font-black text-nile-green uppercase tracking-widest">
+                    <div className="flex items-center gap-2 text-[9px] font-semibold text-nile-green">
                         <CheckCircle2 size={12} strokeWidth={3} />
                         <span>PLATFORM OPERATIONAL</span>
                     </div>
@@ -174,17 +177,17 @@ const StaffDashboard = () => {
             {/* ── Stat Cards ───────────────────────────────────────── */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                 {statCards.map(s => (
-                    <div key={s.label} className="bg-white border-[2px] border-black rounded-[20px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 md:p-6 hover:translate-y-[-3px] transition-all">
+                    <div key={s.label} className="bg-white border border-gray-100 rounded-[20px] shadow-card p-4 md:p-6 hover:translate-y-[-3px] transition-all">
                         <div className="flex justify-between items-start mb-3">
-                            <div className={`w-9 h-9 md:w-10 md:h-10 rounded-xl border-2 border-black flex items-center justify-center ${s.color}`}>
+                            <div className={`w-9 h-9 md:w-10 md:h-10 rounded-xl border border-gray-100 flex items-center justify-center ${s.color}`}>
                                 {s.icon}
                             </div>
-                            <span className="text-[8px] font-black bg-black/5 text-black/40 px-2 py-0.5 rounded-full border border-black/10 uppercase tracking-wider">LIVE</span>
+                            <span className="text-[8px] font-semibold bg-black/5 text-black/40 px-2 py-0.5 rounded-full border border-black/10 tracking-wider">LIVE</span>
                         </div>
-                        <h3 className="text-2xl md:text-4xl font-black text-black leading-none tracking-tighter">
+                        <h3 className="text-2xl md:text-4xl font-semibold text-black leading-none">
                             {s.value.toLocaleString()}
                         </h3>
-                        <p className="text-[8px] md:text-[10px] font-black text-black/40 uppercase mt-2 tracking-widest">{s.label}</p>
+                        <p className="text-[8px] md:text-[10px] font-semibold text-black/40 mt-2">{s.label}</p>
                     </div>
                 ))}
             </div>
@@ -203,14 +206,14 @@ const StaffDashboard = () => {
                         emptyLabel="No pending employer verifications"
                     >
                         {pendingEmployers.map(emp => (
-                            <div key={emp.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 md:p-5 bg-nile-white/60 border-[2px] border-black rounded-[20px] hover:bg-white transition-all gap-4">
+                            <div key={emp.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 md:p-5 bg-nile-white/60 border border-gray-100 rounded-[20px] hover:bg-white transition-all gap-4">
                                 <div className="flex items-center gap-4 min-w-0 flex-1">
-                                    <div className="w-10 h-10 bg-black text-white rounded-xl flex items-center justify-center font-black text-sm flex-shrink-0">
+                                    <div className="w-10 h-10 bg-black text-white rounded-xl flex items-center justify-center font-semibold text-sm flex-shrink-0">
                                         {emp.company_name.charAt(0).toUpperCase()}
                                     </div>
                                     <div className="min-w-0">
-                                        <p className="font-black text-[12px] md:text-sm uppercase text-black leading-none mb-1 truncate">{emp.company_name}</p>
-                                        <p className="text-[8px] md:text-[9px] font-black text-black/40 uppercase tracking-wider truncate">
+                                        <p className="font-semibold text-[12px] md:text-sm text-black leading-none mb-1 truncate">{emp.company_name}</p>
+                                        <p className="text-[8px] md:text-[9px] font-semibold text-black/40 tracking-wider truncate">
                                             {emp.industry} &bull; {emp.location}
                                         </p>
                                         <p className="text-[8px] font-bold text-nile-blue/60 truncate">{emp.contact_email}</p>
@@ -242,14 +245,14 @@ const StaffDashboard = () => {
                         emptyLabel="No pending job approvals"
                     >
                         {pendingJobs.map(job => (
-                            <div key={job.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 md:p-5 bg-nile-white/60 border-[2px] border-black rounded-[20px] hover:bg-white transition-all gap-4">
+                            <div key={job.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 md:p-5 bg-nile-white/60 border border-gray-100 rounded-[20px] hover:bg-white transition-all gap-4">
                                 <div className="flex items-center gap-4 min-w-0 flex-1">
-                                    <div className="w-10 h-10 bg-nile-blue/10 text-nile-blue rounded-xl flex items-center justify-center border-2 border-black flex-shrink-0">
+                                    <div className="w-10 h-10 bg-nile-blue/10 text-nile-blue rounded-xl flex items-center justify-center border border-gray-100 flex-shrink-0">
                                         <Briefcase size={16} />
                                     </div>
                                     <div className="min-w-0">
-                                        <p className="font-black text-[12px] md:text-sm uppercase text-black leading-none mb-1 truncate">{job.title}</p>
-                                        <p className="text-[8px] md:text-[9px] font-black text-black/40 uppercase tracking-wider truncate">
+                                        <p className="font-semibold text-[12px] md:text-sm text-black leading-none mb-1 truncate">{job.title}</p>
+                                        <p className="text-[8px] md:text-[9px] font-semibold text-black/40 tracking-wider truncate">
                                             {job.company} &bull; {job.type} &bull; {job.location}
                                         </p>
                                     </div>
@@ -288,12 +291,12 @@ const StaffDashboard = () => {
                                 <button
                                     key={qa.label}
                                     onClick={() => navigate(qa.path)}
-                                    className="flex flex-col items-start gap-3 p-4 bg-nile-white border-[2px] border-black rounded-[16px] hover:bg-white hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[-2px] transition-all text-left"
+                                    className="flex flex-col items-start gap-3 p-4 bg-nile-white border border-gray-100 rounded-[16px] hover:bg-white hover:shadow-card hover:translate-y-[-2px] transition-all text-left"
                                 >
-                                    <div className={`w-9 h-9 rounded-lg border-2 border-black flex items-center justify-center ${qa.color}`}>
+                                    <div className={`w-9 h-9 rounded-lg border border-gray-100 flex items-center justify-center ${qa.color}`}>
                                         {qa.icon}
                                     </div>
-                                    <span className="text-[9px] font-black uppercase tracking-widest text-black leading-tight">{qa.label}</span>
+                                    <span className="text-[9px] font-semibold text-black leading-tight">{qa.label}</span>
                                 </button>
                             ))}
                         </div>
@@ -312,11 +315,11 @@ const StaffDashboard = () => {
                                 const pct = total > 0 ? Math.round((bar.value / total) * 100) : 0;
                                 return (
                                     <div key={bar.label} className="space-y-1.5">
-                                        <div className="flex justify-between text-[8px] md:text-[9px] font-black uppercase tracking-widest">
+                                        <div className="flex justify-between text-[8px] md:text-[9px] font-semibold">
                                             <span className="text-black/60">{bar.label}</span>
                                             <span className="text-black">{bar.value.toLocaleString()}</span>
                                         </div>
-                                        <div className="h-3 bg-nile-white border-[2px] border-black rounded-full overflow-hidden p-0.5">
+                                        <div className="h-3 bg-nile-white border border-gray-100 rounded-full overflow-hidden p-0.5">
                                             <div
                                                 className={`h-full ${bar.color} rounded-full transition-all duration-700`}
                                                 style={{ width: `${Math.max(pct, 2)}%` }}
@@ -327,14 +330,14 @@ const StaffDashboard = () => {
                             })}
 
                             {stats && (
-                                <div className="pt-3 border-t-[2px] border-black/5 grid grid-cols-2 gap-3">
-                                    <div className="bg-nile-white border-[2px] border-black rounded-[12px] p-3 text-center">
-                                        <p className="text-lg font-black text-black leading-none">{stats.pending_employers}</p>
-                                        <p className="text-[7px] font-black uppercase tracking-widest text-black/40 mt-1">PENDING EMP.</p>
+                                <div className="pt-3 border-t border-gray-100/5 grid grid-cols-2 gap-3">
+                                    <div className="bg-nile-white border border-gray-100 rounded-[12px] p-3 text-center">
+                                        <p className="text-lg font-semibold text-black leading-none">{stats.pending_employers}</p>
+                                        <p className="text-[7px] font-semibold text-black/40 mt-1">PENDING EMP.</p>
                                     </div>
-                                    <div className="bg-nile-white border-[2px] border-black rounded-[12px] p-3 text-center">
-                                        <p className="text-lg font-black text-black leading-none">{stats.upcoming_events}</p>
-                                        <p className="text-[7px] font-black uppercase tracking-widest text-black/40 mt-1">UPCOMING EVT.</p>
+                                    <div className="bg-nile-white border border-gray-100 rounded-[12px] p-3 text-center">
+                                        <p className="text-lg font-semibold text-black leading-none">{stats.upcoming_events}</p>
+                                        <p className="text-[7px] font-semibold text-black/40 mt-1">UPCOMING EVT.</p>
                                     </div>
                                 </div>
                             )}
@@ -357,20 +360,20 @@ const QueueSection = ({
     emptyLabel: string;
     children: React.ReactNode;
 }) => (
-    <div className="bg-white border-[2px] border-black rounded-[24px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b-[2px] border-black/5">
+    <div className="bg-white border border-gray-100 rounded-[24px] shadow-card overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100/5">
             <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-black text-white rounded-lg flex items-center justify-center flex-shrink-0">
                     {icon}
                 </div>
-                <h3 className="text-[10px] md:text-xs font-black uppercase tracking-[0.15em] text-black">{title}</h3>
+                <h3 className="text-[10px] md:text-xs font-semibold text-black">{title}</h3>
             </div>
             {badgeCount > 0 ? (
-                <span className="text-[8px] font-black bg-red-500 text-white px-2.5 py-1 rounded-full uppercase tracking-wider">
+                <span className="text-[8px] font-semibold bg-red-500 text-white px-2.5 py-1 rounded-full tracking-wider">
                     {badgeCount} PENDING
                 </span>
             ) : (
-                <span className="text-[8px] font-black bg-nile-green/20 text-nile-green px-2.5 py-1 rounded-full uppercase tracking-wider">
+                <span className="text-[8px] font-semibold bg-nile-green/20 text-nile-green px-2.5 py-1 rounded-full tracking-wider">
                     CLEAR
                 </span>
             )}
@@ -379,7 +382,7 @@ const QueueSection = ({
             {React.Children.count(children) === 0 || badgeCount === 0 ? (
                 <div className="py-12 text-center border-2 border-dashed border-black/10 rounded-[20px]">
                     <CheckCircle2 size={28} className="text-nile-green/30 mx-auto mb-3" />
-                    <p className="text-[9px] font-black text-black/30 uppercase tracking-[0.2em]">{emptyLabel}</p>
+                    <p className="text-[9px] font-semibold text-black/30">{emptyLabel}</p>
                 </div>
             ) : children}
         </div>
@@ -397,7 +400,7 @@ const ActionButton = ({
     <button
         onClick={onClick}
         disabled={isLoading}
-        className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border-[2px] border-black font-black text-[9px] uppercase tracking-widest shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all disabled:opacity-50 disabled:pointer-events-none
+        className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-100 font-semibold text-[9px] shadow-card transition-all disabled:opacity-50 disabled:pointer-events-none
             ${variant === 'approve'
                 ? 'bg-nile-green text-white'
                 : 'bg-white text-red-500 hover:bg-red-50'

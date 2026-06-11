@@ -32,7 +32,10 @@ const EmployerCandidates = () => {
         finally { setLoading(false); }
     }, [showToast]);
 
-    useEffect(() => { load(); }, [load]);
+    useEffect(() => {
+        const t = setTimeout(load, 0);
+        return () => clearTimeout(t);
+    }, [load]);
 
     // Deduplicate by student_id — one card per student (show their best/latest status)
     const candidates = useMemo(() => {
@@ -76,9 +79,9 @@ const EmployerCandidates = () => {
         <div className="p-4 md:p-8 space-y-8 anime-fade-in font-sans pb-20 text-left min-h-full">
 
             {/* Header */}
-            <div className="border-b-[2px] border-black pb-6">
-                <h2 className="text-3xl md:text-5xl font-black text-black uppercase leading-none tracking-tighter">Talent Pool .</h2>
-                <p className="text-[9px] font-black text-black/40 uppercase tracking-[0.2em] mt-1">
+            <div className="border-b border-gray-100 pb-6">
+                <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">Talent Pool .</h2>
+                <p className="text-[9px] font-semibold text-black/40 mt-1">
                     {candidates.length} UNIQUE CANDIDATES · ALL APPLIED TO YOUR LISTINGS
                 </p>
             </div>
@@ -89,12 +92,12 @@ const EmployerCandidates = () => {
                     <Search size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-black/30" />
                     <input type="text" value={search} onChange={e => setSearch(e.target.value)}
                         placeholder="SEARCH BY NAME, MAJOR OR ROLE..."
-                        className="w-full pl-10 pr-4 py-3 rounded-xl border-[2px] border-black font-black text-[9px] tracking-widest uppercase outline-none focus:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] bg-nile-white/60 focus:bg-white transition-all" />
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-100 font-semibold text-[9px] outline-none focus:shadow-card bg-nile-white/60 focus:bg-white transition-all" />
                 </div>
-                <div className="flex bg-white p-1 border-[2px] border-black rounded-xl gap-0.5 overflow-x-auto">
+                <div className="flex bg-white p-1 border border-gray-100 rounded-xl gap-0.5 overflow-x-auto">
                     {(['all', 'applied', 'screening', 'interview', 'offer', 'rejected'] as FilterStatus[]).map(f => (
                         <button key={f} onClick={() => setFilterStatus(f)}
-                            className={`px-2.5 py-1.5 rounded-lg font-black text-[7px] uppercase tracking-wider transition-all whitespace-nowrap
+                            className={`px-2.5 py-1.5 rounded-lg font-semibold text-[7px] tracking-wider transition-all whitespace-nowrap
                                 ${filterStatus === f ? 'bg-black text-white' : 'text-black/40 hover:text-black'}`}>
                             {f}
                         </button>
@@ -106,7 +109,7 @@ const EmployerCandidates = () => {
             {filtered.length === 0 ? (
                 <div className="py-24 text-center border-[2px] border-dashed border-black/10 rounded-[32px]">
                     <Users size={32} className="text-black/15 mx-auto mb-4" />
-                    <p className="text-[9px] font-black text-black/30 uppercase tracking-[0.2em]">
+                    <p className="text-[9px] font-semibold text-black/30">
                         {search ? 'No candidates match your search' : applications.length === 0 ? 'No candidates yet — post jobs to attract talent' : `No ${filterStatus} candidates`}
                     </p>
                 </div>
@@ -129,25 +132,25 @@ const CandidateCard = ({ candidate, onMessage }: {
     const initials = (candidate.student_name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
 
     return (
-        <div className="bg-white border-[2px] border-black rounded-[24px] p-5 flex flex-col gap-4 hover:translate-y-[-2px] shadow-[3px_3px_0px_0px_rgba(0,0,0,0.1)] hover:shadow-[4px_4px_0px_0px_rgba(30,73,157,0.4)] transition-all">
+        <div className="bg-white border border-gray-100 rounded-[24px] p-5 flex flex-col gap-4 hover:translate-y-[-2px] shadow-card hover:shadow-blue transition-all">
             <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-nile-blue text-white rounded-2xl flex items-center justify-center font-black text-base flex-shrink-0">
+                    <div className="w-12 h-12 bg-nile-blue text-white rounded-2xl flex items-center justify-center font-semibold text-base flex-shrink-0">
                         {initials}
                     </div>
                     <div className="min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
-                            <p className="font-black text-sm uppercase text-black truncate leading-none">{candidate.student_name}</p>
+                            <p className="font-semibold text-sm text-black truncate leading-none">{candidate.student_name}</p>
                             {candidate.is_verified && <CheckCircle2 size={11} className="text-nile-green flex-shrink-0" strokeWidth={3} />}
                         </div>
-                        <span className={`text-[7px] font-black px-2 py-0.5 rounded-full border uppercase ${badge}`}>
+                        <span className={`text-[7px] font-semibold px-2 py-0.5 rounded-full border ${badge}`}>
                             {candidate.status}
                         </span>
                     </div>
                 </div>
             </div>
 
-            <div className="space-y-2 text-[8px] font-black text-black/50 uppercase">
+            <div className="space-y-2 text-[8px] font-semibold text-black/50">
                 {candidate.major && (
                     <div className="flex items-center gap-2">
                         <GraduationCap size={11} className="text-nile-blue flex-shrink-0" />
@@ -163,10 +166,10 @@ const CandidateCard = ({ candidate, onMessage }: {
 
             <div className="flex gap-2 mt-auto">
                 <button onClick={onMessage}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 border-[2px] border-black rounded-xl font-black text-[8px] uppercase hover:bg-black hover:text-white transition-all">
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 border border-gray-100 rounded-xl font-semibold text-[8px] hover:bg-black hover:text-white transition-all">
                     <MessageSquare size={12} /> MESSAGE
                 </button>
-                <button className="p-2.5 border-[2px] border-black rounded-xl text-black/40 hover:border-nile-blue hover:text-nile-blue transition-all">
+                <button className="p-2.5 border border-gray-100 rounded-xl text-black/40 hover:border-nile-blue hover:text-nile-blue transition-all">
                     <ArrowUpRight size={14} />
                 </button>
             </div>

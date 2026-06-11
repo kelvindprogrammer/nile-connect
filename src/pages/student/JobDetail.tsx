@@ -8,7 +8,7 @@ import {
 import Button from '../../components/Button';
 import Card from '../../components/Card';
 import { useToast } from '../../context/ToastContext';
-import { apiClient } from '../../services/api';
+import { apiClient, getErrorMessage } from '../../services/api';
 
 interface JobDetail {
     id: string;
@@ -30,9 +30,9 @@ interface ApiEnvelope<T> { data: T; }
 const typeColors: Record<string, string> = {
     'full-time':  'bg-nile-green text-black',
     'remote':     'bg-nile-blue text-white',
-    'hybrid':     'bg-nile-white text-black border-[1.5px] border-black',
+    'hybrid':     'bg-nile-white text-black border border-gray-100',
     'internship': 'bg-black text-white',
-    'part-time':  'bg-yellow-100 text-yellow-700 border-[1.5px] border-black',
+    'part-time':  'bg-yellow-100 text-yellow-700 border border-gray-100',
 };
 
 function postedAgo(dateStr: string): string {
@@ -55,15 +55,18 @@ const JobDetail = () => {
     const [applying, setApplying] = useState(false);
 
     useEffect(() => {
-        if (!id) { setError(true); setIsLoading(false); return; }
-        apiClient
-            .get<ApiEnvelope<{ job: JobDetail }>>(`/api/jobs/${id}`)
-            .then(({ data }) => {
-                if (data.data?.job) setJob(data.data.job);
-                else setError(true);
-            })
-            .catch(() => setError(true))
-            .finally(() => setIsLoading(false));
+        const t = setTimeout(() => {
+            if (!id) { setError(true); setIsLoading(false); return; }
+            apiClient
+                .get<ApiEnvelope<{ job: JobDetail }>>(`/api/jobs/${id}`)
+                .then(({ data }) => {
+                    if (data.data?.job) setJob(data.data.job);
+                    else setError(true);
+                })
+                .catch(() => setError(true))
+                .finally(() => setIsLoading(false));
+        }, 0);
+        return () => clearTimeout(t);
     }, [id]);
 
     const handleApply = async () => {
@@ -73,9 +76,8 @@ const JobDetail = () => {
             await apiClient.post('/api/jobs', { job_id: id });
             showToast('Application submitted!', 'success');
             navigate('/student/applications');
-        } catch (err: any) {
-            const msg = err?.response?.data?.error || 'Failed to apply. Please try again.';
-            showToast(msg, 'error');
+        } catch (err) {
+            showToast(getErrorMessage(err, 'Failed to apply. Please try again.'), 'error');
         } finally {
             setApplying(false);
         }
@@ -98,7 +100,7 @@ const JobDetail = () => {
         <DashboardLayout>
             <div className="p-8 flex flex-col items-center justify-center h-[60vh] gap-4">
                 <AlertCircle size={40} className="text-red-400" />
-                <p className="text-[10px] font-black text-black/40 uppercase tracking-widest">Job not found</p>
+                <p className="text-[10px] font-semibold text-black/40">Job not found</p>
                 <Button variant="outline" size="sm" onClick={() => navigate('/student/jobs')}>
                     <ArrowLeft size={14} className="mr-2" /> BACK TO JOB BOARD
                 </Button>
@@ -107,7 +109,7 @@ const JobDetail = () => {
     );
 
     const typeKey = (job.type || '').toLowerCase();
-    const typeClass = typeColors[typeKey] || 'bg-nile-white text-black border-[1.5px] border-black';
+    const typeClass = typeColors[typeKey] || 'bg-nile-white text-black border border-gray-100';
     const skills = job.skills ? job.skills.split(',').map(s => s.trim()).filter(Boolean) : [];
     const requirements = job.requirements
         ? job.requirements.split('\n').map(s => s.trim()).filter(Boolean)
@@ -123,45 +125,45 @@ const JobDetail = () => {
                 {/* Back */}
                 <button
                     onClick={() => navigate('/student/jobs')}
-                    className="flex items-center gap-2 text-black/40 font-black uppercase tracking-widest text-[9px] hover:text-black transition-colors group"
+                    className="flex items-center gap-2 text-black/40 font-semibold text-[9px] hover:text-black transition-colors group"
                 >
                     <ArrowLeft size={14} strokeWidth={3} className="group-hover:-translate-x-1 transition-transform" />
                     BACK TO JOB BOARD
                 </button>
 
                 {/* Header Card */}
-                <div className="bg-white border-[2px] border-black rounded-[24px] shadow-[6px_6px_0px_0px_rgba(108,187,86,1)] p-6 md:p-8">
+                <div className="bg-white border border-gray-100 rounded-[24px] shadow-green p-6 md:p-8">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                         <div className="flex items-center gap-5">
-                            <div className="w-16 h-16 md:w-20 md:h-20 rounded-[20px] bg-nile-blue text-white flex items-center justify-center text-xl md:text-2xl font-black border-[2px] border-black shadow-[4px_4px_0px_0px_rgba(108,187,86,1)] flex-shrink-0">
+                            <div className="w-16 h-16 md:w-20 md:h-20 rounded-[20px] bg-nile-blue text-white flex items-center justify-center text-xl md:text-2xl font-semibold border border-gray-100 shadow-green flex-shrink-0">
                                 {initials}
                             </div>
                             <div className="space-y-1">
                                 <div className="flex items-center flex-wrap gap-2 mb-1">
-                                    <h1 className="text-2xl md:text-3xl font-black text-black uppercase leading-none tracking-tighter">{job.title}</h1>
-                                    <span className={`text-[7px] font-black px-2 py-0.5 rounded-full border-[1.5px] border-black ${typeClass}`}>
+                                    <h1 className="text-2xl md:text-3xl font-semibold text-black leading-none">{job.title}</h1>
+                                    <span className={`text-[7px] font-semibold px-2 py-0.5 rounded-full border border-gray-100 ${typeClass}`}>
                                         {job.type?.toUpperCase() || 'ROLE'}
                                     </span>
                                 </div>
                                 <div className="flex items-center gap-1.5">
                                     <Building size={12} strokeWidth={2.5} className="text-nile-blue/50" />
-                                    <p className="text-[10px] font-bold text-nile-blue/50 uppercase tracking-widest">{job.company_name}</p>
+                                    <p className="text-[10px] font-bold text-nile-blue/50">{job.company_name}</p>
                                 </div>
                                 <div className="flex items-center gap-4 pt-1 flex-wrap">
                                     {job.location && (
-                                        <span className="text-[8px] font-black text-black/40 uppercase flex items-center gap-1">
+                                        <span className="text-[8px] font-semibold text-black/40 flex items-center gap-1">
                                             <MapPin size={10} strokeWidth={3} className="text-nile-blue" /> {job.location}
                                         </span>
                                     )}
                                     {job.salary && (
-                                        <span className="text-[8px] font-black text-black/40 uppercase flex items-center gap-1">
+                                        <span className="text-[8px] font-semibold text-black/40 flex items-center gap-1">
                                             <DollarSign size={10} strokeWidth={3} className="text-nile-green" /> {job.salary}
                                         </span>
                                     )}
-                                    <span className="text-[8px] font-black text-black/30 uppercase flex items-center gap-1">
+                                    <span className="text-[8px] font-semibold text-black/30 flex items-center gap-1">
                                         <Clock size={10} strokeWidth={3} /> {postedAgo(job.posted_at)}
                                     </span>
-                                    <span className="text-[8px] font-black text-black/30 uppercase">
+                                    <span className="text-[8px] font-semibold text-black/30">
                                         {job.applicant_count} applicant{job.applicant_count !== 1 ? 's' : ''}
                                     </span>
                                 </div>
@@ -170,7 +172,7 @@ const JobDetail = () => {
                         <div className="flex gap-3 w-full md:w-auto">
                             <button
                                 onClick={handleSave}
-                                className={`p-3 border-[2px] border-black rounded-xl transition-all ${isSaved ? 'bg-nile-green text-black' : 'bg-white hover:bg-black/5'}`}
+                                className={`p-3 border border-gray-100 rounded-xl transition-all ${isSaved ? 'bg-nile-green text-black' : 'bg-white hover:bg-black/5'}`}
                             >
                                 <Bookmark size={16} strokeWidth={3} fill={isSaved ? 'currentColor' : 'none'} />
                             </button>
@@ -204,7 +206,7 @@ const JobDetail = () => {
                                     {requirements.map((req, i) => (
                                         <li key={i} className="flex items-start gap-3">
                                             <ShieldCheck size={14} className="text-nile-green flex-shrink-0 mt-0.5" strokeWidth={2.5} />
-                                            <span className="font-bold text-nile-blue/70 text-[10px] uppercase leading-snug">{req}</span>
+                                            <span className="font-bold text-nile-blue/70 text-[10px] leading-snug">{req}</span>
                                         </li>
                                     ))}
                                 </ul>
@@ -226,11 +228,11 @@ const JobDetail = () => {
                             </div>
 
                             {skills.length > 0 && (
-                                <div className="mt-6 pt-5 border-t-[2px] border-black/5">
-                                    <p className="text-[9px] font-black text-black/30 uppercase tracking-[0.2em] mb-3">SKILLS</p>
+                                <div className="mt-6 pt-5 border-t border-gray-100/5">
+                                    <p className="text-[9px] font-semibold text-black/30 mb-3">SKILLS</p>
                                     <div className="flex flex-wrap gap-2">
                                         {skills.map(tag => (
-                                            <span key={tag} className="text-[8px] font-black text-black uppercase px-2.5 py-1 bg-nile-white border-[2px] border-black rounded-lg hover:bg-black hover:text-white transition-colors cursor-pointer">
+                                            <span key={tag} className="text-[8px] font-semibold text-black px-2.5 py-1 bg-nile-white border border-gray-100 rounded-lg hover:bg-black hover:text-white transition-colors cursor-pointer">
                                                 {tag}
                                             </span>
                                         ))}
@@ -239,14 +241,14 @@ const JobDetail = () => {
                             )}
                         </Card>
 
-                        <div className="bg-nile-blue text-white border-[2px] border-black rounded-[20px] p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                            <p className="text-[8px] font-black text-white/50 uppercase tracking-widest mb-3">READY TO APPLY?</p>
+                        <div className="bg-nile-blue text-white border border-gray-100 rounded-[20px] p-5 shadow-card">
+                            <p className="text-[8px] font-semibold text-white/50 mb-3">READY TO APPLY?</p>
                             <Button
                                 fullWidth
                                 size="md"
                                 onClick={handleApply}
                                 isLoading={applying}
-                                className="!bg-white !text-black hover:!bg-nile-green border-[2px] border-black"
+                                className="!bg-white !text-black hover:!bg-nile-green border border-gray-100"
                             >
                                 SUBMIT APPLICATION
                             </Button>
@@ -262,12 +264,12 @@ const DetailItem = ({ icon, label, value, color }: {
     icon: React.ReactNode; label: string; value: string; color: string;
 }) => (
     <div className="flex items-start gap-4">
-        <div className={`w-9 h-9 bg-nile-white rounded-xl border-[2px] border-black flex items-center justify-center ${color} shadow-sm flex-shrink-0`}>
+        <div className={`w-9 h-9 bg-nile-white rounded-xl border border-gray-100 flex items-center justify-center ${color} shadow-sm flex-shrink-0`}>
             {icon}
         </div>
         <div className="text-left min-w-0">
-            <p className="text-[8px] font-black text-black/30 uppercase tracking-[0.2em]">{label}</p>
-            <p className="text-[10px] font-black text-black uppercase tracking-tight truncate">{value}</p>
+            <p className="text-[8px] font-semibold text-black/30">{label}</p>
+            <p className="text-[10px] font-semibold text-black tracking-tight truncate">{value}</p>
         </div>
     </div>
 );

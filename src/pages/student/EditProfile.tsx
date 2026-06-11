@@ -73,10 +73,10 @@ const EditProfile = () => {
         <DashboardLayout>
             <div className="p-4 md:p-8 space-y-6 md:space-y-8 anime-fade-in font-sans pb-24 text-left max-w-4xl mx-auto">
 
-                <div className="flex items-center justify-between border-b-[2px] border-black pb-6">
+                <div className="flex items-center justify-between border-b border-gray-100 pb-6">
                     <div className="space-y-1">
-                        <h2 className="text-2xl md:text-4xl font-black text-black leading-none uppercase tracking-tighter">Edit Profile .</h2>
-                        <p className="text-[9px] font-black text-nile-blue/50 uppercase tracking-[0.2em]">UPDATE YOUR PUBLIC PORTFOLIO</p>
+                        <h2 className="text-2xl md:text-4xl font-semibold text-black leading-none">Edit Profile .</h2>
+                        <p className="text-[9px] font-semibold text-nile-blue/50">UPDATE YOUR PUBLIC PORTFOLIO</p>
                     </div>
                     <Button variant="ghost" size="sm" onClick={() => navigate('/student/profile')}>
                         <ArrowLeft size={14} className="mr-2" /> CANCEL
@@ -88,7 +88,7 @@ const EditProfile = () => {
                     {/* Avatar */}
                     <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 p-6 bg-nile-blue/5 border-[2px] border-dashed border-black/10 rounded-[24px]">
                         <div className="relative group flex-shrink-0">
-                            <div className="w-20 h-20 rounded-[16px] border-[2px] border-black overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                            <div className="w-20 h-20 rounded-[16px] border border-gray-100 overflow-hidden shadow-card">
                                 {picture ? (
                                     <img src={picture} alt={name} className="w-full h-full object-cover" />
                                 ) : (
@@ -112,15 +112,15 @@ const EditProfile = () => {
                                     if (!file) return;
                                     setUploadingPic(true);
                                     try { await uploadPicture(file); showToast('Picture updated!', 'success'); }
-                                    catch (err: any) { showToast(err.message || 'Upload failed', 'error'); }
+                                    catch (err) { showToast(err instanceof Error ? err.message : 'Upload failed', 'error'); }
                                     finally { setUploadingPic(false); if (picInputRef.current) picInputRef.current.value = ''; }
                                 }}
                             />
                         </div>
                         <div className="space-y-1 text-center sm:text-left">
-                            <h4 className="text-sm font-black text-black uppercase">PROFILE IMAGE</h4>
-                            <p className="text-[9px] font-black text-nile-blue/40 uppercase tracking-widest">JPG, PNG, WEBP — max 4MB</p>
-                            {picture && <p className="text-[8px] font-black text-nile-green uppercase">✓ PHOTO UPLOADED</p>}
+                            <h4 className="text-sm font-semibold text-black">PROFILE IMAGE</h4>
+                            <p className="text-[9px] font-semibold text-nile-blue/40">JPG, PNG, WEBP — max 4MB</p>
+                            {picture && <p className="text-[8px] font-semibold text-nile-green">✓ PHOTO UPLOADED</p>}
                             <div className="flex gap-2 pt-1 justify-center sm:justify-start">
                                 <Button size="xs" variant="primary" type="button" onClick={() => picInputRef.current?.click()}>UPLOAD NEW</Button>
                                 {picture && <Button size="xs" variant="outline" type="button" onClick={() => { removePicture(); showToast('Photo removed', 'success'); }}>REMOVE</Button>}
@@ -130,7 +130,7 @@ const EditProfile = () => {
 
                     {/* Basic Info */}
                     <div className="space-y-4">
-                        <h3 className="text-xs font-black uppercase tracking-widest text-black/50 border-b border-black/10 pb-2">BASIC INFORMATION</h3>
+                        <h3 className="text-xs font-semibold text-black/50 border-b border-black/10 pb-2">BASIC INFORMATION</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <InputField label="FULL NAME" value={name} onChange={e => setName(e.target.value)} icon={<User size={14} />} />
                             <InputField label="EMAIL ADDRESS" type="email" value={email} onChange={e => setEmail(e.target.value)} icon={<Mail size={14} />} />
@@ -144,9 +144,9 @@ const EditProfile = () => {
 
                     {/* Bio */}
                     <div className="space-y-2">
-                        <h3 className="text-xs font-black uppercase tracking-widest text-black/50 border-b border-black/10 pb-2">PROFESSIONAL BIO</h3>
+                        <h3 className="text-xs font-semibold text-black/50 border-b border-black/10 pb-2">PROFESSIONAL BIO</h3>
                         <textarea
-                            className="w-full h-28 bg-nile-white/40 border-[2px] border-black rounded-2xl p-4 font-bold text-xs outline-none focus:bg-white focus:shadow-[4px_4px_0px_0px_rgba(30,73,157,1)] transition-all resize-none"
+                            className="w-full h-28 bg-nile-white/40 border border-gray-100 rounded-2xl p-4 font-bold text-xs outline-none focus:bg-white focus:shadow-blue transition-all resize-none"
                             placeholder="Tell people about yourself, your goals, and what makes you unique..."
                             value={bio}
                             onChange={e => setBio(e.target.value)}
@@ -155,7 +155,7 @@ const EditProfile = () => {
 
                     {/* Skills */}
                     <div className="space-y-3">
-                        <h3 className="text-xs font-black uppercase tracking-widest text-black/50 border-b border-black/10 pb-2">SKILLS</h3>
+                        <h3 className="text-xs font-semibold text-black/50 border-b border-black/10 pb-2">SKILLS</h3>
                         <div className="flex gap-2">
                             <input
                                 type="text"
@@ -163,7 +163,7 @@ const EditProfile = () => {
                                 onChange={e => setSkillInput(e.target.value)}
                                 onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddSkill(); } }}
                                 placeholder="e.g. React, Python, Leadership..."
-                                className="flex-1 border-[2px] border-black rounded-xl py-2.5 px-4 font-bold text-xs outline-none focus:shadow-[2px_2px_0px_0px_#1E499D] transition-all bg-nile-white/40"
+                                className="flex-1 border border-gray-100 rounded-xl py-2.5 px-4 font-bold text-xs outline-none focus:shadow-blue transition-all bg-nile-white/40"
                             />
                             <Button size="sm" variant="outline" type="button" onClick={handleAddSkill}>
                                 <Plus size={14} strokeWidth={3} />
@@ -174,7 +174,7 @@ const EditProfile = () => {
                                 {skills.map(s => (
                                     <span
                                         key={s}
-                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-white border-[2px] border-black rounded-lg text-[9px] font-black uppercase tracking-widest shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-100 rounded-lg text-[9px] font-semibold shadow-card"
                                     >
                                         {s}
                                         <button type="button" onClick={() => setSkills(p => p.filter(x => x !== s))} className="text-red-400 hover:text-red-600 transition-colors">
@@ -189,20 +189,20 @@ const EditProfile = () => {
                     {/* Experiences */}
                     <div className="space-y-4">
                         <div className="flex items-center justify-between border-b border-black/10 pb-2">
-                            <h3 className="text-xs font-black uppercase tracking-widest text-black/50">EXPERIENCE</h3>
-                            <button type="button" onClick={() => setShowAddExp(true)} className="flex items-center gap-1 text-[9px] font-black text-nile-blue uppercase tracking-widest hover:text-nile-green transition-colors">
+                            <h3 className="text-xs font-semibold text-black/50">EXPERIENCE</h3>
+                            <button type="button" onClick={() => setShowAddExp(true)} className="flex items-center gap-1 text-[9px] font-semibold text-nile-blue hover:text-nile-green transition-colors">
                                 <Plus size={12} strokeWidth={3} /> ADD
                             </button>
                         </div>
 
                         {experiences.map(exp => (
-                            <div key={exp.id} className="flex items-start gap-4 p-4 bg-white border-[2px] border-black rounded-[16px] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                                <div className="w-10 h-10 rounded-xl bg-nile-blue text-white flex items-center justify-center flex-shrink-0 border-2 border-black">
+                            <div key={exp.id} className="flex items-start gap-4 p-4 bg-white border border-gray-100 rounded-[16px] shadow-card">
+                                <div className="w-10 h-10 rounded-xl bg-nile-blue text-white flex items-center justify-center flex-shrink-0 border border-gray-100">
                                     <Briefcase size={16} />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="font-black text-sm uppercase leading-none">{exp.title}</p>
-                                    <p className="text-[9px] font-black text-nile-blue/60 uppercase mt-1">{exp.company} • {exp.duration}</p>
+                                    <p className="font-semibold text-sm leading-none">{exp.title}</p>
+                                    <p className="text-[9px] font-semibold text-nile-blue/60 mt-1">{exp.company} • {exp.duration}</p>
                                     {exp.description && <p className="text-[10px] font-bold text-black/60 mt-2 leading-relaxed">{exp.description}</p>}
                                 </div>
                                 <button
@@ -222,25 +222,25 @@ const EditProfile = () => {
                                         placeholder="JOB TITLE *"
                                         value={newExp.title}
                                         onChange={e => setNewExp(p => ({ ...p, title: e.target.value }))}
-                                        className="border-[2px] border-black rounded-xl py-2.5 px-4 font-bold text-xs outline-none focus:shadow-[2px_2px_0px_0px_#1E499D] transition-all bg-white uppercase"
+                                        className="border border-gray-100 rounded-xl py-2.5 px-4 font-bold text-xs outline-none focus:shadow-blue transition-all bg-white"
                                     />
                                     <input
                                         placeholder="COMPANY *"
                                         value={newExp.company}
                                         onChange={e => setNewExp(p => ({ ...p, company: e.target.value }))}
-                                        className="border-[2px] border-black rounded-xl py-2.5 px-4 font-bold text-xs outline-none focus:shadow-[2px_2px_0px_0px_#1E499D] transition-all bg-white uppercase"
+                                        className="border border-gray-100 rounded-xl py-2.5 px-4 font-bold text-xs outline-none focus:shadow-blue transition-all bg-white"
                                     />
                                     <input
                                         placeholder="DURATION (e.g. Jan 2023 – Dec 2023)"
                                         value={newExp.duration}
                                         onChange={e => setNewExp(p => ({ ...p, duration: e.target.value }))}
-                                        className="sm:col-span-2 border-[2px] border-black rounded-xl py-2.5 px-4 font-bold text-xs outline-none focus:shadow-[2px_2px_0px_0px_#1E499D] transition-all bg-white"
+                                        className="sm:col-span-2 border border-gray-100 rounded-xl py-2.5 px-4 font-bold text-xs outline-none focus:shadow-blue transition-all bg-white"
                                     />
                                     <textarea
                                         placeholder="Brief description (optional)"
                                         value={newExp.description}
                                         onChange={e => setNewExp(p => ({ ...p, description: e.target.value }))}
-                                        className="sm:col-span-2 border-[2px] border-black rounded-xl py-2.5 px-4 font-bold text-xs outline-none focus:shadow-[2px_2px_0px_0px_#1E499D] transition-all bg-white h-20 resize-none"
+                                        className="sm:col-span-2 border border-gray-100 rounded-xl py-2.5 px-4 font-bold text-xs outline-none focus:shadow-blue transition-all bg-white h-20 resize-none"
                                     />
                                 </div>
                                 <div className="flex gap-2">
@@ -254,7 +254,7 @@ const EditProfile = () => {
                             <button
                                 type="button"
                                 onClick={() => setShowAddExp(true)}
-                                className="w-full py-6 border-[2px] border-dashed border-black/20 rounded-[16px] text-[10px] font-black text-black/30 hover:bg-black/5 hover:text-black hover:border-black transition-all flex items-center justify-center gap-2"
+                                className="w-full py-6 border-[2px] border-dashed border-black/20 rounded-[16px] text-[10px] font-semibold text-black/30 hover:bg-black/5 hover:text-black hover:border-black transition-all flex items-center justify-center gap-2"
                             >
                                 <Plus size={14} strokeWidth={3} /> ADD FIRST EXPERIENCE
                             </button>
@@ -270,7 +270,7 @@ const EditProfile = () => {
                         </div>
                     </Card>
 
-                    <div className="pt-4 border-t-[2px] border-black/5">
+                    <div className="pt-4 border-t border-gray-100/5">
                         <Button fullWidth size="md" type="submit">
                             <Save size={14} className="mr-2" /> SAVE PROFILE
                         </Button>

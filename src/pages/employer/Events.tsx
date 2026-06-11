@@ -36,7 +36,10 @@ const EmployerEvents = () => {
         finally { setLoading(false); }
     }, [showToast]);
 
-    useEffect(() => { load(); }, [load]);
+    useEffect(() => {
+        const t = setTimeout(load, 0);
+        return () => clearTimeout(t);
+    }, [load]);
 
     const myEvents = user?.id ? events.filter(e => e.organiser_id === user.id) : [];
     const displayed = tab === 'MY EVENTS' ? myEvents : events;
@@ -74,18 +77,18 @@ const EmployerEvents = () => {
     return (
         <div className="p-4 md:p-8 space-y-8 anime-fade-in font-sans pb-20 text-left min-h-full">
 
-            <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-4 border-b-[2px] border-black pb-6">
+            <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-4 border-b border-gray-100 pb-6">
                 <div>
-                    <h2 className="text-3xl md:text-5xl font-black text-black uppercase leading-none tracking-tighter">Events .</h2>
-                    <p className="text-[9px] font-black text-black/40 uppercase tracking-[0.2em] mt-1">
+                    <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">Events .</h2>
+                    <p className="text-[9px] font-semibold text-black/40 mt-1">
                         CAMPUS EVENTS · {upcoming.length} UPCOMING
                     </p>
                 </div>
-                <div className="flex bg-white p-1 border-[2px] border-black rounded-2xl shadow-sm">
+                <div className="flex bg-white p-1 border border-gray-100 rounded-2xl shadow-sm">
                     {(['ALL EVENTS', 'MY EVENTS', 'CREATE'] as Tab[]).map(t => (
                         <button key={t} onClick={() => setTab(t)}
-                            className={`flex items-center gap-1.5 px-3 md:px-5 py-2 rounded-xl font-black text-[8px] tracking-widest uppercase transition-all whitespace-nowrap
-                                ${tab === t ? 'bg-black text-white shadow-[2px_2px_0px_0px_#6CBB56]' : 'text-black/40 hover:text-black'}`}>
+                            className={`flex items-center gap-1.5 px-3 md:px-5 py-2 rounded-xl font-semibold text-[8px] transition-all whitespace-nowrap
+                                ${tab === t ? 'bg-black text-white shadow-green' : 'text-black/40 hover:text-black'}`}>
                             {t === 'CREATE' && <Plus size={11} strokeWidth={3} />}
                             {t}
                         </button>
@@ -99,9 +102,9 @@ const EmployerEvents = () => {
                     {tab === 'MY EVENTS' && myEvents.length === 0 && (
                         <div className="py-20 text-center border-[2px] border-dashed border-black/10 rounded-[28px]">
                             <Calendar size={28} className="text-black/15 mx-auto mb-4" />
-                            <p className="text-[9px] font-black text-black/30 uppercase">You haven't created any events yet</p>
+                            <p className="text-[9px] font-semibold text-black/30">You haven't created any events yet</p>
                             <button onClick={() => setTab('CREATE')}
-                                className="mt-5 px-5 py-2.5 bg-black text-white border-[2px] border-black rounded-xl font-black text-[9px] uppercase shadow-[3px_3px_0px_0px_#6CBB56] hover:translate-x-px hover:translate-y-px hover:shadow-none transition-all">
+                                className="mt-5 px-5 py-2.5 bg-black text-white border border-gray-100 rounded-xl font-semibold text-[9px] shadow-green transition-all">
                                 <Plus size={11} className="inline mr-1.5" /> CREATE EVENT
                             </button>
                         </div>
@@ -109,7 +112,7 @@ const EmployerEvents = () => {
 
                     {upcoming.length > 0 && (
                         <div className="space-y-4">
-                            <h3 className="text-[9px] font-black uppercase tracking-widest text-black/40">UPCOMING</h3>
+                            <h3 className="text-[9px] font-semibold text-black/40">UPCOMING</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {upcoming.map(e => <EventCard key={e.id} event={e} />)}
                             </div>
@@ -118,7 +121,7 @@ const EmployerEvents = () => {
 
                     {past.length > 0 && (
                         <div className="space-y-4">
-                            <h3 className="text-[9px] font-black uppercase tracking-widest text-black/30">PAST / CANCELLED</h3>
+                            <h3 className="text-[9px] font-semibold text-black/30">PAST / CANCELLED</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 opacity-60">
                                 {past.map(e => <EventCard key={e.id} event={e} />)}
                             </div>
@@ -128,7 +131,7 @@ const EmployerEvents = () => {
                     {displayed.length === 0 && tab === 'ALL EVENTS' && (
                         <div className="py-20 text-center border-[2px] border-dashed border-black/10 rounded-[28px]">
                             <Calendar size={28} className="text-black/15 mx-auto mb-4" />
-                            <p className="text-[9px] font-black text-black/30 uppercase">No events on the platform yet</p>
+                            <p className="text-[9px] font-semibold text-black/30">No events on the platform yet</p>
                         </div>
                     )}
                 </div>
@@ -137,14 +140,14 @@ const EmployerEvents = () => {
             {/* ── Create form ─────────────────────────────── */}
             {tab === 'CREATE' && (
                 <div className="max-w-2xl anime-fade-in">
-                    <div className="bg-white border-[2px] border-black rounded-[28px] p-6 md:p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-                        <div className="flex items-center gap-3 mb-6 pb-5 border-b-[2px] border-black/5">
+                    <div className="bg-white border border-gray-100 rounded-[28px] p-6 md:p-8 shadow-card">
+                        <div className="flex items-center gap-3 mb-6 pb-5 border-b border-gray-100/5">
                             <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center">
                                 <Calendar size={18} className="text-nile-green" />
                             </div>
                             <div>
-                                <h3 className="font-black text-sm uppercase">Create Event</h3>
-                                <p className="text-[8px] font-black text-black/40 uppercase">SUBMITTED FOR STAFF APPROVAL</p>
+                                <h3 className="font-semibold text-sm">Create Event</h3>
+                                <p className="text-[8px] font-semibold text-black/40">SUBMITTED FOR STAFF APPROVAL</p>
                             </div>
                         </div>
 
@@ -152,12 +155,12 @@ const EmployerEvents = () => {
                             <F label="EVENT TITLE *">
                                 <input type="text" value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
                                     placeholder="e.g. Tech Talent Info Session"
-                                    className="w-full border-[2px] border-black rounded-xl py-3 px-4 font-black text-xs outline-none focus:shadow-[3px_3px_0px_0px_#1E499D] bg-nile-white/40 focus:bg-white transition-all" />
+                                    className="w-full border border-gray-100 rounded-xl py-3 px-4 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40 focus:bg-white transition-all" />
                             </F>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <F label="CATEGORY">
                                     <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))}
-                                        className="w-full border-[2px] border-black rounded-xl py-3 px-4 font-black text-xs outline-none bg-white cursor-pointer">
+                                        className="w-full border border-gray-100 rounded-xl py-3 px-4 font-semibold text-xs outline-none bg-white cursor-pointer">
                                         <option value="networking">Networking</option>
                                         <option value="career_fair">Career Fair</option>
                                         <option value="workshop">Workshop</option>
@@ -168,30 +171,30 @@ const EmployerEvents = () => {
                                 </F>
                                 <F label="CAPACITY">
                                     <input type="number" min={1} value={form.capacity} onChange={e => setForm(p => ({ ...p, capacity: Number(e.target.value) }))}
-                                        className="w-full border-[2px] border-black rounded-xl py-3 px-4 font-black text-xs outline-none focus:shadow-[3px_3px_0px_0px_#1E499D] bg-nile-white/40 focus:bg-white transition-all" />
+                                        className="w-full border border-gray-100 rounded-xl py-3 px-4 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40 focus:bg-white transition-all" />
                                 </F>
                                 <F label="DATE *">
                                     <input type="date" value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))}
                                         min={new Date().toISOString().split('T')[0]}
-                                        className="w-full border-[2px] border-black rounded-xl py-3 px-4 font-black text-xs outline-none focus:shadow-[3px_3px_0px_0px_#1E499D] bg-nile-white/40 focus:bg-white transition-all" />
+                                        className="w-full border border-gray-100 rounded-xl py-3 px-4 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40 focus:bg-white transition-all" />
                                 </F>
                                 <F label="TIME *">
                                     <input type="time" value={form.time} onChange={e => setForm(p => ({ ...p, time: e.target.value }))}
-                                        className="w-full border-[2px] border-black rounded-xl py-3 px-4 font-black text-xs outline-none focus:shadow-[3px_3px_0px_0px_#1E499D] bg-nile-white/40 focus:bg-white transition-all" />
+                                        className="w-full border border-gray-100 rounded-xl py-3 px-4 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40 focus:bg-white transition-all" />
                                 </F>
                             </div>
                             <F label="LOCATION *">
                                 <input type="text" value={form.location} onChange={e => setForm(p => ({ ...p, location: e.target.value }))}
                                     placeholder="e.g. Nile University Hall A / Online (Teams)"
-                                    className="w-full border-[2px] border-black rounded-xl py-3 px-4 font-black text-xs outline-none focus:shadow-[3px_3px_0px_0px_#1E499D] bg-nile-white/40 focus:bg-white transition-all" />
+                                    className="w-full border border-gray-100 rounded-xl py-3 px-4 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40 focus:bg-white transition-all" />
                             </F>
                             <F label="DESCRIPTION *">
                                 <textarea rows={4} value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
                                     placeholder="Describe your event and what attendees will gain..."
-                                    className="w-full border-[2px] border-black rounded-xl py-3 px-4 font-black text-xs outline-none focus:shadow-[3px_3px_0px_0px_#1E499D] bg-nile-white/40 focus:bg-white transition-all resize-none" />
+                                    className="w-full border border-gray-100 rounded-xl py-3 px-4 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40 focus:bg-white transition-all resize-none" />
                             </F>
                             <button type="submit" disabled={submitting}
-                                className="w-full py-4 bg-black text-white border-[2px] border-black rounded-xl font-black text-[9px] uppercase tracking-widest shadow-[4px_4px_0px_0px_#6CBB56] hover:translate-x-px hover:translate-y-px hover:shadow-[3px_3px_0px_0px_#6CBB56] transition-all disabled:opacity-40 flex items-center justify-center gap-2">
+                                className="w-full py-4 bg-black text-white border border-gray-100 rounded-xl font-semibold text-[9px] shadow-green transition-all disabled:opacity-40 flex items-center justify-center gap-2">
                                 {submitting ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
                                 {submitting ? 'SUBMITTING...' : 'SUBMIT FOR APPROVAL'}
                             </button>
@@ -207,15 +210,15 @@ const EventCard = ({ event }: { event: StaffEvent }) => {
     const catColor = categoryColors[event.category] || categoryColors.other;
     const regPct = event.capacity > 0 ? Math.min(100, Math.round((event.registrations_count / event.capacity) * 100)) : 0;
     return (
-        <div className="bg-white border-[2px] border-black rounded-[24px] p-5 flex flex-col gap-4 hover:translate-y-[-1px] shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] hover:shadow-[4px_4px_0px_0px_rgba(30,73,157,0.3)] transition-all">
+        <div className="bg-white border border-gray-100 rounded-[24px] p-5 flex flex-col gap-4 hover:translate-y-[-1px] shadow-card hover:shadow-blue transition-all">
             <div className="flex flex-wrap gap-2">
-                <span className={`text-[7px] font-black px-2 py-0.5 rounded-full border uppercase ${catColor}`}>{event.category.replace('_', ' ')}</span>
-                <span className={`text-[7px] font-black px-2 py-0.5 rounded-full border uppercase ${event.status === 'published' ? 'bg-nile-green/20 text-nile-green border-nile-green/30' : 'bg-yellow-50 text-yellow-600 border-yellow-200'}`}>
+                <span className={`text-[7px] font-semibold px-2 py-0.5 rounded-full border ${catColor}`}>{event.category.replace('_', ' ')}</span>
+                <span className={`text-[7px] font-semibold px-2 py-0.5 rounded-full border ${event.status === 'published' ? 'bg-nile-green/20 text-nile-green border-nile-green/30' : 'bg-yellow-50 text-yellow-600 border-yellow-200'}`}>
                     {event.status}
                 </span>
             </div>
-            <h3 className="font-black text-sm uppercase leading-tight">{event.title}</h3>
-            <div className="space-y-1.5 text-[8px] font-black text-black/50 uppercase">
+            <h3 className="font-semibold text-sm leading-tight">{event.title}</h3>
+            <div className="space-y-1.5 text-[8px] font-semibold text-black/50">
                 <div className="flex items-center gap-2">
                     <Calendar size={10} className="text-nile-blue" />
                     <span>{new Date(event.date).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })} · {event.time}</span>
@@ -226,7 +229,7 @@ const EventCard = ({ event }: { event: StaffEvent }) => {
                 </div>
             </div>
             <div className="space-y-1.5">
-                <div className="flex justify-between text-[7px] font-black uppercase text-black/40">
+                <div className="flex justify-between text-[7px] font-semibold text-black/40">
                     <span className="flex items-center gap-1"><Users size={9} />{event.registrations_count}/{event.capacity}</span>
                     <span>{regPct}%</span>
                 </div>
@@ -240,7 +243,7 @@ const EventCard = ({ event }: { event: StaffEvent }) => {
 
 const F = ({ label, children }: { label: string; children: React.ReactNode }) => (
     <div className="space-y-1.5">
-        <label className="text-[8px] font-black uppercase tracking-widest text-black/50">{label}</label>
+        <label className="text-[8px] font-semibold text-black/50">{label}</label>
         {children}
     </div>
 );

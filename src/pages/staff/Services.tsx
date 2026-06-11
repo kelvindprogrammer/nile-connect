@@ -129,21 +129,21 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({ request, onClose, onConfi
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in"
             onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
         >
-            <div className="bg-white border-[2px] border-black rounded-[24px] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] w-full max-w-md animate-in zoom-in-95 slide-in-from-bottom-4">
+            <div className="bg-white border border-gray-100 rounded-[24px] shadow-card w-full max-w-md animate-in zoom-in-95 slide-in-from-bottom-4">
                 {/* Modal Header */}
-                <div className="flex items-center justify-between p-6 border-b-[2px] border-black">
+                <div className="flex items-center justify-between p-6 border-b border-gray-100">
                     <div className="flex items-center gap-3">
-                        <div className={`w-9 h-9 rounded-[12px] flex items-center justify-center border-[2px] border-black ${SERVICE_ICON_BG[request.serviceType]}`}>
+                        <div className={`w-9 h-9 rounded-[12px] flex items-center justify-center border border-gray-100 ${SERVICE_ICON_BG[request.serviceType]}`}>
                             {SERVICE_ICONS[request.serviceType]}
                         </div>
                         <div>
-                            <p className="font-black text-[10px] uppercase tracking-widest text-black">Schedule Session</p>
-                            <p className="text-[8px] font-black text-black/40 uppercase tracking-wider">{request.serviceType}</p>
+                            <p className="font-semibold text-[10px] text-black">Schedule Session</p>
+                            <p className="text-[8px] font-semibold text-black/40 tracking-wider">{request.serviceType}</p>
                         </div>
                     </div>
                     <button
                         onClick={onClose}
-                        className="w-8 h-8 flex items-center justify-center rounded-lg border-[2px] border-black hover:bg-black hover:text-white transition-all"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-100 hover:bg-black hover:text-white transition-all"
                     >
                         <X size={14} />
                     </button>
@@ -153,37 +153,37 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({ request, onClose, onConfi
                 <div className="px-6 pt-4 pb-2 flex items-center gap-3 bg-black/[0.02]">
                     <Avatar name={request.student.full_name} size="sm" />
                     <div>
-                        <p className="font-black text-xs uppercase text-black">{request.student.full_name}</p>
-                        <p className="text-[8px] font-black text-black/40 uppercase">{request.student.major || 'No major'} · Class of {request.student.graduation_year}</p>
+                        <p className="font-semibold text-xs text-black">{request.student.full_name}</p>
+                        <p className="text-[8px] font-semibold text-black/40">{request.student.major || 'No major'} · Class of {request.student.graduation_year}</p>
                     </div>
                 </div>
 
                 {/* Date + Time pickers */}
                 <div className="p-6 space-y-4">
                     <div className="space-y-1.5">
-                        <label className="text-[8px] font-black uppercase tracking-widest text-black/50">Date</label>
+                        <label className="text-[8px] font-semibold text-black/50">Date</label>
                         <input
                             type="date"
                             min={minDate}
                             value={date}
                             onChange={(e) => setDate(e.target.value)}
-                            className="w-full border-[2px] border-black rounded-xl px-4 py-2.5 font-black text-[10px] uppercase outline-none focus:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all bg-white"
+                            className="w-full border border-gray-100 rounded-xl px-4 py-2.5 font-semibold text-[10px] outline-none focus:shadow-card transition-all bg-white"
                         />
                     </div>
                     <div className="space-y-1.5">
-                        <label className="text-[8px] font-black uppercase tracking-widest text-black/50">Time</label>
+                        <label className="text-[8px] font-semibold text-black/50">Time</label>
                         <input
                             type="time"
                             value={time}
                             onChange={(e) => setTime(e.target.value)}
-                            className="w-full border-[2px] border-black rounded-xl px-4 py-2.5 font-black text-[10px] outline-none focus:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all bg-white"
+                            className="w-full border border-gray-100 rounded-xl px-4 py-2.5 font-semibold text-[10px] outline-none focus:shadow-card transition-all bg-white"
                         />
                     </div>
 
                     {date && time && (
                         <div className="flex items-center gap-2 p-3 bg-nile-blue/5 border-[2px] border-nile-blue/20 rounded-xl">
                             <Calendar size={13} className="text-nile-blue flex-shrink-0" />
-                            <p className="text-[8px] font-black text-nile-blue uppercase">
+                            <p className="text-[8px] font-semibold text-nile-blue">
                                 {new Date(`${date}T${time}`).toLocaleString('en-GB', {
                                     weekday: 'long', day: 'numeric', month: 'long',
                                     year: 'numeric', hour: '2-digit', minute: '2-digit',
@@ -232,9 +232,9 @@ const ServiceOverviewCard: React.FC<ServiceCardProps> = ({ type, count, pending,
         'CV Review':       'bg-nile-green',
     };
     const accentShadow: Record<ServiceType, string> = {
-        'Mock Interview':  'shadow-[4px_4px_0px_0px_rgba(30,73,157,1)]',
-        'Career Advisory': 'shadow-[4px_4px_0px_0px_rgba(168,85,247,1)]',
-        'CV Review':       'shadow-[4px_4px_0px_0px_rgba(108,187,86,1)]',
+        'Mock Interview':  'shadow-blue',
+        'Career Advisory': 'shadow-soft-md',
+        'CV Review':       'shadow-green',
     };
     const activeBorder: Record<ServiceType, string> = {
         'Mock Interview':  'border-nile-blue',
@@ -245,25 +245,25 @@ const ServiceOverviewCard: React.FC<ServiceCardProps> = ({ type, count, pending,
     return (
         <button
             onClick={onClick}
-            className={`group w-full text-left bg-white border-[2px] rounded-[20px] p-5 transition-all hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]
+            className={`group w-full text-left bg-white border-[2px] rounded-[20px] p-5 transition-all hover:-translate-y-0.5 hover:shadow-card
                 ${active
                     ? `${activeBorder[type]} ${accentShadow[type]}`
-                    : 'border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'
+                    : 'border-black shadow-card'
                 }`}
         >
             <div className="flex items-start justify-between mb-4">
-                <div className={`w-11 h-11 rounded-[14px] flex items-center justify-center border-[2px] border-black text-white ${iconBg[type]}`}>
+                <div className={`w-11 h-11 rounded-[14px] flex items-center justify-center border border-gray-100 text-white ${iconBg[type]}`}>
                     {SERVICE_ICONS[type]}
                 </div>
                 {pending > 0 && (
-                    <span className="text-[7px] font-black px-2 py-0.5 rounded-full bg-yellow-50 text-yellow-600 border border-yellow-300 uppercase">
+                    <span className="text-[7px] font-semibold px-2 py-0.5 rounded-full bg-yellow-50 text-yellow-600 border border-yellow-300">
                         {pending} PENDING
                     </span>
                 )}
             </div>
             <div>
-                <p className="text-2xl font-black text-black leading-none">{count}</p>
-                <p className="text-[8px] font-black text-black/40 uppercase tracking-widest mt-1">{type} Requests</p>
+                <p className="text-2xl font-semibold text-black leading-none">{count}</p>
+                <p className="text-[8px] font-semibold text-black/40 mt-1">{type} Requests</p>
             </div>
             <div className="mt-3 h-1 rounded-full bg-black/5 overflow-hidden">
                 <div
@@ -271,7 +271,7 @@ const ServiceOverviewCard: React.FC<ServiceCardProps> = ({ type, count, pending,
                     style={{ width: count > 0 ? `${Math.min(100, (pending / count) * 100)}%` : '0%' }}
                 />
             </div>
-            <p className="text-[7px] font-black text-black/30 uppercase mt-1 tracking-wider">
+            <p className="text-[7px] font-semibold text-black/30 mt-1 tracking-wider">
                 {count > 0 ? `${Math.round(((count - pending) / count) * 100)}% resolved` : 'No requests yet'}
             </p>
         </button>
@@ -310,32 +310,32 @@ const RequestRow: React.FC<RequestRowProps> = ({
         : null;
 
     return (
-        <div className="bg-white border-[2px] border-black rounded-[18px] p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all group">
+        <div className="bg-white border border-gray-100 rounded-[18px] p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 hover:shadow-card transition-all group">
             {/* Avatar + student info */}
             <div className="flex items-center gap-3 flex-1 min-w-0">
                 <Avatar name={student.full_name} size="sm" />
                 <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2 mb-0.5">
-                        <p className="font-black text-[11px] uppercase text-black truncate leading-none">
+                        <p className="font-semibold text-[11px] text-black truncate leading-none">
                             {student.full_name}
                         </p>
-                        <span className={`inline-flex items-center gap-1 text-[7px] font-black px-2 py-0.5 rounded-full border uppercase ${SERVICE_COLORS[serviceType]}`}>
+                        <span className={`inline-flex items-center gap-1 text-[7px] font-semibold px-2 py-0.5 rounded-full border ${SERVICE_COLORS[serviceType]}`}>
                             {SERVICE_ICONS[serviceType]}
                             {serviceType}
                         </span>
-                        <span className={`inline-flex items-center gap-1 text-[7px] font-black px-2 py-0.5 rounded-full border uppercase ${STATUS_COLORS[status]}`}>
+                        <span className={`inline-flex items-center gap-1 text-[7px] font-semibold px-2 py-0.5 rounded-full border ${STATUS_COLORS[status]}`}>
                             {STATUS_ICON[status]}
                             {status}
                         </span>
                     </div>
                     <div className="flex flex-wrap gap-3 mt-1">
-                        <span className="text-[7px] font-black text-black/40 uppercase">{student.major || 'No Major'}</span>
-                        <span className="text-[7px] font-black text-black/30 uppercase">Class of {student.graduation_year}</span>
-                        <span className="text-[7px] font-black text-black/25 uppercase flex items-center gap-1">
+                        <span className="text-[7px] font-semibold text-black/40">{student.major || 'No Major'}</span>
+                        <span className="text-[7px] font-semibold text-black/30">Class of {student.graduation_year}</span>
+                        <span className="text-[7px] font-semibold text-black/25 flex items-center gap-1">
                             <Clock size={8} /> Requested {formattedDate}
                         </span>
                         {formattedScheduled && (
-                            <span className="text-[7px] font-black text-nile-blue/60 uppercase flex items-center gap-1">
+                            <span className="text-[7px] font-semibold text-nile-blue/60 flex items-center gap-1">
                                 <Calendar size={8} /> {formattedScheduled}
                             </span>
                         )}
@@ -351,7 +351,7 @@ const RequestRow: React.FC<RequestRowProps> = ({
                             <button
                                 onClick={() => onSchedule(request)}
                                 disabled={actionLoading}
-                                className="flex items-center gap-1.5 px-3 py-2 bg-nile-blue text-white border-[2px] border-black rounded-xl font-black text-[8px] uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-px hover:translate-y-px transition-all disabled:opacity-40"
+                                className="flex items-center gap-1.5 px-3 py-2 bg-nile-blue text-white border border-gray-100 rounded-xl font-semibold text-[8px] shadow-card transition-all disabled:opacity-40"
                             >
                                 <Calendar size={11} />
                                 SCHEDULE
@@ -360,7 +360,7 @@ const RequestRow: React.FC<RequestRowProps> = ({
                         <button
                             onClick={() => onComplete(request.id)}
                             disabled={actionLoading}
-                            className="flex items-center gap-1.5 px-3 py-2 bg-nile-green text-white border-[2px] border-black rounded-xl font-black text-[8px] uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-px hover:translate-y-px transition-all disabled:opacity-40"
+                            className="flex items-center gap-1.5 px-3 py-2 bg-nile-green text-white border border-gray-100 rounded-xl font-semibold text-[8px] shadow-card transition-all disabled:opacity-40"
                         >
                             {actionLoading ? <Loader2 size={11} className="animate-spin" /> : <CheckCircle2 size={11} />}
                             COMPLETE
@@ -368,14 +368,14 @@ const RequestRow: React.FC<RequestRowProps> = ({
                     </>
                 )}
                 {status === 'Completed' && (
-                    <span className="flex items-center gap-1.5 px-3 py-2 bg-nile-green/10 text-nile-green border-[2px] border-nile-green/30 rounded-xl font-black text-[8px] uppercase">
+                    <span className="flex items-center gap-1.5 px-3 py-2 bg-nile-green/10 text-nile-green border-[2px] border-nile-green/30 rounded-xl font-semibold text-[8px]">
                         <CheckCircle2 size={11} />
                         DONE
                     </span>
                 )}
                 <button
                     onClick={() => onViewProfile(student.id)}
-                    className="flex items-center gap-1.5 px-3 py-2 bg-white text-black border-[2px] border-black rounded-xl font-black text-[8px] uppercase hover:bg-black hover:text-white transition-all"
+                    className="flex items-center gap-1.5 px-3 py-2 bg-white text-black border border-gray-100 rounded-xl font-semibold text-[8px] hover:bg-black hover:text-white transition-all"
                 >
                     <Users size={11} />
                     PROFILE
@@ -393,10 +393,10 @@ const MetricPill: React.FC<{
     color?: string;
     icon?: React.ReactNode;
 }> = ({ label, value, color = 'bg-white text-black', icon }) => (
-    <div className={`flex items-center gap-2.5 px-4 py-2.5 border-[2px] border-black rounded-xl font-black uppercase ${color}`}>
+    <div className={`flex items-center gap-2.5 px-4 py-2.5 border border-gray-100 rounded-xl font-semibold ${color}`}>
         {icon && <span className="opacity-60">{icon}</span>}
-        <span className="text-xl font-black leading-none">{value}</span>
-        <span className="text-[7px] tracking-widest leading-tight max-w-[60px]">{label}</span>
+        <span className="text-xl font-semibold leading-none">{value}</span>
+        <span className="text-[7px] leading-tight max-w-[60px]">{label}</span>
     </div>
 );
 
@@ -404,13 +404,13 @@ const MetricPill: React.FC<{
 
 const EmptyState: React.FC<{ tab: TabFilter }> = ({ tab }) => (
     <div className="py-20 border-[2px] border-dashed border-black/10 rounded-[24px] flex flex-col items-center justify-center gap-3">
-        <div className="w-14 h-14 rounded-[18px] bg-black/5 border-[2px] border-black/10 flex items-center justify-center text-black/20">
+        <div className="w-14 h-14 rounded-[18px] bg-black/5 border border-gray-100/10 flex items-center justify-center text-black/20">
             {tab === 'MOCK INTERVIEWS' ? <Mic size={24} />
                 : tab === 'CAREER ADVISORY' ? <MessageSquare size={24} />
                 : tab === 'CV REVIEW' ? <FileText size={24} />
                 : <Users size={24} />}
         </div>
-        <p className="text-[9px] font-black text-black/30 uppercase tracking-[0.2em] text-center px-4">
+        <p className="text-[9px] font-semibold text-black/30 text-center px-4">
             No service requests match your current filters.
         </p>
     </div>
@@ -447,7 +447,10 @@ const StaffServices: React.FC = () => {
         }
     }, []);
 
-    useEffect(() => { load(); }, [load]);
+    useEffect(() => {
+        const t = setTimeout(load, 0);
+        return () => clearTimeout(t);
+    }, [load]);
 
     // ── Metrics ───────────────────────────────────────────────────────────────
 
@@ -574,10 +577,10 @@ const StaffServices: React.FC = () => {
                 <span className="text-3xl">⚠️</span>
             </div>
             <div>
-                <p className="font-black text-lg uppercase text-black">Could not load student data</p>
-                <p className="text-[9px] font-black text-black/40 uppercase tracking-widest mt-1">Please try again or log out and back in</p>
+                <p className="font-semibold text-lg text-black">Could not load student data</p>
+                <p className="text-[9px] font-semibold text-black/40 mt-1">Please try again or log out and back in</p>
             </div>
-            <button onClick={load} className="px-6 py-3 bg-black text-white border-[2px] border-black rounded-xl font-black text-[9px] uppercase tracking-widest shadow-[3px_3px_0px_0px_#6CBB56] hover:shadow-none hover:translate-x-px hover:translate-y-px transition-all">
+            <button onClick={load} className="px-6 py-3 bg-black text-white border border-gray-100 rounded-xl font-semibold text-[9px] shadow-green transition-all">
                 TRY AGAIN
             </button>
         </div>
@@ -592,12 +595,12 @@ const StaffServices: React.FC = () => {
             <div className="p-4 md:p-8 space-y-8 font-sans pb-24 text-left min-h-full">
 
                 {/* ── Header ──────────────────────────────────────────────── */}
-                <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-4 border-b-[2px] border-black pb-6">
+                <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-4 border-b border-gray-100 pb-6">
                     <div>
-                        <h2 className="text-3xl md:text-5xl font-black text-black uppercase leading-none tracking-tighter">
+                        <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">
                             Career Services .
                         </h2>
-                        <p className="text-[9px] font-black text-black/40 uppercase tracking-[0.2em] mt-1">
+                        <p className="text-[9px] font-semibold text-black/40 mt-1">
                             MOCK INTERVIEWS · CAREER ADVISORY · CV REVIEWS
                         </p>
                     </div>
@@ -657,7 +660,7 @@ const StaffServices: React.FC = () => {
                 {/* ── Tabs + Filters ───────────────────────────────────────── */}
                 <div className="flex flex-col gap-4">
                     {/* Tab strip */}
-                    <div className="flex bg-white p-1 border-[2px] border-black rounded-2xl shadow-sm overflow-x-auto gap-0.5">
+                    <div className="flex bg-white p-1 border border-gray-100 rounded-2xl shadow-sm overflow-x-auto gap-0.5">
                         {TABS.map((tab) => {
                             const count = tab === 'ALL REQUESTS' ? requests.length
                                 : tab === 'MOCK INTERVIEWS' ? typeCounts.counts['Mock Interview']
@@ -667,9 +670,9 @@ const StaffServices: React.FC = () => {
                                 <button
                                     key={tab}
                                     onClick={() => { setActiveTab(tab); setStatusFilter('All'); setSearch(''); }}
-                                    className={`flex items-center gap-1.5 px-3 md:px-5 py-2 rounded-xl font-black text-[8px] tracking-widest uppercase transition-all whitespace-nowrap
+                                    className={`flex items-center gap-1.5 px-3 md:px-5 py-2 rounded-xl font-semibold text-[8px] transition-all whitespace-nowrap
                                         ${activeTab === tab
-                                            ? 'bg-black text-white shadow-[2px_2px_0px_0px_#6CBB56]'
+                                            ? 'bg-black text-white shadow-green'
                                             : 'text-black/40 hover:text-black'}`}
                                 >
                                     {tab === 'ALL REQUESTS' && <Users size={10} />}
@@ -677,7 +680,7 @@ const StaffServices: React.FC = () => {
                                     {tab === 'CAREER ADVISORY' && <MessageSquare size={10} />}
                                     {tab === 'CV REVIEW' && <FileText size={10} />}
                                     {tab}
-                                    <span className={`text-[7px] px-1.5 py-0.5 rounded-full font-black ${activeTab === tab ? 'bg-white/20 text-white' : 'bg-black/5 text-black/50'}`}>
+                                    <span className={`text-[7px] px-1.5 py-0.5 rounded-full font-semibold ${activeTab === tab ? 'bg-white/20 text-white' : 'bg-black/5 text-black/50'}`}>
                                         {count}
                                     </span>
                                 </button>
@@ -694,7 +697,7 @@ const StaffServices: React.FC = () => {
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 placeholder="SEARCH BY NAME, MAJOR, OR SERVICE TYPE..."
-                                className="w-full pl-10 pr-4 py-3 rounded-xl border-[2px] border-black font-black text-[9px] tracking-widest uppercase outline-none focus:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] bg-white transition-all"
+                                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-100 font-semibold text-[9px] outline-none focus:shadow-card bg-white transition-all"
                             />
                             {search && (
                                 <button
@@ -710,7 +713,7 @@ const StaffServices: React.FC = () => {
                         <div className="relative">
                             <button
                                 onClick={() => setShowStatusDropdown((p) => !p)}
-                                className="flex items-center gap-2 px-4 py-3 border-[2px] border-black rounded-xl font-black text-[9px] uppercase tracking-widest bg-white hover:bg-black hover:text-white transition-all whitespace-nowrap"
+                                className="flex items-center gap-2 px-4 py-3 border border-gray-100 rounded-xl font-semibold text-[9px] bg-white hover:bg-black hover:text-white transition-all whitespace-nowrap"
                             >
                                 <span
                                     className={`w-2 h-2 rounded-full ${
@@ -724,12 +727,12 @@ const StaffServices: React.FC = () => {
                                 <ChevronDown size={12} className={`transition-transform ${showStatusDropdown ? 'rotate-180' : ''}`} />
                             </button>
                             {showStatusDropdown && (
-                                <div className="absolute right-0 top-full mt-1 z-20 bg-white border-[2px] border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden min-w-[140px]">
+                                <div className="absolute right-0 top-full mt-1 z-20 bg-white border border-gray-100 rounded-xl shadow-card overflow-hidden min-w-[140px]">
                                     {(['All', 'Pending', 'Scheduled', 'Completed'] as StatusFilter[]).map((s) => (
                                         <button
                                             key={s}
                                             onClick={() => { setStatusFilter(s); setShowStatusDropdown(false); }}
-                                            className={`w-full text-left px-4 py-2.5 font-black text-[8px] uppercase tracking-widest hover:bg-black/5 transition-colors flex items-center gap-2
+                                            className={`w-full text-left px-4 py-2.5 font-semibold text-[8px] hover:bg-black/5 transition-colors flex items-center gap-2
                                                 ${statusFilter === s ? 'bg-black/5 text-black' : 'text-black/60'}`}
                                         >
                                             <span className={`w-1.5 h-1.5 rounded-full ${
@@ -747,7 +750,7 @@ const StaffServices: React.FC = () => {
                     </div>
 
                     {/* Result count */}
-                    <p className="text-[8px] font-black text-black/30 uppercase tracking-widest">
+                    <p className="text-[8px] font-semibold text-black/30">
                         SHOWING {filtered.length} OF {requests.length} REQUESTS
                         {search && ` · SEARCH: "${search}"`}
                         {statusFilter !== 'All' && ` · STATUS: ${statusFilter}`}

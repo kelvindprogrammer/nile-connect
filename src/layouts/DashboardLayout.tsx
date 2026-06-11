@@ -10,6 +10,8 @@ import NileConnectLogo from '../components/NileConnectLogo';
 import NotificationTray from '../components/NotificationTray';
 import { useAuth } from '../context/AuthContext';
 import { useProfilePicture } from '../hooks/useProfilePicture';
+import { useNotifications } from '../hooks/useNotifications';
+import { useUnreadMessages } from '../hooks/useUnreadMessages';
 
 const navItems = [
     { to: '/student',              icon: Home,          label: 'Home',     exact: true },
@@ -27,9 +29,9 @@ const isActive = (to: string, pathname: string, exact = false) =>
     exact ? pathname === to : pathname === to || pathname.startsWith(to + '/');
 
 const NavItem = ({
-    to, Icon, label, active, mobile = false,
+    to, Icon, label, active, mobile = false, badge,
 }: {
-    to: string; Icon: React.ElementType; label: string; active: boolean; mobile?: boolean;
+    to: string; Icon: React.ElementType; label: string; active: boolean; mobile?: boolean; badge?: number;
 }) => {
     const navigate = useNavigate();
     return (
@@ -45,11 +47,16 @@ const NavItem = ({
             `}
         >
             <div className={`
-                flex items-center justify-center rounded-lg transition-all duration-200
+                relative flex items-center justify-center rounded-lg transition-all duration-200
                 ${mobile ? 'w-6 h-6' : 'w-9 h-9'}
                 ${!mobile && active ? 'text-nile-blue' : ''}
             `}>
                 <Icon size={mobile ? 18 : 19} strokeWidth={active ? 2.2 : 1.8} />
+                {!!badge && badge > 0 && (
+                    <span className="absolute -top-1 -right-1 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1">
+                        {badge > 9 ? '9+' : badge}
+                    </span>
+                )}
             </div>
             <span className={`
                 mt-1 leading-none transition-colors
@@ -69,6 +76,8 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
     const location = useLocation();
     const { user, logout, isLoading } = useAuth();
     const { picture: profilePic } = useProfilePicture();
+    const { notifications, unreadCount: unreadNotifCount, loaded: notifsLoaded, refreshNotifications, markRead, markAllRead } = useNotifications();
+    const { unreadCount: unreadMsgCount } = useUnreadMessages();
 
     const [showNotifications, setShowNotifications] = useState(false);
     const [showMoreMenu, setShowMoreMenu] = useState(false);
@@ -82,9 +91,9 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
     const displayInfo = user?.type === 'alumni' ? 'Alumni' : user?.department || 'Student';
 
     useEffect(() => {
-        setProgress(40);
+        const start = setTimeout(() => setProgress(40), 0);
         const t = setTimeout(() => setProgress(100), 350);
-        return () => { clearTimeout(t); setProgress(0); };
+        return () => { clearTimeout(start); clearTimeout(t); setProgress(0); };
     }, [location.pathname]);
 
     useEffect(() => {
@@ -101,6 +110,16 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
     const crumbs = location.pathname.split('/').filter(x => x && x !== 'student');
 
     const handleLogout = () => { logout(); navigate('/login', { replace: true }); };
+
+    const toggleNotifications = () => {
+        setShowNotifications(v => {
+            const next = !v;
+            if (next) refreshNotifications();
+            return next;
+        });
+    };
+
+    const navBadge = (label: string) => (label === 'Messages' ? unreadMsgCount : undefined);
 
     const searchSuggestions = searchQuery.trim() ? [
         { label: `People: "${searchQuery}"`,  Icon: Users,    to: `/student/network?q=${encodeURIComponent(searchQuery)}` },
@@ -143,6 +162,7 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
                             Icon={item.icon}
                             label={item.label}
                             active={isActive(item.to, location.pathname, item.exact)}
+                            badge={navBadge(item.label)}
                         />
                     ))}
                 </nav>
@@ -208,17 +228,23 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
                             {navItems.map(item => {
                                 const active = isActive(item.to, location.pathname, item.exact);
                                 const Icon = item.icon;
+                                const badge = navBadge(item.label);
                                 return (
                                     <button
                                         key={item.to}
                                         onClick={() => { navigate(item.to); setShowMoreMenu(false); }}
-                                        className={`flex flex-col items-center gap-2 p-3 rounded-2xl transition-all
+                                        className={`relative flex flex-col items-center gap-2 p-3 rounded-2xl transition-all
                                             ${active
                                                 ? 'bg-nile-blue text-white'
                                                 : 'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}
                                     >
                                         <Icon size={20} strokeWidth={active ? 2.2 : 1.8} />
                                         <span className="text-[10px] font-medium leading-none">{item.label}</span>
+                                        {!!badge && badge > 0 && (
+                                            <span className="absolute top-1.5 right-1.5 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1">
+                                                {badge > 9 ? '9+' : badge}
+                                            </span>
+                                        )}
                                     </button>
                                 );
                             })}
@@ -298,18 +324,32 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
                         <button onClick={() => navigate('/student/messages')}
                             className="relative p-2 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors">
                             <Mail size={18} />
-                            <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-red-400 rounded-full" />
+                            {unreadMsgCount > 0 && (
+                                <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1">
+                                    {unreadMsgCount > 9 ? '9+' : unreadMsgCount}
+                                </span>
+                            )}
                         </button>
 
                         <div ref={notifRef} className="relative">
-                            <button onClick={() => setShowNotifications(v => !v)}
+                            <button onClick={toggleNotifications}
                                 className={`relative p-2 rounded-xl transition-colors ${showNotifications ? 'text-nile-blue bg-nile-blue-50' : 'text-gray-400 hover:text-gray-700 hover:bg-gray-50'}`}>
                                 <Bell size={18} />
-                                <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-nile-green rounded-full" />
+                                {unreadNotifCount > 0 && (
+                                    <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-nile-green text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1">
+                                        {unreadNotifCount > 9 ? '9+' : unreadNotifCount}
+                                    </span>
+                                )}
                             </button>
                             {showNotifications && (
                                 <div className="absolute top-full right-0 mt-2 z-50 w-80 max-w-[calc(100vw-16px)] animate-in fade-in slide-in-from-top-1">
-                                    <NotificationTray onClose={() => setShowNotifications(false)} />
+                                    <NotificationTray
+                                        notifications={notifications}
+                                        loaded={notifsLoaded}
+                                        onMarkRead={markRead}
+                                        onMarkAllRead={markAllRead}
+                                        onClose={() => setShowNotifications(false)}
+                                    />
                                 </div>
                             )}
                         </div>

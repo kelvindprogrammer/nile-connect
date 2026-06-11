@@ -23,11 +23,11 @@ interface ApiEvent {
 interface ApiEnvelope<T> { data: T; }
 
 const catColors: Record<string, string> = {
-    tech: 'bg-nile-blue text-white',
-    workshop: 'bg-nile-green text-white',
-    fair: 'bg-nile-green text-white',
-    webinar: 'bg-nile-white text-black',
-    seminar: 'bg-black text-white',
+    tech: 'bg-nile-blue/10 text-nile-blue',
+    workshop: 'bg-nile-green/10 text-nile-green',
+    fair: 'bg-nile-green/10 text-nile-green',
+    webinar: 'bg-gray-100 text-gray-500',
+    seminar: 'bg-gray-100 text-gray-500',
 };
 
 const filters = ['ALL', 'TECH', 'WORKSHOP', 'FAIR', 'WEBINAR', 'SEMINAR'];
@@ -72,13 +72,13 @@ const EventsCalendar = () => {
         <DashboardLayout>
             <div className="p-4 md:p-10 space-y-6 md:space-y-10 font-sans bg-nile-white min-h-full pb-24 text-left">
                 {/* Header */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b-[2px] border-black pb-6 md:pb-10">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-gray-100 pb-6 md:pb-10">
                     <div className="space-y-1 md:space-y-2">
-                        <h2 className="text-3xl md:text-6xl font-black text-black leading-none uppercase tracking-tighter">Events .</h2>
-                        <p className="text-[10px] md:text-lg font-bold text-nile-blue/70 uppercase tracking-widest">Stay connected with your campus .</p>
+                        <h2 className="text-3xl md:text-5xl font-semibold text-gray-900 leading-tight">Events</h2>
+                        <p className="text-sm text-gray-600">Stay connected with your campus</p>
                     </div>
-                    <Button variant="primary" size="sm" className="shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                        + SUGGEST EVENT
+                    <Button variant="nile" size="sm">
+                        + Suggest event
                     </Button>
                 </div>
 
@@ -88,7 +88,7 @@ const EventsCalendar = () => {
                         <button
                             key={f}
                             onClick={() => setActive(f)}
-                            className={`px-4 md:px-6 py-1.5 md:py-2 rounded-full border-[2px] border-black font-black text-[9px] md:text-xs transition-all whitespace-nowrap ${active === f ? 'bg-nile-green text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'bg-white text-black'}`}
+                            className={`px-4 md:px-6 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-colors whitespace-nowrap ${active === f ? 'bg-nile-blue text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
                         >
                             {f}
                         </button>
@@ -100,37 +100,37 @@ const EventsCalendar = () => {
                         <Loader2 size={32} className="animate-spin text-nile-blue/40" />
                     </div>
                 ) : filtered.length === 0 ? (
-                    <div className="py-20 text-center border-[2px] border-dashed border-black/10 rounded-[24px]">
-                        <p className="text-[10px] font-black text-black/20 uppercase tracking-[0.2em]">
-                            {active === 'ALL' ? 'NO EVENTS SCHEDULED YET' : `NO ${active} EVENTS`}
+                    <div className="py-20 text-center border border-dashed border-gray-200 rounded-2xl">
+                        <p className="text-sm text-gray-400">
+                            {active === 'ALL' ? 'No events scheduled yet' : `No ${active.toLowerCase()} events`}
                         </p>
                     </div>
                 ) : (
                     <>
                         {/* Featured */}
                         {featured && (
-                            <div className="bg-nile-green text-white p-6 md:p-10 rounded-[28px] md:rounded-[40px] border-[2px] md:border-3 border-black shadow-[6px_6px_0px_0px_#000] relative overflow-hidden group">
-                                <div className="absolute top-4 right-4 bg-white/20 text-white text-[8px] md:text-[10px] font-black px-3 md:px-4 py-1 rounded-full border-[1.5px] border-white/40 uppercase z-10">
-                                    FEATURED
+                            <div className="bg-nile-green text-white p-6 md:p-10 rounded-3xl relative overflow-hidden group shadow-card">
+                                <div className="absolute top-4 right-4 bg-white/20 text-white text-xs font-medium px-3 md:px-4 py-1 rounded-full z-10">
+                                    Featured
                                 </div>
                                 <div className="relative z-10 space-y-4 md:space-y-6">
-                                    <span className="text-[8px] md:text-[9px] font-black px-3 py-1 rounded-full border-2 border-white/40 uppercase bg-black/10 inline-block">
-                                        {featured.category?.toUpperCase()}
+                                    <span className="text-xs font-medium px-3 py-1 rounded-full bg-white/15 inline-block">
+                                        {featured.category}
                                     </span>
-                                    <h3 className="text-2xl md:text-5xl font-black leading-none uppercase tracking-tighter max-w-2xl">{featured.title}</h3>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 text-[10px] md:text-sm font-black text-white/80 uppercase">
-                                        <div className="flex items-center space-x-2"><CalendarDays size={16} strokeWidth={3} /><span>{formatDate(featured.date)}</span></div>
-                                        <div className="flex items-center space-x-2"><Clock size={16} strokeWidth={3} /><span>{featured.time || 'TBA'}</span></div>
-                                        <div className="flex items-center space-x-2"><MapPin size={16} strokeWidth={3} /><span>{featured.location}</span></div>
-                                        <div className="flex items-center space-x-2"><Users size={16} strokeWidth={3} /><span>{featured.registrations_count} / {featured.capacity} GOING</span></div>
+                                    <h3 className="text-2xl md:text-5xl font-semibold leading-tight max-w-2xl">{featured.title}</h3>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 text-sm font-medium text-white/80">
+                                        <div className="flex items-center space-x-2"><CalendarDays size={16} strokeWidth={2} /><span>{formatDate(featured.date)}</span></div>
+                                        <div className="flex items-center space-x-2"><Clock size={16} strokeWidth={2} /><span>{featured.time || 'TBA'}</span></div>
+                                        <div className="flex items-center space-x-2"><MapPin size={16} strokeWidth={2} /><span>{featured.location}</span></div>
+                                        <div className="flex items-center space-x-2"><Users size={16} strokeWidth={2} /><span>{featured.registrations_count} / {featured.capacity} going</span></div>
                                     </div>
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        className="bg-white border-white text-black hover:bg-white/90 w-full sm:w-auto"
+                                        className="bg-white border-white text-gray-900 hover:bg-white/90 w-full sm:w-auto"
                                         onClick={() => handleRegister(featured.id)}
                                     >
-                                        {registeredIds.has(featured.id) ? '✓ REGISTERED' : 'REGISTER NOW'}
+                                        {registeredIds.has(featured.id) ? '✓ Registered' : 'Register now'}
                                         <ArrowRight size={18} className="ml-2" />
                                     </Button>
                                 </div>
@@ -154,39 +154,39 @@ const EventsCalendar = () => {
 
 const EventCard = ({ event, registered, onRegister }: { event: ApiEvent; registered: boolean; onRegister: () => void }) => {
     const catKey = event.category?.toLowerCase() || '';
-    const catClass = catColors[catKey] || 'bg-nile-white text-black border-[1.5px] border-black';
+    const catClass = catColors[catKey] || 'bg-gray-100 text-gray-500';
 
     return (
-        <div className="bg-white p-6 md:p-8 rounded-[24px] md:rounded-[40px] border-[2px] md:border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all group flex flex-col text-left">
+        <div className="social-card p-6 md:p-8 hover:-translate-y-1 transition-all group flex flex-col text-left">
             <div className="flex justify-between items-start mb-4 md:mb-6">
-                <span className={`text-[8px] md:text-[9px] font-black px-2 md:px-3 py-1 rounded-full border-[1.5px] md:border-2 border-black uppercase ${catClass}`}>
-                    {event.category?.toUpperCase()}
+                <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${catClass}`}>
+                    {event.category}
                 </span>
-                <span className="text-[8px] md:text-[9px] font-black text-nile-blue/50 uppercase tracking-widest">{event.organiser_type?.toUpperCase()}</span>
+                <span className="text-xs text-gray-400">{event.organiser_type}</span>
             </div>
 
-            <h3 className="text-lg md:text-2xl font-black text-black uppercase mb-4 md:mb-6 leading-none tracking-tighter">{event.title}</h3>
+            <h3 className="text-lg md:text-2xl font-semibold text-gray-900 mb-4 md:mb-6 leading-tight">{event.title}</h3>
 
             <div className="space-y-2 md:space-y-3 mb-6 md:mb-8 flex-1">
-                <div className="flex items-center space-x-2.5 text-[11px] md:text-sm font-black text-nile-blue/70">
-                    <CalendarDays size={14} strokeWidth={3} />
-                    <span className="uppercase">{formatDate(event.date)}{event.time ? ` • ${event.time}` : ''}</span>
+                <div className="flex items-center space-x-2.5 text-sm text-gray-600">
+                    <CalendarDays size={14} strokeWidth={2} />
+                    <span>{formatDate(event.date)}{event.time ? ` • ${event.time}` : ''}</span>
                 </div>
-                <div className="flex items-center space-x-2.5 text-[11px] md:text-sm font-black text-nile-blue/70">
-                    <MapPin size={14} strokeWidth={3} />
-                    <span className="uppercase">{event.location}</span>
+                <div className="flex items-center space-x-2.5 text-sm text-gray-600">
+                    <MapPin size={14} strokeWidth={2} />
+                    <span>{event.location}</span>
                 </div>
-                <div className="flex items-center space-x-2.5 text-[11px] md:text-sm font-black text-nile-blue/70">
-                    <Users size={14} strokeWidth={3} />
-                    <span className="uppercase">{event.registrations_count} / {event.capacity} GOING</span>
+                <div className="flex items-center space-x-2.5 text-sm text-gray-600">
+                    <Users size={14} strokeWidth={2} />
+                    <span>{event.registrations_count} / {event.capacity} going</span>
                 </div>
             </div>
 
             <button
                 onClick={onRegister}
-                className={`w-full font-black py-3 md:py-4 rounded-[16px] md:rounded-full border-[2px] md:border-3 border-black shadow-[3px_3px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all uppercase text-[10px] md:text-sm ${registered ? 'bg-nile-green text-white' : 'bg-white text-black'}`}
+                className={`w-full font-medium py-3 md:py-4 rounded-full transition-colors text-sm ${registered ? 'bg-nile-green text-white hover:bg-nile-green-600' : 'bg-nile-blue text-white hover:bg-nile-blue-600'}`}
             >
-                {registered ? '✓ REGISTERED' : 'REGISTER NOW'}
+                {registered ? '✓ Registered' : 'Register now'}
             </button>
         </div>
     );

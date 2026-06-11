@@ -29,6 +29,9 @@ type User struct {
 	Level        int                               // 100, 200, 300, 400, 500
 	FacultyID    string `gorm:"type:text"`        // "fac_eng"
 	DepartmentID string `gorm:"type:text"`        // "dept_cs"
+
+	// Presence — updated by the messaging heartbeat endpoint.
+	LastActiveAt *time.Time
 }
 
 type EmployerProfile struct {
@@ -137,6 +140,8 @@ type Message struct {
 	ReceiverID string         `gorm:"not null;index"`
 	Content    string         `gorm:"type:text;not null"`
 	IsRead     bool           `gorm:"default:false"`
+	MediaURL   string         `gorm:"type:text"`
+	MediaType  string         `gorm:"type:text"` // "image" | "file"
 }
 
 type PasswordReset struct {
@@ -147,4 +152,46 @@ type PasswordReset struct {
 	Token     string         `gorm:"uniqueIndex;not null"`
 	ExpiresAt time.Time      `gorm:"not null"`
 	Used      bool           `gorm:"default:false"`
+}
+
+type Notification struct {
+	ID        string         `gorm:"primaryKey;type:text;default:gen_random_uuid()"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
+	UserID    string         `gorm:"not null;index"` // recipient
+	ActorID   string         `gorm:"type:text;index"` // who triggered it
+	Type      string         `gorm:"type:text;not null"` // message|like|comment|connection_request|connection_accept|application_status|event
+	Title     string         `gorm:"type:text;not null"`
+	Body      string         `gorm:"type:text"`
+	Link      string         `gorm:"type:text"`
+	IsRead    bool           `gorm:"default:false"`
+}
+
+type Comment struct {
+	ID         string         `gorm:"primaryKey;type:text;default:gen_random_uuid()"`
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+	DeletedAt  gorm.DeletedAt `gorm:"index"`
+	PostID     string         `gorm:"not null;index"`
+	AuthorID   string         `gorm:"not null;index"`
+	AuthorType string         `gorm:"type:text;not null"`
+	Content    string         `gorm:"type:text;not null"`
+}
+
+type Connection struct {
+	ID          string         `gorm:"primaryKey;type:text;default:gen_random_uuid()"`
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	DeletedAt   gorm.DeletedAt `gorm:"index"`
+	RequesterID string         `gorm:"not null;index"`
+	RecipientID string         `gorm:"not null;index"`
+	Status      string         `gorm:"type:text;default:'pending'"` // pending|accepted|declined
+}
+
+type TypingStatus struct {
+	ID        string `gorm:"primaryKey;type:text;default:gen_random_uuid()"`
+	UpdatedAt time.Time
+	UserID    string `gorm:"not null;uniqueIndex:idx_typing_pair"`
+	PartnerID string `gorm:"not null;uniqueIndex:idx_typing_pair"`
 }

@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { type AxiosError } from 'axios';
 
 // Both clients send cookies automatically (session-based auth via nile_session
 // httponly cookie set by /api/auth/callback).
@@ -18,7 +18,7 @@ export const aiClient = axios.create({
 // ---------------------------------------------------------------------------
 // Response interceptor — redirect to /login on 401 (session expired / gone)
 // ---------------------------------------------------------------------------
-const handleAuthError = (error: any) => {
+const handleAuthError = (error: AxiosError) => {
     const status = error.response?.status;
     const url: string = error.config?.url || '';
 
@@ -53,3 +53,14 @@ const handleAuthError = (error: any) => {
 
 apiClient.interceptors.response.use((r) => r, handleAuthError);
 aiClient.interceptors.response.use((r) => r, handleAuthError);
+
+// ---------------------------------------------------------------------------
+// Shared helper for extracting a user-facing message from a caught error
+// ---------------------------------------------------------------------------
+export const getErrorMessage = (err: unknown, fallback: string): string => {
+    if (axios.isAxiosError(err)) {
+        const data = err.response?.data as { error?: string } | undefined;
+        if (data?.error) return data.error;
+    }
+    return fallback;
+};

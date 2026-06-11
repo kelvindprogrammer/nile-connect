@@ -87,6 +87,10 @@ func migrate(db *gorm.DB) {
 		&models.PostLike{},
 		&models.Message{},
 		&models.PasswordReset{},
+		&models.Notification{},
+		&models.Comment{},
+		&models.Connection{},
+		&models.TypingStatus{},
 	)
 
 	// Explicit column additions for Campus One fields.
@@ -103,6 +107,15 @@ func migrate(db *gorm.DB) {
 		`CREATE INDEX IF NOT EXISTS idx_users_campus_one_sub ON users(campus_one_sub)`,
 		// Make password_hash nullable so SSO users can exist without a password.
 		`ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL`,
+
+		// Presence + media attachments + social features.
+		`ALTER TABLE users ADD COLUMN IF NOT EXISTS last_active_at TIMESTAMPTZ`,
+		`ALTER TABLE messages ADD COLUMN IF NOT EXISTS media_url TEXT`,
+		`ALTER TABLE messages ADD COLUMN IF NOT EXISTS media_type TEXT`,
+		`CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id)`,
+		`CREATE INDEX IF NOT EXISTS idx_comments_post ON comments(post_id)`,
+		`CREATE INDEX IF NOT EXISTS idx_connections_requester ON connections(requester_id)`,
+		`CREATE INDEX IF NOT EXISTS idx_connections_recipient ON connections(recipient_id)`,
 	} {
 		db.Exec(stmt)
 	}

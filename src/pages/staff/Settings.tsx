@@ -42,20 +42,20 @@ const StaffSettings = () => {
         <div className="p-4 md:p-8 space-y-8 font-sans bg-nile-white min-h-full anime-fade-in text-left pb-24 md:pb-8">
 
             {/* Hero Header */}
-            <div className="bg-white border-[2px] border-black rounded-[24px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+            <div className="bg-white border border-gray-100 rounded-[24px] shadow-card p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-1/3 h-full bg-black/[0.03] -skew-x-12 translate-x-1/4 pointer-events-none" />
                 <div className="space-y-2 z-10">
-                    <span className="px-3 py-1 bg-black text-white text-[8px] font-black uppercase tracking-widest rounded-full">ADMIN CONFIG</span>
-                    <h2 className="text-3xl md:text-5xl font-black text-black leading-none uppercase tracking-tighter">System Config .</h2>
-                    <p className="text-[10px] font-bold text-black/40 uppercase tracking-widest">Administrative controls and platform security protocols.</p>
+                    <span className="px-3 py-1 bg-black text-white text-[8px] font-semibold rounded-full">ADMIN CONFIG</span>
+                    <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">System Config .</h2>
+                    <p className="text-[10px] font-bold text-black/40">Administrative controls and platform security protocols.</p>
                 </div>
                 <div className="hidden md:flex items-center gap-4 z-10">
-                    <div className="w-14 h-14 bg-black text-nile-green rounded-[18px] border-[2px] border-black flex items-center justify-center shadow-[3px_3px_0px_0px_rgba(108,187,86,1)]">
+                    <div className="w-14 h-14 bg-black text-nile-green rounded-[18px] border border-gray-100 flex items-center justify-center shadow-green">
                         <ShieldCheck size={26} />
                     </div>
                     <div>
-                        <p className="font-black text-sm uppercase text-black">{staffName}</p>
-                        <p className="text-[9px] font-black text-black/30 uppercase">STAFF ADMINISTRATOR</p>
+                        <p className="font-semibold text-sm text-black">{staffName}</p>
+                        <p className="text-[9px] font-semibold text-black/30">STAFF ADMINISTRATOR</p>
                         <p className="text-[8px] font-bold text-nile-blue/60 truncate max-w-[180px]">{email}</p>
                     </div>
                 </div>
@@ -72,10 +72,10 @@ const StaffSettings = () => {
                     <button
                         key={a.label}
                         onClick={() => navigate(a.path)}
-                        className={`bg-white border-[2px] border-black rounded-[16px] p-4 flex flex-col items-start gap-2.5 transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,0.08)] hover:shadow-none hover:translate-x-px hover:translate-y-px ${a.color}`}
+                        className={`bg-white border border-gray-100 rounded-[16px] p-4 flex flex-col items-start gap-2.5 transition-all shadow-card ${a.color}`}
                     >
                         {a.icon}
-                        <span className="text-[9px] font-black uppercase tracking-widest leading-none">{a.label}</span>
+                        <span className="text-[9px] font-semibold leading-none">{a.label}</span>
                     </button>
                 ))}
             </div>
@@ -93,22 +93,22 @@ const StaffSettings = () => {
                     <Divider />
                     <div className="flex items-center justify-between py-1">
                         <div className="space-y-0.5">
-                            <p className="text-[11px] font-black text-black uppercase">Platform Status</p>
-                            <p className="text-[9px] font-bold text-black/30 uppercase">Nile Connect is fully operational.</p>
+                            <p className="text-[11px] font-semibold text-black">Platform Status</p>
+                            <p className="text-[9px] font-bold text-black/30">Nile Connect is fully operational.</p>
                         </div>
-                        <span className="flex items-center gap-1 px-2.5 py-1 bg-nile-green/10 text-nile-green text-[8px] font-black uppercase rounded-full border border-nile-green/20">
+                        <span className="flex items-center gap-1 px-2.5 py-1 bg-nile-green/10 text-nile-green text-[8px] font-semibold rounded-full border border-nile-green/20">
                             <CheckCircle2 size={10} strokeWidth={3} /> LIVE
                         </span>
                     </div>
                     <Divider />
                     <div className="flex items-center justify-between py-1">
                         <div className="space-y-0.5">
-                            <p className="text-[11px] font-black text-black uppercase">Dashboard Overview</p>
-                            <p className="text-[9px] font-bold text-black/30 uppercase">View platform-wide metrics and engagement reports.</p>
+                            <p className="text-[11px] font-semibold text-black">Dashboard Overview</p>
+                            <p className="text-[9px] font-bold text-black/30">View platform-wide metrics and engagement reports.</p>
                         </div>
                         <button
                             onClick={() => navigate('/staff')}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-black text-white border-[2px] border-black rounded-lg font-black text-[8px] uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-px hover:translate-y-px transition-all"
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-black text-white border border-gray-100 rounded-lg font-semibold text-[8px] shadow-card transition-all"
                         >
                             VIEW
                         </button>
@@ -126,18 +126,18 @@ const StaffSettings = () => {
                     <Divider />
                     <div className="flex items-center justify-between py-1">
                         <div className="space-y-0.5">
-                            <p className="text-[11px] font-black text-black uppercase">Campus One SSO</p>
-                            <p className="text-[9px] font-bold text-black/30 uppercase">Authentication handled by Nile University SSO.</p>
+                            <p className="text-[11px] font-semibold text-black">Campus One SSO</p>
+                            <p className="text-[9px] font-bold text-black/30">Authentication handled by Nile University SSO.</p>
                         </div>
-                        <span className="flex items-center gap-1 px-2.5 py-1 bg-nile-blue/10 text-nile-blue text-[8px] font-black uppercase rounded-full border border-nile-blue/20">
+                        <span className="flex items-center gap-1 px-2.5 py-1 bg-nile-blue/10 text-nile-blue text-[8px] font-semibold rounded-full border border-nile-blue/20">
                             <Lock size={10} strokeWidth={3} /> SECURED
                         </span>
                     </div>
                     <Divider />
                     <div className="flex items-center justify-between py-1">
                         <div className="space-y-0.5">
-                            <p className="text-[11px] font-black text-black uppercase">Active Admin Sessions</p>
-                            <p className="text-[9px] font-bold text-black/30 uppercase">You are signed in on this device.</p>
+                            <p className="text-[11px] font-semibold text-black">Active Admin Sessions</p>
+                            <p className="text-[9px] font-bold text-black/30">You are signed in on this device.</p>
                         </div>
                         <ChevronRight size={16} className="text-black/20" />
                     </div>
@@ -168,12 +168,12 @@ const StaffSettings = () => {
                     <Divider />
                     <div className="flex items-center justify-between py-1">
                         <div className="space-y-0.5">
-                            <p className="text-[11px] font-black text-black uppercase">Export Platform Data</p>
-                            <p className="text-[9px] font-bold text-black/30 uppercase">Download CSV reports for students, jobs and applications.</p>
+                            <p className="text-[11px] font-semibold text-black">Export Platform Data</p>
+                            <p className="text-[9px] font-bold text-black/30">Download CSV reports for students, jobs and applications.</p>
                         </div>
                         <button
                             onClick={() => navigate('/staff/reports')}
-                            className="flex items-center gap-1.5 px-3 py-1.5 border-[2px] border-black rounded-lg font-black text-[8px] uppercase hover:bg-black hover:text-white transition-all"
+                            className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-100 rounded-lg font-semibold text-[8px] hover:bg-black hover:text-white transition-all"
                         >
                             <BarChart2 size={10} /> REPORTS
                         </button>
@@ -185,7 +185,7 @@ const StaffSettings = () => {
                     <button
                         onClick={handleSave}
                         disabled={saving}
-                        className="flex items-center gap-2 px-8 py-3 bg-black text-white border-[2px] border-black rounded-xl font-black text-[10px] uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-px hover:translate-y-px hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all disabled:opacity-50 disabled:pointer-events-none"
+                        className="flex items-center gap-2 px-8 py-3 bg-black text-white border border-gray-100 rounded-xl font-semibold text-[10px] shadow-card transition-all disabled:opacity-50 disabled:pointer-events-none"
                     >
                         {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                         {saving ? 'COMMITTING...' : 'COMMIT CHANGES'}
@@ -196,12 +196,12 @@ const StaffSettings = () => {
                 <Section icon={<Trash2 size={14} />} label="DANGER ZONE" danger>
                     <div className="flex items-center justify-between py-1">
                         <div className="space-y-0.5">
-                            <p className="text-[11px] font-black text-black uppercase">Sign Out</p>
-                            <p className="text-[9px] font-bold text-black/30 uppercase">End your admin session securely.</p>
+                            <p className="text-[11px] font-semibold text-black">Sign Out</p>
+                            <p className="text-[9px] font-bold text-black/30">End your admin session securely.</p>
                         </div>
                         <button
                             onClick={logout}
-                            className="flex items-center gap-1.5 px-3 py-1.5 border-[2px] border-black rounded-lg font-black text-[8px] uppercase text-black hover:bg-black hover:text-white transition-all"
+                            className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-100 rounded-lg font-semibold text-[8px] text-black hover:bg-black hover:text-white transition-all"
                         >
                             <LogOut size={10} /> SIGN OUT
                         </button>
@@ -218,10 +218,10 @@ const Section = ({ icon, label, children, danger = false }: {
     icon: React.ReactNode; label: string; children: React.ReactNode; danger?: boolean;
 }) => (
     <section className="space-y-3">
-        <h3 className={`text-[9px] font-black uppercase tracking-[0.3em] flex items-center gap-2 ${danger ? 'text-red-500' : 'text-black/40'}`}>
+        <h3 className={`text-[9px] font-semibold flex items-center gap-2 ${danger ? 'text-red-500' : 'text-black/40'}`}>
             {icon} {label}
         </h3>
-        <div className={`bg-white border-[2px] border-black rounded-[20px] p-5 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] space-y-3 ${danger ? 'border-red-200' : ''}`}>
+        <div className={`bg-white border border-gray-100 rounded-[20px] p-5 shadow-card space-y-3 ${danger ? 'border-red-200' : ''}`}>
             {children}
         </div>
     </section>
@@ -232,8 +232,8 @@ const Divider = () => <div className="border-t border-dashed border-black/5" />;
 const ToggleRow = ({ label, desc, on, onFlip }: { label: string; desc: string; on: boolean; onFlip: () => void }) => (
     <div className="flex items-center justify-between py-1">
         <div className="space-y-0.5 mr-4">
-            <p className="text-[11px] font-black text-black uppercase">{label}</p>
-            <p className="text-[9px] font-bold text-black/30 uppercase">{desc}</p>
+            <p className="text-[11px] font-semibold text-black">{label}</p>
+            <p className="text-[9px] font-bold text-black/30">{desc}</p>
         </div>
         <button
             onClick={onFlip}
