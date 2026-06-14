@@ -51,6 +51,9 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	case "comments":
 		comments(w, r, database)
 		return
+	case "post":
+		deletePost(w, r, database)
+		return
 	}
 
 	switch r.Method {
@@ -199,6 +202,40 @@ func toggleLike(w http.ResponseWriter, r *http.Request, database *gorm.DB) {
 	respond.OK(w, map[string]any{"liked": liked, "likes_count": likesCount})
 }
 
+// DELETE /api/feed?path=post&id=<postID> — delete a post (author or career-services staff only).
+func deletePost(w http.ResponseWriter, r *http.Request, database *gorm.DB) {
+	if r.Method != http.MethodDelete {
+		respond.Error(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+	postID := r.URL.Query().Get("id")
+	if postID == "" {
+		respond.Error(w, http.StatusBadRequest, "id is required")
+		return
+	}
+	auth, err := mw.Auth(r)
+	if err != nil {
+		respond.Error(w, http.StatusUnauthorized, "authentication required")
+		return
+	}
+
+	var post models.Post
+	if err := database.Where("id = ? AND deleted_at IS NULL", postID).First(&post).Error; err != nil {
+		respond.Error(w, http.StatusNotFound, "post not found")
+		return
+	}
+	if post.AuthorID != auth.UserID && auth.Role != "staff" {
+		respond.Error(w, http.StatusNotFound, "post not found")
+		return
+	}
+
+	if err := database.Delete(&post).Error; err != nil {
+		respond.Error(w, http.StatusInternalServerError, "could not delete post")
+		return
+	}
+	respond.OK(w, map[string]any{"deleted": true})
+}
+
 type commentResponse struct {
 	ID         string    `json:"id"`
 	PostID     string    `json:"post_id"`
@@ -285,6 +322,36 @@ func comments(w http.ResponseWriter, r *http.Request, database *gorm.DB) {
 			Content:    comment.Content,
 			CreatedAt:  comment.CreatedAt,
 		})
+
+	case http.MethodDelete:
+		auth, err := mw.Auth(r)
+		if err != nil {
+			respond.Error(w, http.StatusUnauthorized, "authentication required")
+			return
+		}
+		commentID := r.URL.Query().Get("commentId")
+		if commentID == "" {
+			respond.Error(w, http.StatusBadRequest, "commentId is required")
+			return
+		}
+
+		var comment models.Comment
+		if err := database.Where("id = ? AND post_id = ? AND deleted_at IS NULL", commentID, postID).First(&comment).Error; err != nil {
+			respond.Error(w, http.StatusNotFound, "comment not found")
+			return
+		}
+		if comment.AuthorID != auth.UserID && auth.Role != "staff" {
+			respond.Error(w, http.StatusNotFound, "comment not found")
+			return
+		}
+
+		if err := database.Delete(&comment).Error; err != nil {
+			respond.Error(w, http.StatusInternalServerError, "could not delete comment")
+			return
+		}
+		database.Model(&models.Post{}).Where("id = ? AND comments_count > 0", postID).
+			UpdateColumn("comments_count", gorm.Expr("comments_count - 1"))
+		respond.OK(w, map[string]any{"deleted": true})
 
 	default:
 		respond.Error(w, http.StatusMethodNotAllowed, "method not allowed")

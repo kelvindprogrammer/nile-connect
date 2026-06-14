@@ -116,7 +116,12 @@ const EmployerCandidates = () => {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                     {filtered.map(c => (
-                        <CandidateCard key={c.student_id} candidate={c} onMessage={() => navigate('/employer/messages')} />
+                        <CandidateCard
+                            key={c.student_id}
+                            candidate={c}
+                            onMessage={() => navigate('/employer/messages', { state: { startConversationWith: { id: c.student_id, full_name: c.student_name } } })}
+                            onView={() => navigate(`/employer/candidates/${c.student_id}`)}
+                        />
                     ))}
                 </div>
             )}
@@ -124,9 +129,10 @@ const EmployerCandidates = () => {
     );
 };
 
-const CandidateCard = ({ candidate, onMessage }: {
+const CandidateCard = ({ candidate, onMessage, onView }: {
     candidate: EmployerApplication & { jobs: string[] };
     onMessage: () => void;
+    onView: () => void;
 }) => {
     const badge = statusBadge[candidate.status] || 'bg-black/5 text-black/40 border-black/10';
     const initials = (candidate.student_name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
@@ -169,7 +175,8 @@ const CandidateCard = ({ candidate, onMessage }: {
                     className="flex-1 flex items-center justify-center gap-1.5 py-2.5 border border-gray-100 rounded-xl font-semibold text-[8px] hover:bg-black hover:text-white transition-all">
                     <MessageSquare size={12} /> MESSAGE
                 </button>
-                <button className="p-2.5 border border-gray-100 rounded-xl text-black/40 hover:border-nile-blue hover:text-nile-blue transition-all">
+                <button onClick={onView} title="View candidate"
+                    className="p-2.5 border border-gray-100 rounded-xl text-black/40 hover:border-nile-blue hover:text-nile-blue transition-all">
                     <ArrowUpRight size={14} />
                 </button>
             </div>

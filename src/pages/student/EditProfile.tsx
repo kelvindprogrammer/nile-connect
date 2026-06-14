@@ -20,7 +20,7 @@ import { apiClient } from '../../services/api';
 
 const EditProfile = () => {
     const navigate = useNavigate();
-    const { user, login, logout } = useAuth();
+    const { user, logout } = useAuth();
     const { showToast } = useToast();
     const { profile, updateProfile } = useProfile(user?.id);
     const { picture, uploadPicture, removePicture } = useProfilePicture();
@@ -103,12 +103,16 @@ const EditProfile = () => {
         }
     };
 
-    const handleSave = (e: React.FormEvent) => {
+    const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
-        login({ ...user!, name, email });
-        updateProfile({ bio, major, location, linkedIn, portfolio, github, phone, skills, experiences });
-        showToast('Profile updated successfully!', 'success');
-        navigate('/student/profile');
+        try {
+            await apiClient.put('/api/student/profile', { full_name: name, major });
+            updateProfile({ bio, major, location, linkedIn, portfolio, github, phone, skills, experiences });
+            showToast('Profile updated successfully!', 'success');
+            navigate('/student/profile');
+        } catch {
+            showToast('Failed to update profile.', 'error');
+        }
     };
 
     return (

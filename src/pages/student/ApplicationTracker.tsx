@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import { MoreHorizontal, ExternalLink, Clock, CheckCircle, XCircle, FileText, Loader2 } from 'lucide-react';
 import { apiClient } from '../../services/api';
@@ -124,6 +125,8 @@ const AppCard = ({ app }: { app: AppItem }) => {
         ? new Date(app.applied_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
         : '';
 
+    const navigate = useNavigate();
+
     return (
         <div className="bg-white p-4 md:p-6 rounded-[20px] md:rounded-[25px] border border-gray-100 shadow-card md:shadow-card transition-all group">
             <div className="flex justify-between items-start mb-3 md:mb-5">
@@ -143,7 +146,10 @@ const AppCard = ({ app }: { app: AppItem }) => {
             <p className="font-semibold text-black text-[11px] md:text-base mb-3 md:mb-5 leading-tight">{app.job_title || 'Untitled Role'}</p>
             <div className="flex justify-between items-center">
                 <span className="text-[8px] md:text-[9px] font-semibold text-nile-blue/60">{dateStr ? `Applied ${dateStr}` : ''}</span>
-                <button className="flex items-center space-x-1 text-[8px] md:text-[9px] font-semibold hover:text-nile-blue transition-colors">
+                <button
+                    onClick={() => navigate(`/student/jobs/${app.job_id}`)}
+                    className="flex items-center space-x-1 text-[8px] md:text-[9px] font-semibold hover:text-nile-blue transition-colors"
+                >
                     <span>VIEW</span>
                     <ExternalLink size={10} strokeWidth={3} />
                 </button>

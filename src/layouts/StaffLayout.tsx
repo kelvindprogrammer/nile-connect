@@ -3,7 +3,7 @@ import { Outlet, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import {
     Home, Briefcase, Calendar, UserRound, LogOut, Bell, Mail,
     ChevronRight, Search, HeartHandshake, BarChart2, Stethoscope,
-    Settings, Grid3X3, X,
+    Settings, Grid3X3, X, MessageCircle,
 } from 'lucide-react';
 import Avatar from '../components/Avatar';
 import NileConnectLogo from '../components/NileConnectLogo';
@@ -20,6 +20,7 @@ const navItems = [
     { to: '/staff/crm',      label: 'CRM',        icon: HeartHandshake },
     { to: '/staff/reports',  label: 'Reports',    icon: BarChart2 },
     { to: '/staff/profile',  label: 'Profile',    icon: UserRound },
+    { to: '/staff/feed',     label: 'Feed',       icon: MessageCircle },
 ];
 
 const isActive = (to: string, pathname: string, exact = false) =>

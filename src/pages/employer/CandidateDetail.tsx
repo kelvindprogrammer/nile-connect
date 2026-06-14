@@ -52,7 +52,7 @@ const CandidateDetail = () => {
 
     if (apps.length === 0) return (
         <div className="p-8 anime-fade-in text-left space-y-6">
-            <button onClick={() => navigate('/candidates')}
+            <button onClick={() => navigate('/employer/candidates')}
                 className="flex items-center gap-2 text-black/40 font-semibold text-[9px] hover:text-black transition-colors">
                 <ArrowLeft size={14} strokeWidth={3} /> BACK TO TALENT POOL
             </button>

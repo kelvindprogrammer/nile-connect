@@ -49,3 +49,11 @@ export const addComment = async (postId: string, content: string): Promise<PostC
     const { data } = await apiClient.post<Envelope<PostComment>>(`/api/feed/${postId}/comments`, { content });
     return data.data;
 };
+
+export const deletePost = async (postId: string): Promise<void> => {
+    await apiClient.delete(`/api/feed/${postId}`);
+};
+
+export const deleteComment = async (postId: string, commentId: string): Promise<void> => {
+    await apiClient.delete(`/api/feed/${postId}/comments/${commentId}`);
+};

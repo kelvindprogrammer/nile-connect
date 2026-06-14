@@ -3,10 +3,10 @@ import Avatar from './Avatar';
 import PostBar from './PostBar';
 import CommentSection from './CommentSection';
 import SharePostModal from './SharePostModal';
-import { MessageCircle, RefreshCcw, Send, ThumbsUp, Loader2 } from 'lucide-react';
+import { MessageCircle, RefreshCcw, Send, ThumbsUp, Loader2, Trash2 } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
-import { getPosts, toggleLike, type Post } from '../services/feedService';
+import { getPosts, toggleLike, deletePost, type Post } from '../services/feedService';
 import { timeAgo } from '../utils/formatDate';
 
 const ROLE_LABELS: Record<string, string> = {
@@ -79,6 +79,26 @@ const Feed: React.FC = () => {
         setPosts(prev => prev.map(p => p.id === postId ? { ...p, comments_count: p.comments_count + 1 } : p));
     };
 
+    const handleCommentDeleted = (postId: string) => {
+        setPosts(prev => prev.map(p => p.id === postId ? { ...p, comments_count: Math.max(0, p.comments_count - 1) } : p));
+    };
+
+    const canModerate = user?.role === 'staff';
+
+    const canDeletePost = (post: Post) => canModerate || user?.id === post.author_id;
+
+    const handleDeletePost = async (id: string) => {
+        if (!window.confirm('Delete this post? This cannot be undone.')) return;
+        const removed = posts.find(p => p.id === id);
+        setPosts(prev => prev.filter(p => p.id !== id));
+        try {
+            await deletePost(id);
+        } catch {
+            if (removed) setPosts(prev => [removed, ...prev].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()));
+            showToast('Could not delete post.', 'error');
+        }
+    };
+
     const authorName = (p: Post) => {
         if (user && p.author_id === user.id) return 'You';
         return p.author_name || ROLE_LABELS[p.author_type] || 'Community member';
@@ -112,6 +132,15 @@ const Feed: React.FC = () => {
                                 <p className="text-xs text-gray-400 mt-0.5">{roleTag(post)} · {timeAgo(post.created_at)}</p>
                             </div>
                         </div>
+                        {canDeletePost(post) && (
+                            <button
+                                onClick={() => handleDeletePost(post.id)}
+                                title="Delete post"
+                                className="p-1.5 -m-1.5 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors flex-shrink-0"
+                            >
+                                <Trash2 size={15} />
+                            </button>
+                        )}
                     </div>
 
                     <div className="px-4 py-2">
@@ -169,7 +198,12 @@ const Feed: React.FC = () => {
                     </div>
 
                     {openComments.has(post.id) && (
-                        <CommentSection postId={post.id} onCommentAdded={() => handleCommentAdded(post.id)} />
+                        <CommentSection
+                            postId={post.id}
+                            onCommentAdded={() => handleCommentAdded(post.id)}
+                            onCommentDeleted={() => handleCommentDeleted(post.id)}
+                            canModerate={canModerate}
+                        />
                     )}
                 </div>
             ))}

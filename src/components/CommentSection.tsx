@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import Avatar from './Avatar';
-import { Send, Loader2 } from 'lucide-react';
+import { Send, Loader2, Trash2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import { getComments, addComment, type PostComment } from '../services/feedService';
+import { getComments, addComment, deleteComment, type PostComment } from '../services/feedService';
 import { timeAgo } from '../utils/formatDate';
 
 interface CommentSectionProps {
     postId: string;
     onCommentAdded?: () => void;
+    onCommentDeleted?: () => void;
+    canModerate?: boolean;
 }
 
-const CommentSection: React.FC<CommentSectionProps> = ({ postId, onCommentAdded }) => {
+const CommentSection: React.FC<CommentSectionProps> = ({ postId, onCommentAdded, onCommentDeleted, canModerate = false }) => {
     const { user } = useAuth();
     const { showToast } = useToast();
     const currentUser = user?.name || 'You';
@@ -48,6 +50,19 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId, onCommentAdded 
         }
     };
 
+    const handleDelete = async (commentId: string) => {
+        if (!window.confirm('Delete this comment?')) return;
+        const removed = comments.find(c => c.id === commentId);
+        setComments(prev => prev.filter(c => c.id !== commentId));
+        try {
+            await deleteComment(postId, commentId);
+            onCommentDeleted?.();
+        } catch {
+            if (removed) setComments(prev => [...prev, removed]);
+            showToast('Could not delete comment.', 'error');
+        }
+    };
+
     return (
         <div className="px-4 py-4 bg-gray-50/60 border-t border-gray-100 space-y-3">
             <div className="space-y-3 max-h-72 overflow-y-auto pr-1 custom-scrollbar">
@@ -58,7 +73,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId, onCommentAdded 
                 ) : comments.length === 0 ? (
                     <p className="text-xs text-gray-400 text-center py-2">No comments yet — start the conversation.</p>
                 ) : comments.map(c => (
-                    <div key={c.id} className="flex gap-2.5 items-start">
+                    <div key={c.id} className="flex gap-2.5 items-start group">
                         <Avatar name={c.author_name} size="sm" />
                         <div className="flex-1 bg-white border border-gray-100 rounded-2xl px-3 py-2 shadow-soft-xs">
                             <div className="flex items-center justify-between gap-2 mb-0.5">
@@ -67,6 +82,15 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId, onCommentAdded 
                             </div>
                             <p className="text-sm text-gray-700 leading-relaxed">{c.content}</p>
                         </div>
+                        {(canModerate || c.author_id === user?.id) && (
+                            <button
+                                onClick={() => handleDelete(c.id)}
+                                title="Delete comment"
+                                className="p-1.5 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors flex-shrink-0 opacity-0 group-hover:opacity-100"
+                            >
+                                <Trash2 size={13} />
+                            </button>
+                        )}
                     </div>
                 ))}
             </div>

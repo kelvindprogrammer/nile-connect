@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import {
     Home, Briefcase, Users, Settings, LogOut, Bell, Mail,
-    ChevronRight, Search, UserRound, Calendar, FileText, Grid3X3, X,
+    ChevronRight, Search, UserRound, Calendar, FileText, Grid3X3, X, MessageCircle,
 } from 'lucide-react';
 import Avatar from '../components/Avatar';
 import NileConnectLogo from '../components/NileConnectLogo';
@@ -19,6 +19,7 @@ const menuItems = [
     { name: 'Events',       path: '/employer/events',       icon: Calendar },
     { name: 'Messages',     path: '/employer/messages',     icon: Mail },
     { name: 'Profile',      path: '/employer/profile',      icon: UserRound },
+    { name: 'Feed',         path: '/employer/feed',         icon: MessageCircle },
 ];
 
 const isActive = (path: string, pathname: string, exact?: boolean) =>

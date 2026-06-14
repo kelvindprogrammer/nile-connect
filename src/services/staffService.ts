@@ -117,7 +117,13 @@ export const getEvents = async (): Promise<StaffEvent[]> => {
 };
 
 export const createEvent = async (req: CreateEventRequest): Promise<StaffEvent> => {
-    const { data } = await apiClient.post<ApiEnvelope<StaffEvent>>('/api/events', req);
+    // req.date arrives as a plain "YYYY-MM-DD" string from <input type="date">,
+    // which Go's time.Time JSON unmarshal (RFC3339) rejects — convert to a Date
+    // so it serializes with a time/offset component.
+    const { data } = await apiClient.post<ApiEnvelope<StaffEvent>>('/api/events', {
+        ...req,
+        date: new Date(req.date),
+    });
     return data.data;
 };
 
