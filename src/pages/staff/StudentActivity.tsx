@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Briefcase, Activity, Search,
     Calendar, MessageSquare, Eye,
@@ -16,10 +17,12 @@ type BadgeStatus = 'pending' | 'urgent' | 'completed';
 
 interface ActivityRow {
     id:          string;
+    studentId:   string;
     studentName: string;
     companyName: string;
     action:      ActionType;
     timestamp:   string;
+    appliedAt:   string | null;
     details:     string;
     status:      BadgeStatus;
 }
@@ -75,6 +78,7 @@ const badgeClasses: Record<BadgeStatus, string> = {
 };
 
 const StudentActivity = () => {
+    const navigate = useNavigate();
     const { showToast } = useToast();
     const [stats,       setStats]       = useState<DashboardStats | null>(null);
     const [apps,        setApps]        = useState<StaffApplication[]>([]);
@@ -100,10 +104,12 @@ const StudentActivity = () => {
 
     const rows: ActivityRow[] = useMemo(() => apps.map(a => ({
         id:          a.id,
+        studentId:   a.student_id,
         studentName: a.student_name || '—',
         companyName: a.company      || '—',
         action:      toAction(a.status),
         timestamp:   fmtDate(a.applied_at),
+        appliedAt:   a.applied_at,
         details:     `${actionLabel[toAction(a.status)]} — ${a.job_title || 'job'}`,
         status:      toBadge(a.status),
     })), [apps]);
@@ -117,6 +123,32 @@ const StudentActivity = () => {
     const interviews  = rows.filter(r => r.action === 'interview_scheduled').length;
     const offers      = rows.filter(r => r.action === 'offer_sent').length;
 
+    const handleExport = () => {
+        const header = ['Student', 'Action', 'Employer', 'Applied At', 'Status'];
+        const escape = (v: string) => `"${v.replace(/"/g, '""')}"`;
+        const lines = [header.map(escape).join(',')];
+        filtered.forEach(r => {
+            lines.push([
+                r.studentName,
+                actionLabel[r.action],
+                r.companyName,
+                r.appliedAt && !r.appliedAt.startsWith('0001') ? new Date(r.appliedAt).toLocaleString('en-GB') : '',
+                r.status,
+            ].map(escape).join(','));
+        });
+
+        const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `student-activity-${new Date().toISOString().slice(0, 10)}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        showToast('Activity report downloaded.', 'success');
+    };
+
     return (
         <div className="p-4 md:p-8 space-y-8 anime-fade-in font-sans text-left pb-24 md:pb-8">
 
@@ -127,8 +159,9 @@ const StudentActivity = () => {
                     <p className="text-[10px] font-semibold text-nile-blue/50">OVERSIGHT OF STUDENT-EMPLOYER INTERACTIONS</p>
                 </div>
                 <button
-                    onClick={() => {}}
-                    className="flex items-center gap-2 px-4 py-2.5 border border-gray-100 rounded-xl font-semibold text-[9px] hover:bg-black hover:text-white transition-all shadow-card hover:shadow-none"
+                    onClick={handleExport}
+                    disabled={isLoading || filtered.length === 0}
+                    className="flex items-center gap-2 px-4 py-2.5 border border-gray-100 rounded-xl font-semibold text-[9px] hover:bg-black hover:text-white transition-all shadow-card hover:shadow-none disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                     <Download size={13} /> EXPORT REPORT
                 </button>
@@ -246,7 +279,12 @@ const StudentActivity = () => {
                                         </span>
                                     </td>
                                     <td className="px-5 py-4 text-right">
-                                        <button className="p-2 rounded-lg text-black/20 hover:bg-black hover:text-white border border-transparent hover:border-black transition-all">
+                                        <button
+                                            onClick={() => navigate(`/staff/students/${row.studentId}`)}
+                                            disabled={!row.studentId}
+                                            className="p-2 rounded-lg text-black/20 hover:bg-black hover:text-white border border-transparent hover:border-black transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                                            title="View student profile"
+                                        >
                                             <Eye size={13} />
                                         </button>
                                     </td>

@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Modal from './Modal';
 import Button from './Button';
-import InputField from './InputField';
 import { useToast } from '../context/ToastContext';
-import { Upload, CheckCircle2 } from 'lucide-react';
+import { Upload, CheckCircle2, FileText, Loader2 } from 'lucide-react';
 import { apiClient, getErrorMessage } from '../services/api';
+import { uploadFile } from '../services/messageService';
 
 interface QuickApplyModalProps {
     isOpen: boolean;
@@ -19,12 +19,54 @@ const QuickApplyModal: React.FC<QuickApplyModalProps> = ({ isOpen, onClose, jobT
     const [step, setStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [coverLetter, setCoverLetter] = useState('');
+    const [resumeUrl, setResumeUrl] = useState('');
+    const [uploadingCv, setUploadingCv] = useState(false);
+    const cvInputRef = useRef<HTMLInputElement>(null);
+
+    // Pre-fill from the student's saved CV, if they've uploaded one.
+    useEffect(() => {
+        if (!isOpen) return;
+        apiClient
+            .get<{ data: { resume_url?: string } }>('/api/student/profile')
+            .then(({ data }) => setResumeUrl(data.data?.resume_url || ''))
+            .catch(() => {});
+    }, [isOpen]);
+
+    const handleCvUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (file.type !== 'application/pdf') {
+            showToast('CV must be a PDF file', 'error');
+            if (cvInputRef.current) cvInputRef.current.value = '';
+            return;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+            showToast('CV must be under 10MB', 'error');
+            if (cvInputRef.current) cvInputRef.current.value = '';
+            return;
+        }
+        setUploadingCv(true);
+        try {
+            const { url } = await uploadFile(file);
+            setResumeUrl(url);
+            showToast('CV attached', 'success');
+        } catch (err) {
+            showToast(err instanceof Error ? err.message : 'CV upload failed', 'error');
+        } finally {
+            setUploadingCv(false);
+            if (cvInputRef.current) cvInputRef.current.value = '';
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!resumeUrl) {
+            showToast('Please attach your CV before applying', 'error');
+            return;
+        }
         setIsSubmitting(true);
         try {
-            await apiClient.post('/api/jobs', { job_id: jobId, cover_letter: coverLetter });
+            await apiClient.post('/api/jobs', { job_id: jobId, cover_letter: coverLetter, resume_url: resumeUrl });
             setStep(2);
             showToast(`Successfully applied to ${company}!`, 'success');
         } catch (err) {
@@ -50,17 +92,34 @@ const QuickApplyModal: React.FC<QuickApplyModalProps> = ({ isOpen, onClose, jobT
                         <p className="text-xs font-bold text-nile-blue/70 uppercase mt-1">{company}</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <InputField label="FULL NAME" placeholder="Grace Stanley" required />
-                        <InputField label="EMAIL" placeholder="grace@nile.edu.ng" type="email" required />
-                    </div>
-
                     <div className="space-y-3">
-                        <label className="text-[10px] font-black text-black tracking-widest uppercase">UPLOAD CV (PDF)</label>
-                        <div className="w-full border-3 border-black border-dashed rounded-2xl p-8 flex flex-col items-center justify-center bg-nile-white/50 hover:bg-white transition-all cursor-pointer group">
-                            <Upload className="text-nile-blue mb-2 group-hover:-translate-y-1 transition-transform" size={24} />
-                            <p className="text-[10px] font-black text-black uppercase">DROP FILE OR CLICK TO BROWSE</p>
-                        </div>
+                        <label className="text-[10px] font-black text-black tracking-widest uppercase">CV (PDF)</label>
+                        {resumeUrl ? (
+                            <div className="flex items-center justify-between gap-3 p-4 border-3 border-black rounded-2xl bg-nile-white/50">
+                                <div className="flex items-center gap-2 min-w-0">
+                                    <FileText className="text-nile-blue flex-shrink-0" size={18} />
+                                    <a href={resumeUrl} target="_blank" rel="noreferrer" className="text-[10px] font-black text-black uppercase underline truncate">
+                                        VIEW ATTACHED CV
+                                    </a>
+                                </div>
+                                <button type="button" onClick={() => cvInputRef.current?.click()} className="text-[10px] font-black text-nile-blue uppercase hover:underline flex-shrink-0">
+                                    {uploadingCv ? <Loader2 size={14} className="animate-spin" /> : 'CHANGE'}
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                type="button"
+                                onClick={() => cvInputRef.current?.click()}
+                                disabled={uploadingCv}
+                                className="w-full border-3 border-black border-dashed rounded-2xl p-8 flex flex-col items-center justify-center bg-nile-white/50 hover:bg-white transition-all cursor-pointer group"
+                            >
+                                {uploadingCv
+                                    ? <Loader2 className="text-nile-blue mb-2 animate-spin" size={24} />
+                                    : <Upload className="text-nile-blue mb-2 group-hover:-translate-y-1 transition-transform" size={24} />}
+                                <p className="text-[10px] font-black text-black uppercase">{uploadingCv ? 'UPLOADING...' : 'CLICK TO UPLOAD CV'}</p>
+                            </button>
+                        )}
+                        <input ref={cvInputRef} type="file" accept="application/pdf" className="hidden" onChange={handleCvUpload} />
                     </div>
 
                     <div className="space-y-3">

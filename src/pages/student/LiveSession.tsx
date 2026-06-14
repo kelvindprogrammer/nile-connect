@@ -9,6 +9,8 @@ import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import type { Peer, MediaConnection } from 'peerjs';
 
+const CALL_RETRY_MS = 3000;
+
 const LiveSession = () => {
     const { roomId } = useParams<{ roomId: string }>();
     const navigate = useNavigate();
@@ -29,9 +31,13 @@ const LiveSession = () => {
     const localStream    = useRef<MediaStream | null>(null);
     const currentCall    = useRef<MediaConnection | null>(null);
     const timerRef       = useRef<ReturnType<typeof setInterval> | null>(null);
+    const callIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const connectedRef    = useRef(false);
+    const otherPeerIdRef  = useRef('');
 
-    const sessionUrl = `${window.location.origin}/student/session/${roomId}`;
-    const myPeerId = `nc-${roomId}-${(user?.id || 'guest').replace(/-/g, '').slice(0, 8)}`;
+    const role = user?.role === 'staff' ? 'staff' : 'student';
+    const basePath = role === 'staff' ? '/staff' : '/student';
+    const sessionUrl = `${window.location.origin}${basePath}/session/${roomId}`;
 
     const startTimer = () => {
         if (timerRef.current) clearInterval(timerRef.current);
@@ -52,6 +58,57 @@ const LiveSession = () => {
         });
     };
 
+    const stopCallAttempts = () => {
+        if (callIntervalRef.current) {
+            clearInterval(callIntervalRef.current);
+            callIntervalRef.current = null;
+        }
+    };
+
+    const handleCall = (call: MediaConnection) => {
+        call.on('stream', (remoteStream: MediaStream) => {
+            if (connectedRef.current) return;
+            connectedRef.current = true;
+            currentCall.current = call;
+            if (remoteVideoRef.current) {
+                remoteVideoRef.current.srcObject = remoteStream;
+            }
+            setPeerCount(1);
+            stopCallAttempts();
+            showToast('Other participant joined the session!', 'success');
+        });
+
+        call.on('close', () => {
+            if (currentCall.current !== call) return;
+            currentCall.current = null;
+            connectedRef.current = false;
+            setPeerCount(0);
+            showToast('Other participant left the session', 'success');
+            // Resume trying to reconnect in case they rejoin
+            const peer = peerRef.current;
+            const stream = localStream.current;
+            if (peer && stream && !peer.destroyed) {
+                startCallAttempts(peer, stream, otherPeerIdRef.current);
+            }
+        });
+
+        call.on('error', () => {});
+    };
+
+    const startCallAttempts = (peer: Peer, stream: MediaStream, otherPeerId: string) => {
+        otherPeerIdRef.current = otherPeerId;
+        const attempt = () => {
+            if (connectedRef.current || peer.destroyed) return;
+            try {
+                const call = peer.call(otherPeerId, stream);
+                if (call) handleCall(call);
+            } catch { /* other peer not online yet — keep retrying */ }
+        };
+        attempt();
+        stopCallAttempts();
+        callIntervalRef.current = setInterval(attempt, CALL_RETRY_MS);
+    };
+
     const startSession = async () => {
         setPhase('connecting');
         setPeerError('');
@@ -63,7 +120,7 @@ const LiveSession = () => {
             }
 
             const { Peer } = await import('peerjs');
-            const peer = new Peer(myPeerId, {
+            const peerConfig = {
                 config: {
                     iceServers: [
                         { urls: 'stun:stun.l.google.com:19302' },
@@ -71,58 +128,44 @@ const LiveSession = () => {
                         { urls: 'stun:global.stun.twilio.com:3478' },
                     ],
                 },
-            });
-            peerRef.current = peer;
+            };
 
-            peer.on('open', () => {
-                setPhase('live');
-                startTimer();
-                // Try to call the other participant
-                const otherPeerId = `nc-${roomId}-host`;
-                if (myPeerId !== otherPeerId) {
-                    setTimeout(() => {
-                        try {
-                            const call = peer.call(otherPeerId, stream);
-                            if (call) {
-                                currentCall.current = call;
-                                call.on('stream', (remoteStream: MediaStream) => {
-                                    if (remoteVideoRef.current) {
-                                        remoteVideoRef.current.srcObject = remoteStream;
-                                    }
-                                    setPeerCount(1);
-                                });
-                                call.on('close', () => setPeerCount(0));
-                                call.on('error', () => {});
-                            }
-                        } catch { /* other peer not yet in room */ }
-                    }, 1500);
-                }
-            });
+            // Two deterministic "slots" per room — whichever participant connects
+            // first claims slot "a", the second falls back to slot "b". Each side
+            // then knows exactly which peer ID to dial for the other.
+            const connectAsSlot = (slot: 'a' | 'b') => {
+                const peer = new Peer(`nc-${roomId}-${slot}`, peerConfig);
+                peerRef.current = peer;
 
-            // Answer incoming calls
-            peer.on('call', (call) => {
-                call.answer(stream);
-                currentCall.current = call;
-                call.on('stream', (remoteStream: MediaStream) => {
-                    if (remoteVideoRef.current) {
-                        remoteVideoRef.current.srcObject = remoteStream;
+                peer.on('open', () => {
+                    setPhase('live');
+                    startTimer();
+                    const otherSlot = slot === 'a' ? 'b' : 'a';
+                    startCallAttempts(peer, stream, `nc-${roomId}-${otherSlot}`);
+                });
+
+                peer.on('call', (call) => {
+                    call.answer(stream);
+                    handleCall(call);
+                });
+
+                peer.on('error', (err) => {
+                    if (err.type === 'unavailable-id') {
+                        if (slot === 'a') {
+                            peer.destroy();
+                            connectAsSlot('b');
+                        } else {
+                            setPeerError('This session already has two participants.');
+                        }
+                    } else if (err.type === 'peer-unavailable') {
+                        // Other participant hasn't joined yet — the retry loop will keep trying
+                    } else {
+                        setPeerError('Connection issue. Please try refreshing.');
                     }
-                    setPeerCount(1);
-                    showToast('Advisor joined the session!', 'success');
                 });
-                call.on('close', () => {
-                    setPeerCount(0);
-                    showToast('Advisor left the session', 'success');
-                });
-            });
+            };
 
-            peer.on('error', (err) => {
-                if (err.type === 'peer-unavailable') {
-                    // Other peer not in room yet — that's fine, we wait
-                } else {
-                    setPeerError('Connection issue. Please try refreshing.');
-                }
-            });
+            connectAsSlot('a');
 
         } catch (err) {
             setPhase('lobby');
@@ -135,6 +178,7 @@ const LiveSession = () => {
     };
 
     const endCall = () => {
+        stopCallAttempts();
         currentCall.current?.close();
         localStream.current?.getTracks().forEach(t => t.stop());
         localStream.current = null;
@@ -157,6 +201,7 @@ const LiveSession = () => {
 
     useEffect(() => {
         return () => {
+            stopCallAttempts();
             localStream.current?.getTracks().forEach(t => t.stop());
             peerRef.current?.destroy();
             if (timerRef.current) clearInterval(timerRef.current);
@@ -175,11 +220,11 @@ const LiveSession = () => {
                     Your live career advisory session has ended. Check your messages for any follow-up notes.
                 </p>
                 <div className="flex gap-3">
-                    <button onClick={() => navigate('/student/career')}
+                    <button onClick={() => navigate(role === 'staff' ? '/staff/services' : '/student/career')}
                         className="flex-1 py-3 border border-gray-100 rounded-xl font-semibold text-[9px] hover:bg-black hover:text-white transition-all">
-                        CAREER CENTER
+                        {role === 'staff' ? 'SERVICES' : 'CAREER CENTER'}
                     </button>
-                    <button onClick={() => navigate('/student')}
+                    <button onClick={() => navigate(basePath)}
                         className="flex-1 py-3 bg-nile-blue text-white border border-gray-100 rounded-xl font-semibold text-[9px] shadow-green transition-all">
                         DASHBOARD
                     </button>
@@ -200,7 +245,7 @@ const LiveSession = () => {
                         {phase === 'live' && (
                             <p className="text-[8px] font-semibold text-nile-green flex items-center gap-1">
                                 <span className="w-1.5 h-1.5 bg-nile-green rounded-full animate-pulse" />
-                                {formatTime(duration)} · {peerCount > 0 ? `${peerCount + 1} PEOPLE` : 'WAITING FOR ADVISOR'}
+                                {formatTime(duration)} · {peerCount > 0 ? `${peerCount + 1} PEOPLE` : 'WAITING FOR OTHER PARTICIPANT'}
                             </p>
                         )}
                     </div>
@@ -230,7 +275,7 @@ const LiveSession = () => {
                                     {phase === 'live' ? 'WAITING FOR OTHER PARTICIPANT...' : 'START SESSION TO BEGIN'}
                                 </p>
                                 {phase === 'live' && (
-                                    <p className="text-[8px] text-white/20 font-bold">Share the link below so your advisor can join</p>
+                                    <p className="text-[8px] text-white/20 font-bold">Share the link below so the other participant can join</p>
                                 )}
                             </div>
                         )}
@@ -257,7 +302,7 @@ const LiveSession = () => {
                     <div className="p-5 border-b border-white/10 space-y-4">
                         <h3 className="text-[10px] font-semibold text-white/40">SESSION DETAILS</h3>
                         <div className="space-y-2 text-[9px] font-semibold text-white/60">
-                            <div className="flex justify-between"><span>PARTICIPANT</span><span className="text-white">{user?.name?.split(' ')[0] || 'STUDENT'}</span></div>
+                            <div className="flex justify-between"><span>PARTICIPANT</span><span className="text-white">{user?.name?.split(' ')[0] || (role === 'staff' ? 'STAFF' : 'STUDENT')}</span></div>
                             <div className="flex justify-between"><span>TYPE</span><span className="text-nile-green">CAREER ADVISORY</span></div>
                             <div className="flex justify-between"><span>STATUS</span>
                                 <span className={phase === 'live' ? 'text-nile-green' : 'text-yellow-400'}>
@@ -268,7 +313,7 @@ const LiveSession = () => {
 
                         {/* Share link */}
                         <div className="space-y-1.5">
-                            <p className="text-[8px] font-semibold text-white/30">SHARE LINK WITH ADVISOR</p>
+                            <p className="text-[8px] font-semibold text-white/30">SHARE LINK WITH THE OTHER PARTICIPANT</p>
                             <div className="flex gap-2">
                                 <div className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-[8px] font-semibold text-white/40 truncate">
                                     {sessionUrl}

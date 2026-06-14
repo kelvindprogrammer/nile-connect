@@ -17,6 +17,7 @@ export interface BackendUser {
     is_verified: boolean;
     major?: string | null;
     graduation_year?: number | null;
+    resume_url?: string | null;
 }
 
 interface ApiEnvelope<T> { data: T; }

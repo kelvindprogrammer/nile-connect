@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     Shield, Bell, Database, Layout, Save, LogOut,
     ChevronRight, CheckCircle2, Loader2, Users,
     BarChart2, Lock, Eye, Trash2, ShieldCheck,
+    AlertTriangle, RefreshCw,
 } from 'lucide-react';
-import Button from '../../components/Button';
 import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { getCleanupPreview, runCleanup, CleanupPreview } from '../../services/staffService';
 
 type Toggle = { label: string; desc: string; key: string };
 
@@ -33,6 +34,41 @@ const StaffSettings = () => {
         await new Promise(r => setTimeout(r, 800));
         setSaving(false);
         showToast('Administrative settings updated', 'success');
+    };
+
+    // ── Database cleanup ────────────────────────────────────────────────────
+    const [cleanup, setCleanup] = useState<CleanupPreview | null>(null);
+    const [cleanupLoading, setCleanupLoading] = useState(true);
+    const [cleanupRunning, setCleanupRunning] = useState(false);
+    const [showCleanupConfirm, setShowCleanupConfirm] = useState(false);
+
+    const fetchCleanup = useCallback(() => {
+        setCleanupLoading(true);
+        getCleanupPreview()
+            .then(setCleanup)
+            .catch(() => showToast('Failed to scan database', 'error'))
+            .finally(() => setCleanupLoading(false));
+    }, [showToast]);
+
+    useEffect(() => {
+        const t = setTimeout(fetchCleanup, 0);
+        return () => clearTimeout(t);
+    }, [fetchCleanup]);
+
+    const totalFlagged = (cleanup?.duplicate_count ?? 0) + (cleanup?.dummy_count ?? 0);
+
+    const handleRunCleanup = async () => {
+        setCleanupRunning(true);
+        try {
+            const result = await runCleanup();
+            showToast(`Cleanup complete — removed ${result.removed} account${result.removed === 1 ? '' : 's'}.`, 'success');
+            setShowCleanupConfirm(false);
+            fetchCleanup();
+        } catch {
+            showToast('Cleanup failed. Please try again.', 'error');
+        } finally {
+            setCleanupRunning(false);
+        }
     };
 
     const staffName = user?.name || 'ADMIN';
@@ -194,6 +230,55 @@ const StaffSettings = () => {
 
                 {/* Danger Zone */}
                 <Section icon={<Trash2 size={14} />} label="DANGER ZONE" danger>
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between py-1">
+                            <div className="space-y-0.5 mr-4">
+                                <p className="text-[11px] font-semibold text-black">Database Cleanup</p>
+                                <p className="text-[9px] font-bold text-black/30">
+                                    {cleanupLoading
+                                        ? 'Scanning for duplicate and test accounts…'
+                                        : totalFlagged === 0
+                                            ? 'No duplicate or test accounts found.'
+                                            : `${cleanup?.duplicate_count ?? 0} duplicate, ${cleanup?.dummy_count ?? 0} test/demo account(s) flagged for removal.`}
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-2 flex-shrink-0">
+                                <button
+                                    onClick={fetchCleanup}
+                                    disabled={cleanupLoading}
+                                    title="Rescan database"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-100 rounded-lg font-semibold text-[8px] text-black hover:bg-black hover:text-white transition-all disabled:opacity-40"
+                                >
+                                    <RefreshCw size={10} className={cleanupLoading ? 'animate-spin' : ''} /> RESCAN
+                                </button>
+                                <button
+                                    onClick={() => setShowCleanupConfirm(true)}
+                                    disabled={cleanupLoading || cleanupRunning || totalFlagged === 0}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500 text-white border border-red-500 rounded-lg font-semibold text-[8px] hover:bg-red-600 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                                >
+                                    <Trash2 size={10} /> RUN CLEANUP
+                                </button>
+                            </div>
+                        </div>
+
+                        {!cleanupLoading && totalFlagged > 0 && (
+                            <div className="rounded-xl bg-red-50 border border-red-100 p-3 space-y-1.5 max-h-40 overflow-y-auto">
+                                {cleanup?.duplicate_groups.map(g => (
+                                    <p key={g.email} className="text-[8px] font-semibold text-black/50 leading-relaxed">
+                                        <span className="text-red-500 font-bold">DUPLICATE</span> — {g.email}: keeping{' '}
+                                        <span className="text-black">{g.keep_name || 'unnamed'}</span>, removing{' '}
+                                        {g.duplicate_names.filter(Boolean).join(', ') || g.duplicate_ids.length + ' account(s)'}
+                                    </p>
+                                ))}
+                                {cleanup?.dummy_accounts.map(d => (
+                                    <p key={d.id} className="text-[8px] font-semibold text-black/50 leading-relaxed">
+                                        <span className="text-red-500 font-bold">TEST DATA</span> — {d.name || d.email || d.id} ({d.role})
+                                    </p>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    <Divider />
                     <div className="flex items-center justify-between py-1">
                         <div className="space-y-0.5">
                             <p className="text-[11px] font-semibold text-black">Sign Out</p>
@@ -208,6 +293,46 @@ const StaffSettings = () => {
                     </div>
                 </Section>
             </div>
+
+            {/* Cleanup confirmation modal */}
+            {showCleanupConfirm && (
+                <div
+                    className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+                    onClick={() => !cleanupRunning && setShowCleanupConfirm(false)}
+                >
+                    <div
+                        className="bg-white rounded-[24px] shadow-card border border-gray-100 p-6 max-w-sm w-full space-y-4"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="flex items-center gap-2 text-red-500">
+                            <AlertTriangle size={18} />
+                            <h3 className="font-semibold text-sm text-black">Confirm Database Cleanup</h3>
+                        </div>
+                        <p className="text-[10px] font-semibold text-black/50 leading-relaxed">
+                            This will permanently delete <span className="text-black">{totalFlagged}</span> account{totalFlagged === 1 ? '' : 's'}{' '}
+                            ({cleanup?.duplicate_count ?? 0} duplicate, {cleanup?.dummy_count ?? 0} test/demo) along with all of their
+                            posts, messages, applications, events and connections. This cannot be undone.
+                        </p>
+                        <div className="flex gap-2 justify-end">
+                            <button
+                                onClick={() => setShowCleanupConfirm(false)}
+                                disabled={cleanupRunning}
+                                className="px-4 py-2 border border-gray-100 rounded-xl font-semibold text-[9px] hover:bg-black/5 transition-all disabled:opacity-40"
+                            >
+                                CANCEL
+                            </button>
+                            <button
+                                onClick={handleRunCleanup}
+                                disabled={cleanupRunning}
+                                className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-xl font-semibold text-[9px] hover:bg-red-600 transition-all disabled:opacity-50"
+                            >
+                                {cleanupRunning ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
+                                {cleanupRunning ? 'DELETING…' : 'DELETE PERMANENTLY'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

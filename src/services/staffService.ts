@@ -16,6 +16,7 @@ export interface StaffApplication {
     id: string; student_id: string; student_name: string;
     job_id: string; job_title: string; company: string;
     status: string; applied_at: string | null;
+    cover_letter: string; resume_url: string;
 }
 
 export interface StaffJob {
@@ -46,6 +47,22 @@ export interface StaffEvent {
 export interface CreateEventRequest {
     title: string; category: string; date: string;
     time: string; location: string; description: string; capacity: number;
+}
+
+export interface CleanupGroup {
+    email: string; keep_id: string; keep_name: string;
+    duplicate_ids: string[]; duplicate_names: string[];
+}
+
+export interface DummyAccount {
+    id: string; name: string; email: string; role: string;
+}
+
+export interface CleanupPreview {
+    duplicate_groups: CleanupGroup[];
+    dummy_accounts: DummyAccount[];
+    duplicate_count: number;
+    dummy_count: number;
 }
 
 export interface PostJobRequest {
@@ -113,4 +130,14 @@ export const updateEvent = async (
 
 export const deleteEvent = async (eventId: string): Promise<void> => {
     await apiClient.delete(`/api/events?id=${eventId}`);
+};
+
+export const getCleanupPreview = async (): Promise<CleanupPreview> => {
+    const { data } = await apiClient.get<ApiEnvelope<CleanupPreview>>('/api/staff/cleanup');
+    return data.data;
+};
+
+export const runCleanup = async (): Promise<{ removed: number; message: string }> => {
+    const { data } = await apiClient.post<ApiEnvelope<{ removed: number; message: string }>>('/api/staff/cleanup');
+    return data.data;
 };

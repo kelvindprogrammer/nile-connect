@@ -134,7 +134,8 @@ const CandidateDetail = () => {
                         </div>
                     </div>
                     <div className="flex gap-2 w-full md:w-auto">
-                        <Button variant="outline" size="md" onClick={() => navigate('/messages')}
+                        <Button variant="outline" size="md"
+                            onClick={() => navigate('/employer/messages', { state: { startConversationWith: { id: candidate.student_id, full_name: candidate.student_name } } })}
                             className="flex-1 md:flex-none flex items-center gap-2">
                             <MessageCircle size={14} /> MESSAGE
                         </Button>

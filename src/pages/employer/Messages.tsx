@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
     Send, Search, ChevronLeft, MessageCircle, Plus, Loader2, X, Paperclip, Smile,
     Check, CheckCheck, FileText, Download,
@@ -19,6 +20,7 @@ const POLL_MS = 3000; // Poll the open thread for new messages / typing every 3s
 const TYPING_THROTTLE_MS = 2000; // At most one "typing" ping every 2s
 
 const EmployerMessages = () => {
+    const location = useLocation();
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [selected, setSelected] = useState<Conversation | null>(null);
     const [search, setSearch] = useState('');
@@ -49,6 +51,18 @@ const EmployerMessages = () => {
         const id = setInterval(loadConversations, 5000);
         return () => { cancelled = true; clearInterval(id); };
     }, [loadConversations]);
+
+    // Deep-link: open a conversation directly when navigated here with
+    // `state: { startConversationWith: { id, full_name } }` (e.g. from a candidate profile page).
+    useEffect(() => {
+        const target = (location.state as { startConversationWith?: { id: string; full_name: string } } | null)?.startConversationWith;
+        if (!target) return;
+        const t = setTimeout(() => {
+            setSelected({ user_id: target.id, full_name: target.full_name, last_msg: '', last_time: '', unread: 0, last_active_at: undefined });
+            window.history.replaceState({}, document.title);
+        }, 0);
+        return () => clearTimeout(t);
+    }, [location.state]);
 
     const handleSearch = async (q: string) => {
         setSearchQuery(q);

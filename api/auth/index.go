@@ -814,6 +814,7 @@ func userToResponse(u *models.User) map[string]any {
 		"is_verified":     u.IsVerified,
 		"major":           u.Major,
 		"graduation_year": u.GraduationYear,
+		"resume_url":      u.ResumeURL,
 	}
 }
 

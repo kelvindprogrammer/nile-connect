@@ -32,6 +32,9 @@ type User struct {
 
 	// Presence — updated by the messaging heartbeat endpoint.
 	LastActiveAt *time.Time
+
+	// ResumeURL points to the student's uploaded CV/resume (Vercel Blob).
+	ResumeURL string `gorm:"type:text"`
 }
 
 type EmployerProfile struct {
@@ -69,14 +72,16 @@ type Job struct {
 }
 
 type Application struct {
-	ID        string         `gorm:"primaryKey;type:text;default:gen_random_uuid()"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt gorm.DeletedAt `gorm:"index"`
-	JobID     string         `gorm:"not null;index"`
-	StudentID string         `gorm:"not null;index"`
-	Status    string         `gorm:"type:text;default:'applied'"`
-	AppliedAt *time.Time
+	ID          string         `gorm:"primaryKey;type:text;default:gen_random_uuid()"`
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	DeletedAt   gorm.DeletedAt `gorm:"index"`
+	JobID       string         `gorm:"not null;index"`
+	StudentID   string         `gorm:"not null;index"`
+	Status      string         `gorm:"type:text;default:'applied'"`
+	AppliedAt   *time.Time
+	CoverLetter string         `gorm:"type:text"`
+	ResumeURL   string         `gorm:"type:text"`
 }
 
 type Event struct {
@@ -194,4 +199,21 @@ type TypingStatus struct {
 	UpdatedAt time.Time
 	UserID    string `gorm:"not null;uniqueIndex:idx_typing_pair"`
 	PartnerID string `gorm:"not null;uniqueIndex:idx_typing_pair"`
+}
+
+// ServiceRequest represents a student's request for a career service
+// (mock interview, career advisory, or CV review) handled by staff.
+type ServiceRequest struct {
+	ID          string         `gorm:"primaryKey;type:text;default:gen_random_uuid()"`
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	DeletedAt   gorm.DeletedAt `gorm:"index"`
+	StudentID   string         `gorm:"not null;index"`
+	StaffID     string         `gorm:"type:text;index"`
+	Type        string         `gorm:"type:text;not null"`          // mock_interview | career_advisory | cv_review
+	Status      string         `gorm:"type:text;default:'pending'"` // pending|scheduled|completed|declined
+	Notes       string         `gorm:"type:text"`
+	Feedback    string         `gorm:"type:text"`
+	ScheduledAt *time.Time
+	RoomID      string `gorm:"type:text"`
 }

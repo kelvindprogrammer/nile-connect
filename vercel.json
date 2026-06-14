@@ -24,6 +24,7 @@
 
     { "source": "/api/student/profile",         "destination": "/api/student?path=profile" },
     { "source": "/api/student/applications",    "destination": "/api/student?path=applications" },
+    { "source": "/api/student/services",        "destination": "/api/student?path=services" },
 
     { "source": "/api/jobs/:id",                "destination": "/api/jobs?id=:id" },
 
@@ -35,6 +36,9 @@
     { "source": "/api/staff/jobs",              "destination": "/api/staff?path=jobs" },
     { "source": "/api/staff/employers",         "destination": "/api/staff?path=employers" },
     { "source": "/api/staff/students",          "destination": "/api/staff?path=students" },
+    { "source": "/api/staff/student-detail",    "destination": "/api/staff?path=student-detail" },
+    { "source": "/api/staff/service-requests",  "destination": "/api/staff?path=service-requests" },
+    { "source": "/api/staff/cleanup",           "destination": "/api/staff?path=cleanup" },
 
     { "source": "/api/employer/profile",        "destination": "/api/employer?path=profile" },
     { "source": "/api/employer/jobs",           "destination": "/api/employer?path=jobs" },

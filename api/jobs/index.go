@@ -8,6 +8,7 @@ import (
 	"nile-connect/lib/db"
 	"nile-connect/lib/models"
 	"nile-connect/lib/mw"
+	"nile-connect/lib/notify"
 	"nile-connect/lib/respond"
 
 	"gorm.io/gorm"
@@ -30,6 +31,7 @@ type jobListItem struct {
 type applyRequest struct {
 	JobID       string `json:"job_id"`
 	CoverLetter string `json:"cover_letter"`
+	ResumeURL   string `json:"resume_url"`
 }
 
 func Handler(w http.ResponseWriter, r *http.Request) {
@@ -148,6 +150,12 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		var job models.Job
+		if err := database.Where("id = ? AND deleted_at IS NULL", req.JobID).First(&job).Error; err != nil {
+			respond.Error(w, http.StatusNotFound, "job not found")
+			return
+		}
+
 		var existing int64
 		database.Model(&models.Application{}).Where("job_id = ? AND student_id = ? AND deleted_at IS NULL", req.JobID, auth.UserID).Count(&existing)
 		if existing > 0 {
@@ -155,18 +163,32 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		// Fall back to the resume on the student's profile if none was
+		// supplied with this specific application.
+		resumeURL := req.ResumeURL
+		if resumeURL == "" {
+			var student models.User
+			if database.Where("id = ?", auth.UserID).First(&student).Error == nil {
+				resumeURL = student.ResumeURL
+			}
+		}
+
 		now := time.Now()
 		app := models.Application{
-			JobID:     req.JobID,
-			StudentID: auth.UserID,
-			Status:    "applied",
-			AppliedAt: &now,
+			JobID:       req.JobID,
+			StudentID:   auth.UserID,
+			Status:      "applied",
+			AppliedAt:   &now,
+			CoverLetter: req.CoverLetter,
+			ResumeURL:   resumeURL,
 		}
 		if err := database.Create(&app).Error; err != nil {
 			respond.Error(w, http.StatusInternalServerError, "could not submit application")
 			return
 		}
 		database.Model(&models.Job{}).Where("id = ?", req.JobID).UpdateColumn("applicant_count", gorm.Expr("applicant_count + 1"))
+
+		notify.Create(database, job.EmployerID, auth.UserID, "application", "New job application", "A student applied to "+job.Title, "/employer/applications")
 
 		respond.Created(w, map[string]any{
 			"id":         app.ID,

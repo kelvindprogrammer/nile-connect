@@ -21,6 +21,7 @@ interface StudentProfile {
     major: string;
     graduation_year: number;
     is_verified: boolean;
+    resume_url?: string;
 }
 
 interface ApiEnvelope<T> { data: T; }
@@ -256,35 +257,46 @@ const Profile = () => {
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setShowCvModal(false)}>
                     <div className="bg-white border border-gray-100 rounded-[28px] shadow-card max-w-sm w-full p-8 space-y-6" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center justify-between">
-                            <h3 className="text-xl font-semibold">Download CV</h3>
+                            <h3 className="text-xl font-semibold">Your CV</h3>
                             <button onClick={() => setShowCvModal(false)} className="p-1.5 border border-gray-100/10 rounded-lg hover:bg-black/5">
                                 <X size={16} strokeWidth={3} />
                             </button>
                         </div>
-                        <p className="text-[10px] font-bold text-black/60 leading-relaxed">
-                            Your CV is auto-generated from your profile data. Complete your profile to improve CV quality.
-                        </p>
-                        <div className="p-5 bg-nile-white rounded-[16px] border border-gray-100 space-y-3">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-nile-blue text-white rounded-xl flex items-center justify-center border border-gray-100">
-                                    <FileText size={18} />
+                        {apiProfile?.resume_url ? (
+                            <>
+                                <p className="text-[10px] font-bold text-black/60 leading-relaxed">
+                                    This is the CV employers and staff will see when you apply for jobs or career services.
+                                </p>
+                                <div className="p-5 bg-nile-white rounded-[16px] border border-gray-100 space-y-3">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 bg-nile-blue text-white rounded-xl flex items-center justify-center border border-gray-100">
+                                            <FileText size={18} />
+                                        </div>
+                                        <div className="min-w-0">
+                                            <p className="font-semibold text-sm truncate">{displayName.replace(/\s+/g, '_')}_CV.pdf</p>
+                                            <p className="text-[8px] font-semibold text-nile-green">UPLOADED</p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p className="font-semibold text-sm">{displayName.replace(' ', '_')}_CV.pdf</p>
-                                    <p className="text-[8px] font-semibold text-black/40">PROFILE STRENGTH: {strength}%</p>
+                                <div className="flex gap-3">
+                                    <Button fullWidth variant="outline" onClick={() => { setShowCvModal(false); navigate('/student/profile/edit'); }}>REPLACE</Button>
+                                    <Button fullWidth onClick={() => window.open(apiProfile.resume_url, '_blank')}>
+                                        <Download size={14} className="mr-2" /> VIEW / DOWNLOAD
+                                    </Button>
                                 </div>
-                            </div>
-                        </div>
-                        <div className="flex gap-3">
-                            <Button fullWidth variant="outline" onClick={() => setShowCvModal(false)}>CANCEL</Button>
-                            <Button fullWidth onClick={() => setShowCvModal(false)}>
-                                <Download size={14} className="mr-2" /> DOWNLOAD
-                            </Button>
-                        </div>
-                        {strength < 70 && (
-                            <p className="text-[9px] font-semibold text-nile-blue/60 text-center">
-                                <button onClick={() => { setShowCvModal(false); navigate('/student/profile/edit'); }} className="underline hover:text-nile-blue">Complete your profile</button> to get a better CV
-                            </p>
+                            </>
+                        ) : (
+                            <>
+                                <p className="text-[10px] font-bold text-black/60 leading-relaxed">
+                                    You haven't uploaded a CV yet. Upload a PDF so employers and career services can review it when you apply.
+                                </p>
+                                <div className="flex gap-3">
+                                    <Button fullWidth variant="outline" onClick={() => setShowCvModal(false)}>CANCEL</Button>
+                                    <Button fullWidth onClick={() => { setShowCvModal(false); navigate('/student/profile/edit'); }}>
+                                        UPLOAD CV
+                                    </Button>
+                                </div>
+                            </>
                         )}
                     </div>
                 </div>

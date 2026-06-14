@@ -41,6 +41,7 @@ import StaffMessages      from './pages/staff/Messages';
 import StaffSettings      from './pages/staff/Settings';
 import StaffReports       from './pages/staff/Reports';
 import StudentActivity    from './pages/staff/StudentActivity';
+import StaffStudentDetail from './pages/staff/StudentDetail';
 
 // ── Employer Section ──────────────────────────────────────────────────────
 import EmployerDashboard      from './pages/employer/Dashboard';
@@ -105,6 +106,7 @@ const App = () => (
                     <Route path="/staff" element={<StaffLayout />}>
                         <Route index               element={<StaffDashboard />} />
                         <Route path="activity"     element={<StudentActivity />} />
+                        <Route path="students/:id" element={<StaffStudentDetail />} />
                         <Route path="applications" element={<Navigate to="/staff/jobs" replace />} />
                         <Route path="events"       element={<StaffEvents />} />
                         <Route path="crm"          element={<StaffCRMManager />} />
@@ -115,6 +117,9 @@ const App = () => (
                         <Route path="messages"     element={<StaffMessages />} />
                         <Route path="settings"     element={<StaffSettings />} />
                     </Route>
+
+                    {/* Staff live session — standalone full-screen, outside StaffLayout */}
+                    <Route path="/staff/session/:roomId" element={<LiveSession />} />
 
                     {/* Employer (authenticated, layout-wrapped) */}
                     <Route path="/employer" element={<EmployerLayout />}>

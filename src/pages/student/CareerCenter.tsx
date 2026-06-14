@@ -1,24 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import {
-    Upload, Video, ArrowUpRight, BookOpen, Star, ChevronRight,
-    Cpu, Sparkles, X, Calendar, Clock, User, CheckCircle2, Mail, Zap, Copy,
+    Video, ArrowUpRight, Cpu, Sparkles, X, Clock, User, CheckCircle2,
+    Zap, Copy, FileText, Loader2, Plus, MessageSquareText,
 } from 'lucide-react';
 import Button from '../../components/Button';
-import Avatar from '../../components/Avatar';
 import { useToast } from '../../context/ToastContext';
 import { useProfile, calculateProfileStrength } from '../../hooks/useProfile';
 import { useAuth } from '../../context/AuthContext';
+import { apiClient, getErrorMessage } from '../../services/api';
 
-const allAdvisors = [
-    { id: 1, name: 'Dr. Amara Osei', speciality: 'CV & Portfolio Review', time: 'FRI 2PM', rating: 4.9, available: true },
-    { id: 2, name: 'Mr. Kelvin Eze', speciality: 'Tech Career Coaching', time: 'SAT 10AM', rating: 4.7, available: true },
-    { id: 3, name: 'Dr. Fatima Yusuf', speciality: 'Interview Preparation', time: 'MON 11AM', rating: 4.8, available: false },
-    { id: 4, name: 'Prof. Chidi Nwachukwu', speciality: 'Industry Networking', time: 'TUE 3PM', rating: 4.6, available: true },
-    { id: 5, name: 'Ms. Aisha Bello', speciality: 'Entrepreneurship & Startups', time: 'WED 1PM', rating: 4.5, available: true },
-    { id: 6, name: 'Mr. Tayo Adewale', speciality: 'Finance & Banking Careers', time: 'THU 9AM', rating: 4.9, available: false },
+interface ServiceRequestItem {
+    id: string;
+    type: 'mock_interview' | 'career_advisory' | 'cv_review';
+    status: 'pending' | 'scheduled' | 'completed' | 'declined';
+    notes: string;
+    feedback: string;
+    scheduled_at: string | null;
+    room_id: string;
+    staff_name: string;
+    created_at: string;
+}
+
+interface ApiEnvelope<T> { data: T; }
+
+const SERVICE_TYPES: { value: ServiceRequestItem['type']; label: string; icon: React.ReactNode; description: string }[] = [
+    { value: 'mock_interview', label: 'Mock Interview', icon: <Video size={18} />, description: 'Practice with a staff member in a live video call' },
+    { value: 'career_advisory', label: 'Career Advisory', icon: <User size={18} />, description: 'Get 1:1 guidance on your career path' },
+    { value: 'cv_review', label: 'CV Review', icon: <FileText size={18} />, description: 'Get expert feedback on your CV' },
 ];
+
+const TYPE_LABELS: Record<string, string> = {
+    mock_interview: 'Mock Interview',
+    career_advisory: 'Career Advisory',
+    cv_review: 'CV Review',
+};
+
+const STATUS_STYLES: Record<string, string> = {
+    pending: 'bg-yellow-100 text-yellow-700',
+    scheduled: 'bg-nile-blue/10 text-nile-blue',
+    completed: 'bg-nile-green/10 text-nile-green',
+    declined: 'bg-red-100 text-red-600',
+};
+
+const formatDate = (iso: string | null) => {
+    if (!iso) return null;
+    return new Date(iso).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+};
 
 const CareerCenter = () => {
     const navigate = useNavigate();
@@ -27,15 +56,25 @@ const CareerCenter = () => {
     const { profile } = useProfile(user?.id);
     const strength = calculateProfileStrength(profile, !!user?.name, !!user?.email);
 
-    const [showAllAdvisors, setShowAllAdvisors] = useState(false);
-    const [bookingAdvisor, setBookingAdvisor] = useState<typeof allAdvisors[0] | null>(null);
-    const [bookingDate, setBookingDate] = useState('');
-    const [bookingNote, setBookingNote] = useState('');
-    const [bookingDone, setBookingDone] = useState<Set<number>>(new Set());
     const [sessionLink, setSessionLink] = useState('');
     const [showSessionModal, setShowSessionModal] = useState(false);
 
-    const visibleAdvisors = showAllAdvisors ? allAdvisors : allAdvisors.slice(0, 2);
+    const [requests, setRequests] = useState<ServiceRequestItem[]>([]);
+    const [loadingRequests, setLoadingRequests] = useState(true);
+    const [showRequestModal, setShowRequestModal] = useState(false);
+    const [requestType, setRequestType] = useState<ServiceRequestItem['type']>('mock_interview');
+    const [requestNotes, setRequestNotes] = useState('');
+    const [submittingRequest, setSubmittingRequest] = useState(false);
+
+    const fetchRequests = useCallback(() => {
+        apiClient
+            .get<ApiEnvelope<{ requests: ServiceRequestItem[] }>>('/api/student/services')
+            .then(({ data }) => setRequests(data.data?.requests || []))
+            .catch(() => {})
+            .finally(() => setLoadingRequests(false));
+    }, []);
+
+    useEffect(() => { fetchRequests(); }, [fetchRequests]);
 
     const generateRoomId = () => {
         const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -54,17 +93,21 @@ const CareerCenter = () => {
         if (roomId) navigate(`/student/session/${roomId}`);
     };
 
-    const handleBook = (e: React.FormEvent) => {
+    const handleSubmitRequest = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!bookingAdvisor) return;
-        const roomId = generateRoomId();
-        setBookingDone(prev => new Set([...prev, bookingAdvisor.id]));
-        showToast(`Session booked with ${bookingAdvisor.name}! Starting video room...`, 'success');
-        setBookingAdvisor(null);
-        setBookingDate('');
-        setBookingNote('');
-        // Navigate to session
-        setTimeout(() => navigate(`/student/session/${roomId}`), 1200);
+        setSubmittingRequest(true);
+        try {
+            await apiClient.post('/api/student/services', { type: requestType, notes: requestNotes });
+            showToast('Request submitted — staff will follow up soon!', 'success');
+            setShowRequestModal(false);
+            setRequestNotes('');
+            setRequestType('mock_interview');
+            fetchRequests();
+        } catch (err) {
+            showToast(getErrorMessage(err, 'Failed to submit request'), 'error');
+        } finally {
+            setSubmittingRequest(false);
+        }
     };
 
     return (
@@ -101,10 +144,10 @@ const CareerCenter = () => {
                         </p>
                     </div>
                     <button
-                        onClick={() => setBookingAdvisor(allAdvisors[0])}
+                        onClick={() => setShowRequestModal(true)}
                         className="bg-white text-nile-green font-semibold py-3 px-6 rounded-full border border-gray-100 shadow-card transition-all text-[10px] whitespace-nowrap flex-shrink-0"
                     >
-                        BOOK ADVISOR
+                        REQUEST CAREER SERVICE
                     </button>
                 </div>
 
@@ -166,82 +209,94 @@ const CareerCenter = () => {
                             </button>
                         </div>
 
-                        {/* Advisors */}
+                        {/* Career Services */}
                         <div className="bg-white p-6 md:p-8 rounded-[28px] border border-gray-100 shadow-card text-left">
                             <div className="flex justify-between items-center mb-5">
-                                <h3 className="text-lg md:text-xl font-semibold text-black">Advisors .</h3>
+                                <h3 className="text-lg md:text-xl font-semibold text-black">Career Services .</h3>
                                 <button
-                                    onClick={() => setShowAllAdvisors(v => !v)}
-                                    className="text-[9px] font-semibold text-nile-blue underline underline-offset-4 hover:text-nile-green transition-colors"
+                                    onClick={() => setShowRequestModal(true)}
+                                    className="flex items-center gap-1 text-[9px] font-semibold text-nile-blue hover:text-nile-green transition-colors"
                                 >
-                                    {showAllAdvisors ? 'SHOW LESS' : 'SEE ALL'}
+                                    <Plus size={12} strokeWidth={3} /> NEW REQUEST
                                 </button>
                             </div>
-                            <div className="space-y-3">
-                                {visibleAdvisors.map(a => (
-                                    <AdvisorCard
-                                        key={a.id}
-                                        advisor={a}
-                                        booked={bookingDone.has(a.id)}
-                                        onBook={() => setBookingAdvisor(a)}
-                                    />
-                                ))}
-                            </div>
+
+                            {loadingRequests ? (
+                                <div className="flex items-center justify-center py-10">
+                                    <Loader2 size={22} className="animate-spin text-nile-blue/30" />
+                                </div>
+                            ) : requests.length === 0 ? (
+                                <div className="text-center py-8 space-y-3">
+                                    <MessageSquareText size={28} className="mx-auto text-nile-blue/20" />
+                                    <p className="text-[10px] font-semibold text-black/40">No requests yet. Book a mock interview, career advisory or CV review with our staff.</p>
+                                    <Button size="xs" onClick={() => setShowRequestModal(true)}>REQUEST A SERVICE</Button>
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    {requests.map(req => (
+                                        <ServiceRequestCard
+                                            key={req.id}
+                                            req={req}
+                                            onJoin={(roomId) => navigate(`/student/session/${roomId}`)}
+                                        />
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Book Advisor Modal */}
-            {bookingAdvisor && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setBookingAdvisor(null)}>
+            {/* Request Service Modal */}
+            {showRequestModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setShowRequestModal(false)}>
                     <div className="bg-white border border-gray-100 rounded-[28px] shadow-card max-w-md w-full p-6 md:p-8 space-y-6" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center justify-between">
-                            <h3 className="text-xl font-semibold">Book Session</h3>
-                            <button onClick={() => setBookingAdvisor(null)} className="p-1.5 border border-gray-100/10 rounded-lg hover:bg-black/5">
+                            <h3 className="text-xl font-semibold">Request Career Service</h3>
+                            <button onClick={() => setShowRequestModal(false)} className="p-1.5 border border-gray-100/10 rounded-lg hover:bg-black/5">
                                 <X size={16} strokeWidth={3} />
                             </button>
                         </div>
 
-                        <div className="flex items-center gap-4 p-4 bg-nile-white rounded-[16px] border border-gray-100">
-                            <div className="w-12 h-12 rounded-full bg-nile-blue text-white flex items-center justify-center font-semibold text-sm border border-gray-100 flex-shrink-0">
-                                {bookingAdvisor.name.split(' ').map(w => w[0]).join('').slice(0, 2)}
-                            </div>
-                            <div>
-                                <p className="font-semibold text-sm">{bookingAdvisor.name}</p>
-                                <p className="text-[9px] font-semibold text-nile-blue/60">{bookingAdvisor.speciality}</p>
-                                <div className="flex items-center gap-1 mt-1">
-                                    <Star size={10} fill="#facc15" className="text-yellow-400" />
-                                    <span className="text-[8px] font-semibold">{bookingAdvisor.rating}</span>
-                                    <span className="text-[8px] text-nile-blue/40 font-semibold ml-2">NEXT SLOT: {bookingAdvisor.time}</span>
+                        <form onSubmit={handleSubmitRequest} className="space-y-4">
+                            <div className="space-y-2">
+                                <label className="text-[9px] font-semibold text-black/50">SERVICE TYPE</label>
+                                <div className="grid grid-cols-1 gap-2">
+                                    {SERVICE_TYPES.map(t => (
+                                        <button
+                                            key={t.value}
+                                            type="button"
+                                            onClick={() => setRequestType(t.value)}
+                                            className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${
+                                                requestType === t.value
+                                                    ? 'border-nile-blue bg-nile-blue/5 shadow-blue'
+                                                    : 'border-gray-100 hover:border-nile-blue/30'
+                                            }`}
+                                        >
+                                            <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${requestType === t.value ? 'bg-nile-blue text-white' : 'bg-nile-white text-nile-blue'}`}>
+                                                {t.icon}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p className="font-semibold text-sm leading-none">{t.label}</p>
+                                                <p className="text-[9px] font-semibold text-black/40 mt-1">{t.description}</p>
+                                            </div>
+                                        </button>
+                                    ))}
                                 </div>
-                            </div>
-                        </div>
-
-                        <form onSubmit={handleBook} className="space-y-4">
-                            <div className="space-y-1.5">
-                                <label className="text-[9px] font-semibold text-black/50">PREFERRED DATE</label>
-                                <input
-                                    type="date"
-                                    value={bookingDate}
-                                    onChange={e => setBookingDate(e.target.value)}
-                                    required
-                                    className="w-full border border-gray-100 rounded-xl py-3 px-4 font-bold text-sm outline-none focus:shadow-blue transition-all bg-nile-white/40"
-                                />
                             </div>
                             <div className="space-y-1.5">
                                 <label className="text-[9px] font-semibold text-black/50">WHAT DO YOU NEED HELP WITH?</label>
                                 <textarea
-                                    value={bookingNote}
-                                    onChange={e => setBookingNote(e.target.value)}
+                                    value={requestNotes}
+                                    onChange={e => setRequestNotes(e.target.value)}
                                     placeholder="e.g. My CV needs improvement and I have an interview at Google next month..."
                                     className="w-full h-24 border border-gray-100 rounded-xl py-3 px-4 font-bold text-sm outline-none focus:shadow-blue transition-all bg-nile-white/40 resize-none"
                                 />
                             </div>
                             <div className="flex gap-3">
-                                <Button variant="outline" fullWidth type="button" onClick={() => setBookingAdvisor(null)}>CANCEL</Button>
-                                <Button fullWidth type="submit">
-                                    <Calendar size={14} className="mr-2" /> BOOK NOW
+                                <Button variant="outline" fullWidth type="button" onClick={() => setShowRequestModal(false)}>CANCEL</Button>
+                                <Button fullWidth type="submit" isLoading={submittingRequest}>
+                                    SUBMIT REQUEST
                                 </Button>
                             </div>
                         </form>
@@ -300,44 +355,46 @@ const CareerCenter = () => {
     );
 };
 
-const AdvisorCard = ({
-    advisor, booked, onBook,
-}: {
-    advisor: typeof allAdvisors[0]; booked: boolean; onBook: () => void;
-}) => (
-    <div className="flex items-center justify-between p-4 border border-gray-100 rounded-[18px] hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all shadow-card hover:shadow-green bg-white">
-        <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-full border border-gray-100 bg-nile-blue text-white flex items-center justify-center font-semibold text-xs flex-shrink-0">
-                {advisor.name.split(' ').map(w => w[0]).join('').slice(0, 2)}
-            </div>
-            <div className="min-w-0">
-                <p className="font-semibold text-black text-[11px] leading-none mb-1 truncate">{advisor.name}</p>
-                <p className="text-[8px] font-semibold text-nile-blue/60 truncate">{advisor.speciality}</p>
-            </div>
-        </div>
-        <div className="flex items-center gap-2 flex-shrink-0 ml-2">
-            <div className="hidden sm:flex items-center gap-1">
-                <Star size={10} strokeWidth={3} className="text-yellow-400" fill="#facc15" />
-                <span className="text-[8px] font-semibold">{advisor.rating}</span>
-            </div>
-            {booked ? (
-                <span className="flex items-center gap-1 text-[8px] font-semibold text-nile-green px-2 py-1 bg-nile-green/10 rounded-full border border-nile-green/20">
-                    <CheckCircle2 size={10} strokeWidth={3} /> BOOKED
+const ServiceRequestCard = ({ req, onJoin }: { req: ServiceRequestItem; onJoin: (roomId: string) => void }) => {
+    const scheduled = formatDate(req.scheduled_at);
+    return (
+        <div className="p-4 border border-gray-100 rounded-[18px] shadow-card bg-white space-y-2">
+            <div className="flex items-center justify-between gap-2">
+                <p className="font-semibold text-black text-[11px] leading-none">{TYPE_LABELS[req.type] || req.type}</p>
+                <span className={`text-[8px] font-semibold px-2 py-1 rounded-full uppercase ${STATUS_STYLES[req.status] || 'bg-gray-100 text-gray-600'}`}>
+                    {req.status}
                 </span>
-            ) : (
+            </div>
+            {req.notes && <p className="text-[9px] font-semibold text-black/50 leading-relaxed">{req.notes}</p>}
+            <div className="flex items-center gap-3 flex-wrap text-[8px] font-semibold text-nile-blue/50">
+                {req.staff_name && (
+                    <span className="flex items-center gap-1"><User size={10} strokeWidth={3} /> {req.staff_name}</span>
+                )}
+                {scheduled && (
+                    <span className="flex items-center gap-1"><Clock size={10} strokeWidth={3} /> {scheduled}</span>
+                )}
+            </div>
+            {req.status === 'completed' && req.feedback && (
+                <div className="p-2.5 bg-nile-green/5 border border-nile-green/20 rounded-xl">
+                    <p className="text-[8px] font-semibold text-nile-green/70 mb-1">FEEDBACK</p>
+                    <p className="text-[9px] font-semibold text-black/60 leading-relaxed">{req.feedback}</p>
+                </div>
+            )}
+            {req.status === 'scheduled' && req.room_id && (
                 <button
-                    onClick={onBook}
-                    disabled={!advisor.available}
-                    className={`text-[8px] font-semibold px-3 py-1.5 rounded-full border border-black transition-all
-                        ${advisor.available
-                            ? 'bg-nile-green text-white hover:bg-nile-blue cursor-pointer'
-                            : 'bg-black/5 text-black/30 cursor-not-allowed'}`}
+                    onClick={() => onJoin(req.room_id)}
+                    className="w-full mt-1 flex items-center justify-center gap-2 py-2 bg-nile-blue text-white border border-gray-100 rounded-xl font-semibold text-[9px] shadow-green transition-all"
                 >
-                    {advisor.available ? advisor.time : 'FULL'}
+                    <Zap size={12} /> JOIN SESSION
                 </button>
             )}
+            {req.status === 'completed' && (
+                <span className="flex items-center gap-1 text-[8px] font-semibold text-nile-green">
+                    <CheckCircle2 size={10} strokeWidth={3} /> COMPLETED
+                </span>
+            )}
         </div>
-    </div>
-);
+    );
+};
 
 export default CareerCenter;

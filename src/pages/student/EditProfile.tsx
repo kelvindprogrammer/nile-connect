@@ -4,7 +4,7 @@ import DashboardLayout from '../../layouts/DashboardLayout';
 import {
     User, Mail, MapPin, Camera, Save, ArrowLeft,
     Link as LinkIcon, Link2, GraduationCap, Phone,
-    Code2, Plus, Trash2, Briefcase, Loader2,
+    Code2, Plus, Trash2, Briefcase, Loader2, FileText,
 } from 'lucide-react';
 import Card from '../../components/Card';
 import InputField from '../../components/InputField';
@@ -14,6 +14,8 @@ import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { useProfile, type Experience } from '../../hooks/useProfile';
 import { useProfilePicture } from '../../hooks/useProfilePicture';
+import { uploadFile } from '../../services/messageService';
+import { apiClient } from '../../services/api';
 
 
 const EditProfile = () => {
@@ -24,6 +26,9 @@ const EditProfile = () => {
     const { picture, uploadPicture, removePicture } = useProfilePicture();
     const picInputRef = useRef<HTMLInputElement>(null);
     const [uploadingPic, setUploadingPic] = useState(false);
+    const cvInputRef = useRef<HTMLInputElement>(null);
+    const [uploadingCv, setUploadingCv] = useState(false);
+    const [resumeUrl, setResumeUrl] = useState(user?.resumeUrl || '');
 
     const [name, setName] = useState(user?.name || '');
     const [email, setEmail] = useState(user?.email || '');
@@ -59,6 +64,43 @@ const EditProfile = () => {
         setExperiences(prev => [...prev, exp]);
         setNewExp({ title: '', company: '', duration: '', description: '' });
         setShowAddExp(false);
+    };
+
+    const handleCvChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (file.type !== 'application/pdf') {
+            showToast('CV must be a PDF file', 'error');
+            if (cvInputRef.current) cvInputRef.current.value = '';
+            return;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+            showToast('CV must be under 10MB', 'error');
+            if (cvInputRef.current) cvInputRef.current.value = '';
+            return;
+        }
+        setUploadingCv(true);
+        try {
+            const { url } = await uploadFile(file);
+            await apiClient.put('/api/student/profile', { resume_url: url });
+            setResumeUrl(url);
+            showToast('CV uploaded successfully!', 'success');
+        } catch (err) {
+            showToast(err instanceof Error ? err.message : 'CV upload failed', 'error');
+        } finally {
+            setUploadingCv(false);
+            if (cvInputRef.current) cvInputRef.current.value = '';
+        }
+    };
+
+    const handleRemoveCv = async () => {
+        try {
+            await apiClient.put('/api/student/profile', { resume_url: '' });
+            setResumeUrl('');
+            showToast('CV removed', 'success');
+        } catch (err) {
+            showToast(err instanceof Error ? err.message : 'Failed to remove CV', 'error');
+        }
     };
 
     const handleSave = (e: React.FormEvent) => {
@@ -126,6 +168,36 @@ const EditProfile = () => {
                                 {picture && <Button size="xs" variant="outline" type="button" onClick={() => { removePicture(); showToast('Photo removed', 'success'); }}>REMOVE</Button>}
                             </div>
                         </div>
+                    </div>
+
+                    {/* CV / Resume */}
+                    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 p-6 bg-nile-green/5 border-[2px] border-dashed border-black/10 rounded-[24px]">
+                        <div className="w-14 h-14 rounded-[16px] bg-nile-blue text-white flex items-center justify-center flex-shrink-0 border border-gray-100">
+                            <FileText size={22} />
+                        </div>
+                        <div className="flex-1 space-y-1 text-center sm:text-left">
+                            <h4 className="text-sm font-semibold text-black">CV / RESUME</h4>
+                            <p className="text-[9px] font-semibold text-nile-blue/40">PDF — max 10MB. Used when you apply to jobs.</p>
+                            {resumeUrl && (
+                                <p className="text-[9px] font-semibold text-nile-green">
+                                    ✓ CV UPLOADED — <a href={resumeUrl} target="_blank" rel="noreferrer" className="underline">VIEW FILE</a>
+                                </p>
+                            )}
+                            <div className="flex gap-2 pt-1 justify-center sm:justify-start">
+                                <Button size="xs" variant="primary" type="button" disabled={uploadingCv} onClick={() => cvInputRef.current?.click()}>
+                                    {uploadingCv ? <Loader2 size={12} className="animate-spin mr-1" /> : null}
+                                    {resumeUrl ? 'REPLACE CV' : 'UPLOAD CV'}
+                                </Button>
+                                {resumeUrl && <Button size="xs" variant="outline" type="button" onClick={handleRemoveCv}>REMOVE</Button>}
+                            </div>
+                        </div>
+                        <input
+                            ref={cvInputRef}
+                            type="file"
+                            accept="application/pdf"
+                            className="hidden"
+                            onChange={handleCvChange}
+                        />
                     </div>
 
                     {/* Basic Info */}

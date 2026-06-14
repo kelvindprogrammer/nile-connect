@@ -17,6 +17,7 @@ export interface User {
     isVerified?: boolean;
     major?: string;
     graduationYear?: number;
+    resumeUrl?: string;
     /** Resolved from departmentId for display only; may be undefined. */
     department?: string;
     /** Employer company name — populated from EmployerProfile, not auth/me. */
@@ -52,6 +53,7 @@ export const mapBackendUser = (bu: BackendUser): User => ({
     isVerified: bu.is_verified,
     major: bu.major ?? undefined,
     graduationYear: bu.graduation_year ?? undefined,
+    resumeUrl: bu.resume_url ?? undefined,
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {

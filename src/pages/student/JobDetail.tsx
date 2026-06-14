@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import {
     ArrowLeft, MapPin, DollarSign, Clock, Briefcase, Bookmark,
     ExternalLink, ShieldCheck, Loader2, AlertCircle, Building,
+    FileText, Upload, X,
 } from 'lucide-react';
 import Button from '../../components/Button';
 import Card from '../../components/Card';
 import { useToast } from '../../context/ToastContext';
 import { apiClient, getErrorMessage } from '../../services/api';
+import { uploadFile } from '../../services/messageService';
 
 interface JobDetail {
     id: string;
@@ -53,6 +55,11 @@ const JobDetail = () => {
     const [error, setError] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
     const [applying, setApplying] = useState(false);
+    const [showApplyModal, setShowApplyModal] = useState(false);
+    const [coverLetter, setCoverLetter] = useState('');
+    const [resumeUrl, setResumeUrl] = useState('');
+    const [uploadingCv, setUploadingCv] = useState(false);
+    const cvInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         const t = setTimeout(() => {
@@ -69,12 +76,51 @@ const JobDetail = () => {
         return () => clearTimeout(t);
     }, [id]);
 
-    const handleApply = async () => {
+    // Pre-fill the CV from the student's profile, if they've uploaded one.
+    useEffect(() => {
+        apiClient
+            .get<ApiEnvelope<{ resume_url?: string }>>('/api/student/profile')
+            .then(({ data }) => setResumeUrl(data.data?.resume_url || ''))
+            .catch(() => {});
+    }, []);
+
+    const handleCvUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (file.type !== 'application/pdf') {
+            showToast('CV must be a PDF file', 'error');
+            if (cvInputRef.current) cvInputRef.current.value = '';
+            return;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+            showToast('CV must be under 10MB', 'error');
+            if (cvInputRef.current) cvInputRef.current.value = '';
+            return;
+        }
+        setUploadingCv(true);
+        try {
+            const { url } = await uploadFile(file);
+            setResumeUrl(url);
+            showToast('CV attached', 'success');
+        } catch (err) {
+            showToast(err instanceof Error ? err.message : 'CV upload failed', 'error');
+        } finally {
+            setUploadingCv(false);
+            if (cvInputRef.current) cvInputRef.current.value = '';
+        }
+    };
+
+    const handleSubmitApplication = async () => {
         if (!id) return;
+        if (!resumeUrl) {
+            showToast('Please attach your CV before applying', 'error');
+            return;
+        }
         setApplying(true);
         try {
-            await apiClient.post('/api/jobs', { job_id: id });
+            await apiClient.post('/api/jobs', { job_id: id, cover_letter: coverLetter, resume_url: resumeUrl });
             showToast('Application submitted!', 'success');
+            setShowApplyModal(false);
             navigate('/student/applications');
         } catch (err) {
             showToast(getErrorMessage(err, 'Failed to apply. Please try again.'), 'error');
@@ -180,8 +226,7 @@ const JobDetail = () => {
                                 variant="primary"
                                 size="md"
                                 className="flex-1 md:flex-none"
-                                onClick={handleApply}
-                                isLoading={applying}
+                                onClick={() => setShowApplyModal(true)}
                             >
                                 APPLY NOW <ExternalLink size={14} className="ml-2" />
                             </Button>
@@ -246,8 +291,7 @@ const JobDetail = () => {
                             <Button
                                 fullWidth
                                 size="md"
-                                onClick={handleApply}
-                                isLoading={applying}
+                                onClick={() => setShowApplyModal(true)}
                                 className="!bg-white !text-black hover:!bg-nile-green border border-gray-100"
                             >
                                 SUBMIT APPLICATION
@@ -256,6 +300,67 @@ const JobDetail = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Apply Modal */}
+            {showApplyModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => !applying && setShowApplyModal(false)}>
+                    <div className="bg-white border border-gray-100 rounded-[28px] shadow-card max-w-lg w-full p-6 md:p-8 space-y-5 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-xl font-semibold truncate pr-4">Apply — {job.title}</h3>
+                            <button onClick={() => setShowApplyModal(false)} className="p-1.5 border border-gray-100/10 rounded-lg hover:bg-black/5 flex-shrink-0">
+                                <X size={16} strokeWidth={3} />
+                            </button>
+                        </div>
+
+                        {/* CV */}
+                        <div className="space-y-2">
+                            <p className="text-[9px] font-semibold text-black/40">YOUR CV (PDF)</p>
+                            {resumeUrl ? (
+                                <div className="flex items-center justify-between gap-3 p-3 bg-nile-white rounded-xl border border-gray-100">
+                                    <div className="flex items-center gap-2 min-w-0">
+                                        <FileText size={16} className="text-nile-blue flex-shrink-0" />
+                                        <a href={resumeUrl} target="_blank" rel="noreferrer" className="text-[10px] font-semibold underline truncate">
+                                            View attached CV
+                                        </a>
+                                    </div>
+                                    <button type="button" onClick={() => cvInputRef.current?.click()} className="text-[9px] font-semibold text-nile-blue hover:underline flex-shrink-0 flex items-center gap-1">
+                                        {uploadingCv ? <Loader2 size={12} className="animate-spin" /> : 'CHANGE'}
+                                    </button>
+                                </div>
+                            ) : (
+                                <button
+                                    type="button"
+                                    onClick={() => cvInputRef.current?.click()}
+                                    disabled={uploadingCv}
+                                    className="w-full p-4 border-[2px] border-dashed border-black/20 rounded-xl text-[10px] font-semibold text-black/40 hover:border-nile-blue hover:text-nile-blue transition-all flex items-center justify-center gap-2"
+                                >
+                                    {uploadingCv ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+                                    UPLOAD CV (PDF)
+                                </button>
+                            )}
+                            <input ref={cvInputRef} type="file" accept="application/pdf" className="hidden" onChange={handleCvUpload} />
+                        </div>
+
+                        {/* Cover letter */}
+                        <div className="space-y-2">
+                            <p className="text-[9px] font-semibold text-black/40">COVER LETTER (OPTIONAL)</p>
+                            <textarea
+                                className="w-full h-32 bg-nile-white/40 border border-gray-100 rounded-2xl p-4 font-bold text-xs outline-none focus:bg-white focus:shadow-blue transition-all resize-none"
+                                placeholder="Tell the employer why you're a great fit for this role..."
+                                value={coverLetter}
+                                onChange={e => setCoverLetter(e.target.value)}
+                            />
+                        </div>
+
+                        <div className="flex gap-3">
+                            <Button fullWidth variant="outline" onClick={() => setShowApplyModal(false)} disabled={applying}>CANCEL</Button>
+                            <Button fullWidth onClick={handleSubmitApplication} isLoading={applying}>
+                                SUBMIT APPLICATION
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </DashboardLayout>
     );
 };

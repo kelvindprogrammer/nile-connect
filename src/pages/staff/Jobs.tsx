@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Briefcase, CheckCircle2, XCircle, Search, MapPin,
     Loader2, Archive, ClipboardList, Plus, FileText,
-    Send, Building2, CalendarDays, Users,
+    Send, Building2, CalendarDays, Users, UserCircle,
     AlertCircle, BadgeCheck, Hourglass,
 } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
@@ -218,7 +219,7 @@ const JobCard: React.FC<JobCardProps> = ({
 
 // ─── Application Card ─────────────────────────────────────────────────────────
 
-const AppCard: React.FC<{ app: StaffApplication }> = ({ app }) => {
+const AppCard: React.FC<{ app: StaffApplication; onViewProfile: (studentId: string) => void }> = ({ app, onViewProfile }) => {
     const group = APP_STATUS_GROUPS.find(g => g.key === app.status) ?? APP_STATUS_GROUPS[0];
 
     return (
@@ -243,9 +244,24 @@ const AppCard: React.FC<{ app: StaffApplication }> = ({ app }) => {
                 </p>
             </div>
 
-            <div className="flex items-center gap-1.5 flex-shrink-0 text-black/20">
-                <Building2 size={11} />
-                <span className="text-[8px] font-semibold truncate max-w-[90px]">{app.company || '—'}</span>
+            <div className="flex items-center gap-2 flex-shrink-0">
+                {app.resume_url && (
+                    <a
+                        href={app.resume_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center gap-1.5 px-3 py-2 bg-white text-black/50 border border-gray-100/30 rounded-xl font-semibold text-[8px] hover:border-black hover:text-black hover:shadow-card transition-all"
+                    >
+                        <FileText size={12} /> VIEW CV
+                    </a>
+                )}
+                <button
+                    onClick={() => onViewProfile(app.student_id)}
+                    disabled={!app.student_id}
+                    className="flex items-center gap-1.5 px-3 py-2 bg-white text-black/50 border border-gray-100/30 rounded-xl font-semibold text-[8px] hover:border-black hover:text-black hover:shadow-card transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                    <UserCircle size={12} /> PROFILE
+                </button>
             </div>
         </div>
     );
@@ -255,6 +271,7 @@ const AppCard: React.FC<{ app: StaffApplication }> = ({ app }) => {
 
 const StaffJobs: React.FC = () => {
     const { showToast } = useToast();
+    const navigate = useNavigate();
 
     // ── State ──────────────────────────────────────────────────────────────────
     const [activeTab, setActiveTab] = useState<ActiveTab>('PENDING_APPROVAL');
@@ -840,7 +857,7 @@ const StaffJobs: React.FC = () => {
                                         ) : (
                                             <div className="space-y-3">
                                                 {group.map(app => (
-                                                    <AppCard key={app.id} app={app} />
+                                                    <AppCard key={app.id} app={app} onViewProfile={(studentId) => navigate(`/staff/students/${studentId}`)} />
                                                 ))}
                                             </div>
                                         )}

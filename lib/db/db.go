@@ -91,6 +91,7 @@ func migrate(db *gorm.DB) {
 		&models.Comment{},
 		&models.Connection{},
 		&models.TypingStatus{},
+		&models.ServiceRequest{},
 	)
 
 	// Explicit column additions for Campus One fields.
@@ -116,6 +117,15 @@ func migrate(db *gorm.DB) {
 		`CREATE INDEX IF NOT EXISTS idx_comments_post ON comments(post_id)`,
 		`CREATE INDEX IF NOT EXISTS idx_connections_requester ON connections(requester_id)`,
 		`CREATE INDEX IF NOT EXISTS idx_connections_recipient ON connections(recipient_id)`,
+
+		// CV / resume + job-application attachments.
+		`ALTER TABLE users ADD COLUMN IF NOT EXISTS resume_url TEXT`,
+		`ALTER TABLE applications ADD COLUMN IF NOT EXISTS cover_letter TEXT`,
+		`ALTER TABLE applications ADD COLUMN IF NOT EXISTS resume_url TEXT`,
+
+		// Career services (mock interview / advisory / CV review).
+		`CREATE INDEX IF NOT EXISTS idx_service_requests_student ON service_requests(student_id)`,
+		`CREATE INDEX IF NOT EXISTS idx_service_requests_staff ON service_requests(staff_id)`,
 	} {
 		db.Exec(stmt)
 	}
