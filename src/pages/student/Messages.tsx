@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import {
     Send, Search, Phone, Video, Smile, Paperclip,
@@ -26,6 +27,7 @@ const TYPING_THROTTLE_MS = 2000; // At most one "typing" ping every 2s
 const Messages = () => {
     const { user } = useAuth();
     const { showToast } = useToast();
+    const location = useLocation();
     useHeartbeat();
 
     const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -45,29 +47,54 @@ const Messages = () => {
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const currentCallRef = useRef<MediaConnection | null>(null);
     const callTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const pendingPartnerRef = useRef<{ id: string; full_name: string } | null>(null);
 
     const activeConv = conversations.find(c => c.user_id === activeUserId) || null;
+
+    // Prepend a synthetic conversation entry for a newly-started chat (from the
+    // Network "Message" deep link) until the backend has a real thread for it.
+    const mergeWithPending = useCallback((data: Conversation[]): Conversation[] => {
+        const pending = pendingPartnerRef.current;
+        if (!pending || data.some(c => c.user_id === pending.id)) return data;
+        return [
+            { user_id: pending.id, full_name: pending.full_name, last_msg: '', last_time: '', unread: 0 },
+            ...data,
+        ];
+    }, []);
 
     // ── Load conversations on mount, poll every 5s ──────────────────────────
     const loadConversations = useCallback(async () => {
         try {
             const data = await getConversations();
-            setConversations(data);
+            setConversations(mergeWithPending(data));
         } catch {
             /* ignore - backend may not have messages yet */
         }
-    }, []);
+    }, [mergeWithPending]);
 
     useEffect(() => {
         let cancelled = false;
         getConversations()
-            .then(data => { if (!cancelled) setConversations(data); })
-            .catch(() => { if (!cancelled) setConversations([]); })
+            .then(data => { if (!cancelled) setConversations(mergeWithPending(data)); })
+            .catch(() => { if (!cancelled) setConversations(mergeWithPending([])); })
             .finally(() => { if (!cancelled) setConvLoading(false); });
 
         const id = setInterval(loadConversations, 5000);
         return () => { cancelled = true; clearInterval(id); };
-    }, [loadConversations]);
+    }, [loadConversations, mergeWithPending]);
+
+    // ── Deep link from Network "Message" button ─────────────────────────────
+    useEffect(() => {
+        const target = (location.state as { startConversationWith?: { id: string; full_name: string } } | null)?.startConversationWith;
+        if (!target) return;
+        const t = setTimeout(() => {
+            pendingPartnerRef.current = target;
+            setActiveUserId(target.id);
+            setConversations(prev => mergeWithPending(prev));
+            window.history.replaceState({}, document.title);
+        }, 0);
+        return () => clearTimeout(t);
+    }, [location.state, mergeWithPending]);
 
     // ── Call helpers (declared before the PeerJS effect that uses startCallTimer) ──
     const formatDuration = (secs: number) => {

@@ -1,6 +1,7 @@
 package db
 
 import (
+	"log"
 	"os"
 	"strings"
 	"sync"
@@ -75,8 +76,13 @@ func dsn() string {
 func migrate(db *gorm.DB) {
 	db.Exec(`CREATE EXTENSION IF NOT EXISTS "pgcrypto"`)
 
-	// AutoMigrate creates new tables and adds missing columns.
-	db.AutoMigrate(
+	// AutoMigrate each model independently. GORM's AutoMigrate aborts the
+	// entire batch on the first error, which would silently prevent tables
+	// later in the list (e.g. connections, service_requests) from ever being
+	// created if an earlier model's migration fails on a warm DB. Running
+	// them one-by-one and logging failures keeps the rest of the schema
+	// in sync even when one model needs manual attention.
+	for _, model := range []interface{}{
 		&models.User{},
 		&models.EmployerProfile{},
 		&models.Job{},
@@ -92,7 +98,11 @@ func migrate(db *gorm.DB) {
 		&models.Connection{},
 		&models.TypingStatus{},
 		&models.ServiceRequest{},
-	)
+	} {
+		if err := db.AutoMigrate(model); err != nil {
+			log.Printf("automigrate %T: %v", model, err)
+		}
+	}
 
 	// Explicit column additions for Campus One fields.
 	// IF NOT EXISTS makes these safe to run on every cold start.

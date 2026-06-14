@@ -2,12 +2,16 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	"gorm.io/gorm"
 
 	"nile-connect/lib/db"
 	"nile-connect/lib/models"
@@ -461,7 +465,7 @@ func getConnections(w http.ResponseWriter, r *http.Request, auth *mw.AuthCtx) {
 	}
 
 	var rows []connRow
-	database.Raw(`
+	if err := database.Raw(`
 		SELECT
 			c.id,
 			CASE WHEN c.requester_id = ? THEN c.recipient_id ELSE c.requester_id END AS other_user_id,
@@ -474,7 +478,11 @@ func getConnections(w http.ResponseWriter, r *http.Request, auth *mw.AuthCtx) {
 		JOIN users u ON u.id = (CASE WHEN c.requester_id = ? THEN c.recipient_id ELSE c.requester_id END) AND u.deleted_at IS NULL
 		WHERE c.deleted_at IS NULL AND (c.requester_id = ? OR c.recipient_id = ?)
 		ORDER BY c.created_at DESC
-	`, auth.UserID, auth.UserID, auth.UserID, auth.UserID, auth.UserID).Scan(&rows)
+	`, auth.UserID, auth.UserID, auth.UserID, auth.UserID, auth.UserID).Scan(&rows).Error; err != nil {
+		log.Printf("connections: query failed: %v", err)
+		respond.Error(w, http.StatusInternalServerError, "could not load connections")
+		return
+	}
 
 	accepted := []connRespItem{}
 	incoming := []connRespItem{}
@@ -532,9 +540,15 @@ func connectionsRequest(w http.ResponseWriter, r *http.Request, auth *mw.AuthCtx
 		respond.Error(w, http.StatusConflict, "connection already exists")
 		return
 	}
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		log.Printf("connections-request: lookup failed: %v", err)
+		respond.Error(w, http.StatusInternalServerError, "could not create connection request")
+		return
+	}
 
 	conn := models.Connection{RequesterID: auth.UserID, RecipientID: toID, Status: "pending"}
 	if err := database.Create(&conn).Error; err != nil {
+		log.Printf("connections-request: create failed: %v", err)
 		respond.Error(w, http.StatusInternalServerError, "could not create connection request")
 		return
 	}
@@ -578,6 +592,9 @@ func connectionsRespond(w http.ResponseWriter, r *http.Request, auth *mw.AuthCtx
 
 	var conn models.Connection
 	if err := database.Where("id = ? AND recipient_id = ? AND status = 'pending' AND deleted_at IS NULL", id, auth.UserID).First(&conn).Error; err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Printf("connections-respond: lookup failed: %v", err)
+		}
 		respond.Error(w, http.StatusNotFound, "connection request not found")
 		return
 	}

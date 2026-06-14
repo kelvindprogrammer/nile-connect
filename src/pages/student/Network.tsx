@@ -239,7 +239,7 @@ const Network = () => {
                                 respondingId={respondingId}
                                 onConnect={() => setConnectTarget(person)}
                                 onRespond={handleRespond}
-                                onMessage={() => navigate('/student/messages')}
+                                onMessage={() => navigate('/student/messages', { state: { startConversationWith: { id: person.id, full_name: person.name } } })}
                             />
                         ))}
                     </div>
