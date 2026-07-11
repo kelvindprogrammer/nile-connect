@@ -33,7 +33,7 @@ import (
 // so we skip oidc.NewProvider() and reference endpoints from the docs directly.
 
 const (
-	campusOneIssuer   = "https://auth.campusone.com.ng"
+	campusOneIssuer   = "https://auth.campusone.com.ng/api/auth"
 	campusOneAuthURL  = "https://auth.campusone.com.ng/api/auth/oauth2/authorize"
 	campusOneTokenURL = "https://auth.campusone.com.ng/api/auth/oauth2/token"
 	campusOneJWKSURL  = "https://auth.campusone.com.ng/api/auth/jwks"
