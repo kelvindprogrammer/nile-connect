@@ -1,15 +1,21 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, Loader2, ChevronRight, Sparkles } from 'lucide-react';
+import { GraduationCap, LayoutList, FileText, Sparkles } from 'lucide-react';
 import Feed from '../../components/Feed';
+import ProfileSnapshotCard from '../../components/home/ProfileSnapshotCard';
+import JobsForYouCard from '../../components/home/JobsForYouCard';
+import EventsCard from '../../components/home/EventsCard';
+import PeopleSuggestionsCard from '../../components/home/PeopleSuggestionsCard';
 import { useAuth } from '../../context/AuthContext';
 import { useProfile, calculateProfileStrength } from '../../hooks/useProfile';
 import { useProfilePicture } from '../../hooks/useProfilePicture';
-import { useToast } from '../../context/ToastContext';
+import { getMyApplications } from '../../services/studentService';
+import { getConnections } from '../../services/connectionService';
+import { recordProfileView } from '../../services/profileService';
 
 const getGreeting = () => {
     const h = new Date().getHours();
-    if (h < 5)  return 'Late night';
+    if (h < 5) return 'Late night';
     if (h < 12) return 'Good morning';
     if (h < 17) return 'Good afternoon';
     return 'Good evening';
@@ -19,62 +25,75 @@ const StudentDashboard = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
     const { profile } = useProfile(user?.id);
-    const { picture, uploadPicture } = useProfilePicture();
-    const { showToast } = useToast();
+    const { picture } = useProfilePicture();
+
+    const [appsCount, setAppsCount] = useState<number | null>(null);
+    const [connCount, setConnCount] = useState<number | null>(null);
+    const [profileViews, setProfileViews] = useState<number | null>(null);
 
     const firstName = (user?.name || 'Student').split(' ')[0];
-    const strength  = calculateProfileStrength(profile, !!user?.name, !!user?.email);
-    const greeting  = getGreeting();
+    const strength = calculateProfileStrength(profile, !!user?.name, !!user?.email);
+    const greeting = getGreeting();
 
-    const [uploadingPic, setUploadingPic] = useState(false);
-    const fileRef = useRef<HTMLInputElement>(null);
-
-    const handlePicSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const f = e.target.files?.[0]; if (!f) return;
-        setUploadingPic(true);
-        try { await uploadPicture(f); showToast('Photo updated!', 'success'); }
-        catch { showToast('Upload failed', 'error'); }
-        finally { setUploadingPic(false); if (fileRef.current) fileRef.current.value = ''; }
-    };
+    useEffect(() => {
+        getMyApplications().then(a => setAppsCount(a.length)).catch(() => setAppsCount(0));
+        getConnections().then(c => setConnCount(c.accepted.length)).catch(() => setConnCount(0));
+        if (user?.id) recordProfileView(user.id).then(r => setProfileViews(r.total_views)).catch(() => setProfileViews(0));
+    }, [user?.id]);
 
     return (
-        <div className="max-w-2xl mx-auto p-4 md:py-6 space-y-4 anime-fade-in font-sans pb-24 md:pb-6">
+        <div className="max-w-[1180px] mx-auto p-4 md:py-6 grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[260px_minmax(0,1fr)_300px] gap-5 anime-fade-in font-sans pb-24 md:pb-6 items-start">
 
-            {/* ── Identity header ─────────────────────────────────────── */}
-            <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-4 flex items-center gap-4">
-                <div className="relative flex-shrink-0">
-                    <div className="w-14 h-14 rounded-2xl border border-gray-100 overflow-hidden bg-nile-blue">
-                        {picture
-                            ? <img src={picture} alt={firstName} className="w-full h-full object-cover" />
-                            : <div className="w-full h-full flex items-center justify-center">
-                                <span className="font-semibold text-white text-lg">{(user?.name || 'S').split(' ').map(n => n[0]).join('').slice(0, 2)}</span>
-                              </div>}
-                    </div>
-                    <button onClick={() => fileRef.current?.click()}
-                        className="absolute -bottom-1 -right-1 w-5 h-5 bg-nile-green border-2 border-white rounded-full flex items-center justify-center hover:scale-110 transition-transform">
-                        {uploadingPic ? <Loader2 size={9} className="text-white animate-spin" /> : <Camera size={9} className="text-white" />}
-                    </button>
-                    <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handlePicSelect} />
-                </div>
-
-                <div className="flex-1 min-w-0">
-                    <p className="text-xs text-gray-400">{greeting},</p>
-                    <h1 className="text-lg font-semibold text-gray-900 leading-tight truncate">{firstName}</h1>
-                    {strength < 100 && (
-                        <button onClick={() => navigate('/student/profile/edit')} className="text-xs font-medium text-nile-blue hover:underline mt-0.5">
-                            Profile {strength}% complete — finish it →
+            {/* ── Left rail: profile snapshot ─────────────────────────── */}
+            <div className="hidden lg:flex flex-col gap-5 sticky top-[76px]">
+                <ProfileSnapshotCard
+                    name={user?.name || 'Student'}
+                    headline={`${user?.major || 'Computer Science'} · Nile University`}
+                    avatarSrc={picture}
+                    profilePath="/student/profile"
+                    stats={[
+                        { label: 'Profile views', value: profileViews ?? '—' },
+                        { label: 'Connections', value: connCount ?? '—', to: '/student/network' },
+                        { label: 'Applications', value: appsCount ?? '—', to: '/student/applications' },
+                    ]}
+                    shortcuts={[
+                        { label: 'Career services', icon: GraduationCap, to: '/student/career' },
+                        { label: 'Applied jobs', icon: LayoutList, to: '/student/applications' },
+                        { label: 'My documents', icon: FileText, to: '/student/documents' },
+                        { label: 'Insights', icon: Sparkles, to: '/student/insights' },
+                    ]}
+                />
+                {strength < 100 && (
+                    <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-4">
+                        <div className="flex items-center justify-between mb-2">
+                            <p className="text-xs font-semibold text-gray-700">Profile strength</p>
+                            <span className="text-xs font-semibold text-nile-blue">{strength}%</span>
+                        </div>
+                        <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mb-3">
+                            <div className="h-full bg-nile-blue rounded-full transition-all duration-700" style={{ width: `${strength}%` }} />
+                        </div>
+                        <button onClick={() => navigate('/student/profile/edit')} className="text-xs font-medium text-nile-blue hover:underline">
+                            Complete your profile →
                         </button>
-                    )}
-                </div>
-
-                <button onClick={() => navigate('/student/insights')}
-                    className="hidden sm:flex items-center gap-1 text-xs font-medium text-gray-400 hover:text-nile-blue transition-colors flex-shrink-0">
-                    <Sparkles size={13} /> Insights <ChevronRight size={13} />
-                </button>
+                    </div>
+                )}
             </div>
 
-            {/* ── Feed ─────────────────────────────────────────────────── */}
-            <Feed />
+            {/* ── Center: composer + feed ──────────────────────────────── */}
+            <div className="min-w-0">
+                <div className="lg:hidden mb-4">
+                    <p className="text-xs text-gray-400">{greeting},</p>
+                    <h1 className="text-lg font-semibold text-gray-900 leading-tight">{firstName}</h1>
+                </div>
+                <Feed />
+            </div>
+
+            {/* ── Right rail: opportunities, events, network ──────────── */}
+            <div className="hidden xl:flex flex-col gap-5 sticky top-[76px]">
+                <JobsForYouCard />
+                <PeopleSuggestionsCard seeAllTo="/student/network" />
+                <EventsCard seeAllTo="/student/events" />
+            </div>
         </div>
     );
 };

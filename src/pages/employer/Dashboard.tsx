@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { CheckCircle2, Clock, ChevronRight, Sparkles } from 'lucide-react';
-import Avatar from '../../components/Avatar';
+import { CheckCircle2, Clock, FileText, Calendar as CalendarIcon, Settings, Sparkles } from 'lucide-react';
 import Feed from '../../components/Feed';
+import ProfileSnapshotCard from '../../components/home/ProfileSnapshotCard';
+import ActiveListingsCard from '../../components/home/ActiveListingsCard';
+import NeedsReviewCard from '../../components/home/NeedsReviewCard';
+import EventsCard from '../../components/home/EventsCard';
 import { useAuth } from '../../context/AuthContext';
 import { getEmployerProfile, EmployerProfile } from '../../services/employerService';
 
 const EmployerDashboard = () => {
-    const navigate = useNavigate();
     const { user } = useAuth();
     const [profile, setProfile] = useState<EmployerProfile | null>(null);
 
@@ -19,35 +20,55 @@ const EmployerDashboard = () => {
     const recruiterName = user?.name || 'Recruiter';
 
     return (
-        <div className="max-w-2xl mx-auto p-4 md:py-6 space-y-4 anime-fade-in font-sans pb-24 md:pb-6">
+        <div className="max-w-[1180px] mx-auto p-4 md:py-6 grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[260px_minmax(0,1fr)_300px] gap-5 anime-fade-in font-sans pb-24 md:pb-6 items-start">
 
-            {/* ── Identity / verification header ─────────────────────── */}
-            <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-4 flex items-center gap-4">
-                <Avatar name={recruiterName} size="lg" />
-                <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                        <h1 className="text-lg font-semibold text-gray-900 leading-tight truncate">{companyName}</h1>
-                        {profile?.status === 'approved' && (
-                            <span className="flex items-center gap-1 px-2 py-0.5 bg-nile-green/10 text-nile-green text-[11px] font-medium rounded-full">
-                                <CheckCircle2 size={11} strokeWidth={2.5} /> Verified
-                            </span>
-                        )}
-                        {profile?.status === 'pending' && (
-                            <span className="flex items-center gap-1 px-2 py-0.5 bg-yellow-50 text-yellow-600 text-[11px] font-medium rounded-full border border-yellow-200">
-                                <Clock size={11} strokeWidth={2.5} /> Pending approval
-                            </span>
-                        )}
+            {/* ── Left rail: company snapshot ─────────────────────────── */}
+            <div className="hidden lg:flex flex-col gap-5 sticky top-[76px]">
+                <ProfileSnapshotCard
+                    name={companyName}
+                    headline={recruiterName}
+                    coverClassName="bg-nile-green"
+                    accentText="text-nile-green-700"
+                    profilePath="/employer/profile"
+                    stats={[
+                        { label: 'Status', value: profile?.status === 'approved' ? 'Verified' : 'Pending' },
+                    ]}
+                    shortcuts={[
+                        { label: 'Applications', icon: FileText, to: '/employer/applications' },
+                        { label: 'Events', icon: CalendarIcon, to: '/employer/events' },
+                        { label: 'Insights', icon: Sparkles, to: '/employer/insights' },
+                        { label: 'Settings', icon: Settings, to: '/employer/settings' },
+                    ]}
+                />
+                {profile?.status === 'pending' && (
+                    <div className="bg-yellow-50 border border-yellow-100 rounded-2xl p-4 flex items-start gap-2.5">
+                        <Clock size={15} className="text-yellow-600 flex-shrink-0 mt-0.5" />
+                        <p className="text-xs text-yellow-700 leading-relaxed">Your company profile is pending staff approval. You'll be notified once it's verified.</p>
                     </div>
-                    <p className="text-xs text-gray-400 mt-0.5">Welcome back, {recruiterName.split(' ')[0]}</p>
-                </div>
-                <button onClick={() => navigate('/employer/insights')}
-                    className="hidden sm:flex items-center gap-1 text-xs font-medium text-gray-400 hover:text-nile-green transition-colors flex-shrink-0">
-                    <Sparkles size={13} /> Insights <ChevronRight size={13} />
-                </button>
+                )}
+                {profile?.status === 'approved' && (
+                    <div className="bg-nile-green/5 border border-nile-green/20 rounded-2xl p-4 flex items-start gap-2.5">
+                        <CheckCircle2 size={15} className="text-nile-green flex-shrink-0 mt-0.5" />
+                        <p className="text-xs text-nile-green-700 leading-relaxed">Your company is verified and visible to students.</p>
+                    </div>
+                )}
             </div>
 
-            {/* ── Feed ─────────────────────────────────────────────────── */}
-            <Feed />
+            {/* ── Center: composer + feed ──────────────────────────────── */}
+            <div className="min-w-0">
+                <div className="lg:hidden mb-4">
+                    <h1 className="text-lg font-semibold text-gray-900 leading-tight truncate">{companyName}</h1>
+                    <p className="text-xs text-gray-400 mt-0.5">Welcome back, {recruiterName.split(' ')[0]}</p>
+                </div>
+                <Feed />
+            </div>
+
+            {/* ── Right rail: listings, review queue, events ───────────── */}
+            <div className="hidden xl:flex flex-col gap-5 sticky top-[76px]">
+                <ActiveListingsCard />
+                <NeedsReviewCard />
+                <EventsCard seeAllTo="/employer/events" />
+            </div>
         </div>
     );
 };
