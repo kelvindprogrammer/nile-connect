@@ -23,6 +23,8 @@
     { "source": "/api/webhooks/campus-one", "destination": "/api/auth?path=webhook" },
     { "source": "/api/auth/verify-email",   "destination": "/api/auth?path=verify-email" },
     { "source": "/api/auth/dev-set-role",   "destination": "/api/auth?path=dev-set-role" },
+    { "source": "/api/auth/dev-list-users", "destination": "/api/auth?path=dev-list-users" },
+    { "source": "/api/auth/dev-delete-user","destination": "/api/auth?path=dev-delete-user" },
 
     { "source": "/api/student/profile",         "destination": "/api/student?path=profile" },
     { "source": "/api/student/applications",    "destination": "/api/student?path=applications" },

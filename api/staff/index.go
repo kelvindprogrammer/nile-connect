@@ -10,6 +10,7 @@ import (
 
 	"gorm.io/gorm"
 
+	"nile-connect/lib/admin"
 	"nile-connect/lib/db"
 	"nile-connect/lib/email"
 	"nile-connect/lib/models"
@@ -772,28 +773,6 @@ func scanForCleanup(database *gorm.DB) ([]cleanupGroup, []dummyAccount) {
 	return groups, dummies
 }
 
-// cascadeDeleteUser removes a user and everything they own/participated in.
-func cascadeDeleteUser(database *gorm.DB, userID string) {
-	database.Where("author_id = ?", userID).Delete(&models.Post{})
-	database.Where("author_id = ?", userID).Delete(&models.Comment{})
-	database.Where("user_id = ?", userID).Delete(&models.PostLike{})
-	database.Where("sender_id = ? OR receiver_id = ?", userID, userID).Delete(&models.Message{})
-	database.Where("user_id = ? OR partner_id = ?", userID, userID).Delete(&models.TypingStatus{})
-	database.Where("student_id = ?", userID).Delete(&models.Application{})
-	database.Where("employer_id = ?", userID).Delete(&models.Job{})
-	database.Where("organiser_id = ?", userID).Delete(&models.Event{})
-	database.Where("student_id = ?", userID).Delete(&models.EventRegistration{})
-	database.Where("requester_id = ? OR recipient_id = ?", userID, userID).Delete(&models.Connection{})
-	database.Where("user_id = ? OR actor_id = ?", userID, userID).Delete(&models.Notification{})
-	database.Where("student_id = ? OR staff_id = ?", userID, userID).Delete(&models.ServiceRequest{})
-	database.Where("user_id = ?", userID).Delete(&models.PasswordReset{})
-	database.Where("user_id = ?", userID).Delete(&models.EmployerProfile{})
-	database.Where("user_id = ?", userID).Delete(&models.Document{})
-	database.Where("author_id = ?", userID).Delete(&models.ApplicationNote{})
-	database.Where("user_id = ?", userID).Delete(&models.EmailVerification{})
-	database.Delete(&models.User{}, "id = ?", userID)
-}
-
 func staffCleanup(w http.ResponseWriter, r *http.Request) {
 	database, err := db.Get()
 	if err != nil {
@@ -820,12 +799,12 @@ func staffCleanup(w http.ResponseWriter, r *http.Request) {
 		removed := 0
 		for _, g := range groups {
 			for _, id := range g.DuplicateIDs {
-				cascadeDeleteUser(database, id)
+				admin.CascadeDeleteUser(database, id)
 				removed++
 			}
 		}
 		for _, d := range dummies {
-			cascadeDeleteUser(database, d.ID)
+			admin.CascadeDeleteUser(database, d.ID)
 			removed++
 		}
 		respond.OK(w, map[string]any{"removed": removed, "message": "cleanup complete"})

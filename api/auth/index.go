@@ -21,6 +21,7 @@ import (
 	"golang.org/x/oauth2"
 	"gorm.io/gorm"
 
+	"nile-connect/lib/admin"
 	"nile-connect/lib/db"
 	"nile-connect/lib/email"
 	"nile-connect/lib/jwtutil"
@@ -158,6 +159,10 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		verifyEmail(w, r)
 	case "dev-set-role":
 		devSetRole(w, r)
+	case "dev-list-users":
+		devListUsers(w, r)
+	case "dev-delete-user":
+		devDeleteUser(w, r)
 	default:
 		respond.Error(w, http.StatusNotFound, "not found")
 	}
@@ -505,6 +510,88 @@ func devSetRole(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respond.OK(w, map[string]any{"email": req.Email, "role": req.Role, "message": "role updated — API calls pick it up immediately; reload the page in-browser to refresh the cached session"})
+}
+
+// devAuthorized checks the shared secret for all dev-* admin endpoints.
+// Disabled entirely (caller gets 404) unless ROLE_OVERRIDE_SECRET is set.
+func devAuthorized(r *http.Request) bool {
+	secret := os.Getenv("ROLE_OVERRIDE_SECRET")
+	if secret == "" {
+		return false
+	}
+	return r.Header.Get("Authorization") == "Bearer "+secret
+}
+
+// devListUsers lists every account (id, name, email, role, created_at) so
+// you can match ambiguous display names to exact emails before deleting
+// anything. Optional ?q= filters by full_name or email substring.
+func devListUsers(w http.ResponseWriter, r *http.Request) {
+	if !devAuthorized(r) {
+		respond.Error(w, http.StatusNotFound, "not found")
+		return
+	}
+	if r.Method != http.MethodGet {
+		respond.Error(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+	database, err := db.Get()
+	if err != nil {
+		respond.Error(w, http.StatusInternalServerError, "database unavailable")
+		return
+	}
+
+	query := database.Where("deleted_at IS NULL")
+	if q := r.URL.Query().Get("q"); q != "" {
+		pattern := "%" + q + "%"
+		query = query.Where("full_name ILIKE ? OR email ILIKE ? OR username ILIKE ?", pattern, pattern, pattern)
+	}
+
+	type row struct {
+		ID             string    `json:"id"`
+		FullName       string    `json:"full_name"`
+		Username       string    `json:"username"`
+		Email          string    `json:"email"`
+		Role           string    `json:"role"`
+		StudentSubtype string    `json:"student_subtype"`
+		CampusOneSub   string    `json:"campus_one_sub"`
+		CreatedAt      time.Time `json:"created_at"`
+	}
+	var users []row
+	query.Model(&models.User{}).Order("created_at desc").Find(&users)
+	respond.OK(w, map[string]any{"users": users, "count": len(users)})
+}
+
+// devDeleteUser cascade-deletes one account by exact email — use
+// dev-list-users first to confirm the exact email, this does not do any
+// fuzzy/name-based matching on purpose.
+func devDeleteUser(w http.ResponseWriter, r *http.Request) {
+	if !devAuthorized(r) {
+		respond.Error(w, http.StatusNotFound, "not found")
+		return
+	}
+	if r.Method != http.MethodPost {
+		respond.Error(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+	var req struct {
+		Email string `json:"email"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.Email == "" {
+		respond.Error(w, http.StatusBadRequest, "email is required")
+		return
+	}
+	database, err := db.Get()
+	if err != nil {
+		respond.Error(w, http.StatusInternalServerError, "database unavailable")
+		return
+	}
+	var user models.User
+	if err := database.Where("email = ? AND deleted_at IS NULL", req.Email).First(&user).Error; err != nil {
+		respond.Error(w, http.StatusNotFound, "no account with that email")
+		return
+	}
+	admin.CascadeDeleteUser(database, user.ID)
+	respond.OK(w, map[string]any{"deleted": true, "email": req.Email, "id": user.ID})
 }
 
 // ── me ────────────────────────────────────────────────────────────────────────
