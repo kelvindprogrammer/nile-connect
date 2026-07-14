@@ -35,11 +35,41 @@ import (
 // so we skip oidc.NewProvider() and reference endpoints from the docs directly.
 
 const (
-	campusOneIssuer   = "https://auth.campusone.com.ng/api/auth"
-	campusOneAuthURL  = "https://auth.campusone.com.ng/api/auth/oauth2/authorize"
-	campusOneTokenURL = "https://auth.campusone.com.ng/api/auth/oauth2/token"
-	campusOneJWKSURL  = "https://auth.campusone.com.ng/api/auth/jwks"
+	campusOneIssuer      = "https://auth.campusone.com.ng/api/auth"
+	campusOneAuthURL     = "https://auth.campusone.com.ng/api/auth/oauth2/authorize"
+	campusOneTokenURL    = "https://auth.campusone.com.ng/api/auth/oauth2/token"
+	campusOneJWKSURL     = "https://auth.campusone.com.ng/api/auth/jwks"
+	campusOneUserInfoURL = "https://auth.campusone.com.ng/api/auth/oauth2/userinfo"
 )
+
+// fetchUserInfo calls Campus One's /oauth2/userinfo endpoint with the
+// access token. The id_token often only carries core identity claims —
+// scope-gated extras (like role/custom_roles behind the "roles" scope) are
+// commonly only returned here, not inlined into the id_token.
+func fetchUserInfo(ctx context.Context, accessToken string) (map[string]any, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, campusOneUserInfoURL, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Authorization", "Bearer "+accessToken)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode >= 300 {
+		return nil, fmt.Errorf("userinfo endpoint returned %d: %s", resp.StatusCode, string(body))
+	}
+	var claims map[string]any
+	if err := json.Unmarshal(body, &claims); err != nil {
+		return nil, err
+	}
+	return claims, nil
+}
 
 // campusOneKeySet fetches and caches Campus One's public keys lazily on first
 // token verification. No network call happens at init time.
@@ -289,9 +319,36 @@ func callback(w http.ResponseWriter, r *http.Request) {
 		if len(claims.Roles) == 0 {
 			claims.Roles = normalizeRolesClaim(rawClaims["roles"])
 		}
-		fmt.Printf("[CALLBACK] raw claim role=%v (%T), raw claim roles=%v (%T)\n",
-			rawClaims["role"], rawClaims["role"], rawClaims["roles"], rawClaims["roles"])
+		if claims.Role == "" {
+			if s, ok := rawClaims["role"].(string); ok {
+				claims.Role = s
+			}
+		}
+		idTokenJSON, _ := json.Marshal(rawClaims)
+		fmt.Printf("[CALLBACK] full id_token claims: %s\n", string(idTokenJSON))
 	}
+
+	// The id_token frequently only carries core identity claims — role data
+	// gated behind the "roles" scope is commonly userinfo-only. Always check
+	// there too and prefer it when the id_token had nothing.
+	if userInfo, uiErr := fetchUserInfo(ctx, token.AccessToken); uiErr != nil {
+		fmt.Printf("[CALLBACK] userinfo fetch failed: %v\n", uiErr)
+	} else {
+		userInfoJSON, _ := json.Marshal(userInfo)
+		fmt.Printf("[CALLBACK] full userinfo claims: %s\n", string(userInfoJSON))
+		if len(claims.Roles) == 0 {
+			claims.Roles = normalizeRolesClaim(userInfo["roles"])
+		}
+		if len(claims.CustomRoles) == 0 {
+			claims.CustomRoles = normalizeRolesClaim(userInfo["custom_roles"])
+		}
+		if claims.Role == "" {
+			if s, ok := userInfo["role"].(string); ok {
+				claims.Role = s
+			}
+		}
+	}
+
 	if claims.Sub == "" {
 		respond.Error(w, http.StatusInternalServerError, "id_token missing sub claim")
 		return
