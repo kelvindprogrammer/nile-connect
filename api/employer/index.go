@@ -8,6 +8,7 @@ import (
 
 	"nile-connect/lib/db"
 	"nile-connect/lib/email"
+	"nile-connect/lib/jsonutil"
 	"nile-connect/lib/models"
 	"nile-connect/lib/mw"
 	"nile-connect/lib/notify"
@@ -174,8 +175,8 @@ func toJobResp(j *models.Job) jobResp {
 		Status: j.Status, RejectionReason: j.RejectionReason,
 		ApplicantCount: j.ApplicantCount, PostedAt: j.CreatedAt,
 	}
-	json.Unmarshal([]byte(j.RequiredDocs), &resp.RequiredDocs)
-	json.Unmarshal([]byte(j.OptionalDocs), &resp.OptionalDocs)
+	resp.RequiredDocs = jsonutil.StringSlice(j.RequiredDocs)
+	resp.OptionalDocs = jsonutil.StringSlice(j.OptionalDocs)
 	return resp
 }
 
@@ -483,8 +484,7 @@ func employerApplicationDetail(w http.ResponseWriter, r *http.Request, auth *mw.
 	var note models.ApplicationNote
 	database.Where("application_id = ? AND author_id = ?", app.ID, auth.UserID).First(&note)
 
-	var docIDs []string
-	json.Unmarshal([]byte(app.DocumentIDs), &docIDs)
+	docIDs := jsonutil.StringSlice(app.DocumentIDs)
 	var docs []models.Document
 	if len(docIDs) > 0 {
 		database.Where("id IN ?", docIDs).Find(&docs)

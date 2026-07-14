@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"nile-connect/lib/db"
+	"nile-connect/lib/jsonutil"
 	"nile-connect/lib/models"
 	"nile-connect/lib/mw"
 	"nile-connect/lib/respond"
@@ -433,9 +434,8 @@ func studentApplicationPackage(w http.ResponseWriter, r *http.Request, auth *mw.
 		respond.Error(w, http.StatusNotFound, "job not found")
 		return
 	}
-	var required, optional []string
-	json.Unmarshal([]byte(job.RequiredDocs), &required)
-	json.Unmarshal([]byte(job.OptionalDocs), &optional)
+	required := jsonutil.StringSlice(job.RequiredDocs)
+	optional := jsonutil.StringSlice(job.OptionalDocs)
 
 	var docs []models.Document
 	database.Where("user_id = ? AND deleted_at IS NULL", auth.UserID).Order("created_at desc").Find(&docs)
@@ -488,8 +488,7 @@ func studentApplicationDetail(w http.ResponseWriter, r *http.Request, auth *mw.A
 		})
 	}
 
-	var docIDs []string
-	json.Unmarshal([]byte(app.DocumentIDs), &docIDs)
+	docIDs := jsonutil.StringSlice(app.DocumentIDs)
 	var docs []models.Document
 	if len(docIDs) > 0 {
 		database.Where("id IN ?", docIDs).Find(&docs)

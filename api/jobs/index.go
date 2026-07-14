@@ -8,6 +8,7 @@ import (
 
 	"nile-connect/lib/db"
 	"nile-connect/lib/email"
+	"nile-connect/lib/jsonutil"
 	"nile-connect/lib/models"
 	"nile-connect/lib/mw"
 	"nile-connect/lib/notify"
@@ -199,8 +200,8 @@ func jobDetailHandler(w http.ResponseWriter, r *http.Request, database *gorm.DB)
 		Requirements: job.Requirements, Status: job.Status,
 		ApplicantCount: job.ApplicantCount, PostedAt: job.CreatedAt, Deadline: job.Deadline,
 	}
-	json.Unmarshal([]byte(job.RequiredDocs), &detail.RequiredDocs)
-	json.Unmarshal([]byte(job.OptionalDocs), &detail.OptionalDocs)
+	detail.RequiredDocs = jsonutil.StringSlice(job.RequiredDocs)
+	detail.OptionalDocs = jsonutil.StringSlice(job.OptionalDocs)
 
 	var emp models.EmployerProfile
 	if database.Where("user_id = ?", job.EmployerID).First(&emp).Error == nil {
@@ -264,8 +265,7 @@ func applyToJob(w http.ResponseWriter, r *http.Request, database *gorm.DB) {
 			respond.Error(w, http.StatusBadRequest, "one or more selected documents are invalid")
 			return
 		}
-		var required []string
-		json.Unmarshal([]byte(job.RequiredDocs), &required)
+		required := jsonutil.StringSlice(job.RequiredDocs)
 		haveTypes := map[string]bool{}
 		for _, d := range docs {
 			haveTypes[d.Type] = true

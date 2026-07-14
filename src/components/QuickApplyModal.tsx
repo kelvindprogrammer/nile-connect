@@ -39,8 +39,8 @@ const QuickApplyModal: React.FC<QuickApplyModalProps> = ({ isOpen, onClose, jobT
                 setPkg(data);
                 // Pre-select the default (or only) document for each required/optional type.
                 const initial: Record<string, string> = {};
-                [...data.required_docs, ...data.optional_docs].forEach(type => {
-                    const docs = data.documents_by_type[type] || [];
+                [...(data.required_docs || []), ...(data.optional_docs || [])].forEach(type => {
+                    const docs = data.documents_by_type?.[type] || [];
                     const preferred = docs.find(d => d.is_default) || docs[0];
                     if (preferred) initial[type] = preferred.id;
                 });

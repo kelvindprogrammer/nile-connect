@@ -1,5 +1,5 @@
 import { apiClient } from './api';
-import type { Document, ApplicationPackage, ApplicationDetail } from '../types/application';
+import type { Document, ApplicationPackage, ApplicationDetail, Application } from '../types/application';
 
 interface ApiEnvelope<T> { data: T; }
 
@@ -7,11 +7,6 @@ export interface Job {
     id: string; title: string; company: string; location: string;
     type: string; description: string; requirements: string[];
     salary_range?: string; tags: string[]; status: string; created_at: string;
-}
-
-export interface Application {
-    id: string; job_id: string; student_id: string;
-    status: string; created_at: string; job?: Job;
 }
 
 export interface StudentProfile {
@@ -36,9 +31,9 @@ export const getJobDetails = async (id: string) => {
     return data.data;
 };
 
-export const getMyApplications = async () => {
-    const { data } = await apiClient.get<ApiEnvelope<Application[]>>('/api/student/applications');
-    return data.data;
+export const getMyApplications = async (): Promise<Application[]> => {
+    const { data } = await apiClient.get<ApiEnvelope<{ applications: Application[] }>>('/api/student/applications');
+    return data.data.applications;
 };
 
 export const applyToJob = async (jobId: string) => {

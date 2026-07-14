@@ -1,17 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Mail, Download, ExternalLink, Edit2, MapPin, GraduationCap,
     Plus, Link2, LogOut, Loader2, ShieldCheck, Phone,
-    Briefcase, FileText, Code2,
+    Briefcase, FileText, Code2, Camera, Share2, Check,
 } from 'lucide-react';
 import Avatar from '../../components/Avatar';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 import Button from '../../components/Button';
 import { apiClient } from '../../services/api';
 import { useProfile, calculateProfileStrength } from '../../hooks/useProfile';
 import { useProfilePicture } from '../../hooks/useProfilePicture';
 import { recordProfileView, getEndorsements, type EndorsementsResponse } from '../../services/profileService';
+import { getMyApplications } from '../../services/studentService';
 
 interface StudentProfile {
     id: string;
@@ -26,16 +28,24 @@ interface StudentProfile {
 
 interface ApiEnvelope<T> { data: T; }
 
+const OFFER_STAGES = new Set(['offer_extended', 'accepted']);
+
 const Profile = () => {
     const navigate = useNavigate();
     const { user, logout } = useAuth();
+    const { showToast } = useToast();
     const { profile } = useProfile(user?.id);
-    const { picture: profilePic } = useProfilePicture();
+    const { picture: profilePic, uploadPicture } = useProfilePicture();
     const [apiProfile, setApiProfile] = useState<StudentProfile | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [showCvModal, setShowCvModal] = useState(false);
     const [totalViews, setTotalViews] = useState<number | null>(null);
     const [endorsements, setEndorsements] = useState<EndorsementsResponse | null>(null);
+    const [appsCount, setAppsCount] = useState<number | null>(null);
+    const [offersCount, setOffersCount] = useState<number | null>(null);
+    const [uploadingPic, setUploadingPic] = useState(false);
+    const [copied, setCopied] = useState(false);
+    const avatarInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         apiClient
@@ -49,9 +59,42 @@ const Profile = () => {
         if (!user?.id) return;
         recordProfileView(user.id).then(r => setTotalViews(r.total_views)).catch(() => {});
         getEndorsements(user.id).then(setEndorsements).catch(() => {});
+        getMyApplications()
+            .then(apps => {
+                setAppsCount(apps.length);
+                setOffersCount(apps.filter(a => OFFER_STAGES.has(a.stage)).length);
+            })
+            .catch(() => {});
     }, [user?.id]);
 
     const endorsementCount = (skill: string) => endorsements?.endorsements?.find(e => e.skill === skill)?.count ?? 0;
+
+    const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setUploadingPic(true);
+        try {
+            await uploadPicture(file);
+            showToast('Profile photo updated!', 'success');
+        } catch (err) {
+            showToast(err instanceof Error ? err.message : 'Upload failed', 'error');
+        } finally {
+            setUploadingPic(false);
+            if (avatarInputRef.current) avatarInputRef.current.value = '';
+        }
+    };
+
+    const handleShareProfile = async () => {
+        const url = `${window.location.origin}/student/profile`;
+        try {
+            await navigator.clipboard.writeText(url);
+            setCopied(true);
+            showToast('Profile link copied to clipboard', 'success');
+            setTimeout(() => setCopied(false), 2000);
+        } catch {
+            showToast('Could not copy link', 'error');
+        }
+    };
 
     const displayName = apiProfile?.full_name || user?.name || 'USER';
     const major = profile.major || apiProfile?.major || user?.major || 'Computer Science';
@@ -101,8 +144,19 @@ const Profile = () => {
                     </div>
 
                     <div className="px-4 md:px-8 pb-6 md:pb-8 relative">
-                        <div className="absolute -top-8 md:-top-12 left-4 md:left-8 w-16 h-16 md:w-24 md:h-24 rounded-2xl border border-gray-100 bg-white shadow-card flex items-center justify-center overflow-hidden">
-                            <Avatar name={displayName} size="lg" src={profilePic || undefined} />
+                        <div className="absolute -top-8 md:-top-12 left-4 md:left-8 group">
+                            <div className="w-16 h-16 md:w-24 md:h-24 rounded-2xl border border-gray-100 bg-white shadow-card flex items-center justify-center overflow-hidden">
+                                <Avatar name={displayName} size="lg" src={profilePic || undefined} />
+                            </div>
+                            <button
+                                onClick={() => avatarInputRef.current?.click()}
+                                disabled={uploadingPic}
+                                className="absolute -bottom-1 -right-1 w-7 h-7 bg-nile-blue text-white rounded-full border-2 border-white shadow-sm flex items-center justify-center hover:scale-110 transition-transform"
+                                title="Change profile photo"
+                            >
+                                {uploadingPic ? <Loader2 size={12} className="animate-spin" /> : <Camera size={12} />}
+                            </button>
+                            <input ref={avatarInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
                         </div>
 
                         <div className="pt-10 md:pt-16 flex flex-col sm:flex-row justify-between sm:items-end gap-4">
@@ -124,6 +178,10 @@ const Profile = () => {
                                 </div>
                             </div>
                             <div className="flex gap-2 flex-shrink-0">
+                                <Button variant="outline" size="sm" onClick={handleShareProfile} title="Copy profile link">
+                                    {copied ? <Check size={14} className="mr-2 text-nile-green" /> : <Share2 size={14} className="mr-2" />}
+                                    {copied ? 'Copied' : 'Share'}
+                                </Button>
                                 <Button variant="outline" size="sm" onClick={() => setShowCvModal(true)}>
                                     <Download size={14} className="mr-2" /> CV
                                 </Button>
@@ -134,9 +192,9 @@ const Profile = () => {
                         </div>
 
                         <div className="flex flex-wrap gap-6 md:gap-10 mt-5 pt-5 md:pt-6 border-t border-gray-100">
-                            <StatBadge value="—" label="Apps" />
+                            <StatBadge value={appsCount === null ? '—' : String(appsCount)} label="Apps" onClick={() => navigate('/student/applications')} />
                             <StatBadge value={totalViews === null ? '—' : String(totalViews)} label="Profile views" />
-                            <StatBadge value="—" label="Offers" />
+                            <StatBadge value={offersCount === null ? '—' : String(offersCount)} label="Offers" onClick={() => navigate('/student/applications')} />
                             <StatBadge value={`${strength}%`} label="Strength" highlight />
                         </div>
                     </div>
@@ -282,36 +340,36 @@ const Profile = () => {
                         </div>
                         {apiProfile?.resume_url ? (
                             <>
-                                <p className="text-[10px] font-bold text-black/60 leading-relaxed">
+                                <p className="text-sm text-gray-500 leading-relaxed">
                                     This is the CV employers and staff will see when you apply for jobs or career services.
                                 </p>
-                                <div className="p-5 bg-nile-white rounded-[16px] border border-gray-100 space-y-3">
+                                <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 space-y-3">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 bg-nile-blue text-white rounded-xl flex items-center justify-center border border-gray-100">
+                                        <div className="w-10 h-10 bg-nile-blue text-white rounded-xl flex items-center justify-center">
                                             <FileText size={18} />
                                         </div>
                                         <div className="min-w-0">
                                             <p className="font-semibold text-sm truncate">{displayName.replace(/\s+/g, '_')}_CV.pdf</p>
-                                            <p className="text-[8px] font-semibold text-nile-green">UPLOADED</p>
+                                            <p className="text-xs font-medium text-nile-green">Uploaded</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="flex gap-3">
-                                    <Button fullWidth variant="outline" onClick={() => { setShowCvModal(false); navigate('/student/profile/edit'); }}>REPLACE</Button>
+                                    <Button fullWidth variant="outline" onClick={() => { setShowCvModal(false); navigate('/student/profile/edit'); }}>Replace</Button>
                                     <Button fullWidth onClick={() => window.open(apiProfile.resume_url, '_blank')}>
-                                        <Download size={14} className="mr-2" /> VIEW / DOWNLOAD
+                                        <Download size={14} className="mr-2" /> View / download
                                     </Button>
                                 </div>
                             </>
                         ) : (
                             <>
-                                <p className="text-[10px] font-bold text-black/60 leading-relaxed">
+                                <p className="text-sm text-gray-500 leading-relaxed">
                                     You haven't uploaded a CV yet. Upload a PDF so employers and career services can review it when you apply.
                                 </p>
                                 <div className="flex gap-3">
-                                    <Button fullWidth variant="outline" onClick={() => setShowCvModal(false)}>CANCEL</Button>
+                                    <Button fullWidth variant="outline" onClick={() => setShowCvModal(false)}>Cancel</Button>
                                     <Button fullWidth onClick={() => { setShowCvModal(false); navigate('/student/profile/edit'); }}>
-                                        UPLOAD CV
+                                        Upload CV
                                     </Button>
                                 </div>
                             </>
@@ -330,12 +388,15 @@ const SectionCard = ({ title, children }: { title: string; children: React.React
     </div>
 );
 
-const StatBadge = ({ value, label, highlight = false }: { value: string; label: string; highlight?: boolean }) => (
-    <div className="text-left">
-        <p className={`text-xl md:text-2xl font-semibold leading-none ${highlight ? 'text-nile-green' : 'text-black'}`}>{value}</p>
-        <p className="text-[7px] font-semibold text-nile-blue/40 mt-1">{label}</p>
-    </div>
-);
+const StatBadge = ({ value, label, highlight = false, onClick }: { value: string; label: string; highlight?: boolean; onClick?: () => void }) => {
+    const Tag = onClick ? 'button' : 'div';
+    return (
+        <Tag onClick={onClick} className={`text-left ${onClick ? 'hover:opacity-70 transition-opacity cursor-pointer' : ''}`}>
+            <p className={`text-xl md:text-2xl font-semibold leading-none ${highlight ? 'text-nile-green' : 'text-black'}`}>{value}</p>
+            <p className="text-xs font-medium text-gray-400 mt-1">{label}</p>
+        </Tag>
+    );
+};
 
 const ContactRow = ({ icon, label, href }: { icon: React.ReactNode; label: string; href?: string }) => (
     <a
@@ -346,7 +407,7 @@ const ContactRow = ({ icon, label, href }: { icon: React.ReactNode; label: strin
         onClick={e => !href && e.preventDefault()}
     >
         <span className="flex-shrink-0">{icon}</span>
-        <span className="text-[9px] font-semibold truncate">{label}</span>
+        <span className="text-sm font-medium truncate">{label}</span>
     </a>
 );
 

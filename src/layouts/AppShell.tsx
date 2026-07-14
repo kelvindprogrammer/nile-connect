@@ -118,8 +118,8 @@ const CONFIG: Record<Role, NavConfig> = {
 const isActive = (to: string, pathname: string, exact = false) =>
     exact ? pathname === to : pathname === to || pathname.startsWith(to + '/');
 
-const NavItem = ({ to, Icon, label, active, mobile = false, badge, accentText, accentBgSoft }: {
-    to: string; Icon: React.ElementType; label: string; active: boolean; mobile?: boolean; badge?: number;
+const NavItem = ({ to, Icon, label, active, badge, accentText, accentBgSoft }: {
+    to: string; Icon: React.ElementType; label: string; active: boolean; badge?: number;
     accentText: string; accentBgSoft: string;
 }) => {
     const navigate = useNavigate();
@@ -127,25 +127,48 @@ const NavItem = ({ to, Icon, label, active, mobile = false, badge, accentText, a
         <button
             onClick={() => navigate(to)}
             title={label}
-            className={`
-                w-full flex flex-col items-center justify-center transition-all duration-200 cursor-pointer
-                ${mobile ? 'py-1.5 flex-1' : 'py-2.5 px-2 rounded-xl'}
-                ${active
-                    ? mobile ? 'opacity-100' : `${accentBgSoft} ${accentText}`
-                    : mobile ? 'opacity-50 hover:opacity-80' : 'text-gray-400 hover:bg-gray-50 hover:text-gray-700'}
-            `}
+            className="w-full flex flex-col items-center justify-center py-1.5 flex-1 transition-all duration-200 cursor-pointer"
         >
-            <div className={`relative flex items-center justify-center rounded-lg ${mobile ? 'w-6 h-6' : 'w-9 h-9'}`}>
-                <Icon size={mobile ? 18 : 19} strokeWidth={active ? 2.2 : 1.8} />
+            <div className={`relative flex items-center justify-center rounded-lg w-6 h-6 ${active ? 'opacity-100' : 'opacity-50 hover:opacity-80'}`}>
+                <Icon size={18} strokeWidth={active ? 2.2 : 1.8} />
                 {!!badge && badge > 0 && (
                     <span className="absolute -top-1 -right-1 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1">
                         {badge > 9 ? '9+' : badge}
                     </span>
                 )}
             </div>
-            <span className={`mt-1 leading-none text-[10px] font-medium transition-colors ${active ? `${accentText} font-semibold` : 'text-gray-400'}`}>
+            <span className={`mt-1 leading-none text-[9px] font-medium transition-colors whitespace-nowrap ${active ? `${accentText} font-semibold` : 'text-gray-400'}`}>
                 {label}
             </span>
+        </button>
+    );
+};
+
+// Desktop rail item: icon + label as a horizontal row, with an active accent
+// bar on the left edge — replaces the old icon-stack rail where longer
+// labels like "Opportunities" would wrap and visually collide with
+// neighbouring rows in the cramped 72px column.
+const RailItem = ({ to, Icon, label, active, badge, accentText, accentBgSoft, accentBg }: {
+    to: string; Icon: React.ElementType; label: string; active: boolean; badge?: number;
+    accentText: string; accentBgSoft: string; accentBg: string;
+}) => {
+    const navigate = useNavigate();
+    return (
+        <button
+            onClick={() => navigate(to)}
+            className={`relative w-full flex items-center gap-3 pl-3.5 pr-3 py-2.5 rounded-xl transition-all duration-150 group
+                ${active ? `${accentBgSoft} ${accentText}` : 'text-gray-500 hover:bg-gray-50 hover:text-gray-800'}`}
+        >
+            {active && <span className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-full ${accentBg}`} />}
+            <div className="relative flex items-center justify-center w-5 h-5 flex-shrink-0">
+                <Icon size={19} strokeWidth={active ? 2.2 : 1.8} />
+                {!!badge && badge > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 min-w-[15px] h-[15px] bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center px-0.5">
+                        {badge > 9 ? '9+' : badge}
+                    </span>
+                )}
+            </div>
+            <span className={`text-sm truncate ${active ? 'font-semibold' : 'font-medium'}`}>{label}</span>
         </button>
     );
 };
@@ -222,35 +245,46 @@ const AppShell = () => {
                 style={{ width: `${progress}%`, opacity: progress >= 100 ? 0 : 1 }} />
 
             {/* ── Desktop Sidebar ─────────────────────────────────────────── */}
-            <aside className="hidden md:flex w-[72px] bg-white border-r border-gray-100 flex-col items-center py-5 z-30 flex-shrink-0">
-                <button onClick={() => navigate(rootPath)} className="mb-5 hover:scale-105 transition-transform flex-shrink-0">
-                    <NileConnectLogo size="xs" showText={false} showTagline={false} animated />
+            <aside className="hidden md:flex w-[236px] bg-white border-r border-gray-100 flex-col py-5 z-30 flex-shrink-0">
+                <button onClick={() => navigate(rootPath)} className="flex items-center gap-2 px-4 mb-6 hover:opacity-80 transition-opacity flex-shrink-0">
+                    <NileConnectLogo size="xs" showText showTagline={false} animated />
                 </button>
 
-                <nav className="flex-1 flex flex-col items-center gap-0.5 w-full overflow-y-auto px-2">
+                <div className="px-4 mb-4">
+                    <p className="text-[11px] font-semibold text-gray-300 uppercase tracking-wider">{cfg.hubLabel}</p>
+                </div>
+
+                <nav className="flex-1 flex flex-col gap-0.5 w-full overflow-y-auto px-3">
                     {cfg.primary.map(item => (
-                        <NavItem key={item.to} to={item.to} Icon={item.icon} label={item.label}
+                        <RailItem key={item.to} to={item.to} Icon={item.icon} label={item.label}
                             active={isActive(item.to, location.pathname, item.exact)}
-                            badge={navBadge(item.label)} accentText={cfg.accentText} accentBgSoft={cfg.accentBgSoft} />
+                            badge={navBadge(item.label)} accentText={cfg.accentText} accentBgSoft={cfg.accentBgSoft} accentBg={cfg.accentBg} />
                     ))}
-                    <div className="w-full h-px bg-gray-100 my-1" />
-                    <button onClick={() => setShowMoreMenu(true)} title="More"
-                        className="w-full flex flex-col items-center justify-center py-2.5 px-2 rounded-xl text-gray-400 hover:bg-gray-50 hover:text-gray-700 transition-all">
-                        <div className="w-9 h-9 flex items-center justify-center">
-                            <Grid3X3 size={19} strokeWidth={1.8} />
-                        </div>
-                        <span className="mt-1 leading-none text-[10px] font-medium">More</span>
-                    </button>
+
+                    <div className="w-full h-px bg-gray-100 my-3" />
+
+                    <p className="px-3.5 mb-1 text-[10px] font-semibold text-gray-300 uppercase tracking-wider">More</p>
+                    {cfg.more.map(item => (
+                        <RailItem key={item.to} to={item.to} Icon={item.icon} label={item.label}
+                            active={isActive(item.to, location.pathname, item.exact)}
+                            badge={navBadge(item.label)} accentText={cfg.accentText} accentBgSoft={cfg.accentBgSoft} accentBg={cfg.accentBg} />
+                    ))}
                 </nav>
 
-                <div className="mt-auto pt-4 border-t border-gray-100 w-full flex flex-col items-center gap-3 px-2">
-                    <button onClick={handleLogout} title="Sign out"
-                        className="w-full py-2 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors">
-                        <LogOut size={17} />
-                    </button>
+                <div className="mt-auto pt-4 border-t border-gray-100 w-full px-3">
                     <button onClick={() => navigate(cfg.profilePath)}
-                        className={`w-10 h-10 rounded-xl overflow-hidden ring-2 ring-transparent ${cfg.avatarHoverRing} transition-all`}>
-                        <Avatar name={userName} size="sm" src={profilePic || undefined} />
+                        className="w-full flex items-center gap-3 px-1.5 py-2 rounded-xl hover:bg-gray-50 transition-colors group">
+                        <div className={`w-9 h-9 rounded-xl overflow-hidden ring-2 ring-transparent ${cfg.avatarGroupRing} transition-all flex-shrink-0`}>
+                            <Avatar name={userName} size="sm" src={profilePic || undefined} />
+                        </div>
+                        <div className="min-w-0 flex-1 text-left">
+                            <p className="text-sm font-semibold text-gray-800 leading-none truncate">{userName}</p>
+                            {subLabel && <p className="text-xs text-gray-400 mt-0.5 truncate">{subLabel}</p>}
+                        </div>
+                    </button>
+                    <button onClick={handleLogout} title="Sign out"
+                        className="w-full mt-1 py-2 flex items-center gap-3 px-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors text-sm font-medium">
+                        <LogOut size={16} /> Sign out
                     </button>
                 </div>
             </aside>
@@ -259,7 +293,7 @@ const AppShell = () => {
             <nav className="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-100 h-[62px] flex items-center z-40 shadow-[0_-1px_12px_rgba(0,0,0,0.06)] px-1">
                 {mobileLeft.map(item => (
                     <NavItem key={item.to} to={item.to} Icon={item.icon} label={item.label}
-                        active={isActive(item.to, location.pathname, item.exact)} mobile
+                        active={isActive(item.to, location.pathname, item.exact)}
                         accentText={cfg.accentText} accentBgSoft={cfg.accentBgSoft} />
                 ))}
                 <button onClick={() => setShowMoreMenu(true)} className="flex-1 flex flex-col items-center justify-center -mt-5">
@@ -270,7 +304,7 @@ const AppShell = () => {
                 </button>
                 {mobileRight.map(item => (
                     <NavItem key={item.to} to={item.to} Icon={item.icon} label={item.label}
-                        active={isActive(item.to, location.pathname, item.exact)} mobile
+                        active={isActive(item.to, location.pathname, item.exact)}
                         badge={navBadge(item.label)} accentText={cfg.accentText} accentBgSoft={cfg.accentBgSoft} />
                 ))}
             </nav>
@@ -407,19 +441,6 @@ const AppShell = () => {
                                 </div>
                             )}
                         </div>
-
-                        <div className="hidden md:block h-5 w-px bg-gray-100 mx-1" />
-
-                        <button onClick={() => navigate(cfg.profilePath)}
-                            className="hidden md:flex items-center gap-2.5 pl-1 pr-2 py-1 rounded-xl hover:bg-gray-50 transition-colors group">
-                            <div className="text-right">
-                                <p className="text-sm font-semibold text-gray-800 leading-none">{userName}</p>
-                                {subLabel && <p className="text-xs text-gray-400 mt-0.5 truncate max-w-[100px]">{subLabel}</p>}
-                            </div>
-                            <div className={`w-8 h-8 rounded-xl overflow-hidden ring-2 ring-gray-100 ${cfg.avatarGroupRing} transition-all`}>
-                                <Avatar name={userName} size="sm" src={profilePic || undefined} />
-                            </div>
-                        </button>
                     </div>
                 </header>
 
