@@ -51,7 +51,7 @@ const Profile = () => {
         getEndorsements(user.id).then(setEndorsements).catch(() => {});
     }, [user?.id]);
 
-    const endorsementCount = (skill: string) => endorsements?.endorsements.find(e => e.skill === skill)?.count ?? 0;
+    const endorsementCount = (skill: string) => endorsements?.endorsements?.find(e => e.skill === skill)?.count ?? 0;
 
     const displayName = apiProfile?.full_name || user?.name || 'USER';
     const major = profile.major || apiProfile?.major || user?.major || 'Computer Science';

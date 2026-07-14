@@ -787,7 +787,7 @@ func endorsements(w http.ResponseWriter, r *http.Request, auth *mw.AuthCtx) {
 			Skill string `json:"skill"`
 			Count int    `json:"count"`
 		}
-		var rows []row
+		rows := []row{}
 		database.Raw(`SELECT skill, COUNT(*) as count FROM endorsements WHERE profile_user_id = ? GROUP BY skill ORDER BY count DESC`, profileUserID).Scan(&rows)
 		endorsedByMe := map[string]bool{}
 		var mine []models.Endorsement

@@ -139,17 +139,17 @@ const QuickApplyModal: React.FC<QuickApplyModalProps> = ({ isOpen, onClose, jobT
         const busy = uploadingType === type;
         return (
             <div key={type} className="space-y-2">
-                <label className="text-[10px] font-black text-black tracking-widest uppercase flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-700 flex items-center gap-1.5">
                     {docLabel(type)}
                     {required
                         ? <span className="text-red-500">*</span>
-                        : <span className="text-[8px] font-bold text-nile-blue/40 normal-case">(optional)</span>}
+                        : <span className="text-xs text-gray-400 font-normal">(optional)</span>}
                 </label>
                 {docs.length > 0 && (
                     <select
                         value={selected}
                         onChange={e => setSelectedDocs(prev => ({ ...prev, [type]: e.target.value }))}
-                        className="w-full border-3 border-black rounded-2xl p-3 font-bold text-xs outline-none focus:shadow-brutalist-sm transition-all"
+                        className="w-full border border-gray-200 rounded-xl p-3 text-sm text-gray-800 outline-none focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10 transition-all bg-white"
                     >
                         {!required && <option value="">— None —</option>}
                         {docs.map(d => (
@@ -161,24 +161,24 @@ const QuickApplyModal: React.FC<QuickApplyModalProps> = ({ isOpen, onClose, jobT
                     type="button"
                     onClick={() => handleUploadNew(type)}
                     disabled={busy}
-                    className="w-full border-3 border-black border-dashed rounded-2xl p-3 flex items-center justify-center gap-2 bg-nile-white/50 hover:bg-white transition-all text-[10px] font-black uppercase"
+                    className="w-full border border-dashed border-gray-200 rounded-xl p-3 flex items-center justify-center gap-2 bg-gray-50 hover:bg-gray-100 transition-all text-sm font-medium text-gray-600"
                 >
                     {busy ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
-                    {busy ? 'UPLOADING...' : docs.length > 0 ? 'UPLOAD ANOTHER' : `UPLOAD ${docLabel(type).toUpperCase()}`}
+                    {busy ? 'Uploading…' : docs.length > 0 ? 'Upload another' : `Upload ${docLabel(type).toLowerCase()}`}
                 </button>
             </div>
         );
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={handleFinalClose} title={step === 1 ? "QUICK APPLICATION" : "APPLICATION SENT"} maxWidth="lg">
+        <Modal isOpen={isOpen} onClose={handleFinalClose} title={step === 1 ? "Apply for this role" : "Application sent"} maxWidth="lg">
             <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileChange} />
             {step === 1 ? (
                 <form onSubmit={handleSubmit} className="space-y-6 font-sans">
-                    <div className="bg-nile-white p-6 rounded-2xl border-3 border-black mb-8">
-                        <p className="text-[10px] font-black text-nile-blue uppercase tracking-widest mb-1">APPLYING FOR</p>
-                        <h3 className="text-xl font-black text-black uppercase leading-tight">{jobTitle}</h3>
-                        <p className="text-xs font-bold text-nile-blue/70 uppercase mt-1">{company}</p>
+                    <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100">
+                        <p className="text-xs font-medium text-nile-blue mb-1">Applying for</p>
+                        <h3 className="text-lg font-semibold text-gray-900 leading-tight">{jobTitle}</h3>
+                        <p className="text-sm text-gray-500 mt-0.5">{company}</p>
                     </div>
 
                     {loadingPackage ? (
@@ -186,13 +186,13 @@ const QuickApplyModal: React.FC<QuickApplyModalProps> = ({ isOpen, onClose, jobT
                             <Loader2 size={28} className="animate-spin text-nile-blue/40" />
                         </div>
                     ) : !pkg ? (
-                        <div className="flex items-center gap-2 p-4 border-3 border-red-400 rounded-2xl bg-red-50 text-red-500 text-[10px] font-black uppercase">
+                        <div className="flex items-center gap-2 p-4 border border-red-200 rounded-xl bg-red-50 text-red-600 text-sm font-medium">
                             <AlertCircle size={16} /> Couldn't load document requirements. Try again.
                         </div>
                     ) : (
                         <div className="space-y-5">
                             {pkg.required_docs.length === 0 && pkg.optional_docs.length === 0 && (
-                                <div className="flex items-center gap-2 p-4 border-3 border-black rounded-2xl bg-nile-white/50 text-[10px] font-black uppercase">
+                                <div className="flex items-center gap-2 p-4 border border-gray-100 rounded-xl bg-gray-50 text-sm font-medium text-gray-600">
                                     <FileText size={16} className="text-nile-blue" /> No documents required for this role.
                                 </div>
                             )}
@@ -201,33 +201,33 @@ const QuickApplyModal: React.FC<QuickApplyModalProps> = ({ isOpen, onClose, jobT
                         </div>
                     )}
 
-                    <div className="space-y-3">
-                        <label className="text-[10px] font-black text-black tracking-widest uppercase">COVER NOTE (OPTIONAL)</label>
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">Cover note (optional)</label>
                         <textarea
-                            className="w-full h-32 border-3 border-black rounded-2xl p-4 font-bold text-sm outline-none focus:shadow-brutalist-sm transition-all"
+                            className="w-full h-28 border border-gray-200 rounded-xl p-4 text-sm text-gray-800 outline-none focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10 transition-all resize-none"
                             placeholder="Why are you a good fit?"
                             value={coverLetter}
                             onChange={e => setCoverLetter(e.target.value)}
                         ></textarea>
                     </div>
 
-                    <div className="flex justify-end gap-3 pt-6">
-                        <Button variant="outline" onClick={handleFinalClose} type="button">CANCEL</Button>
-                        <Button variant="primary" type="submit" isLoading={isSubmitting} disabled={loadingPackage || !pkg}>SUBMIT APP</Button>
+                    <div className="flex justify-end gap-3 pt-2">
+                        <Button variant="outline" onClick={handleFinalClose} type="button">Cancel</Button>
+                        <Button variant="primary" type="submit" isLoading={isSubmitting} disabled={loadingPackage || !pkg}>Submit application</Button>
                     </div>
                 </form>
             ) : (
-                <div className="py-12 flex flex-col items-center text-center space-y-6 animate-in fade-in zoom-in duration-300">
-                    <div className="w-24 h-24 bg-nile-green text-white rounded-full flex items-center justify-center shadow-brutalist-sm border-3 border-black">
-                        <CheckCircle2 size={48} strokeWidth={3} />
+                <div className="py-10 flex flex-col items-center text-center space-y-5 animate-in fade-in zoom-in duration-300">
+                    <div className="w-20 h-20 bg-nile-green/10 text-nile-green rounded-full flex items-center justify-center">
+                        <CheckCircle2 size={40} />
                     </div>
-                    <div className="space-y-2">
-                        <h3 className="text-2xl font-black text-black uppercase tracking-tight">YOU'RE ALL SET!</h3>
-                        <p className="text-sm font-bold text-nile-blue/70 uppercase max-w-xs">
-                            YOUR APPLICATION HAS BEEN DISPATCHED TO THE RECRUITING TEAM AT <span className="text-nile-blue underline">{company}</span>.
+                    <div className="space-y-1.5">
+                        <h3 className="text-xl font-semibold text-gray-900">You're all set!</h3>
+                        <p className="text-sm text-gray-500 max-w-xs">
+                            Your application has been sent to the recruiting team at <span className="text-nile-blue font-medium">{company}</span>.
                         </p>
                     </div>
-                    <Button variant="outline" onClick={handleFinalClose} className="mt-4">BACK TO JOBS</Button>
+                    <Button variant="outline" onClick={handleFinalClose} className="mt-2">Back to jobs</Button>
                 </div>
             )}
         </Modal>

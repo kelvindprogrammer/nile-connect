@@ -43,26 +43,26 @@ const Modal: React.FC<ModalProps> = ({
     };
 
     return (
-        <div 
+        <div
             ref={overlayRef}
             onClick={handleOverlayClick}
-            className="fixed inset-0 z-50 bg-nile-blue/20 backdrop-blur-sm flex items-center justify-center p-4 anime-fade-in"
+            className="fixed inset-0 z-50 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center p-4 anime-fade-in"
         >
-            <div className={`bg-white border-4 border-black w-full ${widthClasses[maxWidth]} rounded-[32px] shadow-brutalist flex flex-col max-h-[90vh] overflow-hidden`}>
-                
+            <div className={`bg-white border border-gray-100 w-full ${widthClasses[maxWidth]} rounded-2xl shadow-soft-lg flex flex-col max-h-[90vh] overflow-hidden`}>
+
                 {/* Header */}
-                <div className="flex justify-between items-center p-6 border-b-4 border-black bg-nile-white">
-                    <h2 className="text-xl font-black text-black uppercase tracking-widest">{title}</h2>
-                    <button 
+                <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100">
+                    <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+                    <button
                         onClick={onClose}
-                        className="bg-white border-2 border-black rounded-lg p-2 hover:bg-black hover:text-white transition-colors"
+                        className="text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg p-1.5 transition-colors"
                     >
-                        <X size={20} strokeWidth={3} />
+                        <X size={18} />
                     </button>
                 </div>
-                
+
                 {/* Content */}
-                <div className="p-8 overflow-y-auto font-sans">
+                <div className="p-6 overflow-y-auto font-sans">
                     {children}
                 </div>
             </div>

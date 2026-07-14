@@ -382,7 +382,7 @@ const JobCard = ({ job, onNavigate, onApply }: { job: Job; onNavigate: () => voi
                 </div>
                 <div className="flex gap-2" onClick={e => e.stopPropagation()}>
                     <Button variant="outline" size="sm" onClick={onNavigate}>View</Button>
-                    <Button size="sm" onClick={onApply}>Quick apply</Button>
+                    <Button size="sm" onClick={onApply}>Apply</Button>
                 </div>
             </div>
         </div>
