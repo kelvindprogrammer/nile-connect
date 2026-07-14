@@ -136,6 +136,24 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 // login initiates the Campus One OIDC PKCE authorization code flow.
 // The browser is redirected to Campus One's consent screen.
 func login(w http.ResponseWriter, r *http.Request) {
+	// Canonicalize to APP_URL's host BEFORE setting any cookies. Campus One's
+	// redirect_uri is always built from APP_URL (see oauthConfig below), so
+	// Campus One will send the browser back to APP_URL's host no matter what
+	// host this request arrived on. A cookie set here for a different host
+	// (e.g. a Vercel preview alias, or www vs bare domain) would silently be
+	// rejected by the browser and never make it back to /callback — this is
+	// the root cause of "missing state cookie" errors. Bouncing here first
+	// guarantees the PKCE cookies below are set on the exact host Campus One
+	// will return to.
+	if canonical := appBaseURL(r); canonical != "" {
+		if cu, err := url.Parse(canonical); err == nil && cu.Host != "" && cu.Host != r.Host {
+			target := canonical + r.URL.RequestURI()
+			fmt.Printf("[LOGIN] Canonicalizing host: %s -> %s\n", r.Host, cu.Host)
+			http.Redirect(w, r, target, http.StatusFound)
+			return
+		}
+	}
+
 	// Remember where to send the user after a successful login.
 	next := r.URL.Query().Get("next")
 	if next == "" || !strings.HasPrefix(next, "/") {
