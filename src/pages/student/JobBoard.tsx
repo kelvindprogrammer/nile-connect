@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
-    Search, MapPin, DollarSign, SlidersHorizontal, Bookmark,
-    Loader2, ChevronDown, X, Check,
+    Search, MapPin, Wallet, SlidersHorizontal, Bookmark,
+    Loader2, ChevronDown, X, Check, Briefcase, Clock, Users, Sparkles,
 } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 import QuickApplyModal from '../../components/QuickApplyModal';
@@ -10,22 +10,49 @@ import Button from '../../components/Button';
 import { getJobs } from '../../services/jobService';
 import type { JobListItem as Job } from '../../types/job';
 
-const typeColors: Record<string, string> = {
-    'full-time': 'bg-nile-green text-black',
-    'remote': 'bg-nile-blue text-white',
-    'hybrid': 'bg-nile-white text-black border border-gray-100',
-    'internship': 'bg-black text-white',
-    'part-time': 'bg-yellow-100 text-yellow-700 border border-gray-100',
+const typeStyles: Record<string, string> = {
+    'full-time': 'bg-nile-green/10 text-nile-green-700',
+    'remote': 'bg-nile-blue/10 text-nile-blue',
+    'hybrid': 'bg-purple-50 text-purple-600',
+    'internship': 'bg-amber-50 text-amber-600',
+    'part-time': 'bg-gray-100 text-gray-600',
 };
 
 const typeLabel: Record<string, string> = {
-    'full-time': 'FULL-TIME', 'remote': 'REMOTE', 'hybrid': 'HYBRID',
-    'internship': 'INTERNSHIP', 'part-time': 'PART-TIME',
+    'full-time': 'Full-time', 'remote': 'Remote', 'hybrid': 'Hybrid',
+    'internship': 'Internship', 'part-time': 'Part-time',
 };
 
-const JOB_TYPES = ['ALL', 'FULL-TIME', 'REMOTE', 'HYBRID', 'INTERNSHIP', 'PART-TIME'];
-const LOCATIONS = ['ALL', 'ABUJA', 'LAGOS', 'KANO', 'REMOTE', 'INTERNATIONAL'];
-const EMPLOYMENT_CATEGORIES = ['ALL', 'internship', 'siwes', 'nyse', 'graduate', 'full-time', 'part-time', 'contract'];
+const JOB_TYPES = ['All', 'Full-time', 'Remote', 'Hybrid', 'Internship', 'Part-time'];
+const LOCATIONS = ['All', 'Abuja', 'Lagos', 'Kano', 'Remote', 'International'];
+const EMPLOYMENT_CATEGORIES = ['All', 'internship', 'siwes', 'nyse', 'graduate', 'full-time', 'part-time', 'contract'];
+
+const timeAgo = (iso?: string) => {
+    if (!iso) return '';
+    const diff = Date.now() - new Date(iso).getTime();
+    const days = Math.floor(diff / 86_400_000);
+    if (days <= 0) return 'Today';
+    if (days === 1) return 'Yesterday';
+    if (days < 7) return `${days}d ago`;
+    if (days < 30) return `${Math.floor(days / 7)}w ago`;
+    return `${Math.floor(days / 30)}mo ago`;
+};
+
+const isRecentlyPosted = (iso?: string) => {
+    if (!iso) return false;
+    const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000);
+    return days <= 2;
+};
+
+const deadlineInfo = (iso?: string): { label: string; urgent: boolean } | null => {
+    if (!iso) return null;
+    const days = Math.ceil((new Date(iso).getTime() - Date.now()) / 86_400_000);
+    if (days < 0) return { label: 'Closed', urgent: false };
+    if (days === 0) return { label: 'Closes today', urgent: true };
+    if (days <= 3) return { label: `${days}d left`, urgent: true };
+    if (days <= 14) return { label: `${days}d left`, urgent: false };
+    return { label: `Closes ${new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`, urgent: false };
+};
 
 const JobBoard = () => {
     const [searchParams] = useSearchParams();
@@ -35,9 +62,9 @@ const JobBoard = () => {
     const [selectedJob, setSelectedJob] = useState<Job | null>(null);
     const [isApplyModalOpen, setApplyModalOpen] = useState(false);
     const [showFilters, setShowFilters] = useState(false);
-    const [typeFilter, setTypeFilter] = useState('ALL');
-    const [locationFilter, setLocationFilter] = useState('ALL');
-    const [categoryFilter, setCategoryFilter] = useState('ALL');
+    const [typeFilter, setTypeFilter] = useState('All');
+    const [locationFilter, setLocationFilter] = useState('All');
+    const [categoryFilter, setCategoryFilter] = useState('All');
     const [remoteOnly, setRemoteOnly] = useState(false);
     const filterRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
@@ -59,15 +86,15 @@ const JobBoard = () => {
         return () => document.removeEventListener('mousedown', handleClick);
     }, []);
 
-    const clearFilters = () => { setTypeFilter('ALL'); setLocationFilter('ALL'); setCategoryFilter('ALL'); setRemoteOnly(false); };
-    const hasFilters = typeFilter !== 'ALL' || locationFilter !== 'ALL' || categoryFilter !== 'ALL' || remoteOnly;
+    const clearFilters = () => { setTypeFilter('All'); setLocationFilter('All'); setCategoryFilter('All'); setRemoteOnly(false); };
+    const hasFilters = typeFilter !== 'All' || locationFilter !== 'All' || categoryFilter !== 'All' || remoteOnly;
 
     const filtered = jobs.filter(j => {
         const matchesSearch = j.title.toLowerCase().includes(search.toLowerCase()) ||
             j.company_name.toLowerCase().includes(search.toLowerCase());
-        const matchesType = typeFilter === 'ALL' || (j.type || '').toLowerCase() === typeFilter.toLowerCase();
-        const matchesLocation = locationFilter === 'ALL' || (j.location || '').toLowerCase().includes(locationFilter.toLowerCase());
-        const matchesCategory = categoryFilter === 'ALL' || (j.employment_category || '').toLowerCase() === categoryFilter.toLowerCase();
+        const matchesType = typeFilter === 'All' || (j.type || '').toLowerCase() === typeFilter.toLowerCase();
+        const matchesLocation = locationFilter === 'All' || (j.location || '').toLowerCase().includes(locationFilter.toLowerCase());
+        const matchesCategory = categoryFilter === 'All' || (j.employment_category || '').toLowerCase() === categoryFilter.toLowerCase();
         const matchesRemote = !remoteOnly || j.is_remote;
         return matchesSearch && matchesType && matchesLocation && matchesCategory && matchesRemote;
     });
@@ -76,121 +103,121 @@ const JobBoard = () => {
 
     return (
         <>
-            <div className="p-4 md:p-8 space-y-6 anime-fade-in font-sans pb-24 text-left">
+            <div className="p-4 md:p-8 space-y-6 anime-fade-in font-sans pb-24 text-left max-w-6xl mx-auto">
 
                 {/* Header */}
-                <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 border-b border-gray-100 pb-6">
+                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                     <div>
-                        <h2 className="text-2xl md:text-4xl font-semibold text-black leading-none">Job Board .</h2>
-                        <p className="text-[8px] md:text-[10px] font-semibold text-nile-blue/50 mt-1">BROWSE ACTIVE CAREER OPPORTUNITIES</p>
+                        <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 leading-tight">Opportunities</h1>
+                        <p className="text-sm text-gray-400 mt-1">
+                            {isLoading ? 'Loading roles…' : `${filtered.length} open ${filtered.length === 1 ? 'role' : 'roles'} matched to your profile`}
+                        </p>
                     </div>
 
-                    <div className="flex items-center gap-2 w-full xl:w-auto">
-                        {/* Search */}
-                        <div className="relative group flex-1 xl:w-64">
-                            <Search size={13} strokeWidth={3} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-black/30 group-focus-within:text-black transition-colors" />
+                    <div className="flex items-center gap-2 w-full lg:w-auto">
+                        <div className="relative group flex-1 lg:w-72">
+                            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-nile-blue transition-colors" />
                             <input
                                 type="text"
                                 value={search}
                                 onChange={e => setSearch(e.target.value)}
-                                placeholder="SEARCH ROLES..."
-                                className="w-full bg-nile-white/40 border border-gray-100 rounded-xl py-2.5 pl-10 pr-4 font-semibold text-[9px] outline-none focus:bg-white focus:shadow-blue transition-all"
+                                placeholder="Search by title or company"
+                                className="w-full bg-white border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-sm text-gray-800 placeholder:text-gray-400 outline-none focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10 transition-all"
                             />
                         </div>
 
-                        {/* Filter Button */}
                         <div className="relative" ref={filterRef}>
                             <button
                                 onClick={() => setShowFilters(v => !v)}
-                                className={`flex items-center gap-2 px-4 py-2.5 border border-gray-100 rounded-xl font-semibold text-[9px] transition-all
+                                className={`flex items-center gap-2 px-4 py-2.5 border rounded-xl text-sm font-medium transition-all
                                     ${showFilters || hasFilters
-                                        ? 'bg-nile-blue text-white shadow-green'
-                                        : 'bg-white hover:bg-nile-white'}`}
+                                        ? 'bg-nile-blue text-white border-nile-blue shadow-blue'
+                                        : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'}`}
                             >
-                                <SlidersHorizontal size={13} strokeWidth={3} />
-                                FILTER
+                                <SlidersHorizontal size={15} />
+                                Filters
                                 {hasFilters && (
-                                    <span className="w-4 h-4 bg-nile-green text-black rounded-full text-[7px] flex items-center justify-center font-semibold">
-                                        {(typeFilter !== 'ALL' ? 1 : 0) + (locationFilter !== 'ALL' ? 1 : 0) + (categoryFilter !== 'ALL' ? 1 : 0) + (remoteOnly ? 1 : 0)}
+                                    <span className="w-5 h-5 bg-nile-green text-white rounded-full text-[10px] flex items-center justify-center font-semibold">
+                                        {(typeFilter !== 'All' ? 1 : 0) + (locationFilter !== 'All' ? 1 : 0) + (categoryFilter !== 'All' ? 1 : 0) + (remoteOnly ? 1 : 0)}
                                     </span>
                                 )}
-                                <ChevronDown size={12} strokeWidth={3} className={`transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+                                <ChevronDown size={14} className={`transition-transform ${showFilters ? 'rotate-180' : ''}`} />
                             </button>
 
                             {showFilters && (
-                                <div className="absolute top-full right-0 mt-2 w-72 bg-white border border-gray-100 rounded-[20px] shadow-card p-5 z-50 space-y-5 animate-in fade-in slide-in-from-top-2">
+                                <div className="absolute top-full right-0 mt-2 w-80 bg-white border border-gray-100 rounded-2xl shadow-soft-lg p-5 z-50 space-y-5">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-[9px] font-semibold">FILTERS</span>
+                                        <span className="text-sm font-semibold text-gray-900">Filters</span>
                                         {hasFilters && (
-                                            <button onClick={clearFilters} className="text-[8px] font-semibold text-red-400 hover:text-red-600 transition-colors flex items-center gap-1">
-                                                <X size={10} strokeWidth={3} /> CLEAR ALL
+                                            <button onClick={clearFilters} className="text-xs font-medium text-red-500 hover:text-red-600 transition-colors">
+                                                Clear all
                                             </button>
                                         )}
                                     </div>
 
                                     <div className="space-y-2">
-                                        <p className="text-[8px] font-semibold text-black/40">JOB TYPE</p>
+                                        <p className="text-xs font-medium text-gray-400">Job type</p>
                                         <div className="grid grid-cols-2 gap-1.5">
                                             {JOB_TYPES.map(t => (
                                                 <button
                                                     key={t}
                                                     onClick={() => setTypeFilter(t)}
-                                                    className={`flex items-center justify-between px-3 py-2 border border-gray-100 rounded-lg font-semibold text-[8px] transition-all
-                                                        ${typeFilter === t ? 'bg-nile-blue text-white' : 'bg-nile-white hover:bg-white'}`}
+                                                    className={`flex items-center justify-between px-3 py-2 border rounded-lg text-xs font-medium transition-all
+                                                        ${typeFilter === t ? 'bg-nile-blue text-white border-nile-blue' : 'bg-gray-50 text-gray-600 border-gray-100 hover:bg-gray-100'}`}
                                                 >
                                                     {t}
-                                                    {typeFilter === t && <Check size={9} strokeWidth={3} />}
+                                                    {typeFilter === t && <Check size={13} />}
                                                 </button>
                                             ))}
                                         </div>
                                     </div>
 
                                     <div className="space-y-2">
-                                        <p className="text-[8px] font-semibold text-black/40">LOCATION</p>
+                                        <p className="text-xs font-medium text-gray-400">Location</p>
                                         <div className="grid grid-cols-2 gap-1.5">
                                             {LOCATIONS.map(l => (
                                                 <button
                                                     key={l}
                                                     onClick={() => setLocationFilter(l)}
-                                                    className={`flex items-center justify-between px-3 py-2 border border-gray-100 rounded-lg font-semibold text-[8px] transition-all
-                                                        ${locationFilter === l ? 'bg-nile-blue text-white' : 'bg-nile-white hover:bg-white'}`}
+                                                    className={`flex items-center justify-between px-3 py-2 border rounded-lg text-xs font-medium transition-all
+                                                        ${locationFilter === l ? 'bg-nile-blue text-white border-nile-blue' : 'bg-gray-50 text-gray-600 border-gray-100 hover:bg-gray-100'}`}
                                                 >
                                                     {l}
-                                                    {locationFilter === l && <Check size={9} strokeWidth={3} />}
+                                                    {locationFilter === l && <Check size={13} />}
                                                 </button>
                                             ))}
                                         </div>
                                     </div>
 
                                     <div className="space-y-2">
-                                        <p className="text-[8px] font-semibold text-black/40">EMPLOYMENT CATEGORY</p>
+                                        <p className="text-xs font-medium text-gray-400">Category</p>
                                         <div className="grid grid-cols-2 gap-1.5">
                                             {EMPLOYMENT_CATEGORIES.map(c => (
                                                 <button
                                                     key={c}
                                                     onClick={() => setCategoryFilter(c)}
-                                                    className={`flex items-center justify-between px-3 py-2 border border-gray-100 rounded-lg font-semibold text-[8px] transition-all
-                                                        ${categoryFilter === c ? 'bg-nile-blue text-white' : 'bg-nile-white hover:bg-white'}`}
+                                                    className={`flex items-center justify-between px-3 py-2 border rounded-lg text-xs font-medium capitalize transition-all
+                                                        ${categoryFilter === c ? 'bg-nile-blue text-white border-nile-blue' : 'bg-gray-50 text-gray-600 border-gray-100 hover:bg-gray-100'}`}
                                                 >
-                                                    {c.toUpperCase()}
-                                                    {categoryFilter === c && <Check size={9} strokeWidth={3} />}
+                                                    {c}
+                                                    {categoryFilter === c && <Check size={13} />}
                                                 </button>
                                             ))}
                                         </div>
                                     </div>
 
-                                    <label className="flex items-center justify-between px-3 py-2 border border-gray-100 rounded-lg cursor-pointer">
-                                        <span className="text-[8px] font-semibold text-black/60">REMOTE ONLY</span>
+                                    <label className="flex items-center justify-between px-3 py-2.5 border border-gray-100 rounded-lg cursor-pointer bg-gray-50">
+                                        <span className="text-xs font-medium text-gray-700">Remote only</span>
                                         <input
                                             type="checkbox"
                                             checked={remoteOnly}
                                             onChange={e => setRemoteOnly(e.target.checked)}
-                                            className="accent-nile-blue"
+                                            className="accent-nile-blue w-4 h-4"
                                         />
                                     </label>
 
                                     <Button fullWidth size="sm" onClick={() => setShowFilters(false)}>
-                                        APPLY FILTERS {filtered.length > 0 ? `(${filtered.length})` : ''}
+                                        Show {filtered.length} {filtered.length === 1 ? 'role' : 'roles'}
                                     </Button>
                                 </div>
                             )}
@@ -201,48 +228,37 @@ const JobBoard = () => {
                 {/* Active filter pills */}
                 {hasFilters && (
                     <div className="flex flex-wrap gap-2">
-                        {typeFilter !== 'ALL' && (
-                            <span className="flex items-center gap-1.5 px-3 py-1.5 bg-nile-blue text-white border border-gray-100 rounded-lg text-[8px] font-semibold shadow-card">
-                                TYPE: {typeFilter}
-                                <button onClick={() => setTypeFilter('ALL')}><X size={9} strokeWidth={3} /></button>
-                            </span>
+                        {typeFilter !== 'All' && (
+                            <FilterPill label={typeFilter} onClear={() => setTypeFilter('All')} />
                         )}
-                        {locationFilter !== 'ALL' && (
-                            <span className="flex items-center gap-1.5 px-3 py-1.5 bg-nile-blue text-white border border-gray-100 rounded-lg text-[8px] font-semibold shadow-card">
-                                LOCATION: {locationFilter}
-                                <button onClick={() => setLocationFilter('ALL')}><X size={9} strokeWidth={3} /></button>
-                            </span>
+                        {locationFilter !== 'All' && (
+                            <FilterPill label={locationFilter} onClear={() => setLocationFilter('All')} />
                         )}
-                        {categoryFilter !== 'ALL' && (
-                            <span className="flex items-center gap-1.5 px-3 py-1.5 bg-nile-blue text-white border border-gray-100 rounded-lg text-[8px] font-semibold shadow-card">
-                                CATEGORY: {categoryFilter.toUpperCase()}
-                                <button onClick={() => setCategoryFilter('ALL')}><X size={9} strokeWidth={3} /></button>
-                            </span>
+                        {categoryFilter !== 'All' && (
+                            <FilterPill label={categoryFilter} onClear={() => setCategoryFilter('All')} />
                         )}
                         {remoteOnly && (
-                            <span className="flex items-center gap-1.5 px-3 py-1.5 bg-nile-blue text-white border border-gray-100 rounded-lg text-[8px] font-semibold shadow-card">
-                                REMOTE ONLY
-                                <button onClick={() => setRemoteOnly(false)}><X size={9} strokeWidth={3} /></button>
-                            </span>
+                            <FilterPill label="Remote only" onClear={() => setRemoteOnly(false)} />
                         )}
                     </div>
                 )}
 
                 {isLoading ? (
-                    <div className="flex items-center justify-center py-20">
-                        <Loader2 size={32} className="animate-spin text-nile-blue/40" />
+                    <div className="flex items-center justify-center py-24">
+                        <Loader2 size={28} className="animate-spin text-nile-blue/40" />
                     </div>
                 ) : filtered.length === 0 ? (
-                    <div className="py-20 text-center border-[2px] border-dashed border-black/10 rounded-[24px] space-y-3">
-                        <p className="text-[10px] font-semibold text-black/20">NO JOBS FOUND</p>
+                    <div className="py-20 text-center border border-dashed border-gray-200 rounded-2xl space-y-3 bg-white">
+                        <Briefcase size={28} className="mx-auto text-gray-300" />
+                        <p className="text-sm font-medium text-gray-400">No roles match your filters right now</p>
                         {hasFilters && (
-                            <button onClick={clearFilters} className="text-[9px] font-semibold text-nile-blue underline hover:text-nile-green transition-colors">
-                                CLEAR FILTERS
+                            <button onClick={clearFilters} className="text-sm font-medium text-nile-blue hover:underline">
+                                Clear filters
                             </button>
                         )}
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
                         {filtered.map(job => (
                             <JobCard
                                 key={job.id}
@@ -268,11 +284,21 @@ const JobBoard = () => {
     );
 };
 
+const FilterPill = ({ label, onClear }: { label: string; onClear: () => void }) => (
+    <span className="flex items-center gap-1.5 pl-3 pr-2 py-1.5 bg-nile-blue/10 text-nile-blue rounded-full text-xs font-medium capitalize">
+        {label}
+        <button onClick={onClear} className="hover:bg-nile-blue/20 rounded-full p-0.5 transition-colors">
+            <X size={11} />
+        </button>
+    </span>
+);
+
 const JobCard = ({ job, onNavigate, onApply }: { job: Job; onNavigate: () => void; onApply: () => void }) => {
     const { showToast } = useToast();
     const [isSaved, setIsSaved] = useState(false);
 
-    const handleSave = () => {
+    const handleSave = (e: React.MouseEvent) => {
+        e.stopPropagation();
         setIsSaved(!isSaved);
         showToast(isSaved ? 'Job removed from saved' : 'Job saved to bookmarks', 'success');
     };
@@ -281,58 +307,83 @@ const JobCard = ({ job, onNavigate, onApply }: { job: Job; onNavigate: () => voi
         ? job.company_name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
         : '?';
 
-    const tags = job.skills ? job.skills.split(',').map(s => s.trim()).filter(Boolean).slice(0, 3) : [];
+    const tags = job.skills ? job.skills.split(',').map(s => s.trim()).filter(Boolean).slice(0, 4) : [];
     const jobTypeKey = (job.type || '').toLowerCase();
-    const typeClass = typeColors[jobTypeKey] || 'bg-nile-white text-black border border-gray-100';
-    const typeName = typeLabel[jobTypeKey] || job.type?.toUpperCase() || 'ROLE';
+    const typeClass = typeStyles[jobTypeKey] || 'bg-gray-100 text-gray-600';
+    const typeName = typeLabel[jobTypeKey] || job.type || 'Role';
+    const deadline = deadlineInfo(job.deadline);
+    const isNew = isRecentlyPosted(job.posted_at);
 
     return (
-        <div className="bg-white p-5 md:p-6 rounded-[20px] border border-gray-100 shadow-card hover:translate-y-[-2px] transition-all group flex flex-col text-left">
-            <div className="flex justify-between items-start mb-4">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-nile-blue text-white flex items-center justify-center text-sm font-semibold border border-gray-100 shadow-green flex-shrink-0">
+        <div
+            onClick={onNavigate}
+            className="group bg-white p-5 rounded-2xl border border-gray-100 shadow-card hover:shadow-soft-md hover:-translate-y-0.5 transition-all cursor-pointer flex flex-col text-left"
+        >
+            <div className="flex justify-between items-start gap-3 mb-3">
+                <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-nile-blue to-nile-blue-600 text-white flex items-center justify-center text-sm font-semibold flex-shrink-0">
                         {initials}
                     </div>
                     <div className="min-w-0">
-                        <h3 className="text-base md:text-lg font-semibold text-black leading-none truncate">{job.title}</h3>
-                        <p className="text-[9px] font-bold text-nile-blue/50 mt-1 truncate">{job.company_name}</p>
+                        <div className="flex items-center gap-1.5">
+                            <h3 className="text-base font-semibold text-gray-900 leading-snug truncate group-hover:text-nile-blue transition-colors">{job.title}</h3>
+                            {isNew && (
+                                <span className="flex-shrink-0 text-[10px] font-semibold text-nile-green bg-nile-green/10 px-1.5 py-0.5 rounded-full">New</span>
+                            )}
+                        </div>
+                        <div className="flex items-center gap-1 mt-0.5">
+                            <p className="text-sm text-gray-500 truncate">{job.company_name}</p>
+                        </div>
                     </div>
                 </div>
                 <button
                     onClick={handleSave}
-                    className={`p-2 border border-gray-100 rounded-lg transition-all flex-shrink-0 ${isSaved ? 'bg-nile-green text-black' : 'bg-white hover:bg-black/5'}`}
+                    className={`p-2 rounded-lg transition-all flex-shrink-0 ${isSaved ? 'bg-nile-green/10 text-nile-green' : 'bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600'}`}
                 >
-                    <Bookmark size={13} strokeWidth={3} fill={isSaved ? 'currentColor' : 'none'} />
+                    <Bookmark size={15} fill={isSaved ? 'currentColor' : 'none'} />
                 </button>
             </div>
 
-            <div className="flex flex-wrap gap-3 mb-4">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mb-3 text-xs text-gray-500">
                 {job.location && (
-                    <div className="flex items-center gap-1.5 text-[8px] font-semibold text-black/60">
-                        <MapPin size={10} strokeWidth={3} className="text-nile-blue" />
-                        <span>{job.location}</span>
-                    </div>
+                    <span className="flex items-center gap-1">
+                        <MapPin size={12} className="text-gray-400" /> {job.location}
+                    </span>
                 )}
                 {job.salary && (
-                    <div className="flex items-center gap-1.5 text-[8px] font-semibold text-black/60">
-                        <DollarSign size={10} strokeWidth={3} className="text-nile-green" />
-                        <span>{job.salary}</span>
-                    </div>
+                    <span className="flex items-center gap-1">
+                        <Wallet size={12} className="text-gray-400" /> {job.salary}
+                    </span>
                 )}
-                <span className={`text-[7px] font-semibold px-2 py-0.5 rounded-full border border-gray-100 ${typeClass}`}>{typeName}</span>
+                {typeof job.applicant_count === 'number' && (
+                    <span className="flex items-center gap-1">
+                        <Users size={12} className="text-gray-400" /> {job.applicant_count} applied
+                    </span>
+                )}
             </div>
 
-            {tags.length > 0 && (
-                <div className="flex flex-wrap gap-1 mb-5">
-                    {tags.map(tag => (
-                        <span key={tag} className="text-[7px] font-semibold px-2 py-1 bg-nile-white border border-black/10 rounded-md">{tag}</span>
-                    ))}
-                </div>
-            )}
+            <div className="flex flex-wrap items-center gap-1.5 mb-4">
+                <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${typeClass}`}>{typeName}</span>
+                {tags.map(tag => (
+                    <span key={tag} className="text-xs font-medium px-2.5 py-1 bg-gray-50 border border-gray-100 rounded-full text-gray-600">{tag}</span>
+                ))}
+            </div>
 
-            <div className="flex gap-2 mt-auto">
-                <Button fullWidth size="sm" onClick={onApply}>QUICK APPLY</Button>
-                <Button variant="outline" size="sm" onClick={onNavigate}>VIEW</Button>
+            <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-50">
+                <div className="flex items-center gap-3 text-[11px] text-gray-400">
+                    <span className="flex items-center gap-1">
+                        <Clock size={11} /> {timeAgo(job.posted_at)}
+                    </span>
+                    {deadline && (
+                        <span className={`flex items-center gap-1 font-medium ${deadline.urgent ? 'text-red-500' : 'text-gray-400'}`}>
+                            <Sparkles size={11} /> {deadline.label}
+                        </span>
+                    )}
+                </div>
+                <div className="flex gap-2" onClick={e => e.stopPropagation()}>
+                    <Button variant="outline" size="sm" onClick={onNavigate}>View</Button>
+                    <Button size="sm" onClick={onApply}>Quick apply</Button>
+                </div>
             </div>
         </div>
     );

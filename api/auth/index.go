@@ -817,34 +817,55 @@ var nonAlphanumRe = regexp.MustCompile(`[^a-z0-9_]`)
 // upsertUser finds an existing user by Campus One sub (or by email for users
 // who pre-dated the OIDC migration) and creates one if neither exists.
 func upsertUser(database *gorm.DB, c *campusOneClaims) (*models.User, error) {
-	role, subtype := mapCampusOneRoleFromClaims(c)
+	role, subtype, roleMatched := mapCampusOneRoleFromClaims(c)
 
-	updates := map[string]interface{}{
-		"campus_one_sub":  c.Sub,
-		"full_name":       c.Name,
-		"email":           c.Email,
-		"role":            role,
-		"student_subtype": subtype,
-		"is_verified":     true,
-		"student_id":      c.StudentID,
-		"study_level":     c.StudyLevel,
-		"level":           c.Level,
-		"faculty_id":      c.FacultyID,
-		"department_id":   c.DepartmentID,
+	// Fields that are safe to refresh on every login regardless of whether
+	// Campus One included role data this time around.
+	baseUpdates := map[string]interface{}{
+		"campus_one_sub": c.Sub,
+		"full_name":      c.Name,
+		"email":          c.Email,
+		"is_verified":    true,
+		"student_id":     c.StudentID,
+		"study_level":    c.StudyLevel,
+		"level":          c.Level,
+		"faculty_id":     c.FacultyID,
+		"department_id":  c.DepartmentID,
+	}
+
+	// IMPORTANT: role/student_subtype must NOT be blindly overwritten on every
+	// login. Campus One's id_token/userinfo frequently omit role/roles/
+	// custom_roles on a given login (token caching, missing scope grant,
+	// etc.) — mapCampusOneRoleFromClaims falls back to a "student" default
+	// in that case. Applying that default to an EXISTING user would silently
+	// demote a real employer/staff account back to student every time they
+	// sign in without fresh role claims. Only write role fields when this
+	// login's claims actually contained a real, matched role signal.
+	updatesWithRole := func() map[string]interface{} {
+		if !roleMatched {
+			return baseUpdates
+		}
+		u := map[string]interface{}{"role": role, "student_subtype": subtype}
+		for k, v := range baseUpdates {
+			u[k] = v
+		}
+		return u
 	}
 
 	// 1. Look up by Campus One sub (stable across logins).
 	var user models.User
 	err := database.Where("campus_one_sub = ? AND deleted_at IS NULL", c.Sub).First(&user).Error
 	if err == nil {
-		database.Model(&user).Updates(updates)
+		database.Model(&user).Updates(updatesWithRole())
+		database.Where("id = ?", user.ID).First(&user)
 		return &user, nil
 	}
 
 	// 2. Fall back to email (covers users who registered before OIDC migration).
 	err = database.Where("email = ? AND deleted_at IS NULL", c.Email).First(&user).Error
 	if err == nil {
-		database.Model(&user).Updates(updates)
+		database.Model(&user).Updates(updatesWithRole())
+		database.Where("id = ?", user.ID).First(&user)
 		return &user, nil
 	}
 
@@ -900,21 +921,25 @@ func generateUsername(database *gorm.DB, c *campusOneClaims) string {
 	return base + "_" + hex.EncodeToString(b)[:6]
 }
 
-// mapCampusOneRole converts a Campus One role string to the Nile Connect
-// (role, studentSubtype) pair stored in the database.
-func mapCampusOneRoleFromClaims(c *campusOneClaims) (role, subtype string) {
+// mapCampusOneRoleFromClaims converts Campus One claims to the Nile Connect
+// (role, studentSubtype) pair stored in the database. The third return value
+// reports whether a real role signal was found in this login's claims at
+// all — false means nothing in custom_roles/roles/role was usable and the
+// (role, subtype) returned is just the generic default, which callers must
+// NOT use to overwrite an existing user's already-known role.
+func mapCampusOneRoleFromClaims(c *campusOneClaims) (role, subtype string, matched bool) {
 	// PRIORITY 1: Check custom_roles for app-specific assignments (e.g., "employer_partners").
 	// Custom roles are the strongest signal and override global roles.
 	for _, cr := range c.CustomRoles {
 		if isCampusOneEmployerRole(cr) {
 			fmt.Printf("[CALLBACK] Matched employer role in custom_roles: %s\n", cr)
-			return "employer", ""
+			return "employer", "", true
 		}
 	}
 	for _, cr := range c.CustomRoles {
 		if isCampusOneStaffRole(cr) {
 			fmt.Printf("[CALLBACK] Matched staff role in custom_roles: %s\n", cr)
-			return "staff", ""
+			return "staff", "", true
 		}
 	}
 
@@ -924,28 +949,38 @@ func mapCampusOneRoleFromClaims(c *campusOneClaims) (role, subtype string) {
 	for _, r := range c.Roles {
 		if isCampusOneEmployerRole(r) {
 			fmt.Printf("[CALLBACK] Matched employer role in roles[]: %s\n", r)
-			return "employer", ""
+			return "employer", "", true
 		}
 	}
 	for _, r := range c.Roles {
 		if isCampusOneStaffRole(r) {
 			fmt.Printf("[CALLBACK] Matched staff role in roles[]: %s\n", r)
-			return "staff", ""
+			return "staff", "", true
 		}
 	}
 	for _, r := range c.Roles {
 		if strings.EqualFold(r, "alumni") || strings.EqualFold(r, "mentor") {
 			fmt.Printf("[CALLBACK] Matched alumni/mentor in roles[]: %s\n", r)
-			return "student", "alumni"
+			return "student", "alumni", true
+		}
+	}
+	// Any other non-empty roles[] entries still count as an explicit student
+	// signal (e.g. a plain "student" role membership) — worth honoring so a
+	// student re-affirmed by Campus One isn't treated as "unmatched".
+	for _, r := range c.Roles {
+		if strings.EqualFold(strings.TrimSpace(r), "student") {
+			return "student", "current", true
 		}
 	}
 
 	// PRIORITY 3: Fall back to primary role claim.
 	if c.Role != "" {
-		return mapCampusOneRole(c.Role)
+		r, s := mapCampusOneRole(c.Role)
+		return r, s, true
 	}
 
-	return "student", "current"
+	// No usable role signal anywhere in this login's claims.
+	return "student", "current", false
 }
 
 func isCampusOneEmployerRole(role string) bool {
