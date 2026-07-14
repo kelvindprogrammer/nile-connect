@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
     ClipboardList, Building2, Search, CheckCircle2, XCircle,
-    Loader2, AlertCircle, ShieldCheck, Clock, Users
+    Loader2, AlertCircle, ShieldCheck, Clock, Users, BadgeCheck
 } from 'lucide-react';
 import Avatar from '../../components/Avatar';
 import { useToast } from '../../context/ToastContext';
@@ -108,7 +108,7 @@ const StaffApplications = () => {
     const handleEmployerAction = async (emp: StaffEmployer, status: 'approved' | 'rejected') => {
         setActionLoading(prev => ({ ...prev, [emp.id]: true }));
         try {
-            await updateEmployerStatus(emp.id, status);
+            await updateEmployerStatus(emp.id, { status });
             setEmployers(prev => prev.map(e => e.id === emp.id ? { ...e, status } : e));
             showToast(
                 `${emp.company_name} has been ${status}.`,
@@ -117,6 +117,24 @@ const StaffApplications = () => {
         } catch {
             showToast(`Failed to update ${emp.company_name}.`, 'error');
         } finally {
+            setActionLoading(prev => ({ ...prev, [emp.id]: false }));
+        }
+    };
+
+    const handleToggleVerified = async (emp: StaffEmployer) => {
+        const nextVerified = !emp.is_verified;
+        setActionLoading(prev => ({ ...prev, [`verify-${emp.id}`]: true }));
+        try {
+            await updateEmployerStatus(emp.id, { is_verified: nextVerified });
+            setEmployers(prev => prev.map(e => e.id === emp.id ? { ...e, is_verified: nextVerified } : e));
+            showToast(
+                nextVerified ? `${emp.company_name} granted the verification badge.` : `Verification badge removed from ${emp.company_name}.`,
+                'success'
+            );
+        } catch {
+            showToast(`Failed to update ${emp.company_name}'s verification badge.`, 'error');
+        } finally {
+            setActionLoading(prev => ({ ...prev, [`verify-${emp.id}`]: false }));
             setActionLoading(prev => ({ ...prev, [emp.id]: false }));
         }
     };
@@ -294,6 +312,11 @@ const StaffApplications = () => {
                                             <div className="flex flex-wrap items-center gap-2 mb-1">
                                                 <p className="font-semibold text-sm text-black leading-none truncate">{emp.company_name}</p>
                                                 <StatusBadge status={emp.status} />
+                                                {emp.is_verified && (
+                                                    <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[7px] font-semibold bg-nile-blue/10 text-nile-blue border border-nile-blue/20">
+                                                        <BadgeCheck size={10} strokeWidth={3} /> VERIFIED
+                                                    </span>
+                                                )}
                                             </div>
                                             <p className="text-[8px] font-semibold text-black/40 tracking-wider truncate">
                                                 {emp.industry} &bull; {emp.location}
@@ -323,6 +346,22 @@ const StaffApplications = () => {
                                             >
                                                 {actionLoading[emp.id] ? <Loader2 size={12} className="animate-spin" /> : <XCircle size={12} strokeWidth={3} />}
                                                 <span className="hidden sm:inline">REJECT</span>
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {empSubTab === 'APPROVED' && (
+                                        <div className="flex gap-2 w-full sm:w-auto shrink-0">
+                                            <button
+                                                onClick={() => handleToggleVerified(emp)}
+                                                disabled={actionLoading[`verify-${emp.id}`]}
+                                                className={`flex items-center gap-1.5 px-3 py-2 border border-gray-100 rounded-xl font-semibold text-[9px] shadow-card transition-all disabled:opacity-50
+                                                    ${emp.is_verified ? 'bg-white text-black/50 hover:bg-black/5' : 'bg-nile-blue text-white'}`}
+                                            >
+                                                {actionLoading[`verify-${emp.id}`]
+                                                    ? <Loader2 size={12} className="animate-spin" />
+                                                    : <BadgeCheck size={12} strokeWidth={3} />}
+                                                <span className="hidden sm:inline">{emp.is_verified ? 'REVOKE BADGE' : 'GRANT VERIFICATION'}</span>
                                             </button>
                                         </div>
                                     )}

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Settings, Building2, Link2, UserRound, Pencil, X, Mail, Globe, LogOut, Loader2, ShieldCheck, ShieldAlert } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Settings, Building2, Link2, Pencil, X, Mail, Globe, LogOut, Loader2, ShieldCheck, ShieldAlert, Upload, Users2, MapPinned, CalendarClock } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Avatar from '../../components/Avatar';
@@ -7,6 +7,7 @@ import Button from '../../components/Button';
 import Card from '../../components/Card';
 import { useToast } from '../../context/ToastContext';
 import { getEmployerProfile, updateEmployerProfile, EmployerProfile as EProfile } from '../../services/employerService';
+import { uploadFile } from '../../services/messageService';
 
 const EmployerProfile = () => {
     const { user, logout } = useAuth();
@@ -18,6 +19,8 @@ const EmployerProfile = () => {
     const [editing, setEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [editForm, setEditForm] = useState<Partial<EProfile>>({});
+    const [uploadingLogo, setUploadingLogo] = useState(false);
+    const logoInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         getEmployerProfile()
@@ -29,6 +32,10 @@ const EmployerProfile = () => {
     const handleSave = async () => {
         setIsSaving(true);
         try {
+            // Backend PUT is a full overwrite (no partial-update semantics), so we
+            // send the entire editForm — it was seeded from the full profile on
+            // load, so untouched fields round-trip unchanged. is_verified/status
+            // are staff-controlled and intentionally omitted.
             const updated = await updateEmployerProfile({
                 company_name: editForm.company_name,
                 industry: editForm.industry,
@@ -37,6 +44,10 @@ const EmployerProfile = () => {
                 contact_email: editForm.contact_email,
                 website: editForm.website,
                 linkedin: editForm.linkedin,
+                logo_url: editForm.logo_url,
+                company_size: editForm.company_size,
+                headquarters: editForm.headquarters,
+                founded_year: editForm.founded_year,
             });
             setProfile(updated);
             setEditForm(updated);
@@ -51,6 +62,22 @@ const EmployerProfile = () => {
 
     const handleCancel = () => { setEditForm(profile ?? {}); setEditing(false); };
 
+    const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setUploadingLogo(true);
+        try {
+            const { url } = await uploadFile(file);
+            setEditForm(p => ({ ...p, logo_url: url }));
+            showToast('Logo uploaded — click Save to apply', 'success');
+        } catch {
+            showToast('Logo upload failed', 'error');
+        } finally {
+            setUploadingLogo(false);
+            if (logoInputRef.current) logoInputRef.current.value = '';
+        }
+    };
+
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-full">
@@ -62,7 +89,8 @@ const EmployerProfile = () => {
     const companyName = profile?.company_name || user?.company || 'YOUR COMPANY';
     const recruiterName = user?.name || 'RECRUITER';
     const email = profile?.contact_email || user?.email || '';
-    const isVerified = profile?.status === 'approved';
+    const isApproved = profile?.status === 'approved';
+    const isVerifiedBadge = !!profile?.is_verified;
 
     return (
         <div className="p-4 md:p-8 space-y-6 md:space-y-10 anime-fade-in font-sans pb-24 md:pb-20 text-left max-w-4xl mx-auto">
@@ -80,21 +108,41 @@ const EmployerProfile = () => {
                 </div>
 
                 <div className="px-4 md:px-8 pb-6 md:pb-8 relative">
-                    <div className="absolute -top-8 md:-top-10 left-4 md:left-8 w-16 h-16 md:w-20 md:h-20 bg-white border border-gray-100 rounded-[12px] md:rounded-[16px] shadow-green flex items-center justify-center overflow-hidden">
-                        <Building2 size={32} strokeWidth={1.5} className="text-black/40" />
+                    <div className="absolute -top-8 md:-top-10 left-4 md:left-8 w-16 h-16 md:w-20 md:h-20 bg-white border border-gray-100 rounded-[12px] md:rounded-[16px] shadow-green flex items-center justify-center overflow-hidden group">
+                        {(editing ? editForm.logo_url : profile?.logo_url) ? (
+                            <img src={editing ? editForm.logo_url : profile?.logo_url} alt={companyName} className="w-full h-full object-cover" />
+                        ) : (
+                            <Building2 size={32} strokeWidth={1.5} className="text-black/40" />
+                        )}
+                        {editing && (
+                            <button
+                                type="button"
+                                onClick={() => logoInputRef.current?.click()}
+                                disabled={uploadingLogo}
+                                className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity"
+                            >
+                                {uploadingLogo ? <Loader2 size={18} className="animate-spin" /> : <Upload size={18} />}
+                            </button>
+                        )}
+                        <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
                     </div>
 
                     <div className="pt-10 md:pt-14 flex flex-col sm:flex-row justify-between sm:items-end gap-4">
                         <div className="space-y-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap mb-1">
                                 <h1 className="text-xl md:text-3xl font-semibold text-black leading-none truncate">{companyName} .</h1>
-                                {isVerified ? (
+                                {isApproved ? (
                                     <span className="flex items-center gap-1 bg-nile-green text-white text-[6px] md:text-[7px] font-semibold px-2 py-0.5 rounded border border-black flex-shrink-0">
-                                        <ShieldCheck size={8} strokeWidth={3} /> VERIFIED
+                                        <ShieldCheck size={8} strokeWidth={3} /> APPROVED
                                     </span>
                                 ) : (
                                     <span className="flex items-center gap-1 bg-yellow-100 text-yellow-700 text-[6px] md:text-[7px] font-semibold px-2 py-0.5 rounded border border-black flex-shrink-0">
                                         <ShieldAlert size={8} strokeWidth={3} /> PENDING
+                                    </span>
+                                )}
+                                {isVerifiedBadge && (
+                                    <span className="flex items-center gap-1 bg-nile-blue text-white text-[6px] md:text-[7px] font-semibold px-2 py-0.5 rounded border border-black flex-shrink-0">
+                                        <ShieldCheck size={8} strokeWidth={3} /> VERIFIED
                                     </span>
                                 )}
                             </div>
@@ -166,7 +214,41 @@ const EmployerProfile = () => {
                                         <label className="text-[9px] font-semibold text-black/40 block mb-1">CONTACT EMAIL</label>
                                         <input type="email" value={editForm.contact_email ?? ''} onChange={e => setEditForm(p => ({ ...p, contact_email: e.target.value }))} className="w-full border border-gray-100 rounded-xl p-3 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40" />
                                     </div>
+                                    <div>
+                                        <label className="text-[9px] font-semibold text-black/40 block mb-1">COMPANY SIZE</label>
+                                        <input value={editForm.company_size ?? ''} onChange={e => setEditForm(p => ({ ...p, company_size: e.target.value }))} placeholder="e.g. 51-200 employees" className="w-full border border-gray-100 rounded-xl p-3 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40" />
+                                    </div>
+                                    <div>
+                                        <label className="text-[9px] font-semibold text-black/40 block mb-1">HEADQUARTERS</label>
+                                        <input value={editForm.headquarters ?? ''} onChange={e => setEditForm(p => ({ ...p, headquarters: e.target.value }))} placeholder="e.g. Abuja, Nigeria" className="w-full border border-gray-100 rounded-xl p-3 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40" />
+                                    </div>
+                                    <div>
+                                        <label className="text-[9px] font-semibold text-black/40 block mb-1">FOUNDED YEAR</label>
+                                        <input
+                                            type="number"
+                                            value={editForm.founded_year ?? ''}
+                                            onChange={e => setEditForm(p => ({ ...p, founded_year: e.target.value ? Number(e.target.value) : undefined }))}
+                                            placeholder="e.g. 2015"
+                                            className="w-full border border-gray-100 rounded-xl p-3 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40"
+                                        />
+                                    </div>
                                 </div>
+                            </div>
+                        </Card>
+                    )}
+
+                    {!editing && (profile?.company_size || profile?.headquarters || profile?.founded_year) && (
+                        <Card title="COMPANY FACTS">
+                            <div className="flex flex-wrap gap-4">
+                                {profile?.company_size && (
+                                    <span className="flex items-center gap-1.5 text-[9px] font-semibold text-black/50"><Users2 size={12} className="text-nile-blue" /> {profile.company_size}</span>
+                                )}
+                                {profile?.headquarters && (
+                                    <span className="flex items-center gap-1.5 text-[9px] font-semibold text-black/50"><MapPinned size={12} className="text-nile-green" /> {profile.headquarters}</span>
+                                )}
+                                {profile?.founded_year ? (
+                                    <span className="flex items-center gap-1.5 text-[9px] font-semibold text-black/50"><CalendarClock size={12} className="text-nile-blue" /> Founded {profile.founded_year}</span>
+                                ) : null}
                             </div>
                         </Card>
                     )}

@@ -22,9 +22,11 @@ import (
 	"gorm.io/gorm"
 
 	"nile-connect/lib/db"
+	"nile-connect/lib/email"
 	"nile-connect/lib/jwtutil"
 	"nile-connect/lib/models"
 	"nile-connect/lib/mw"
+	"nile-connect/lib/notify"
 	"nile-connect/lib/respond"
 )
 
@@ -122,6 +124,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		deleteAccount(w, r)
 	case "webhook":
 		webhook(w, r)
+	case "verify-email":
+		verifyEmail(w, r)
 	default:
 		respond.Error(w, http.StatusNotFound, "not found")
 	}
@@ -144,7 +148,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 	secure := isSecureContext(r)
 	domain := cookieDomain(r)
-	
+
 	// DEBUG: Log domain calculation and request info
 	fmt.Printf("[LOGIN] Request Host: %s, TLS: %v, X-Forwarded-Proto: %s\n", r.Host, r.TLS != nil, r.Header.Get("X-Forwarded-Proto"))
 	fmt.Printf("[LOGIN] APP_URL env: %s\n", os.Getenv("APP_URL"))
@@ -196,7 +200,7 @@ func callback(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("%s ", c.Name)
 	}
 	fmt.Printf("\n")
-	
+
 	// ── 1. Retrieve and validate PKCE / state cookies ─────────────────────────
 	stateCookie, err := r.Cookie("c1_state")
 	if err != nil || stateCookie.Value == "" {
@@ -305,6 +309,8 @@ func callback(w http.ResponseWriter, r *http.Request) {
 				// Don't fail the login — let them sign in and create it via API if needed.
 			} else {
 				fmt.Printf("[CALLBACK] Auto-created empty employer profile for user %s\n", user.ID)
+				sendEmployerVerificationEmail(database, r, user)
+				notifyStaffOfNewEmployer(database, user)
 			}
 		}
 	}
@@ -410,6 +416,68 @@ func deleteAccount(w http.ResponseWriter, r *http.Request) {
 	// Clear the session so the browser is immediately signed out.
 	clearCookie(w, "nile_session", isSecureContext(r), cookieDomain(r))
 	respond.OK(w, map[string]string{"message": "account deleted"})
+}
+
+// ── employer email verification ─────────────────────────────────────────────
+
+// sendEmployerVerificationEmail creates a one-time token and emails the
+// employer a confirmation link, run once when their profile is first
+// auto-created. Best-effort: failures are logged, never block login.
+func sendEmployerVerificationEmail(database *gorm.DB, r *http.Request, user *models.User) {
+	token := randBase64(24)
+	ev := models.EmailVerification{
+		UserID:    user.ID,
+		Token:     token,
+		ExpiresAt: time.Now().Add(24 * time.Hour),
+	}
+	if err := database.Create(&ev).Error; err != nil {
+		fmt.Printf("[CALLBACK] Warning: could not create email verification: %v\n", err)
+		return
+	}
+	link := appBaseURL(r) + "/api/auth/verify-email?token=" + token
+	subject, html := email.VerifyEmailTemplate(link)
+	email.Send(user.Email, subject, html)
+}
+
+func notifyStaffOfNewEmployer(database *gorm.DB, employer *models.User) {
+	var staffUsers []models.User
+	database.Where("role = ? AND deleted_at IS NULL", "staff").Find(&staffUsers)
+	for _, s := range staffUsers {
+		notify.CreateAndEmail(database, s.ID, employer.ID, "employer_registered", "New employer registration",
+			employer.FullName+" registered as an employer partner", "/staff/employers",
+			func() (string, string) { return email.NewEmployerRegisteredTemplate(employer.FullName) })
+	}
+}
+
+// verifyEmail confirms an employer's contact email via the token sent by
+// sendEmployerVerificationEmail, then redirects to a frontend confirmation page.
+func verifyEmail(w http.ResponseWriter, r *http.Request) {
+	token := r.URL.Query().Get("token")
+	if token == "" {
+		respond.Error(w, http.StatusBadRequest, "token is required")
+		return
+	}
+	database, err := db.Get()
+	if err != nil {
+		respond.Error(w, http.StatusInternalServerError, "database unavailable")
+		return
+	}
+	var ev models.EmailVerification
+	if err := database.Where("token = ?", token).First(&ev).Error; err != nil {
+		http.Redirect(w, r, appBaseURL(r)+"/verify-email?status=invalid", http.StatusFound)
+		return
+	}
+	if ev.VerifiedAt != nil {
+		http.Redirect(w, r, appBaseURL(r)+"/verify-email?status=already-verified", http.StatusFound)
+		return
+	}
+	if time.Now().After(ev.ExpiresAt) {
+		http.Redirect(w, r, appBaseURL(r)+"/verify-email?status=expired", http.StatusFound)
+		return
+	}
+	now := time.Now()
+	database.Model(&ev).Update("verified_at", now)
+	http.Redirect(w, r, appBaseURL(r)+"/verify-email?status=success", http.StatusFound)
 }
 
 // ── webhook ───────────────────────────────────────────────────────────────────
@@ -822,13 +890,13 @@ func userToResponse(u *models.User) map[string]any {
 // when the database is temporarily unavailable.
 func sessionClaimsToResponse(c *jwtutil.SessionClaims) map[string]any {
 	return map[string]any{
-		"id":         c.UserID,
-		"name":       c.FullName,
-		"username":   c.Username,
-		"email":      c.Email,
-		"role":       c.Role,
+		"id":              c.UserID,
+		"name":            c.FullName,
+		"username":        c.Username,
+		"email":           c.Email,
+		"role":            c.Role,
 		"student_subtype": c.Subtype,
-		"student_id": c.StudentID,
-		"is_verified": true,
+		"student_id":      c.StudentID,
+		"is_verified":     true,
 	}
 }

@@ -58,6 +58,15 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		connectionsRequest(w, r, auth)
 	case "connections-respond":
 		connectionsRespond(w, r, auth)
+	case "connections-for":
+		connectionsFor(w, r, auth)
+	case "people-you-may-know":
+		peopleYouMayKnow(w, r, auth)
+
+	case "profile-view":
+		recordProfileView(w, r, auth)
+	case "endorsements":
+		endorsements(w, r, auth)
 
 	case "presence":
 		presenceHeartbeat(w, r, auth)
@@ -616,6 +625,209 @@ func connectionsRespond(w http.ResponseWriter, r *http.Request, auth *mw.AuthCtx
 	}
 
 	respond.OK(w, map[string]any{"id": conn.ID, "status": status})
+}
+
+// GET /api/messages?path=connections-for&userId=<id> — a user's accepted
+// connection IDs, used to compute mutual connections client-side. Only the
+// accepted set is exposed (never pending/incoming) since that's the only
+// slice safe to share about a third party.
+func connectionsFor(w http.ResponseWriter, r *http.Request, auth *mw.AuthCtx) {
+	if r.Method != http.MethodGet {
+		respond.Error(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+	userID := r.URL.Query().Get("userId")
+	if userID == "" {
+		respond.Error(w, http.StatusBadRequest, "userId is required")
+		return
+	}
+	database, err := db.Get()
+	if err != nil {
+		respond.Error(w, http.StatusInternalServerError, "database unavailable")
+		return
+	}
+	ids := acceptedConnectionIDs(database, userID)
+	respond.OK(w, map[string]any{"user_id": userID, "connection_ids": ids})
+}
+
+// acceptedConnectionIDs returns the set of user IDs a given user has an
+// accepted connection with.
+func acceptedConnectionIDs(database *gorm.DB, userID string) []string {
+	var ids []string
+	database.Raw(`
+		SELECT CASE WHEN requester_id = ? THEN recipient_id ELSE requester_id END
+		FROM connections
+		WHERE status = 'accepted' AND deleted_at IS NULL AND (requester_id = ? OR recipient_id = ?)
+	`, userID, userID, userID).Scan(&ids)
+	return ids
+}
+
+// GET /api/messages?path=people-you-may-know — second-degree connections
+// (accepted connections of your accepted connections) not already connected
+// or pending with you.
+func peopleYouMayKnow(w http.ResponseWriter, r *http.Request, auth *mw.AuthCtx) {
+	if r.Method != http.MethodGet {
+		respond.Error(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+	database, err := db.Get()
+	if err != nil {
+		respond.Error(w, http.StatusInternalServerError, "database unavailable")
+		return
+	}
+
+	direct := acceptedConnectionIDs(database, auth.UserID)
+	exclude := map[string]bool{auth.UserID: true}
+	for _, id := range direct {
+		exclude[id] = true
+	}
+	var pending []string
+	database.Raw(`
+		SELECT CASE WHEN requester_id = ? THEN recipient_id ELSE requester_id END
+		FROM connections WHERE status = 'pending' AND deleted_at IS NULL AND (requester_id = ? OR recipient_id = ?)
+	`, auth.UserID, auth.UserID, auth.UserID).Scan(&pending)
+	for _, id := range pending {
+		exclude[id] = true
+	}
+
+	mutualCount := map[string]int{}
+	for _, id := range direct {
+		for _, second := range acceptedConnectionIDs(database, id) {
+			if !exclude[second] {
+				mutualCount[second]++
+			}
+		}
+	}
+
+	type suggestion struct {
+		UserID   string `json:"user_id"`
+		FullName string `json:"full_name"`
+		Role     string `json:"role"`
+		Mutual   int    `json:"mutual_connections"`
+	}
+	suggestions := make([]suggestion, 0, len(mutualCount))
+	for id, count := range mutualCount {
+		var u models.User
+		if database.Where("id = ? AND deleted_at IS NULL", id).First(&u).Error != nil {
+			continue
+		}
+		suggestions = append(suggestions, suggestion{UserID: u.ID, FullName: u.FullName, Role: u.Role, Mutual: count})
+	}
+	for i := 1; i < len(suggestions); i++ {
+		for j := i; j > 0 && suggestions[j].Mutual > suggestions[j-1].Mutual; j-- {
+			suggestions[j], suggestions[j-1] = suggestions[j-1], suggestions[j]
+		}
+	}
+	if len(suggestions) > 20 {
+		suggestions = suggestions[:20]
+	}
+	respond.OK(w, map[string]any{"suggestions": suggestions})
+}
+
+// ── social proof: profile views + endorsements ──────────────────────────────
+
+// POST /api/messages?path=profile-view&userId=<id> — records a debounced
+// visit to userId's profile (skipped if the same viewer viewed the same
+// profile within the last hour, and always skipped for self-views).
+func recordProfileView(w http.ResponseWriter, r *http.Request, auth *mw.AuthCtx) {
+	if r.Method != http.MethodPost {
+		respond.Error(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+	profileUserID := r.URL.Query().Get("userId")
+	if profileUserID == "" {
+		respond.Error(w, http.StatusBadRequest, "userId is required")
+		return
+	}
+	database, err := db.Get()
+	if err != nil {
+		respond.Error(w, http.StatusInternalServerError, "database unavailable")
+		return
+	}
+	if profileUserID == auth.UserID {
+		var total int64
+		database.Model(&models.ProfileView{}).Where("profile_user_id = ?", profileUserID).Count(&total)
+		respond.OK(w, map[string]any{"recorded": false, "total_views": total})
+		return
+	}
+	var recent int64
+	database.Model(&models.ProfileView{}).
+		Where("viewer_id = ? AND profile_user_id = ? AND created_at > ?", auth.UserID, profileUserID, time.Now().Add(-1*time.Hour)).
+		Count(&recent)
+	if recent == 0 {
+		database.Create(&models.ProfileView{ViewerID: auth.UserID, ProfileUserID: profileUserID})
+	}
+	var total int64
+	database.Model(&models.ProfileView{}).Where("profile_user_id = ?", profileUserID).Count(&total)
+	respond.OK(w, map[string]any{"recorded": recent == 0, "total_views": total})
+}
+
+// GET /api/messages?path=endorsements&userId=<id> — list endorsement counts
+//
+//	per skill for a user.
+//
+// POST /api/messages?path=endorsements&userId=<id> body {skill} — endorse
+//
+//	one of that user's skills (idempotent per endorser+skill).
+func endorsements(w http.ResponseWriter, r *http.Request, auth *mw.AuthCtx) {
+	profileUserID := r.URL.Query().Get("userId")
+	if profileUserID == "" {
+		respond.Error(w, http.StatusBadRequest, "userId is required")
+		return
+	}
+	database, err := db.Get()
+	if err != nil {
+		respond.Error(w, http.StatusInternalServerError, "database unavailable")
+		return
+	}
+
+	switch r.Method {
+	case http.MethodGet:
+		type row struct {
+			Skill string `json:"skill"`
+			Count int    `json:"count"`
+		}
+		var rows []row
+		database.Raw(`SELECT skill, COUNT(*) as count FROM endorsements WHERE profile_user_id = ? GROUP BY skill ORDER BY count DESC`, profileUserID).Scan(&rows)
+		endorsedByMe := map[string]bool{}
+		var mine []models.Endorsement
+		database.Where("profile_user_id = ? AND endorser_id = ?", profileUserID, auth.UserID).Find(&mine)
+		for _, e := range mine {
+			endorsedByMe[e.Skill] = true
+		}
+		respond.OK(w, map[string]any{"endorsements": rows, "endorsed_by_me": endorsedByMe})
+
+	case http.MethodPost:
+		if profileUserID == auth.UserID {
+			respond.Error(w, http.StatusBadRequest, "cannot endorse your own skill")
+			return
+		}
+		var req struct {
+			Skill string `json:"skill"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.Skill == "" {
+			respond.Error(w, http.StatusBadRequest, "skill is required")
+			return
+		}
+		var existing int64
+		database.Model(&models.Endorsement{}).
+			Where("profile_user_id = ? AND endorser_id = ? AND skill = ?", profileUserID, auth.UserID, req.Skill).
+			Count(&existing)
+		if existing == 0 {
+			database.Create(&models.Endorsement{EndorserID: auth.UserID, ProfileUserID: profileUserID, Skill: req.Skill})
+			var actor models.User
+			if database.Where("id = ?", auth.UserID).First(&actor).Error == nil {
+				notify.Create(database, profileUserID, auth.UserID, "endorsement",
+					"New skill endorsement",
+					fmt.Sprintf("%s endorsed your %s skill", actor.FullName, req.Skill),
+					"/profile")
+			}
+		}
+		respond.Created(w, map[string]any{"endorsed": true})
+
+	default:
+		respond.Error(w, http.StatusMethodNotAllowed, "method not allowed")
+	}
 }
 
 // POST /api/messages?path=presence — heartbeat, called periodically while the app is open.

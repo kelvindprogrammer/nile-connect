@@ -11,6 +11,7 @@ import (
 	"gorm.io/gorm"
 
 	"nile-connect/lib/db"
+	"nile-connect/lib/email"
 	"nile-connect/lib/models"
 	"nile-connect/lib/mw"
 	"nile-connect/lib/notify"
@@ -117,6 +118,7 @@ func staffApplications(w http.ResponseWriter, r *http.Request) {
 		JobTitle    string     `json:"job_title"`
 		Company     string     `json:"company"`
 		Status      string     `json:"status"`
+		Stage       string     `json:"stage"`
 		AppliedAt   *time.Time `json:"applied_at"`
 		CoverLetter string     `json:"cover_letter"`
 		ResumeURL   string     `json:"resume_url"`
@@ -127,7 +129,7 @@ func staffApplications(w http.ResponseWriter, r *http.Request) {
 
 	result := make([]appSum, 0, len(apps))
 	for _, a := range apps {
-		sum := appSum{ID: a.ID, StudentID: a.StudentID, JobID: a.JobID, Status: a.Status, AppliedAt: a.AppliedAt, CoverLetter: a.CoverLetter, ResumeURL: a.ResumeURL}
+		sum := appSum{ID: a.ID, StudentID: a.StudentID, JobID: a.JobID, Status: a.Status, Stage: a.Stage, AppliedAt: a.AppliedAt, CoverLetter: a.CoverLetter, ResumeURL: a.ResumeURL}
 		var student models.User
 		if database.Where("id = ?", a.StudentID).First(&student).Error == nil {
 			sum.Student = student.FullName
@@ -226,7 +228,8 @@ func staffJobs(w http.ResponseWriter, r *http.Request, staffUserID string) {
 			return
 		}
 		var req struct {
-			Status string `json:"status"`
+			Status          string `json:"status"`
+			RejectionReason string `json:"rejection_reason"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			respond.Error(w, http.StatusBadRequest, "invalid request body")
@@ -237,7 +240,38 @@ func staffJobs(w http.ResponseWriter, r *http.Request, staffUserID string) {
 			respond.Error(w, http.StatusBadRequest, "invalid status value")
 			return
 		}
-		database.Model(&models.Job{}).Where("id = ?", jobID).Update("status", req.Status)
+
+		var job models.Job
+		if err := database.Where("id = ?", jobID).First(&job).Error; err != nil {
+			respond.Error(w, http.StatusNotFound, "job not found")
+			return
+		}
+
+		updates := map[string]any{"status": req.Status}
+		if req.Status == "active" {
+			now := time.Now()
+			updates["approved_by"] = staffUserID
+			updates["approved_at"] = now
+			updates["rejection_reason"] = ""
+		} else if req.Status == "rejected" {
+			updates["rejection_reason"] = req.RejectionReason
+		}
+		database.Model(&models.Job{}).Where("id = ?", jobID).Updates(updates)
+
+		if req.Status == "active" || req.Status == "rejected" {
+			var emp models.EmployerProfile
+			database.Where("user_id = ?", job.EmployerID).First(&emp)
+			if req.Status == "active" {
+				notify.CreateAndEmail(database, job.EmployerID, staffUserID, "job_status", "Job approved",
+					"Your job posting \""+job.Title+"\" is now live", "/employer/jobs",
+					func() (string, string) { return email.JobApprovedTemplate(job.Title) })
+			} else {
+				notify.CreateAndEmail(database, job.EmployerID, staffUserID, "job_status", "Job needs changes",
+					"Your job posting \""+job.Title+"\" was not approved", "/employer/jobs",
+					func() (string, string) { return email.JobRejectedTemplate(job.Title, req.RejectionReason) })
+			}
+		}
+
 		respond.OK(w, map[string]string{"message": "job status updated"})
 
 	default:
@@ -255,13 +289,15 @@ func staffEmployers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	type empSum struct {
-		ID          string    `json:"id"`
-		CompanyName string    `json:"company_name"`
-		Industry    string    `json:"industry"`
-		Location    string    `json:"location"`
-		Email       string    `json:"contact_email"`
-		Status      string    `json:"status"`
-		CreatedAt   time.Time `json:"created_at"`
+		ID            string    `json:"id"`
+		CompanyName   string    `json:"company_name"`
+		Industry      string    `json:"industry"`
+		Location      string    `json:"location"`
+		Email         string    `json:"contact_email"`
+		Status        string    `json:"status"`
+		IsVerified    bool      `json:"is_verified"`
+		EmailVerified bool      `json:"email_verified"`
+		CreatedAt     time.Time `json:"created_at"`
 	}
 
 	switch r.Method {
@@ -270,7 +306,15 @@ func staffEmployers(w http.ResponseWriter, r *http.Request) {
 		database.Where("deleted_at IS NULL").Order("created_at desc").Find(&profiles)
 		result := make([]empSum, 0, len(profiles))
 		for _, p := range profiles {
-			result = append(result, empSum{ID: p.ID, CompanyName: p.CompanyName, Industry: p.Industry, Location: p.Location, Email: p.ContactEmail, Status: p.Status, CreatedAt: p.CreatedAt})
+			sum := empSum{
+				ID: p.ID, CompanyName: p.CompanyName, Industry: p.Industry, Location: p.Location,
+				Email: p.ContactEmail, Status: p.Status, IsVerified: p.IsVerified, CreatedAt: p.CreatedAt,
+			}
+			var ev models.EmailVerification
+			if database.Where("user_id = ? AND verified_at IS NOT NULL", p.UserID).First(&ev).Error == nil {
+				sum.EmailVerified = true
+			}
+			result = append(result, sum)
 		}
 		respond.OK(w, map[string]any{"employers": result})
 
@@ -281,18 +325,46 @@ func staffEmployers(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		var req struct {
-			Status string `json:"status"`
+			Status     *string `json:"status"`
+			IsVerified *bool   `json:"is_verified"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			respond.Error(w, http.StatusBadRequest, "invalid request body")
 			return
 		}
-		allowed := map[string]bool{"approved": true, "pending": true, "rejected": true}
-		if !allowed[req.Status] {
-			respond.Error(w, http.StatusBadRequest, "invalid status value")
+		var profile models.EmployerProfile
+		if err := database.Where("id = ?", profileID).First(&profile).Error; err != nil {
+			respond.Error(w, http.StatusNotFound, "employer profile not found")
 			return
 		}
-		database.Model(&models.EmployerProfile{}).Where("id = ?", profileID).Update("status", req.Status)
+
+		updates := map[string]any{}
+		if req.Status != nil {
+			allowed := map[string]bool{"approved": true, "pending": true, "rejected": true}
+			if !allowed[*req.Status] {
+				respond.Error(w, http.StatusBadRequest, "invalid status value")
+				return
+			}
+			updates["status"] = *req.Status
+		}
+		if req.IsVerified != nil {
+			updates["is_verified"] = *req.IsVerified
+		}
+		if len(updates) > 0 {
+			database.Model(&models.EmployerProfile{}).Where("id = ?", profileID).Updates(updates)
+		}
+
+		if req.Status != nil {
+			notify.CreateAndEmail(database, profile.UserID, "", "employer_status", "Employer status updated",
+				"Your employer account status is now "+*req.Status, "/employer/profile",
+				func() (string, string) { return email.EmployerStatusTemplate(profile.CompanyName, *req.Status) })
+		}
+		if req.IsVerified != nil && *req.IsVerified {
+			notify.CreateAndEmail(database, profile.UserID, "", "employer_verified", "Verification badge granted",
+				profile.CompanyName+" is now verified", "/employer/profile",
+				func() (string, string) { return email.EmployerVerifiedTemplate(profile.CompanyName) })
+		}
+
 		respond.OK(w, map[string]string{"message": "employer status updated"})
 
 	default:
@@ -716,6 +788,9 @@ func cascadeDeleteUser(database *gorm.DB, userID string) {
 	database.Where("student_id = ? OR staff_id = ?", userID, userID).Delete(&models.ServiceRequest{})
 	database.Where("user_id = ?", userID).Delete(&models.PasswordReset{})
 	database.Where("user_id = ?", userID).Delete(&models.EmployerProfile{})
+	database.Where("user_id = ?", userID).Delete(&models.Document{})
+	database.Where("author_id = ?", userID).Delete(&models.ApplicationNote{})
+	database.Where("user_id = ?", userID).Delete(&models.EmailVerification{})
 	database.Delete(&models.User{}, "id = ?", userID)
 }
 

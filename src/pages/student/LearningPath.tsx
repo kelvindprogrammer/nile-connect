@@ -1,5 +1,4 @@
 import React from 'react';
-import DashboardLayout from '../../layouts/DashboardLayout';
 import { 
     BookOpen, CheckCircle2, Clock, Trash2, 
     ExternalLink, Plus, Zap, AlertCircle, TrendingUp,
@@ -22,7 +21,7 @@ const LearningPath = () => {
     const completionRate = tasks.length > 0 ? Math.round((stats.completed / tasks.length) * 100) : 0;
 
     return (
-        <DashboardLayout>
+        <>
             <div className="p-4 md:p-8 space-y-8 anime-fade-in text-left max-w-6xl mx-auto pb-24 md:pb-8">
                 <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-100 pb-6">
                     <div className="space-y-1">
@@ -112,7 +111,7 @@ const LearningPath = () => {
                     </div>
                 </div>
             </div>
-        </DashboardLayout>
+        </>
     );
 };
 

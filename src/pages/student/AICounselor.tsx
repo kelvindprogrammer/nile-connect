@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import DashboardLayout from '../../layouts/DashboardLayout';
 import {
     Cpu, Zap, Target, BookOpen, CheckCircle2,
     AlertCircle, Sparkles, Send, MessageSquare, X, Upload,
@@ -235,7 +234,7 @@ const AICounselor = () => {
     // -----------------------------------------------------------------------
 
     return (
-        <DashboardLayout>
+        <>
             <div className="p-4 md:p-6 font-sans bg-nile-white min-h-full pb-24 md:pb-4 text-left">
 
                 {/* Header */}
@@ -544,7 +543,7 @@ const AICounselor = () => {
                 </div>
                 </div>{/* end grid */}
             </div>
-        </DashboardLayout>
+        </>
     );
 };
 

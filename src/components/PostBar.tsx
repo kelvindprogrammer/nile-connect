@@ -4,25 +4,36 @@ import { Image as ImageIcon, X, Loader2, Send } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useProfilePicture } from '../hooks/useProfilePicture';
 import { useToast } from '../context/ToastContext';
-import { createPost, type Post } from '../services/feedService';
+import { createPost, type Post, type PostKind } from '../services/feedService';
 import { uploadFile } from '../services/messageService';
 import { resizeImage } from '../utils/imageResize';
 
 interface PostBarProps {
     onPostCreated: (post: Post) => void;
+    prefillJobId?: string;
+    prefillContent?: string;
 }
 
-const PostBar: React.FC<PostBarProps> = ({ onPostCreated }) => {
+const KIND_OPTIONS: { value: PostKind; label: string; studentAllowed: boolean }[] = [
+    { value: 'text', label: 'General', studentAllowed: true },
+    { value: 'achievement', label: 'Achievement', studentAllowed: true },
+    { value: 'announcement', label: 'Announcement', studentAllowed: false },
+];
+
+const PostBar: React.FC<PostBarProps> = ({ onPostCreated, prefillJobId, prefillContent }) => {
     const { user } = useAuth();
     const { picture } = useProfilePicture();
     const { showToast } = useToast();
     const fileRef = useRef<HTMLInputElement>(null);
 
-    const [expanded, setExpanded] = useState(false);
-    const [content, setContent] = useState('');
+    const [expanded, setExpanded] = useState(!!prefillJobId);
+    const [content, setContent] = useState(prefillContent || '');
     const [mediaFile, setMediaFile] = useState<File | null>(null);
     const [mediaPreview, setMediaPreview] = useState<string | null>(null);
     const [posting, setPosting] = useState(false);
+    const [kind, setKind] = useState<PostKind>(prefillJobId ? 'job' : 'text');
+
+    const availableKinds = KIND_OPTIONS.filter(k => user?.role !== 'student' || k.studentAllowed);
 
     const firstName = user?.name ? user.name.split(' ')[0] : 'there';
     const displayName = user?.name || 'User';
@@ -50,11 +61,12 @@ const PostBar: React.FC<PostBarProps> = ({ onPostCreated }) => {
     const handleCancel = () => {
         setContent('');
         removeMedia();
-        setExpanded(false);
+        setExpanded(!!prefillJobId);
+        setKind(prefillJobId ? 'job' : 'text');
     };
 
     const handleSubmit = async () => {
-        if (!content.trim() && !mediaFile) return;
+        if (!content.trim() && !mediaFile && kind !== 'job') return;
         setPosting(true);
         try {
             let mediaUrl: string | undefined;
@@ -62,7 +74,9 @@ const PostBar: React.FC<PostBarProps> = ({ onPostCreated }) => {
                 const result = await uploadFile(mediaFile);
                 mediaUrl = result.url;
             }
-            const post = await createPost(content.trim(), mediaUrl);
+            const post = await createPost(content.trim() || 'Check out this opportunity', {
+                mediaUrl, kind, jobId: kind === 'job' ? prefillJobId : undefined,
+            });
             onPostCreated(post);
             handleCancel();
             showToast('Post published!', 'success');
@@ -105,6 +119,24 @@ const PostBar: React.FC<PostBarProps> = ({ onPostCreated }) => {
                             >
                                 <X size={14} />
                             </button>
+                        </div>
+                    )}
+
+                    {expanded && !prefillJobId && (
+                        <div className="flex items-center gap-1.5 mt-3 flex-wrap">
+                            {availableKinds.map(opt => (
+                                <button
+                                    key={opt.value}
+                                    onClick={() => setKind(opt.value)}
+                                    className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
+                                        kind === opt.value
+                                            ? 'bg-nile-blue text-white border-nile-blue'
+                                            : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
+                                    }`}
+                                >
+                                    {opt.label}
+                                </button>
+                            ))}
                         </div>
                     )}
 

@@ -1,192 +1,180 @@
 import React, { useEffect, useState } from 'react';
-import { Mail, MapPin, Shield, LogOut, Edit, TrendingUp, Loader2 } from 'lucide-react';
+import { Mail, MapPin, Shield, LogOut, Edit, ShieldCheck, Link2, ExternalLink } from 'lucide-react';
 import Avatar from '../../components/Avatar';
-import NileConnectLogo from '../../components/NileConnectLogo';
+import Card from '../../components/Card';
 import Button from '../../components/Button';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '../../context/ToastContext';
 import { getDashboardStats, type DashboardStats } from '../../services/staffService';
+import { recordProfileView } from '../../services/profileService';
+
+const FOCUS_AREAS = ['Career counseling', 'Employer relations', 'Job approvals', 'Student advocacy'];
 
 const StaffProfile = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
-    const { showToast } = useToast();
     const [stats, setStats] = useState<DashboardStats | null>(null);
     const [loading, setLoading] = useState(true);
+    const [totalViews, setTotalViews] = useState<number | null>(null);
 
-    const name       = user?.name       || 'STAFF MEMBER';
-    const email      = user?.email      || 'staff@nileuni.edu.ng';
-    const department = user?.department || 'CAREER SERVICES';
+    const name = user?.name || 'Staff member';
+    const email = user?.email || '';
+    const department = user?.department || 'Career Services';
 
     useEffect(() => {
-        getDashboardStats()
-            .then(setStats)
-            .catch(() => {})
-            .finally(() => setLoading(false));
+        getDashboardStats().then(setStats).catch(() => {}).finally(() => setLoading(false));
     }, []);
+
+    useEffect(() => {
+        if (!user?.id) return;
+        recordProfileView(user.id).then(r => setTotalViews(r.total_views)).catch(() => {});
+    }, [user?.id]);
 
     const handleLogout = () => { logout(); navigate('/login'); };
 
     return (
         <div className="p-4 md:p-8 space-y-6 anime-fade-in font-sans pb-24 text-left max-w-4xl mx-auto">
 
-            {/* ── HERO ──────────────────────────────────────────────────────── */}
-            <div className="bg-white border border-gray-100 rounded-[28px] shadow-card overflow-hidden">
+            {/* Hero */}
+            <div className="bg-white border border-gray-100 rounded-[24px] shadow-card overflow-hidden">
+                <div className="h-24 md:h-32 bg-gradient-to-r from-nile-blue to-nile-blue-600 relative" />
 
-                {/* Banner */}
-                <div className="h-32 md:h-40 bg-black relative overflow-hidden border-b border-gray-100">
-                    <div className="absolute inset-0 opacity-[0.05] bg-[linear-gradient(rgba(255,255,255,1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,1)_1px,transparent_1px)] bg-[size:24px_24px]" />
-                    <div className="absolute right-6 top-1/2 -translate-y-1/2 opacity-15">
-                        <NileConnectLogo size="md" showText animated textColor="white" showTagline={false} />
-                    </div>
-                    <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 bg-white/10 border border-white/20 rounded-lg backdrop-blur-sm">
-                        <Shield size={11} className="text-nile-green" />
-                        <span className="text-[8px] font-semibold text-white">STAFF ADMIN</span>
-                    </div>
-                </div>
-
-                {/* Info */}
                 <div className="px-5 md:px-8 pb-6 relative">
-                    <div className="absolute -top-10 left-5 md:left-8 w-20 h-20 rounded-[20px] border border-gray-100 bg-white shadow-card overflow-hidden">
+                    <div className="absolute -top-10 left-5 md:left-8 w-20 h-20 rounded-2xl border border-gray-100 bg-white shadow-card overflow-hidden">
                         <Avatar name={name} size="lg" />
                     </div>
 
                     <div className="pt-12 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
                         <div>
                             <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                <h1 className="text-2xl md:text-3xl font-semibold text-black leading-none">{name} .</h1>
-                                <span className="bg-nile-green text-white px-2 py-0.5 rounded text-[7px] font-semibold border border-black">VERIFIED</span>
+                                <h1 className="text-xl md:text-2xl font-semibold text-gray-900 leading-none">{name}</h1>
+                                <span className="flex items-center gap-1 bg-nile-green text-white text-xs font-medium px-2.5 py-1 rounded-full">
+                                    <ShieldCheck size={11} strokeWidth={3} /> Staff
+                                </span>
                             </div>
-                            <p className="text-[9px] font-semibold text-nile-blue/50">{department}</p>
-                            <div className="flex flex-wrap items-center gap-3 mt-2 text-[8px] font-semibold text-black/30">
-                                <span className="flex items-center gap-1"><Mail size={10} />{email}</span>
-                                <span className="flex items-center gap-1"><MapPin size={10} />Nile University, Abuja</span>
-                            </div>
+                            <p className="text-sm font-medium text-nile-blue">{department}</p>
                         </div>
                         <div className="flex gap-2 w-full sm:w-auto">
                             <Button variant="outline" size="sm" onClick={() => navigate('/staff/settings')} className="flex-1 sm:flex-none">
-                                <Edit size={13} className="mr-1.5" /> EDIT
+                                <Edit size={13} className="mr-1.5" /> Edit
                             </Button>
-                            <Button variant="outline" size="sm" className="text-red-500 border-red-200 hover:bg-red-500 hover:text-white hover:border-red-500 flex-1 sm:flex-none" onClick={handleLogout}>
-                                <LogOut size={13} className="mr-1.5" /> LOGOUT
+                            <Button
+                                variant="outline" size="sm"
+                                className="text-red-500 border-red-200 hover:bg-red-500 hover:text-white hover:border-red-500 flex-1 sm:flex-none"
+                                onClick={handleLogout}
+                            >
+                                <LogOut size={13} className="mr-1.5" /> Log out
                             </Button>
                         </div>
                     </div>
 
-                    {/* Live stats */}
-                    <div className="mt-6 pt-5 border-t border-gray-100/5">
-                        {loading ? (
-                            <div className="flex items-center gap-2">
-                                <Loader2 size={14} className="animate-spin text-black/20" />
-                                <span className="text-[8px] font-semibold text-black/20">Loading stats...</span>
-                            </div>
-                        ) : stats && (
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                {[
-                                    { v: stats.pending_jobs + stats.pending_employers, l: 'PENDING',   c: 'text-yellow-500' },
-                                    { v: stats.total_employers,                        l: 'COMPANIES', c: 'text-nile-blue' },
-                                    { v: stats.active_jobs,                            l: 'JOBS LIVE', c: 'text-nile-green' },
-                                    { v: stats.total_students,                         l: 'STUDENTS',  c: 'text-black' },
-                                ].map(s => (
-                                    <div key={s.l}>
-                                        <p className={`text-xl md:text-2xl font-semibold leading-none ${s.c} counter-reveal`}>{s.v.toLocaleString()}</p>
-                                        <p className="text-[7px] font-semibold text-black/30 mt-1">{s.l}</p>
-                                    </div>
-                                ))}
+                    <div className="flex flex-wrap gap-6 mt-5 pt-5 border-t border-gray-100">
+                        <div className="text-left">
+                            <p className="text-xl font-semibold leading-none text-gray-900">{totalViews === null ? '—' : totalViews}</p>
+                            <p className="text-xs text-gray-400 mt-1">Profile views</p>
+                        </div>
+                        {!loading && stats && (
+                            <div className="text-left">
+                                <p className="text-xl font-semibold leading-none text-nile-blue">{(stats.pending_jobs + stats.pending_employers).toLocaleString()}</p>
+                                <p className="text-xs text-gray-400 mt-1">Pending approvals</p>
                             </div>
                         )}
                     </div>
                 </div>
             </div>
 
-            {/* ── BODY ─────────────────────────────────────────────────────── */}
+            {/* Body */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 space-y-6">
+                    <Card title="About">
+                        <p className="text-sm text-gray-500 leading-relaxed">
+                            {name} is part of the {department} team, helping students find internships, SIWES
+                            placements, and graduate opportunities, and supporting employer partners through
+                            the hiring pipeline.
+                        </p>
+                    </Card>
 
-                {/* Contact + Quick Access */}
-                <div className="space-y-4">
-                    <div className="bg-white border border-gray-100 rounded-[20px] p-5 shadow-card space-y-4">
-                        <h3 className="text-[9px] font-semibold text-black/40 pb-3 border-b border-gray-100/5">CONTACT INFO</h3>
-                        {[
-                            { icon: <Mail size={13} />,   label: 'EMAIL',  value: email },
-                            { icon: <Shield size={13} />, label: 'ROLE',   value: 'CAREER SERVICES STAFF' },
-                            { icon: <MapPin size={13} />, label: 'OFFICE', value: 'Career Centre, Rm 402' },
-                        ].map(r => (
-                            <div key={r.label} className="flex items-start gap-3">
-                                <div className="w-8 h-8 bg-nile-white border border-gray-100 rounded-lg flex items-center justify-center text-nile-blue flex-shrink-0">{r.icon}</div>
-                                <div className="min-w-0">
-                                    <p className="text-[7px] font-semibold text-black/30">{r.label}</p>
-                                    <p className="text-[9px] font-semibold text-black truncate">{r.value}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="bg-white border border-gray-100 rounded-[20px] p-5 shadow-card space-y-2">
-                        <h3 className="text-[9px] font-semibold text-black/40 pb-3 border-b border-gray-100/5">QUICK ACCESS</h3>
-                        {[
-                            { label: 'Job Pipeline',    to: '/staff/jobs',     col: 'hover:bg-nile-blue hover:text-white hover:border-nile-blue' },
-                            { label: 'Career Services', to: '/staff/services', col: 'hover:bg-nile-green hover:text-white hover:border-nile-green' },
-                            { label: 'Events',          to: '/staff/events',   col: 'hover:bg-black hover:text-white hover:border-black' },
-                            { label: 'Reports',         to: '/staff/reports',  col: 'hover:bg-nile-blue hover:text-white hover:border-nile-blue' },
-                        ].map(a => (
-                            <button key={a.label} onClick={() => navigate(a.to)}
-                                className={`w-full text-left px-3 py-2.5 border border-gray-100/10 rounded-xl font-semibold text-[9px] text-black/50 transition-all ${a.col}`}>
-                                {a.label} →
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Platform overview */}
-                <div className="lg:col-span-2 space-y-5">
-                    <div className="bg-white border border-gray-100 rounded-[20px] p-6 shadow-card">
-                        <div className="flex items-center justify-between mb-5">
-                            <h3 className="text-[10px] font-semibold text-black/40">PLATFORM OVERVIEW</h3>
-                            {stats && (
-                                <div className="flex items-center gap-1.5 text-[8px] font-semibold text-nile-green">
-                                    <TrendingUp size={11} /> LIVE DATA
-                                </div>
-                            )}
+                    <Card title="Focus areas">
+                        <div className="flex flex-wrap gap-2">
+                            {FOCUS_AREAS.map(area => (
+                                <span key={area} className="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">
+                                    {area}
+                                </span>
+                            ))}
                         </div>
+                    </Card>
 
+                    <Card title="Platform activity" subtitle="Platform-wide totals, not individually attributed">
                         {loading ? (
                             <div className="grid grid-cols-2 gap-4 animate-pulse">
-                                {[1,2,3,4].map(i => <div key={i} className="h-20 bg-black/5 rounded-[16px]" />)}
+                                {[1, 2, 3, 4].map(i => <div key={i} className="h-20 bg-gray-100 rounded-2xl" />)}
                             </div>
                         ) : stats ? (
                             <div className="grid grid-cols-2 gap-4">
                                 {[
-                                    { label: 'Students',      v: stats.total_students,     sub: 'REGISTERED ACCOUNTS',       c: 'bg-nile-blue/5 border-nile-blue/20', cv: 'text-nile-blue' },
-                                    { label: 'Employers',     v: stats.total_employers,    sub: `${stats.pending_employers} PENDING`,    c: 'bg-yellow-50 border-yellow-200', cv: 'text-yellow-600' },
-                                    { label: 'Active Jobs',   v: stats.active_jobs,        sub: `${stats.pending_jobs} PENDING REVIEW`, c: 'bg-nile-green/5 border-nile-green/20', cv: 'text-nile-green' },
-                                    { label: 'Applications',  v: stats.total_applications, sub: 'TOTAL SUBMITTED',            c: 'bg-black/5 border-black/10', cv: 'text-black' },
+                                    { label: 'Students', v: stats.total_students, sub: 'Registered accounts', c: 'bg-nile-blue/5 border-nile-blue/10', cv: 'text-nile-blue' },
+                                    { label: 'Employers', v: stats.total_employers, sub: `${stats.pending_employers} pending`, c: 'bg-yellow-50 border-yellow-100', cv: 'text-yellow-600' },
+                                    { label: 'Active jobs', v: stats.active_jobs, sub: `${stats.pending_jobs} pending review`, c: 'bg-nile-green/5 border-nile-green/10', cv: 'text-nile-green' },
+                                    { label: 'Applications', v: stats.total_applications, sub: 'Total submitted', c: 'bg-gray-50 border-gray-100', cv: 'text-gray-700' },
                                 ].map(s => (
-                                    <div key={s.label} className={`border-[2px] rounded-[16px] p-4 ${s.c}`}>
+                                    <div key={s.label} className={`border rounded-2xl p-4 ${s.c}`}>
                                         <p className={`text-2xl font-semibold leading-none ${s.cv}`}>{s.v.toLocaleString()}</p>
-                                        <p className="text-[8px] font-semibold text-black/60 tracking-wide mt-1">{s.label}</p>
-                                        <p className="text-[7px] font-semibold text-black/30 mt-0.5">{s.sub}</p>
+                                        <p className="text-xs font-medium text-gray-600 mt-1">{s.label}</p>
+                                        <p className="text-xs text-gray-400 mt-0.5">{s.sub}</p>
                                     </div>
                                 ))}
                             </div>
                         ) : (
-                            <p className="text-[9px] font-semibold text-black/20 text-center py-8">Failed to load stats</p>
+                            <p className="text-sm text-gray-400 text-center py-8">Failed to load stats</p>
                         )}
-                    </div>
+                    </Card>
+                </div>
 
-                    {/* Branding */}
-                    <div className="bg-black rounded-[20px] p-6 border border-gray-100 shadow-green">
-                        <div className="flex items-center justify-between flex-wrap gap-4">
-                            <div>
-                                <p className="text-[7px] font-semibold text-white/40 mb-2">POWERED BY</p>
-                                <NileConnectLogo size="sm" showText showTagline animated textColor="white" />
-                            </div>
-                            <div className="text-right">
-                                <p className="text-[7px] font-semibold text-white/30">STAFF CONSOLE</p>
-                                <p className="text-[9px] font-semibold text-nile-green mt-0.5">v2.0 · LIVE</p>
-                            </div>
+                <div className="space-y-6">
+                    <Card title="Role & department">
+                        <div className="space-y-3">
+                            {[
+                                { icon: <Mail size={14} />, label: 'Email', value: email },
+                                { icon: <Shield size={14} />, label: 'Role', value: 'Career services staff' },
+                                { icon: <MapPin size={14} />, label: 'Office', value: 'Career Centre, Rm 402' },
+                            ].map(r => (
+                                <div key={r.label} className="flex items-start gap-3">
+                                    <div className="w-8 h-8 bg-nile-white border border-gray-100 rounded-lg flex items-center justify-center text-nile-blue flex-shrink-0">{r.icon}</div>
+                                    <div className="min-w-0">
+                                        <p className="text-xs text-gray-400">{r.label}</p>
+                                        <p className="text-sm font-medium text-gray-900 truncate">{r.value}</p>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                    </div>
+                    </Card>
+
+                    <Card title="Connect">
+                        <div className="space-y-2">
+                            <a
+                                href={email ? `mailto:${email}` : undefined}
+                                className="flex items-center gap-3 p-3 border border-gray-100 rounded-xl hover:bg-nile-blue hover:text-white transition-all group"
+                            >
+                                <Mail size={14} strokeWidth={3} className="flex-shrink-0" />
+                                <span className="text-xs font-medium truncate">{email || 'No email'}</span>
+                            </a>
+                            <a
+                                href="/staff/messages"
+                                className="flex items-center gap-3 p-3 border border-gray-100 rounded-xl hover:bg-nile-blue hover:text-white transition-all"
+                            >
+                                <Link2 size={14} strokeWidth={3} className="flex-shrink-0" />
+                                <span className="text-xs font-medium">Message this staff member</span>
+                            </a>
+                            <a
+                                href="https://nileuniversity.edu.ng"
+                                target="_blank" rel="noreferrer"
+                                className="flex items-center gap-3 p-3 border border-gray-100 rounded-xl hover:bg-nile-blue hover:text-white transition-all"
+                            >
+                                <ExternalLink size={14} strokeWidth={3} className="flex-shrink-0" />
+                                <span className="text-xs font-medium">Nile University</span>
+                            </a>
+                        </div>
+                    </Card>
                 </div>
             </div>
         </div>

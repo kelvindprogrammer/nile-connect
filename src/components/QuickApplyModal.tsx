@@ -1,10 +1,14 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Modal from './Modal';
 import Button from './Button';
 import { useToast } from '../context/ToastContext';
-import { Upload, CheckCircle2, FileText, Loader2 } from 'lucide-react';
-import { apiClient, getErrorMessage } from '../services/api';
+import { Upload, CheckCircle2, FileText, Loader2, AlertCircle } from 'lucide-react';
+import { getErrorMessage } from '../services/api';
 import { uploadFile } from '../services/messageService';
+import { getApplicationPackage, createDocument } from '../services/studentService';
+import { applyToJob } from '../services/jobService';
+import type { ApplicationPackage, Document } from '../types/application';
+import { DOCUMENT_TYPES } from '../types/application';
 
 interface QuickApplyModalProps {
     isOpen: boolean;
@@ -14,59 +18,106 @@ interface QuickApplyModalProps {
     jobId: string;
 }
 
+const docLabel = (type: string) => DOCUMENT_TYPES.find(d => d.value === type)?.label ?? type;
+
 const QuickApplyModal: React.FC<QuickApplyModalProps> = ({ isOpen, onClose, jobTitle, company, jobId }) => {
     const { showToast } = useToast();
     const [step, setStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [coverLetter, setCoverLetter] = useState('');
-    const [resumeUrl, setResumeUrl] = useState('');
-    const [uploadingCv, setUploadingCv] = useState(false);
-    const cvInputRef = useRef<HTMLInputElement>(null);
+    const [loadingPackage, setLoadingPackage] = useState(true);
+    const [pkg, setPkg] = useState<ApplicationPackage | null>(null);
+    const [selectedDocs, setSelectedDocs] = useState<Record<string, string>>({}); // type -> document id
+    const [uploadingType, setUploadingType] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const uploadTargetType = useRef<string | null>(null);
 
-    // Pre-fill from the student's saved CV, if they've uploaded one.
+    const loadPackage = useCallback(() => {
+        setLoadingPackage(true);
+        getApplicationPackage(jobId)
+            .then(data => {
+                setPkg(data);
+                // Pre-select the default (or only) document for each required/optional type.
+                const initial: Record<string, string> = {};
+                [...data.required_docs, ...data.optional_docs].forEach(type => {
+                    const docs = data.documents_by_type[type] || [];
+                    const preferred = docs.find(d => d.is_default) || docs[0];
+                    if (preferred) initial[type] = preferred.id;
+                });
+                setSelectedDocs(initial);
+            })
+            .catch(() => setPkg(null))
+            .finally(() => setLoadingPackage(false));
+    }, [jobId]);
+
     useEffect(() => {
         if (!isOpen) return;
-        apiClient
-            .get<{ data: { resume_url?: string } }>('/api/student/profile')
-            .then(({ data }) => setResumeUrl(data.data?.resume_url || ''))
-            .catch(() => {});
-    }, [isOpen]);
+        const t = setTimeout(() => {
+            setStep(1);
+            setCoverLetter('');
+            loadPackage();
+        }, 0);
+        return () => clearTimeout(t);
+    }, [isOpen, loadPackage]);
 
-    const handleCvUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleUploadNew = (type: string) => {
+        uploadTargetType.current = type;
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (!file) return;
-        if (file.type !== 'application/pdf') {
-            showToast('CV must be a PDF file', 'error');
-            if (cvInputRef.current) cvInputRef.current.value = '';
-            return;
-        }
+        const type = uploadTargetType.current;
+        if (!file || !type) return;
         if (file.size > 10 * 1024 * 1024) {
-            showToast('CV must be under 10MB', 'error');
-            if (cvInputRef.current) cvInputRef.current.value = '';
+            showToast('File must be under 10MB', 'error');
+            if (fileInputRef.current) fileInputRef.current.value = '';
             return;
         }
-        setUploadingCv(true);
+        setUploadingType(type);
         try {
             const { url } = await uploadFile(file);
-            setResumeUrl(url);
-            showToast('CV attached', 'success');
+            const doc: Document = await createDocument({
+                type,
+                title: file.name,
+                file_url: url,
+                file_name: file.name,
+                is_default: !(pkg?.documents_by_type[type]?.length),
+            });
+            setPkg(prev => prev && ({
+                ...prev,
+                documents_by_type: {
+                    ...prev.documents_by_type,
+                    [type]: [...(prev.documents_by_type[type] || []), doc],
+                },
+            }));
+            setSelectedDocs(prev => ({ ...prev, [type]: doc.id }));
+            showToast(`${docLabel(type)} uploaded`, 'success');
         } catch (err) {
-            showToast(err instanceof Error ? err.message : 'CV upload failed', 'error');
+            showToast(getErrorMessage(err, 'Upload failed'), 'error');
         } finally {
-            setUploadingCv(false);
-            if (cvInputRef.current) cvInputRef.current.value = '';
+            setUploadingType(null);
+            if (fileInputRef.current) fileInputRef.current.value = '';
         }
     };
 
+    const missingRequired = pkg
+        ? pkg.required_docs.filter(type => !selectedDocs[type])
+        : [];
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!resumeUrl) {
-            showToast('Please attach your CV before applying', 'error');
+        if (missingRequired.length > 0) {
+            showToast(`Please provide: ${missingRequired.map(docLabel).join(', ')}`, 'error');
             return;
         }
         setIsSubmitting(true);
         try {
-            await apiClient.post('/api/jobs', { job_id: jobId, cover_letter: coverLetter, resume_url: resumeUrl });
+            await applyToJob({
+                job_id: jobId,
+                cover_letter: coverLetter,
+                document_ids: Object.values(selectedDocs),
+            });
             setStep(2);
             showToast(`Successfully applied to ${company}!`, 'success');
         } catch (err) {
@@ -82,8 +133,46 @@ const QuickApplyModal: React.FC<QuickApplyModalProps> = ({ isOpen, onClose, jobT
         onClose();
     };
 
+    const renderDocPicker = (type: string, required: boolean) => {
+        const docs = pkg?.documents_by_type[type] || [];
+        const selected = selectedDocs[type] || '';
+        const busy = uploadingType === type;
+        return (
+            <div key={type} className="space-y-2">
+                <label className="text-[10px] font-black text-black tracking-widest uppercase flex items-center gap-2">
+                    {docLabel(type)}
+                    {required
+                        ? <span className="text-red-500">*</span>
+                        : <span className="text-[8px] font-bold text-nile-blue/40 normal-case">(optional)</span>}
+                </label>
+                {docs.length > 0 && (
+                    <select
+                        value={selected}
+                        onChange={e => setSelectedDocs(prev => ({ ...prev, [type]: e.target.value }))}
+                        className="w-full border-3 border-black rounded-2xl p-3 font-bold text-xs outline-none focus:shadow-brutalist-sm transition-all"
+                    >
+                        {!required && <option value="">— None —</option>}
+                        {docs.map(d => (
+                            <option key={d.id} value={d.id}>{d.title}{d.is_default ? ' (default)' : ''}</option>
+                        ))}
+                    </select>
+                )}
+                <button
+                    type="button"
+                    onClick={() => handleUploadNew(type)}
+                    disabled={busy}
+                    className="w-full border-3 border-black border-dashed rounded-2xl p-3 flex items-center justify-center gap-2 bg-nile-white/50 hover:bg-white transition-all text-[10px] font-black uppercase"
+                >
+                    {busy ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+                    {busy ? 'UPLOADING...' : docs.length > 0 ? 'UPLOAD ANOTHER' : `UPLOAD ${docLabel(type).toUpperCase()}`}
+                </button>
+            </div>
+        );
+    };
+
     return (
-        <Modal isOpen={isOpen} onClose={handleFinalClose} title={step === 1 ? "QUICK APPLICATION" : "APPLICATION SENT"}>
+        <Modal isOpen={isOpen} onClose={handleFinalClose} title={step === 1 ? "QUICK APPLICATION" : "APPLICATION SENT"} maxWidth="lg">
+            <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileChange} />
             {step === 1 ? (
                 <form onSubmit={handleSubmit} className="space-y-6 font-sans">
                     <div className="bg-nile-white p-6 rounded-2xl border-3 border-black mb-8">
@@ -92,35 +181,25 @@ const QuickApplyModal: React.FC<QuickApplyModalProps> = ({ isOpen, onClose, jobT
                         <p className="text-xs font-bold text-nile-blue/70 uppercase mt-1">{company}</p>
                     </div>
 
-                    <div className="space-y-3">
-                        <label className="text-[10px] font-black text-black tracking-widest uppercase">CV (PDF)</label>
-                        {resumeUrl ? (
-                            <div className="flex items-center justify-between gap-3 p-4 border-3 border-black rounded-2xl bg-nile-white/50">
-                                <div className="flex items-center gap-2 min-w-0">
-                                    <FileText className="text-nile-blue flex-shrink-0" size={18} />
-                                    <a href={resumeUrl} target="_blank" rel="noreferrer" className="text-[10px] font-black text-black uppercase underline truncate">
-                                        VIEW ATTACHED CV
-                                    </a>
+                    {loadingPackage ? (
+                        <div className="flex items-center justify-center py-10">
+                            <Loader2 size={28} className="animate-spin text-nile-blue/40" />
+                        </div>
+                    ) : !pkg ? (
+                        <div className="flex items-center gap-2 p-4 border-3 border-red-400 rounded-2xl bg-red-50 text-red-500 text-[10px] font-black uppercase">
+                            <AlertCircle size={16} /> Couldn't load document requirements. Try again.
+                        </div>
+                    ) : (
+                        <div className="space-y-5">
+                            {pkg.required_docs.length === 0 && pkg.optional_docs.length === 0 && (
+                                <div className="flex items-center gap-2 p-4 border-3 border-black rounded-2xl bg-nile-white/50 text-[10px] font-black uppercase">
+                                    <FileText size={16} className="text-nile-blue" /> No documents required for this role.
                                 </div>
-                                <button type="button" onClick={() => cvInputRef.current?.click()} className="text-[10px] font-black text-nile-blue uppercase hover:underline flex-shrink-0">
-                                    {uploadingCv ? <Loader2 size={14} className="animate-spin" /> : 'CHANGE'}
-                                </button>
-                            </div>
-                        ) : (
-                            <button
-                                type="button"
-                                onClick={() => cvInputRef.current?.click()}
-                                disabled={uploadingCv}
-                                className="w-full border-3 border-black border-dashed rounded-2xl p-8 flex flex-col items-center justify-center bg-nile-white/50 hover:bg-white transition-all cursor-pointer group"
-                            >
-                                {uploadingCv
-                                    ? <Loader2 className="text-nile-blue mb-2 animate-spin" size={24} />
-                                    : <Upload className="text-nile-blue mb-2 group-hover:-translate-y-1 transition-transform" size={24} />}
-                                <p className="text-[10px] font-black text-black uppercase">{uploadingCv ? 'UPLOADING...' : 'CLICK TO UPLOAD CV'}</p>
-                            </button>
-                        )}
-                        <input ref={cvInputRef} type="file" accept="application/pdf" className="hidden" onChange={handleCvUpload} />
-                    </div>
+                            )}
+                            {pkg.required_docs.map(type => renderDocPicker(type, true))}
+                            {pkg.optional_docs.map(type => renderDocPicker(type, false))}
+                        </div>
+                    )}
 
                     <div className="space-y-3">
                         <label className="text-[10px] font-black text-black tracking-widest uppercase">COVER NOTE (OPTIONAL)</label>
@@ -134,7 +213,7 @@ const QuickApplyModal: React.FC<QuickApplyModalProps> = ({ isOpen, onClose, jobT
 
                     <div className="flex justify-end gap-3 pt-6">
                         <Button variant="outline" onClick={handleFinalClose} type="button">CANCEL</Button>
-                        <Button variant="primary" type="submit" isLoading={isSubmitting}>SUBMIT APP</Button>
+                        <Button variant="primary" type="submit" isLoading={isSubmitting} disabled={loadingPackage || !pkg}>SUBMIT APP</Button>
                     </div>
                 </form>
             ) : (

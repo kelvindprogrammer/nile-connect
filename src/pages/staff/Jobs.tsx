@@ -181,6 +181,9 @@ const JobCard: React.FC<JobCardProps> = ({
                         </span>
                     )}
                 </div>
+                {job.status === 'rejected' && job.rejection_reason && (
+                    <p className="text-[8px] font-semibold text-red-500 mt-1">REASON: {job.rejection_reason}</p>
+                )}
             </div>
 
             {/* Actions */}
@@ -370,10 +373,16 @@ const StaffJobs: React.FC = () => {
     // ── Actions ───────────────────────────────────────────────────────────────
 
     const handleJobAction = async (job: StaffJob, action: 'active' | 'rejected' | 'archived') => {
+        let rejectionReason: string | undefined;
+        if (action === 'rejected') {
+            const input = window.prompt(`Reason for rejecting "${job.title}" (optional):`, '');
+            if (input === null) return; // cancelled
+            rejectionReason = input.trim() || undefined;
+        }
         setActionLoading(prev => ({ ...prev, [job.id]: true }));
         try {
-            await updateJobStatus(job.id, action);
-            setJobs(prev => prev.map(j => j.id === job.id ? { ...j, status: action } : j));
+            await updateJobStatus(job.id, action, rejectionReason);
+            setJobs(prev => prev.map(j => j.id === job.id ? { ...j, status: action, rejection_reason: rejectionReason ?? j.rejection_reason } : j));
             const verbs: Record<string, string> = { active: 'approved', rejected: 'rejected', archived: 'archived' };
             showToast(`"${job.title}" ${verbs[action]}.`, action === 'active' ? 'success' : 'error');
         } catch {

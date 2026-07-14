@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DashboardLayout from '../../layouts/DashboardLayout';
 import {
     Video, ArrowUpRight, Cpu, Sparkles, X, Clock, User, CheckCircle2,
     Zap, Copy, FileText, Loader2, Plus, MessageSquareText,
@@ -111,7 +110,7 @@ const CareerCenter = () => {
     };
 
     return (
-        <DashboardLayout>
+        <>
             <div className="p-4 md:p-10 space-y-6 md:space-y-8 font-sans bg-nile-white min-h-full pb-24">
 
                 {/* Header */}
@@ -351,7 +350,7 @@ const CareerCenter = () => {
                     </div>
                 </div>
             )}
-        </DashboardLayout>
+        </>
     );
 };
 

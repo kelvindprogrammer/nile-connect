@@ -1,419 +1,59 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-    Users, Building2, Briefcase, ClipboardList, CheckCircle2,
-    XCircle, ShieldCheck, FileText, BarChart2, MessageSquare,
-    Loader2, CalendarDays, TrendingUp
-} from 'lucide-react';
-import Card from '../../components/Card';
-import Button from '../../components/Button';
+import { ChevronRight, Sparkles } from 'lucide-react';
 import Avatar from '../../components/Avatar';
-import { useToast } from '../../context/ToastContext';
+import Feed from '../../components/Feed';
 import { useAuth } from '../../hooks/useAuth';
-import {
-    getDashboardStats,
-    getStaffEmployers,
-    getStaffJobs,
-    updateEmployerStatus,
-    updateJobStatus,
-    DashboardStats,
-    StaffEmployer,
-    StaffJob,
-} from '../../services/staffService';
-
-// ── Loading Skeleton ──────────────────────────────────────────────────────────
-
-const LoadingSkeleton = () => (
-    <div className="p-4 md:p-8 space-y-6 md:space-y-10 animate-pulse bg-nile-white min-h-full">
-        <div className="h-44 md:h-52 bg-black/5 rounded-3xl" />
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {[1, 2, 3, 4].map(i => <div key={i} className="h-28 md:h-36 bg-black/5 rounded-2xl" />)}
-        </div>
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 md:gap-10">
-            <div className="xl:col-span-8 space-y-6">
-                <div className="h-80 bg-black/5 rounded-2xl" />
-                <div className="h-80 bg-black/5 rounded-2xl" />
-            </div>
-            <div className="xl:col-span-4 space-y-6">
-                <div className="h-60 bg-black/5 rounded-2xl" />
-                <div className="h-72 bg-black/5 rounded-2xl" />
-            </div>
-        </div>
-    </div>
-);
-
-// ── Main Component ────────────────────────────────────────────────────────────
+import { getDashboardStats, DashboardStats } from '../../services/staffService';
 
 const StaffDashboard = () => {
     const navigate = useNavigate();
-    const { showToast } = useToast();
     const { user } = useAuth();
-
-    const [isLoading, setIsLoading] = useState(true);
     const [stats, setStats] = useState<DashboardStats | null>(null);
-    const [employers, setEmployers] = useState<StaffEmployer[]>([]);
-    const [jobs, setJobs] = useState<StaffJob[]>([]);
-    const [actionLoading, setActionLoading] = useState<Record<string, boolean>>({});
 
-    const staffName = user?.name || 'ADMIN';
-    const today = new Date().toLocaleDateString('en-NG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
-
-    const fetchAll = useCallback(async () => {
-        try {
-            const [s, e, j] = await Promise.all([
-                getDashboardStats(),
-                getStaffEmployers(),
-                getStaffJobs(),
-            ]);
-            setStats(s);
-            setEmployers(e);
-            setJobs(j);
-        } catch {
-            showToast('Failed to load dashboard data.', 'error');
-        } finally {
-            setIsLoading(false);
-        }
-    }, [showToast]);
+    const fetchStats = useCallback(() => {
+        getDashboardStats().then(setStats).catch(() => {});
+    }, []);
 
     useEffect(() => {
-        const t = setTimeout(fetchAll, 0);
+        const t = setTimeout(fetchStats, 0);
         return () => clearTimeout(t);
-    }, [fetchAll]);
+    }, [fetchStats]);
 
-    const pendingEmployers = employers.filter(e => e.status === 'pending');
-    const pendingJobs = jobs.filter(j => j.status === 'pending');
-    const totalPending = pendingEmployers.length + pendingJobs.length;
-
-    const handleEmployerAction = async (id: string, companyName: string, status: 'approved' | 'rejected') => {
-        setActionLoading(prev => ({ ...prev, [`emp-${id}`]: true }));
-        try {
-            await updateEmployerStatus(id, status);
-            setEmployers(prev => prev.map(e => e.id === id ? { ...e, status } : e));
-            showToast(`${companyName} has been ${status}.`, status === 'approved' ? 'success' : 'error');
-        } catch {
-            showToast(`Failed to update ${companyName}.`, 'error');
-        } finally {
-            setActionLoading(prev => ({ ...prev, [`emp-${id}`]: false }));
-        }
-    };
-
-    const handleJobAction = async (id: string, title: string, status: 'active' | 'rejected') => {
-        setActionLoading(prev => ({ ...prev, [`job-${id}`]: true }));
-        try {
-            await updateJobStatus(id, status);
-            setJobs(prev => prev.map(j => j.id === id ? { ...j, status } : j));
-            showToast(`"${title}" has been ${status === 'active' ? 'approved' : 'rejected'}.`, status === 'active' ? 'success' : 'error');
-        } catch {
-            showToast(`Failed to update job "${title}".`, 'error');
-        } finally {
-            setActionLoading(prev => ({ ...prev, [`job-${id}`]: false }));
-        }
-    };
-
-    if (isLoading) return <LoadingSkeleton />;
-
-    const statCards = [
-        { label: 'TOTAL STUDENTS', value: stats?.total_students ?? 0, icon: <Users size={18} />, color: 'bg-black text-white' },
-        { label: 'TOTAL EMPLOYERS', value: stats?.total_employers ?? 0, icon: <Building2 size={18} />, color: 'bg-nile-green/20 text-nile-green' },
-        { label: 'ACTIVE JOBS', value: stats?.active_jobs ?? 0, icon: <Briefcase size={18} />, color: 'bg-nile-blue/10 text-nile-blue' },
-        { label: 'APPLICATIONS', value: stats?.total_applications ?? 0, icon: <ClipboardList size={18} />, color: 'bg-black/5 text-black' },
-    ];
+    const staffName = user?.name || 'Staff';
+    const totalPending = (stats?.pending_employers ?? 0) + (stats?.pending_jobs ?? 0);
 
     return (
-        <div className="p-4 md:p-8 space-y-8 md:space-y-12 anime-fade-in font-sans bg-nile-white min-h-full pb-20 md:pb-8 text-left">
+        <div className="max-w-2xl mx-auto p-4 md:py-6 space-y-4 anime-fade-in font-sans pb-24 md:pb-6">
 
-            {/* ── Hero ─────────────────────────────────────────────── */}
-            <section className="bg-white border border-gray-100 rounded-[24px] md:rounded-[40px] shadow-card md:shadow-card p-6 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-1/3 h-full bg-black/[0.03] -skew-x-12 translate-x-1/2 pointer-events-none" />
-
-                <div className="space-y-4 z-10 w-full md:max-w-lg">
-                    <div className="flex flex-wrap items-center gap-2">
-                        <span className="px-3 py-1 bg-black text-white text-[8px] md:text-[10px] font-semibold rounded-full">
-                            STAFF CONSOLE
-                        </span>
-                        {totalPending > 0 && (
-                            <span className="px-3 py-1 bg-red-500 text-white text-[8px] md:text-[10px] font-semibold rounded-full animate-pulse">
-                                {totalPending} PENDING
-                            </span>
-                        )}
-                    </div>
-                    <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">
-                        WELCOME,<br />
-                        <span className="text-nile-green">{staffName}</span>
-                    </h2>
-                    <p className="text-[10px] md:text-xs font-bold text-black/40 flex items-center gap-2">
-                        <CalendarDays size={12} /> {today}
-                    </p>
-                    <div className="flex flex-wrap gap-3 pt-1">
-                        <Button onClick={() => navigate('/staff/services')} size="sm">
-                            <FileText size={14} className="mr-1.5" /> CV REVIEW
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => navigate('/staff/applications')}>
-                            <ShieldCheck size={14} className="mr-1.5" /> VERIFICATIONS
-                        </Button>
-                    </div>
+            {/* ── Identity header ─────────────────────────────────────── */}
+            <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-4 flex items-center gap-4">
+                <Avatar name={staffName} size="lg" />
+                <div className="flex-1 min-w-0">
+                    <h1 className="text-lg font-semibold text-gray-900 leading-tight truncate">Welcome, {staffName.split(' ')[0]}</h1>
+                    <p className="text-xs text-gray-400 mt-0.5">{user?.department || 'Career Services'}</p>
                 </div>
-
-                <div className="hidden md:flex flex-col justify-between w-64 h-44 bg-white border border-gray-100 rounded-[28px] p-6 shadow-green z-10 flex-shrink-0">
-                    <div className="flex justify-between items-start">
-                        <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center text-white">
-                            <TrendingUp size={18} />
-                        </div>
-                        <span className="text-[9px] font-semibold text-black/30">LIVE METRICS</span>
-                    </div>
-                    <div className="space-y-1">
-                        <h4 className="text-4xl font-semibold text-black leading-none">
-                            {stats ? (stats.pending_employers + stats.pending_jobs) : '—'}
-                        </h4>
-                        <p className="text-[9px] font-semibold text-black/40">ITEMS AWAITING ACTION</p>
-                    </div>
-                    <div className="flex items-center gap-2 text-[9px] font-semibold text-nile-green">
-                        <CheckCircle2 size={12} strokeWidth={3} />
-                        <span>PLATFORM OPERATIONAL</span>
-                    </div>
-                </div>
-            </section>
-
-            {/* ── Stat Cards ───────────────────────────────────────── */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-                {statCards.map(s => (
-                    <div key={s.label} className="bg-white border border-gray-100 rounded-[20px] shadow-card p-4 md:p-6 hover:translate-y-[-3px] transition-all">
-                        <div className="flex justify-between items-start mb-3">
-                            <div className={`w-9 h-9 md:w-10 md:h-10 rounded-xl border border-gray-100 flex items-center justify-center ${s.color}`}>
-                                {s.icon}
-                            </div>
-                            <span className="text-[8px] font-semibold bg-black/5 text-black/40 px-2 py-0.5 rounded-full border border-black/10 tracking-wider">LIVE</span>
-                        </div>
-                        <h3 className="text-2xl md:text-4xl font-semibold text-black leading-none">
-                            {s.value.toLocaleString()}
-                        </h3>
-                        <p className="text-[8px] md:text-[10px] font-semibold text-black/40 mt-2">{s.label}</p>
-                    </div>
-                ))}
+                <button onClick={() => navigate('/staff/insights')}
+                    className="hidden sm:flex items-center gap-1 text-xs font-medium text-gray-400 hover:text-gray-900 transition-colors flex-shrink-0">
+                    <Sparkles size={13} /> Insights <ChevronRight size={13} />
+                </button>
             </div>
 
-            {/* ── Operational Grid ─────────────────────────────────── */}
-            <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 md:gap-10">
+            {/* ── Pending-approvals pill (time-sensitive, must not be buried) ── */}
+            {totalPending > 0 && (
+                <button onClick={() => navigate('/staff/insights')}
+                    className="w-full flex items-center justify-between gap-3 px-4 py-3 bg-red-50 border border-red-100 rounded-2xl hover:bg-red-100/60 transition-colors">
+                    <span className="text-sm font-medium text-red-600">
+                        {totalPending} pending approval{totalPending !== 1 ? 's' : ''} need your attention
+                    </span>
+                    <ChevronRight size={16} className="text-red-400 flex-shrink-0" />
+                </button>
+            )}
 
-                {/* Left: Queues */}
-                <div className="xl:col-span-8 space-y-8">
-
-                    {/* Employer Verification Queue */}
-                    <QueueSection
-                        title="EMPLOYER VERIFICATION QUEUE"
-                        icon={<Building2 size={16} />}
-                        badgeCount={pendingEmployers.length}
-                        emptyLabel="No pending employer verifications"
-                    >
-                        {pendingEmployers.map(emp => (
-                            <div key={emp.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 md:p-5 bg-nile-white/60 border border-gray-100 rounded-[20px] hover:bg-white transition-all gap-4">
-                                <div className="flex items-center gap-4 min-w-0 flex-1">
-                                    <div className="w-10 h-10 bg-black text-white rounded-xl flex items-center justify-center font-semibold text-sm flex-shrink-0">
-                                        {emp.company_name.charAt(0).toUpperCase()}
-                                    </div>
-                                    <div className="min-w-0">
-                                        <p className="font-semibold text-[12px] md:text-sm text-black leading-none mb-1 truncate">{emp.company_name}</p>
-                                        <p className="text-[8px] md:text-[9px] font-semibold text-black/40 tracking-wider truncate">
-                                            {emp.industry} &bull; {emp.location}
-                                        </p>
-                                        <p className="text-[8px] font-bold text-nile-blue/60 truncate">{emp.contact_email}</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-2 w-full sm:w-auto justify-end shrink-0">
-                                    <ActionButton
-                                        label="APPROVE"
-                                        isLoading={actionLoading[`emp-${emp.id}`]}
-                                        onClick={() => handleEmployerAction(emp.id, emp.company_name, 'approved')}
-                                        variant="approve"
-                                    />
-                                    <ActionButton
-                                        label="REJECT"
-                                        isLoading={actionLoading[`emp-${emp.id}`]}
-                                        onClick={() => handleEmployerAction(emp.id, emp.company_name, 'rejected')}
-                                        variant="reject"
-                                    />
-                                </div>
-                            </div>
-                        ))}
-                    </QueueSection>
-
-                    {/* Job Approval Queue */}
-                    <QueueSection
-                        title="JOB APPROVAL QUEUE"
-                        icon={<Briefcase size={16} />}
-                        badgeCount={pendingJobs.length}
-                        emptyLabel="No pending job approvals"
-                    >
-                        {pendingJobs.map(job => (
-                            <div key={job.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 md:p-5 bg-nile-white/60 border border-gray-100 rounded-[20px] hover:bg-white transition-all gap-4">
-                                <div className="flex items-center gap-4 min-w-0 flex-1">
-                                    <div className="w-10 h-10 bg-nile-blue/10 text-nile-blue rounded-xl flex items-center justify-center border border-gray-100 flex-shrink-0">
-                                        <Briefcase size={16} />
-                                    </div>
-                                    <div className="min-w-0">
-                                        <p className="font-semibold text-[12px] md:text-sm text-black leading-none mb-1 truncate">{job.title}</p>
-                                        <p className="text-[8px] md:text-[9px] font-semibold text-black/40 tracking-wider truncate">
-                                            {job.company} &bull; {job.type} &bull; {job.location}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-2 w-full sm:w-auto justify-end shrink-0">
-                                    <ActionButton
-                                        label="APPROVE"
-                                        isLoading={actionLoading[`job-${job.id}`]}
-                                        onClick={() => handleJobAction(job.id, job.title, 'active')}
-                                        variant="approve"
-                                    />
-                                    <ActionButton
-                                        label="REJECT"
-                                        isLoading={actionLoading[`job-${job.id}`]}
-                                        onClick={() => handleJobAction(job.id, job.title, 'rejected')}
-                                        variant="reject"
-                                    />
-                                </div>
-                            </div>
-                        ))}
-                    </QueueSection>
-                </div>
-
-                {/* Right: Sidebar */}
-                <div className="xl:col-span-4 space-y-8">
-
-                    {/* Quick Actions */}
-                    <Card title="QUICK ACTIONS">
-                        <div className="grid grid-cols-2 gap-3">
-                            {[
-                                { label: 'REVIEW CVs', icon: <FileText size={18} />, path: '/staff/services', color: 'bg-black text-white' },
-                                { label: 'ALL STUDENTS', icon: <Users size={18} />, path: '/staff/services?tab=students', color: 'bg-nile-green/20 text-nile-green' },
-                                { label: 'GENERATE REPORT', icon: <BarChart2 size={18} />, path: '/staff/services?tab=reporting', color: 'bg-nile-blue/10 text-nile-blue' },
-                                { label: 'CRM', icon: <MessageSquare size={18} />, path: '/staff/crm', color: 'bg-black/5 text-black' },
-                            ].map(qa => (
-                                <button
-                                    key={qa.label}
-                                    onClick={() => navigate(qa.path)}
-                                    className="flex flex-col items-start gap-3 p-4 bg-nile-white border border-gray-100 rounded-[16px] hover:bg-white hover:shadow-card hover:translate-y-[-2px] transition-all text-left"
-                                >
-                                    <div className={`w-9 h-9 rounded-lg border border-gray-100 flex items-center justify-center ${qa.color}`}>
-                                        {qa.icon}
-                                    </div>
-                                    <span className="text-[9px] font-semibold text-black leading-tight">{qa.label}</span>
-                                </button>
-                            ))}
-                        </div>
-                    </Card>
-
-                    {/* Engagement Metrics */}
-                    <Card title="ENGAGEMENT METRICS">
-                        <div className="space-y-5">
-                            {[
-                                { label: 'STUDENTS', value: stats?.total_students ?? 0, max: Math.max(stats?.total_students ?? 1, 1), color: 'bg-black' },
-                                { label: 'EMPLOYERS', value: stats?.total_employers ?? 0, max: Math.max(stats?.total_employers ?? 1, 1), color: 'bg-nile-green' },
-                                { label: 'ACTIVE JOBS', value: stats?.active_jobs ?? 0, max: Math.max(stats?.active_jobs ?? 1, 1), color: 'bg-nile-blue' },
-                                { label: 'APPLICATIONS', value: stats?.total_applications ?? 0, max: Math.max(stats?.total_applications ?? 1, 1), color: 'bg-black/60' },
-                            ].map(bar => {
-                                const total = (stats?.total_students ?? 1) + (stats?.total_employers ?? 0) + (stats?.active_jobs ?? 0) + (stats?.total_applications ?? 0);
-                                const pct = total > 0 ? Math.round((bar.value / total) * 100) : 0;
-                                return (
-                                    <div key={bar.label} className="space-y-1.5">
-                                        <div className="flex justify-between text-[8px] md:text-[9px] font-semibold">
-                                            <span className="text-black/60">{bar.label}</span>
-                                            <span className="text-black">{bar.value.toLocaleString()}</span>
-                                        </div>
-                                        <div className="h-3 bg-nile-white border border-gray-100 rounded-full overflow-hidden p-0.5">
-                                            <div
-                                                className={`h-full ${bar.color} rounded-full transition-all duration-700`}
-                                                style={{ width: `${Math.max(pct, 2)}%` }}
-                                            />
-                                        </div>
-                                    </div>
-                                );
-                            })}
-
-                            {stats && (
-                                <div className="pt-3 border-t border-gray-100/5 grid grid-cols-2 gap-3">
-                                    <div className="bg-nile-white border border-gray-100 rounded-[12px] p-3 text-center">
-                                        <p className="text-lg font-semibold text-black leading-none">{stats.pending_employers}</p>
-                                        <p className="text-[7px] font-semibold text-black/40 mt-1">PENDING EMP.</p>
-                                    </div>
-                                    <div className="bg-nile-white border border-gray-100 rounded-[12px] p-3 text-center">
-                                        <p className="text-lg font-semibold text-black leading-none">{stats.upcoming_events}</p>
-                                        <p className="text-[7px] font-semibold text-black/40 mt-1">UPCOMING EVT.</p>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </Card>
-                </div>
-            </div>
+            {/* ── Feed ─────────────────────────────────────────────────── */}
+            <Feed />
         </div>
     );
 };
-
-// ── Sub-components ────────────────────────────────────────────────────────────
-
-const QueueSection = ({
-    title, icon, badgeCount, emptyLabel, children
-}: {
-    title: string;
-    icon: React.ReactNode;
-    badgeCount: number;
-    emptyLabel: string;
-    children: React.ReactNode;
-}) => (
-    <div className="bg-white border border-gray-100 rounded-[24px] shadow-card overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100/5">
-            <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-black text-white rounded-lg flex items-center justify-center flex-shrink-0">
-                    {icon}
-                </div>
-                <h3 className="text-[10px] md:text-xs font-semibold text-black">{title}</h3>
-            </div>
-            {badgeCount > 0 ? (
-                <span className="text-[8px] font-semibold bg-red-500 text-white px-2.5 py-1 rounded-full tracking-wider">
-                    {badgeCount} PENDING
-                </span>
-            ) : (
-                <span className="text-[8px] font-semibold bg-nile-green/20 text-nile-green px-2.5 py-1 rounded-full tracking-wider">
-                    CLEAR
-                </span>
-            )}
-        </div>
-        <div className="p-4 md:p-5 space-y-3">
-            {React.Children.count(children) === 0 || badgeCount === 0 ? (
-                <div className="py-12 text-center border-2 border-dashed border-black/10 rounded-[20px]">
-                    <CheckCircle2 size={28} className="text-nile-green/30 mx-auto mb-3" />
-                    <p className="text-[9px] font-semibold text-black/30">{emptyLabel}</p>
-                </div>
-            ) : children}
-        </div>
-    </div>
-);
-
-const ActionButton = ({
-    label, isLoading, onClick, variant
-}: {
-    label: string;
-    isLoading: boolean;
-    onClick: () => void;
-    variant: 'approve' | 'reject';
-}) => (
-    <button
-        onClick={onClick}
-        disabled={isLoading}
-        className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-100 font-semibold text-[9px] shadow-card transition-all disabled:opacity-50 disabled:pointer-events-none
-            ${variant === 'approve'
-                ? 'bg-nile-green text-white'
-                : 'bg-white text-red-500 hover:bg-red-50'
-            }`}
-    >
-        {isLoading
-            ? <Loader2 size={12} className="animate-spin" />
-            : variant === 'approve'
-                ? <CheckCircle2 size={12} strokeWidth={3} />
-                : <XCircle size={12} strokeWidth={3} />
-        }
-        <span className="hidden sm:inline">{label}</span>
-    </button>
-);
 
 export default StaffDashboard;

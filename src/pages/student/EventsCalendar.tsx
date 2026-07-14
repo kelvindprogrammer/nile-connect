@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import DashboardLayout from '../../layouts/DashboardLayout';
 import { MapPin, CalendarDays, Clock, Users, ArrowRight, Loader2 } from 'lucide-react';
 import Button from '../../components/Button';
 import { apiClient } from '../../services/api';
@@ -69,7 +68,7 @@ const EventsCalendar = () => {
     };
 
     return (
-        <DashboardLayout>
+        <>
             <div className="p-4 md:p-10 space-y-6 md:space-y-10 font-sans bg-nile-white min-h-full pb-24 text-left">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-gray-100 pb-6 md:pb-10">
@@ -148,7 +147,7 @@ const EventsCalendar = () => {
                     </>
                 )}
             </div>
-        </DashboardLayout>
+        </>
     );
 };
 

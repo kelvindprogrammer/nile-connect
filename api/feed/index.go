@@ -25,12 +25,20 @@ type postResponse struct {
 	LikesCount    int       `json:"likes_count"`
 	CommentsCount int       `json:"comments_count"`
 	Liked         bool      `json:"liked"`
+	JobID         *string   `json:"job_id,omitempty"`
+	Kind          string    `json:"kind"`
 	CreatedAt     time.Time `json:"created_at"`
 }
 
+var allowedPostKinds = map[string]bool{
+	"text": true, "job": true, "achievement": true, "announcement": true,
+}
+
 type createPostRequest struct {
-	Content  string `json:"content"`
-	MediaUrl string `json:"media_url"`
+	Content  string  `json:"content"`
+	MediaUrl string  `json:"media_url"`
+	JobID    *string `json:"job_id"`
+	Kind     string  `json:"kind"`
 }
 
 func Handler(w http.ResponseWriter, r *http.Request) {
@@ -113,11 +121,29 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 			respond.Error(w, http.StatusBadRequest, "content is required")
 			return
 		}
+		kind := req.Kind
+		if kind == "" {
+			kind = "text"
+		}
+		if !allowedPostKinds[kind] {
+			respond.Error(w, http.StatusBadRequest, "invalid kind")
+			return
+		}
+		if kind == "announcement" && auth.Role == "student" {
+			respond.Error(w, http.StatusForbidden, "only employers and staff can post announcements")
+			return
+		}
+		if kind == "job" && (req.JobID == nil || *req.JobID == "") {
+			respond.Error(w, http.StatusBadRequest, "job_id is required for a job share")
+			return
+		}
 		post := models.Post{
 			AuthorID:   auth.UserID,
 			AuthorType: auth.Role,
 			Content:    req.Content,
 			MediaUrl:   req.MediaUrl,
+			JobID:      req.JobID,
+			Kind:       kind,
 		}
 		if err := database.Create(&post).Error; err != nil {
 			respond.Error(w, http.StatusInternalServerError, "could not create post")
@@ -136,6 +162,10 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func toPostResponse(p *models.Post) postResponse {
+	kind := p.Kind
+	if kind == "" {
+		kind = "text"
+	}
 	return postResponse{
 		ID:            p.ID,
 		AuthorID:      p.AuthorID,
@@ -144,6 +174,8 @@ func toPostResponse(p *models.Post) postResponse {
 		MediaUrl:      p.MediaUrl,
 		LikesCount:    p.LikesCount,
 		CommentsCount: p.CommentsCount,
+		JobID:         p.JobID,
+		Kind:          kind,
 		CreatedAt:     p.CreatedAt,
 	}
 }

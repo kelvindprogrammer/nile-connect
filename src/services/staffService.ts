@@ -15,7 +15,7 @@ export interface DashboardStats {
 export interface StaffApplication {
     id: string; student_id: string; student_name: string;
     job_id: string; job_title: string; company: string;
-    status: string; applied_at: string | null;
+    status: string; stage?: string; applied_at: string | null;
     cover_letter: string; resume_url: string;
 }
 
@@ -23,12 +23,15 @@ export interface StaffJob {
     id: string; title: string; company: string;
     employer_id: string; type: string; location: string;
     status: string; posted_at: string;
+    rejection_reason?: string;
 }
 
 export interface StaffEmployer {
     id: string; company_name: string; industry: string;
     location: string; contact_email: string;
     status: string; created_at: string;
+    is_verified?: boolean;
+    email_verified?: boolean;
 }
 
 export interface StaffStudent {
@@ -85,8 +88,11 @@ export const getStaffJobs = async (): Promise<StaffJob[]> => {
     return data.data.jobs ?? [];
 };
 
-export const updateJobStatus = async (jobId: string, status: string): Promise<void> => {
-    await apiClient.put(`/api/staff/jobs?id=${jobId}`, { status });
+export const updateJobStatus = async (jobId: string, status: string, rejectionReason?: string): Promise<void> => {
+    await apiClient.put(`/api/staff/jobs?id=${jobId}`, {
+        status,
+        ...(rejectionReason ? { rejection_reason: rejectionReason } : {}),
+    });
 };
 
 export const postJob = async (req: PostJobRequest): Promise<void> => {
@@ -98,8 +104,11 @@ export const getStaffEmployers = async (): Promise<StaffEmployer[]> => {
     return data.data.employers ?? [];
 };
 
-export const updateEmployerStatus = async (profileId: string, status: string): Promise<void> => {
-    await apiClient.put(`/api/staff/employers?id=${profileId}`, { status });
+export const updateEmployerStatus = async (
+    profileId: string,
+    payload: { status?: string; is_verified?: boolean }
+): Promise<void> => {
+    await apiClient.put(`/api/staff/employers?id=${profileId}`, payload);
 };
 
 export const getStaffStudents = async (): Promise<StaffStudent[]> => {

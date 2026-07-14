@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DashboardLayout from '../../layouts/DashboardLayout';
 import {
     Mail, Download, ExternalLink, Edit2, MapPin, GraduationCap,
     Plus, Link2, LogOut, Loader2, ShieldCheck, Phone,
@@ -12,6 +11,7 @@ import Button from '../../components/Button';
 import { apiClient } from '../../services/api';
 import { useProfile, calculateProfileStrength } from '../../hooks/useProfile';
 import { useProfilePicture } from '../../hooks/useProfilePicture';
+import { recordProfileView, getEndorsements, type EndorsementsResponse } from '../../services/profileService';
 
 interface StudentProfile {
     id: string;
@@ -34,6 +34,8 @@ const Profile = () => {
     const [apiProfile, setApiProfile] = useState<StudentProfile | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [showCvModal, setShowCvModal] = useState(false);
+    const [totalViews, setTotalViews] = useState<number | null>(null);
+    const [endorsements, setEndorsements] = useState<EndorsementsResponse | null>(null);
 
     useEffect(() => {
         apiClient
@@ -42,6 +44,14 @@ const Profile = () => {
             .catch(() => {})
             .finally(() => setIsLoading(false));
     }, []);
+
+    useEffect(() => {
+        if (!user?.id) return;
+        recordProfileView(user.id).then(r => setTotalViews(r.total_views)).catch(() => {});
+        getEndorsements(user.id).then(setEndorsements).catch(() => {});
+    }, [user?.id]);
+
+    const endorsementCount = (skill: string) => endorsements?.endorsements.find(e => e.skill === skill)?.count ?? 0;
 
     const displayName = apiProfile?.full_name || user?.name || 'USER';
     const major = profile.major || apiProfile?.major || user?.major || 'Computer Science';
@@ -54,11 +64,11 @@ const Profile = () => {
 
     if (isLoading) {
         return (
-            <DashboardLayout>
+            <>
                 <div className="flex items-center justify-center h-64">
                     <Loader2 size={32} className="animate-spin text-nile-blue/40" />
                 </div>
-            </DashboardLayout>
+            </>
         );
     }
 
@@ -66,7 +76,7 @@ const Profile = () => {
     const strengthBg = strength >= 80 ? 'bg-nile-green' : strength >= 50 ? 'bg-nile-blue' : 'bg-red-400';
 
     return (
-        <DashboardLayout>
+        <>
             <div className="p-4 md:p-8 space-y-6 md:space-y-8 anime-fade-in font-sans pb-24 text-left">
 
                 {/* Banner */}
@@ -125,7 +135,7 @@ const Profile = () => {
 
                         <div className="flex flex-wrap gap-6 md:gap-10 mt-5 pt-5 md:pt-6 border-t border-gray-100">
                             <StatBadge value="—" label="Apps" />
-                            <StatBadge value="—" label="Hits" />
+                            <StatBadge value={totalViews === null ? '—' : String(totalViews)} label="Profile views" />
                             <StatBadge value="—" label="Offers" />
                             <StatBadge value={`${strength}%`} label="Strength" highlight />
                         </div>
@@ -195,11 +205,19 @@ const Profile = () => {
                         {profile.skills.length > 0 && (
                             <SectionCard title="Skills">
                                 <div className="flex flex-wrap gap-2">
-                                    {profile.skills.map(s => (
-                                        <span key={s} className="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">
-                                            {s}
-                                        </span>
-                                    ))}
+                                    {profile.skills.map(s => {
+                                        const count = endorsementCount(s);
+                                        return (
+                                            <span key={s} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">
+                                                {s}
+                                                {count > 0 && (
+                                                    <span className="px-1.5 py-0.5 rounded-full bg-nile-blue/10 text-nile-blue text-[10px] font-semibold">
+                                                        {count}
+                                                    </span>
+                                                )}
+                                            </span>
+                                        );
+                                    })}
                                 </div>
                             </SectionCard>
                         )}
@@ -301,7 +319,7 @@ const Profile = () => {
                     </div>
                 </div>
             )}
-        </DashboardLayout>
+        </>
     );
 };
 

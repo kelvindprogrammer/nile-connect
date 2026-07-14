@@ -2,20 +2,28 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Search, Users, GraduationCap, CheckCircle2,
-    MessageSquare, ArrowUpRight, Briefcase,
+    MessageSquare, ArrowUpRight, Briefcase, Star,
 } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 import { getEmployerApplications, EmployerApplication } from '../../services/employerService';
+import { APPLICATION_STAGES } from '../../types/application';
 
-type FilterStatus = 'all' | 'applied' | 'screening' | 'interview' | 'offer' | 'rejected';
+type FilterStatus = 'all' | string;
 
 const statusBadge: Record<string, string> = {
-    applied:   'bg-nile-blue/10 text-nile-blue border-nile-blue/20',
-    screening: 'bg-purple-50 text-purple-600 border-purple-200',
-    interview: 'bg-orange-50 text-orange-500 border-orange-200',
-    offer:     'bg-nile-green/20 text-nile-green border-nile-green/30',
-    rejected:  'bg-red-50 text-red-500 border-red-200',
+    submitted:            'bg-nile-blue/10 text-nile-blue border-nile-blue/20',
+    under_review:         'bg-purple-50 text-purple-600 border-purple-200',
+    shortlisted:          'bg-orange-50 text-orange-500 border-orange-200',
+    interview_scheduled:  'bg-orange-50 text-orange-500 border-orange-200',
+    assessment_sent:      'bg-yellow-50 text-yellow-600 border-yellow-200',
+    offer_extended:       'bg-nile-green/20 text-nile-green border-nile-green/30',
+    accepted:             'bg-nile-green/20 text-nile-green border-nile-green/30',
+    rejected:             'bg-red-50 text-red-500 border-red-200',
+    withdrawn:            'bg-black/5 text-black/40 border-black/10',
 };
+
+const stageLabel = (s: string) => APPLICATION_STAGES.find(x => x.value === s)?.label ?? s;
+const stageRank: string[] = APPLICATION_STAGES.map(s => s.value);
 
 const EmployerCandidates = () => {
     const navigate = useNavigate();
@@ -44,11 +52,11 @@ const EmployerCandidates = () => {
             const existing = map.get(app.student_id);
             if (existing) {
                 existing.jobs.push(app.job_title);
-                // prefer higher-stage status
-                const rank = ['rejected', 'applied', 'screening', 'interview', 'offer'];
-                if (rank.indexOf(app.status) > rank.indexOf(existing.status)) {
-                    existing.status = app.status;
+                // prefer higher-stage application
+                if (stageRank.indexOf(app.stage) > stageRank.indexOf(existing.stage)) {
+                    existing.stage = app.stage;
                 }
+                if (app.rating > existing.rating) existing.rating = app.rating;
             } else {
                 map.set(app.student_id, { ...app, jobs: [app.job_title] });
             }
@@ -57,7 +65,7 @@ const EmployerCandidates = () => {
     }, [applications]);
 
     const filtered = useMemo(() => candidates
-        .filter(c => filterStatus === 'all' || c.status === filterStatus)
+        .filter(c => filterStatus === 'all' || c.stage === filterStatus)
         .filter(c => !search ||
             (c.student_name || '').toLowerCase().includes(search.toLowerCase()) ||
             (c.major || '').toLowerCase().includes(search.toLowerCase()) ||
@@ -95,11 +103,16 @@ const EmployerCandidates = () => {
                         className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-100 font-semibold text-[9px] outline-none focus:shadow-card bg-nile-white/60 focus:bg-white transition-all" />
                 </div>
                 <div className="flex bg-white p-1 border border-gray-100 rounded-xl gap-0.5 overflow-x-auto">
-                    {(['all', 'applied', 'screening', 'interview', 'offer', 'rejected'] as FilterStatus[]).map(f => (
-                        <button key={f} onClick={() => setFilterStatus(f)}
+                    <button onClick={() => setFilterStatus('all')}
+                        className={`px-2.5 py-1.5 rounded-lg font-semibold text-[7px] tracking-wider transition-all whitespace-nowrap
+                            ${filterStatus === 'all' ? 'bg-black text-white' : 'text-black/40 hover:text-black'}`}>
+                        ALL
+                    </button>
+                    {APPLICATION_STAGES.map(f => (
+                        <button key={f.value} onClick={() => setFilterStatus(f.value)}
                             className={`px-2.5 py-1.5 rounded-lg font-semibold text-[7px] tracking-wider transition-all whitespace-nowrap
-                                ${filterStatus === f ? 'bg-black text-white' : 'text-black/40 hover:text-black'}`}>
-                            {f}
+                                ${filterStatus === f.value ? 'bg-black text-white' : 'text-black/40 hover:text-black'}`}>
+                            {f.label}
                         </button>
                     ))}
                 </div>
@@ -110,7 +123,7 @@ const EmployerCandidates = () => {
                 <div className="py-24 text-center border-[2px] border-dashed border-black/10 rounded-[32px]">
                     <Users size={32} className="text-black/15 mx-auto mb-4" />
                     <p className="text-[9px] font-semibold text-black/30">
-                        {search ? 'No candidates match your search' : applications.length === 0 ? 'No candidates yet — post jobs to attract talent' : `No ${filterStatus} candidates`}
+                        {search ? 'No candidates match your search' : applications.length === 0 ? 'No candidates yet — post jobs to attract talent' : `No ${stageLabel(filterStatus).toLowerCase()} candidates`}
                     </p>
                 </div>
             ) : (
@@ -120,7 +133,7 @@ const EmployerCandidates = () => {
                             key={c.student_id}
                             candidate={c}
                             onMessage={() => navigate('/employer/messages', { state: { startConversationWith: { id: c.student_id, full_name: c.student_name } } })}
-                            onView={() => navigate(`/employer/candidates/${c.student_id}`)}
+                            onView={() => navigate(`/employer/candidates/${c.id}`)}
                         />
                     ))}
                 </div>
@@ -134,7 +147,7 @@ const CandidateCard = ({ candidate, onMessage, onView }: {
     onMessage: () => void;
     onView: () => void;
 }) => {
-    const badge = statusBadge[candidate.status] || 'bg-black/5 text-black/40 border-black/10';
+    const badge = statusBadge[candidate.stage] || 'bg-black/5 text-black/40 border-black/10';
     const initials = (candidate.student_name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
 
     return (
@@ -150,7 +163,7 @@ const CandidateCard = ({ candidate, onMessage, onView }: {
                             {candidate.is_verified && <CheckCircle2 size={11} className="text-nile-green flex-shrink-0" strokeWidth={3} />}
                         </div>
                         <span className={`text-[7px] font-semibold px-2 py-0.5 rounded-full border ${badge}`}>
-                            {candidate.status}
+                            {stageLabel(candidate.stage)}
                         </span>
                     </div>
                 </div>
@@ -162,6 +175,13 @@ const CandidateCard = ({ candidate, onMessage, onView }: {
                         <GraduationCap size={11} className="text-nile-blue flex-shrink-0" />
                         <span className="truncate">{candidate.major}</span>
                         {candidate.graduation_year > 0 && <span className="text-black/30">· {candidate.graduation_year}</span>}
+                        {candidate.gpa > 0 && <span className="text-black/30">· GPA {candidate.gpa.toFixed(2)}</span>}
+                    </div>
+                )}
+                {candidate.rating > 0 && (
+                    <div className="flex items-center gap-2">
+                        <Star size={11} className="text-yellow-500 flex-shrink-0" fill="currentColor" />
+                        <span className="truncate">{candidate.rating}/5 rating</span>
                     </div>
                 )}
                 <div className="flex items-start gap-2">

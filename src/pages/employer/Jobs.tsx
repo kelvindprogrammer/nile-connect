@@ -7,8 +7,11 @@ import InputField from '../../components/InputField';
 import { useToast } from '../../context/ToastContext';
 import { getEmployerJobs, postJob, JobListing } from '../../services/employerService';
 import { getErrorMessage } from '../../services/api';
+import { DOCUMENT_TYPES } from '../../types/application';
 
 type Tab = 'active' | 'post' | 'pending';
+
+const EMPLOYMENT_CATEGORIES = ['internship', 'siwes', 'nyse', 'graduate', 'full-time', 'part-time', 'contract'];
 
 const EmployerJobs = () => {
     const navigate = useNavigate();
@@ -20,7 +23,14 @@ const EmployerJobs = () => {
 
     const [form, setForm] = useState({
         title: '', type: '', location: '', salary: '', description: '', requirements: '', skills: '',
+        employment_category: 'full-time', is_remote: false,
     });
+    const [requiredDocs, setRequiredDocs] = useState<string[]>([]);
+    const [optionalDocs, setOptionalDocs] = useState<string[]>([]);
+
+    const toggleDoc = (list: string[], setList: (v: string[]) => void, type: string) => {
+        setList(list.includes(type) ? list.filter(t => t !== type) : [...list, type]);
+    };
 
     useEffect(() => {
         if (tab !== 'active') return;
@@ -46,11 +56,17 @@ const EmployerJobs = () => {
                 description: form.description,
                 requirements: form.requirements,
                 skills: form.skills,
+                employment_category: form.employment_category,
+                is_remote: form.is_remote,
+                required_docs: requiredDocs,
+                optional_docs: optionalDocs,
             });
             showToast('Job listing submitted for Staff review.', 'success');
             setJobs(prev => [created, ...prev]);
             setTab('pending');
-            setForm({ title: '', type: '', location: '', salary: '', description: '', requirements: '', skills: '' });
+            setForm({ title: '', type: '', location: '', salary: '', description: '', requirements: '', skills: '', employment_category: 'full-time', is_remote: false });
+            setRequiredDocs([]);
+            setOptionalDocs([]);
         } catch (err) {
             showToast(getErrorMessage(err, 'Submission failed. Please try again.'), 'error');
         } finally {
@@ -162,7 +178,66 @@ const EmployerJobs = () => {
                                 <InputField label="SALARY" placeholder="₦400,000 - ₦600,000" icon={<DollarSign size={16} />} value={form.salary} onChange={e => setForm(f => ({ ...f, salary: e.target.value }))} />
                             </div>
 
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 items-end">
+                                <div className="space-y-3">
+                                    <label className="text-[8px] md:text-[10px] font-semibold text-black ml-1">EMPLOYMENT CATEGORY</label>
+                                    <select
+                                        value={form.employment_category}
+                                        onChange={e => setForm(f => ({ ...f, employment_category: e.target.value }))}
+                                        className="w-full border border-gray-100 rounded-xl md:rounded-2xl py-3.5 px-4 font-bold text-xs md:text-sm outline-none focus:shadow-green transition-all bg-nile-white/40 cursor-pointer"
+                                    >
+                                        {EMPLOYMENT_CATEGORIES.map(c => (
+                                            <option key={c} value={c}>{c.replace(/-/g, ' ').toUpperCase()}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <label className="flex items-center gap-3 border border-gray-100 rounded-xl md:rounded-2xl py-3.5 px-4 bg-nile-white/40 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={form.is_remote}
+                                        onChange={e => setForm(f => ({ ...f, is_remote: e.target.checked }))}
+                                        className="accent-nile-blue w-4 h-4"
+                                    />
+                                    <span className="text-[9px] md:text-[10px] font-semibold text-black">THIS ROLE IS REMOTE</span>
+                                </label>
+                            </div>
+
                             <InputField label="REQUIRED SKILLS (COMMA SEPARATED)" placeholder="React, TypeScript, PostgreSQL" value={form.skills} onChange={e => setForm(f => ({ ...f, skills: e.target.value }))} />
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
+                                <div className="space-y-3">
+                                    <label className="text-[8px] md:text-[10px] font-semibold text-black ml-1">REQUIRED DOCUMENTS</label>
+                                    <div className="grid grid-cols-1 gap-1.5">
+                                        {DOCUMENT_TYPES.map(t => (
+                                            <label key={t.value} className="flex items-center gap-2 text-[9px] font-semibold text-black/60 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={requiredDocs.includes(t.value)}
+                                                    onChange={() => toggleDoc(requiredDocs, setRequiredDocs, t.value)}
+                                                    className="accent-nile-blue"
+                                                />
+                                                {t.label}
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="space-y-3">
+                                    <label className="text-[8px] md:text-[10px] font-semibold text-black ml-1">OPTIONAL DOCUMENTS</label>
+                                    <div className="grid grid-cols-1 gap-1.5">
+                                        {DOCUMENT_TYPES.filter(t => !requiredDocs.includes(t.value)).map(t => (
+                                            <label key={t.value} className="flex items-center gap-2 text-[9px] font-semibold text-black/60 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={optionalDocs.includes(t.value)}
+                                                    onChange={() => toggleDoc(optionalDocs, setOptionalDocs, t.value)}
+                                                    className="accent-nile-blue"
+                                                />
+                                                {t.label}
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
 
                             <div className="space-y-3">
                                 <label className="text-[8px] md:text-[10px] font-semibold text-black md: ml-1">JOB DESCRIPTION</label>

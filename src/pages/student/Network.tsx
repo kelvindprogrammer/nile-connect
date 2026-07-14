@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import DashboardLayout from '../../layouts/DashboardLayout';
 import { Search, MessageCircle, UserPlus, UserCheck, Clock, Check, X, Users, Loader2 } from 'lucide-react';
 import Avatar from '../../components/Avatar';
 import { useToast } from '../../context/ToastContext';
 import ConnectionModal from '../../components/ConnectionModal';
 import { searchUsers, type UserProfile } from '../../services/messageService';
-import { getConnections, respondConnection, type ConnectionsResponse, type ConnectionItem } from '../../services/connectionService';
+import {
+    getConnections, respondConnection, requestConnection, getConnectionSuggestions,
+    type ConnectionsResponse, type ConnectionItem, type ConnectionSuggestion,
+} from '../../services/connectionService';
 import { isOnline, presenceLabel } from '../../utils/formatDate';
 
 const ROLE_LABELS: Record<string, string> = {
@@ -70,6 +72,9 @@ const Network = () => {
     const [connectTarget, setConnectTarget] = useState<Person | null>(null);
     const [respondingId, setRespondingId] = useState<string | null>(null);
 
+    const [suggestions, setSuggestions] = useState<ConnectionSuggestion[]>([]);
+    const [suggestSending, setSuggestSending] = useState<string | null>(null);
+
     const setSearchTerm = (value: string) => setSearchParams(value ? { q: value } : {}, { replace: true });
 
     useEffect(() => {
@@ -78,8 +83,24 @@ const Network = () => {
             .then(c => { if (!cancelled) setConnections(c); })
             .catch(() => { if (!cancelled) setConnections(emptyConnections); })
             .finally(() => { if (!cancelled) setConnLoading(false); });
+        getConnectionSuggestions()
+            .then(s => { if (!cancelled) setSuggestions(s); })
+            .catch(() => { if (!cancelled) setSuggestions([]); });
         return () => { cancelled = true; };
     }, []);
+
+    const handleSuggestionConnect = async (suggestion: ConnectionSuggestion) => {
+        setSuggestSending(suggestion.user_id);
+        try {
+            await requestConnection(suggestion.user_id);
+            setSuggestions(prev => prev.filter(s => s.user_id !== suggestion.user_id));
+            showToast(`Invitation sent to ${suggestion.full_name}`, 'success');
+        } catch {
+            showToast('Could not send invitation.', 'error');
+        } finally {
+            setSuggestSending(null);
+        }
+    };
 
     const fetchPeople = useCallback(async () => {
         setPeopleLoading(true);
@@ -137,7 +158,7 @@ const Network = () => {
     };
 
     return (
-        <DashboardLayout>
+        <>
             <div className="max-w-5xl mx-auto py-6 md:py-10 px-4 md:px-6 space-y-5 anime-fade-in min-h-full pb-24">
 
                 <div className="flex items-center gap-3">
@@ -191,6 +212,33 @@ const Network = () => {
                                 </button>
                             </div>
                         ))}
+                    </div>
+                )}
+
+                {suggestions.length > 0 && (
+                    <div className="social-card p-4 space-y-3">
+                        <h2 className="text-sm font-semibold text-gray-900">People you may know</h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {suggestions.map(s => (
+                                <div key={s.user_id} className="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 transition-colors">
+                                    <Avatar name={s.full_name} size="sm" />
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-medium text-gray-900 truncate">{s.full_name}</p>
+                                        <p className="text-xs text-gray-400">
+                                            {ROLE_LABELS[s.role] || s.role}
+                                            {s.mutual_connections > 0 ? ` · ${s.mutual_connections} mutual` : ''}
+                                        </p>
+                                    </div>
+                                    <button
+                                        onClick={() => handleSuggestionConnect(s)}
+                                        disabled={suggestSending === s.user_id}
+                                        className="w-8 h-8 flex items-center justify-center rounded-full bg-nile-blue/10 text-nile-blue hover:bg-nile-blue hover:text-white transition-colors disabled:opacity-60 flex-shrink-0"
+                                    >
+                                        {suggestSending === s.user_id ? <Loader2 size={14} className="animate-spin" /> : <UserPlus size={14} />}
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 )}
 
@@ -256,7 +304,7 @@ const Network = () => {
                     />
                 )}
             </div>
-        </DashboardLayout>
+        </>
     );
 };
 

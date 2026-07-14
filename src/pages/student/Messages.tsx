@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
-import DashboardLayout from '../../layouts/DashboardLayout';
 import {
     Send, Search, Phone, Video, Smile, Paperclip,
     ChevronLeft, MessageCircle, PhoneOff, MicOff, Mic, VideoOff, Loader2,
@@ -214,7 +213,7 @@ const Messages = () => {
     );
 
     return (
-        <DashboardLayout>
+        <>
             <div className="flex h-[calc(100vh-56px)] font-sans bg-white">
 
                 {/* Conversations sidebar */}
@@ -366,7 +365,7 @@ const Messages = () => {
                     </div>
                 </div>
             )}
-        </DashboardLayout>
+        </>
     );
 };
 

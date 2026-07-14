@@ -1,6 +1,5 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DashboardLayout from '../../layouts/DashboardLayout';
 import {
     User, Mail, MapPin, Camera, Save, ArrowLeft,
     Link as LinkIcon, Link2, GraduationCap, Phone,
@@ -34,6 +33,7 @@ const EditProfile = () => {
     const [email, setEmail] = useState(user?.email || '');
     const [bio, setBio] = useState(profile.bio || '');
     const [major, setMajor] = useState(profile.major || user?.major || '');
+    const [gpa, setGpa] = useState<string>('');
     const [location, setLocation] = useState(profile.location || 'Abuja, Nigeria');
     const [linkedIn, setLinkedIn] = useState(profile.linkedIn || '');
     const [portfolio, setPortfolio] = useState(profile.portfolio || '');
@@ -103,10 +103,27 @@ const EditProfile = () => {
         }
     };
 
+    useEffect(() => {
+        const t = setTimeout(() => {
+            apiClient
+                .get<{ data: { gpa?: number } }>('/api/student/profile')
+                .then(({ data }) => {
+                    if (data.data?.gpa) setGpa(String(data.data.gpa));
+                })
+                .catch(() => {});
+        }, 0);
+        return () => clearTimeout(t);
+    }, []);
+
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await apiClient.put('/api/student/profile', { full_name: name, major });
+            const gpaValue = gpa.trim() ? Number(gpa) : undefined;
+            await apiClient.put('/api/student/profile', {
+                full_name: name,
+                major,
+                ...(gpaValue !== undefined && !Number.isNaN(gpaValue) ? { gpa: gpaValue } : {}),
+            });
             updateProfile({ bio, major, location, linkedIn, portfolio, github, phone, skills, experiences });
             showToast('Profile updated successfully!', 'success');
             navigate('/student/profile');
@@ -116,7 +133,7 @@ const EditProfile = () => {
     };
 
     return (
-        <DashboardLayout>
+        <>
             <div className="p-4 md:p-8 space-y-6 md:space-y-8 anime-fade-in font-sans pb-24 text-left max-w-4xl mx-auto">
 
                 <div className="flex items-center justify-between border-b border-gray-100 pb-6">
@@ -211,6 +228,14 @@ const EditProfile = () => {
                             <InputField label="FULL NAME" value={name} onChange={e => setName(e.target.value)} icon={<User size={14} />} />
                             <InputField label="EMAIL ADDRESS" type="email" value={email} onChange={e => setEmail(e.target.value)} icon={<Mail size={14} />} />
                             <InputField label="ACADEMIC MAJOR" value={major} onChange={e => setMajor(e.target.value)} icon={<GraduationCap size={14} />} />
+                            <InputField
+                                label="GPA / CGPA"
+                                type="number"
+                                value={gpa}
+                                onChange={e => setGpa(e.target.value)}
+                                icon={<GraduationCap size={14} />}
+                                placeholder="e.g. 4.50"
+                            />
                             <InputField label="PHONE NUMBER" value={phone} onChange={e => setPhone(e.target.value)} icon={<Phone size={14} />} />
                             <div className="sm:col-span-2">
                                 <InputField label="LOCATION" value={location} onChange={e => setLocation(e.target.value)} icon={<MapPin size={14} />} />
@@ -353,7 +378,7 @@ const EditProfile = () => {
                     </div>
                 </form>
             </div>
-        </DashboardLayout>
+        </>
     );
 };
 

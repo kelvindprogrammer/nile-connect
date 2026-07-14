@@ -58,9 +58,13 @@ Adding any new endpoint requires **both** a `case "xxx":` in the handler's `swit
 **Adding a new user field:**
 Must update in this exact order: `lib/models/models.go` → `lib/db/db.go` (explicit ALTER TABLE) → `api/auth/index.go:userToResponse` → `src/services/authService.ts:BackendUser` → `src/context/AuthContext.tsx:User` + `mapBackendUser`.
 
+**Applications pipeline / ATS:** `Application.Stage` (rich 9-value enum: submitted, under_review, shortlisted, interview_scheduled, assessment_sent, offer_extended, accepted, rejected, withdrawn — see `lib/pipeline`) drives the ATS UI; the legacy 5-value `Application.Status` is kept in sync via `pipeline.ToLegacyStatus()` so older readers still work. Every stage change is recorded in `ApplicationStageHistory`. Students attach reusable `Document` rows (resume/cover_letter/reference_letter/transcript/siwes_letter/certification/portfolio) to applications instead of re-uploading each time — see `api/student/index.go` (`documents`, `application-package` cases) and `api/jobs/index.go` (`apply` case validates `document_ids` against a job's `RequiredDocs`).
+
+**Email:** `lib/email` sends transactional email via Resend (fire-and-forget, logs and continues if `RESEND_API_KEY` is unset — never blocks the request). `notify.CreateAndEmail()` is the standard call site: it creates the in-app `Notification` row and sends the matching email template in one call. Add new events by writing a template function in `lib/email/templates.go` and calling `notify.CreateAndEmail` at the relevant handler site.
+
 ## Key Constraints
 
-- **Vercel function limit:** The hobby plan allows 12 serverless functions. Currently at 10 Go + 1 `health.go` + 2 Python = 13 (health is a single-file handler, not counted by Vercel the same way). Do not add new top-level `api/` files without removing another.
+- **Vercel function limit:** The hobby plan allows 12 serverless functions. Currently 8 Go `index.go` folders + `health.go` + 2 Python files = 11 (health is a single-file handler, not counted by Vercel the same way) — **1 slot of headroom**. New functionality should extend an existing handler with a new `case` rather than add a new top-level `api/` folder.
 - **No pgBouncer:** Go GORM needs `STORAGE_DATABASE_URL_UNPOOLED`. The pooled URL will cause prepared-statement errors.
 - **CORS:** `mw.HandlePreflight(w, r)` must be the first call in every Go handler — it sets CORS headers for all responses and handles OPTIONS preflight.
 - **Response envelope:** All Go API responses must use `respond.OK(w, payload)` → `{"data": payload}`. Frontend unwraps as `response.data.data`.
@@ -91,3 +95,6 @@ Required (Vercel + local `.env.local`):
 | `STORAGE_DATABASE_URL_UNPOOLED` | Neon direct connection string (preferred) |
 | `DATABASE_URL` | Fallback Postgres connection string |
 | `GROQ_API_KEY` | Groq API key for AI functions |
+| `RESEND_API_KEY` | Resend API key — powers all transactional email (`lib/email`). Sends are skipped (logged only) when unset, so local dev works without it |
+| `RESEND_FROM` | Optional sender address override, e.g. `Nile Connect <notifications@yourdomain.com>` (falls back to a default) |
+| `CRON_SECRET` | Bearer token Vercel Cron sends to `/api/jobs?path=deadline-reminders`; the endpoint rejects requests without a matching `Authorization: Bearer <secret>` header |

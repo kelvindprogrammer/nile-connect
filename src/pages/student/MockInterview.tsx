@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DashboardLayout from '../../layouts/DashboardLayout';
 import {
     ArrowLeft, Mic, MicOff, Send, Loader2, CheckCircle2, RefreshCw,
     Video, ChevronRight, Star, Award, MessageSquare, Brain,
@@ -148,7 +147,7 @@ const MockInterview = () => {
 
     if (phase === 'setup') {
         return (
-            <DashboardLayout>
+            <>
                 <div className="p-4 md:p-10 space-y-8 font-sans bg-nile-white min-h-full pb-24 text-left anime-fade-in">
                     <div className="flex items-center gap-4 border-b border-gray-100 pb-6">
                         <button onClick={() => navigate('/student/career')} className="p-2 border border-gray-100 rounded-xl hover:bg-black hover:text-white transition-all">
@@ -219,14 +218,14 @@ const MockInterview = () => {
                         </Button>
                     </div>
                 </div>
-            </DashboardLayout>
+            </>
         );
     }
 
     if (phase === 'feedback') {
         const scoreColor = avgScore >= 8 ? 'text-nile-green' : avgScore >= 6 ? 'text-nile-blue' : 'text-red-500';
         return (
-            <DashboardLayout>
+            <>
                 <div className="p-4 md:p-10 space-y-8 font-sans bg-nile-white min-h-full pb-24 text-left anime-fade-in">
                     <div className="flex items-center gap-4 border-b border-gray-100 pb-6">
                         <button onClick={() => navigate('/student/career')} className="p-2 border border-gray-100 rounded-xl hover:bg-black hover:text-white transition-all">
@@ -293,12 +292,12 @@ const MockInterview = () => {
                         </Button>
                     </div>
                 </div>
-            </DashboardLayout>
+            </>
         );
     }
 
     return (
-        <DashboardLayout>
+        <>
             <div className="p-4 md:p-8 font-sans bg-nile-white min-h-full pb-24 text-left anime-fade-in flex flex-col gap-6">
                 <div className="flex items-center justify-between border-b border-gray-100 pb-4">
                     <div className="flex items-center gap-3">
@@ -371,7 +370,7 @@ const MockInterview = () => {
                     </div>
                 )}
             </div>
-        </DashboardLayout>
+        </>
     );
 };
 

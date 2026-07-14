@@ -3,11 +3,17 @@ import Avatar from './Avatar';
 import PostBar from './PostBar';
 import CommentSection from './CommentSection';
 import SharePostModal from './SharePostModal';
-import { MessageCircle, RefreshCcw, Send, ThumbsUp, Loader2, Trash2 } from 'lucide-react';
+import { MessageCircle, RefreshCcw, Send, ThumbsUp, Loader2, Trash2, Trophy, Megaphone } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
 import { getPosts, toggleLike, deletePost, type Post } from '../services/feedService';
 import { timeAgo } from '../utils/formatDate';
+import JobShareCard from './JobShareCard';
+
+const KIND_BADGE: Record<string, { label: string; className: string; Icon: typeof Trophy } | undefined> = {
+    achievement: { label: 'Achievement', className: 'bg-nile-green/10 text-nile-green', Icon: Trophy },
+    announcement: { label: 'Announcement', className: 'bg-nile-blue/10 text-nile-blue', Icon: Megaphone },
+};
 
 const ROLE_LABELS: Record<string, string> = {
     student: 'Student',
@@ -132,6 +138,15 @@ const Feed: React.FC = () => {
                                 <p className="text-xs text-gray-400 mt-0.5">{roleTag(post)} · {timeAgo(post.created_at)}</p>
                             </div>
                         </div>
+                        {KIND_BADGE[post.kind] && (() => {
+                            const badge = KIND_BADGE[post.kind]!;
+                            const Icon = badge.Icon;
+                            return (
+                                <span className={`flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-medium flex-shrink-0 ${badge.className}`}>
+                                    <Icon size={11} />{badge.label}
+                                </span>
+                            );
+                        })()}
                         {canDeletePost(post) && (
                             <button
                                 onClick={() => handleDeletePost(post.id)}
@@ -152,6 +167,8 @@ const Feed: React.FC = () => {
                             <img src={post.media_url} alt="Post attachment" loading="lazy" />
                         </div>
                     )}
+
+                    {post.kind === 'job' && post.job_id && <JobShareCard jobId={post.job_id} />}
 
                     {(post.likes_count > 0 || post.comments_count > 0) && (
                         <div className="px-4 py-2 flex justify-between items-center text-xs text-gray-400">

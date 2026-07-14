@@ -98,6 +98,12 @@ func migrate(db *gorm.DB) {
 		&models.Connection{},
 		&models.TypingStatus{},
 		&models.ServiceRequest{},
+		&models.Document{},
+		&models.ApplicationStageHistory{},
+		&models.ApplicationNote{},
+		&models.EmailVerification{},
+		&models.ProfileView{},
+		&models.Endorsement{},
 	} {
 		if err := db.AutoMigrate(model); err != nil {
 			log.Printf("automigrate %T: %v", model, err)
@@ -136,6 +142,49 @@ func migrate(db *gorm.DB) {
 		// Career services (mock interview / advisory / CV review).
 		`CREATE INDEX IF NOT EXISTS idx_service_requests_student ON service_requests(student_id)`,
 		`CREATE INDEX IF NOT EXISTS idx_service_requests_staff ON service_requests(staff_id)`,
+
+		// GPA for ATS filtering/sorting.
+		`ALTER TABLE users ADD COLUMN IF NOT EXISTS gpa DOUBLE PRECISION DEFAULT 0`,
+
+		// Employer profile — rich company page fields.
+		`ALTER TABLE employer_profiles ADD COLUMN IF NOT EXISTS logo_url TEXT`,
+		`ALTER TABLE employer_profiles ADD COLUMN IF NOT EXISTS company_size TEXT`,
+		`ALTER TABLE employer_profiles ADD COLUMN IF NOT EXISTS headquarters TEXT`,
+		`ALTER TABLE employer_profiles ADD COLUMN IF NOT EXISTS is_verified BOOLEAN DEFAULT false`,
+		`ALTER TABLE employer_profiles ADD COLUMN IF NOT EXISTS founded_year INTEGER`,
+
+		// Jobs — opportunity type, remote flag, document requirements, approval trail.
+		`ALTER TABLE jobs ADD COLUMN IF NOT EXISTS employment_category TEXT`,
+		`ALTER TABLE jobs ADD COLUMN IF NOT EXISTS is_remote BOOLEAN DEFAULT false`,
+		`ALTER TABLE jobs ADD COLUMN IF NOT EXISTS required_docs TEXT`,
+		`ALTER TABLE jobs ADD COLUMN IF NOT EXISTS optional_docs TEXT`,
+		`ALTER TABLE jobs ADD COLUMN IF NOT EXISTS approved_by TEXT`,
+		`ALTER TABLE jobs ADD COLUMN IF NOT EXISTS approved_at TIMESTAMPTZ`,
+		`ALTER TABLE jobs ADD COLUMN IF NOT EXISTS rejection_reason TEXT`,
+
+		// Applications — pipeline stage + document package + withdrawal.
+		`ALTER TABLE applications ADD COLUMN IF NOT EXISTS stage TEXT DEFAULT 'submitted'`,
+		`ALTER TABLE applications ADD COLUMN IF NOT EXISTS stage_order INTEGER DEFAULT 0`,
+		`ALTER TABLE applications ADD COLUMN IF NOT EXISTS document_ids TEXT`,
+		`ALTER TABLE applications ADD COLUMN IF NOT EXISTS withdrawn_at TIMESTAMPTZ`,
+		`UPDATE applications SET stage = 'submitted' WHERE stage IS NULL OR stage = ''`,
+
+		// Document library + ATS audit trail.
+		`CREATE INDEX IF NOT EXISTS idx_documents_user ON documents(user_id)`,
+		`CREATE INDEX IF NOT EXISTS idx_app_stage_history_app ON application_stage_history(application_id)`,
+		`CREATE INDEX IF NOT EXISTS idx_app_notes_app ON application_notes(application_id)`,
+		`CREATE INDEX IF NOT EXISTS idx_email_verifications_user ON email_verifications(user_id)`,
+
+		// Feed enrichment — job-share posts + post kind.
+		`ALTER TABLE posts ADD COLUMN IF NOT EXISTS job_id TEXT`,
+		`ALTER TABLE posts ADD COLUMN IF NOT EXISTS kind TEXT DEFAULT 'text'`,
+		`UPDATE posts SET kind = 'text' WHERE kind IS NULL OR kind = ''`,
+		`CREATE INDEX IF NOT EXISTS idx_posts_job_id ON posts(job_id)`,
+
+		// Social proof — profile views + skill endorsements.
+		`CREATE INDEX IF NOT EXISTS idx_profile_views_subject ON profile_views(profile_user_id)`,
+		`CREATE INDEX IF NOT EXISTS idx_endorsements_subject ON endorsements(profile_user_id)`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS idx_endorsements_unique ON endorsements(endorser_id, profile_user_id, skill)`,
 	} {
 		db.Exec(stmt)
 	}

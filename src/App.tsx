@@ -7,15 +7,14 @@ import { AuthProvider } from './context/AuthContext';
 // ── Entry & Auth Pages ────────────────────────────────────────────────────
 import Onboarding         from './pages/auth/Onboarding';
 import Login              from './pages/auth/Login';
+import VerifyEmail        from './pages/VerifyEmail';
 
 
-// ── Layouts ───────────────────────────────────────────────────────────────
-import StaffLayout    from './layouts/StaffLayout';
-import EmployerLayout from './layouts/EmployerLayout';
+// ── Layout ────────────────────────────────────────────────────────────────
+import AppShell from './layouts/AppShell';
 
 // ── Student Section ───────────────────────────────────────────────────────
 import StudentDashboard   from './pages/student/Dashboard';
-import StudentFeed        from './pages/student/Feed';
 import JobBoard           from './pages/student/JobBoard';
 import JobDetail          from './pages/student/JobDetail';
 import CareerCenter       from './pages/student/CareerCenter';
@@ -29,10 +28,11 @@ import LearningPath       from './pages/student/LearningPath';
 import LiveSession        from './pages/student/LiveSession';
 import Network            from './pages/student/Network';
 import StudentMessages    from './pages/student/Messages';
+import StudentDocuments   from './pages/student/Documents';
+import StudentInsights    from './pages/student/Insights';
 
 // ── Staff Section ─────────────────────────────────────────────────────────
 import StaffDashboard     from './pages/staff/Dashboard';
-import StaffFeed          from './pages/staff/Feed';
 import StaffCRMManager    from './pages/staff/CRMManager';
 import StaffEvents        from './pages/staff/Events';
 import StaffJobs          from './pages/staff/Jobs';
@@ -43,6 +43,7 @@ import StaffSettings      from './pages/staff/Settings';
 import StaffReports       from './pages/staff/Reports';
 import StudentActivity    from './pages/staff/StudentActivity';
 import StaffStudentDetail from './pages/staff/StudentDetail';
+import StaffInsights      from './pages/staff/Insights';
 
 // ── Employer Section ──────────────────────────────────────────────────────
 import EmployerDashboard      from './pages/employer/Dashboard';
@@ -50,11 +51,11 @@ import EmployerCandidates     from './pages/employer/Candidates';
 import EmployerCandidateDetail from './pages/employer/CandidateDetail';
 import EmployerJobs           from './pages/employer/Jobs';
 import EmployerApplications   from './pages/employer/Applications';
-import EmployerFeed           from './pages/employer/Feed';
 import EmployerEvents         from './pages/employer/Events';
 import EmployerProfile        from './pages/employer/Profile';
 import EmployerMessages       from './pages/employer/Messages';
 import EmployerSettings       from './pages/employer/Settings';
+import EmployerInsights       from './pages/employer/Insights';
 
 // ── Fallback ──────────────────────────────────────────────────────────────
 import NotFound from './pages/NotFound';
@@ -73,6 +74,7 @@ const App = () => (
                     <Route path="/"           element={<Navigate to="/onboarding" replace />} />
                     <Route path="/onboarding" element={<T><Onboarding /></T>} />
                     <Route path="/login"           element={<T><Login /></T>} />
+                    <Route path="/verify-email"    element={<T><VerifyEmail /></T>} />
                     {/* Legacy auth routes redirect to login — Campus One SSO handles registration */}
                     <Route path="/register"        element={<Navigate to="/login" replace />} />
                     <Route path="/join-as"         element={<Navigate to="/login" replace />} />
@@ -84,10 +86,10 @@ const App = () => (
                     <Route path="/employer-registration" element={<Navigate to="/login" replace />} />
                     <Route path="/awaiting-verification" element={<Navigate to="/login" replace />} />
 
-                    {/* Student (authenticated) */}
-                    <Route path="/student">
+                    {/* Student (authenticated, AppShell-wrapped) */}
+                    <Route path="/student" element={<AppShell />}>
                         <Route index                   element={<StudentDashboard />} />
-                        <Route path="feed"             element={<StudentFeed />} />
+                        <Route path="feed"             element={<Navigate to="/student" replace />} />
                         <Route path="jobs"             element={<JobBoard />} />
                         <Route path="jobs/:id"         element={<JobDetail />} />
                         <Route path="career"                    element={<CareerCenter />} />
@@ -95,18 +97,22 @@ const App = () => (
                         <Route path="career/learning"           element={<LearningPath />} />
                         <Route path="career/mock-interview"     element={<MockInterview />} />
                         <Route path="applications"     element={<ApplicationTracker />} />
+                        <Route path="documents"        element={<StudentDocuments />} />
                         <Route path="events"           element={<EventsCalendar />} />
+                        <Route path="insights"         element={<StudentInsights />} />
                         <Route path="profile"          element={<StudentProfile />} />
                         <Route path="profile/edit"     element={<EditProfile />} />
                         <Route path="network"          element={<Network />} />
                         <Route path="messages"         element={<StudentMessages />} />
-                        <Route path="session/:roomId"  element={<LiveSession />} />
                     </Route>
 
-                    {/* Staff (authenticated, layout-wrapped) */}
-                    <Route path="/staff" element={<StaffLayout />}>
+                    {/* Student live session — standalone full-screen, outside AppShell */}
+                    <Route path="/student/session/:roomId" element={<LiveSession />} />
+
+                    {/* Staff (authenticated, AppShell-wrapped) */}
+                    <Route path="/staff" element={<AppShell />}>
                         <Route index               element={<StaffDashboard />} />
-                        <Route path="feed"         element={<StaffFeed />} />
+                        <Route path="feed"         element={<Navigate to="/staff" replace />} />
                         <Route path="activity"     element={<StudentActivity />} />
                         <Route path="students/:id" element={<StaffStudentDetail />} />
                         <Route path="applications" element={<Navigate to="/staff/jobs" replace />} />
@@ -115,26 +121,28 @@ const App = () => (
                         <Route path="jobs"         element={<StaffJobs />} />
                         <Route path="services"     element={<StaffServices />} />
                         <Route path="reports"      element={<StaffReports />} />
+                        <Route path="insights"     element={<StaffInsights />} />
                         <Route path="profile"      element={<StaffProfile />} />
                         <Route path="messages"     element={<StaffMessages />} />
                         <Route path="settings"     element={<StaffSettings />} />
                     </Route>
 
-                    {/* Staff live session — standalone full-screen, outside StaffLayout */}
+                    {/* Staff live session — standalone full-screen, outside AppShell */}
                     <Route path="/staff/session/:roomId" element={<LiveSession />} />
 
-                    {/* Employer (authenticated, layout-wrapped) */}
-                    <Route path="/employer" element={<EmployerLayout />}>
+                    {/* Employer (authenticated, AppShell-wrapped) */}
+                    <Route path="/employer" element={<AppShell />}>
                         <Route index                      element={<EmployerDashboard />} />
                         <Route path="candidates"          element={<EmployerCandidates />} />
                         <Route path="candidates/:id"      element={<EmployerCandidateDetail />} />
                         <Route path="jobs"                element={<EmployerJobs />} />
                         <Route path="applications"        element={<EmployerApplications />} />
-                        <Route path="feed"                element={<EmployerFeed />} />
+                        <Route path="feed"                element={<Navigate to="/employer" replace />} />
                         <Route path="events"              element={<EmployerEvents />} />
+                        <Route path="insights"            element={<EmployerInsights />} />
                         <Route path="profile"             element={<EmployerProfile />} />
                         <Route path="messages"            element={<EmployerMessages />} />
-                        <Route path="settings"            element={<EmployerSettings />} />
+                        <Route path="settings"             element={<EmployerSettings />} />
                     </Route>
 
                     {/* Catch-all */}

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import DashboardLayout from '../../layouts/DashboardLayout';
 import {
     Search, MapPin, DollarSign, SlidersHorizontal, Bookmark,
     Loader2, ChevronDown, X, Check,
@@ -8,22 +7,8 @@ import {
 import { useToast } from '../../context/ToastContext';
 import QuickApplyModal from '../../components/QuickApplyModal';
 import Button from '../../components/Button';
-import { apiClient } from '../../services/api';
-
-interface Job {
-    id: string;
-    title: string;
-    company_name: string;
-    location: string;
-    type: string;
-    salary: string;
-    skills: string;
-    description: string;
-    applicant_count: number;
-    posted_at: string;
-}
-
-interface ApiEnvelope<T> { data: T; }
+import { getJobs } from '../../services/jobService';
+import type { JobListItem as Job } from '../../types/job';
 
 const typeColors: Record<string, string> = {
     'full-time': 'bg-nile-green text-black',
@@ -40,6 +25,7 @@ const typeLabel: Record<string, string> = {
 
 const JOB_TYPES = ['ALL', 'FULL-TIME', 'REMOTE', 'HYBRID', 'INTERNSHIP', 'PART-TIME'];
 const LOCATIONS = ['ALL', 'ABUJA', 'LAGOS', 'KANO', 'REMOTE', 'INTERNATIONAL'];
+const EMPLOYMENT_CATEGORIES = ['ALL', 'internship', 'siwes', 'nyse', 'graduate', 'full-time', 'part-time', 'contract'];
 
 const JobBoard = () => {
     const [searchParams] = useSearchParams();
@@ -51,13 +37,14 @@ const JobBoard = () => {
     const [showFilters, setShowFilters] = useState(false);
     const [typeFilter, setTypeFilter] = useState('ALL');
     const [locationFilter, setLocationFilter] = useState('ALL');
+    const [categoryFilter, setCategoryFilter] = useState('ALL');
+    const [remoteOnly, setRemoteOnly] = useState(false);
     const filterRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
-        apiClient
-            .get<ApiEnvelope<{ jobs: Job[] }>>('/api/jobs', { params: search ? { q: search } : {} })
-            .then(({ data }) => setJobs(data.data.jobs ?? []))
+        getJobs(search ? { q: search } : undefined)
+            .then(setJobs)
             .catch(() => setJobs([]))
             .finally(() => setIsLoading(false));
     }, [search]);
@@ -72,21 +59,23 @@ const JobBoard = () => {
         return () => document.removeEventListener('mousedown', handleClick);
     }, []);
 
-    const clearFilters = () => { setTypeFilter('ALL'); setLocationFilter('ALL'); };
-    const hasFilters = typeFilter !== 'ALL' || locationFilter !== 'ALL';
+    const clearFilters = () => { setTypeFilter('ALL'); setLocationFilter('ALL'); setCategoryFilter('ALL'); setRemoteOnly(false); };
+    const hasFilters = typeFilter !== 'ALL' || locationFilter !== 'ALL' || categoryFilter !== 'ALL' || remoteOnly;
 
     const filtered = jobs.filter(j => {
         const matchesSearch = j.title.toLowerCase().includes(search.toLowerCase()) ||
             j.company_name.toLowerCase().includes(search.toLowerCase());
         const matchesType = typeFilter === 'ALL' || (j.type || '').toLowerCase() === typeFilter.toLowerCase();
         const matchesLocation = locationFilter === 'ALL' || (j.location || '').toLowerCase().includes(locationFilter.toLowerCase());
-        return matchesSearch && matchesType && matchesLocation;
+        const matchesCategory = categoryFilter === 'ALL' || (j.employment_category || '').toLowerCase() === categoryFilter.toLowerCase();
+        const matchesRemote = !remoteOnly || j.is_remote;
+        return matchesSearch && matchesType && matchesLocation && matchesCategory && matchesRemote;
     });
 
     const handleQuickApply = (job: Job) => { setSelectedJob(job); setApplyModalOpen(true); };
 
     return (
-        <DashboardLayout>
+        <>
             <div className="p-4 md:p-8 space-y-6 anime-fade-in font-sans pb-24 text-left">
 
                 {/* Header */}
@@ -122,7 +111,7 @@ const JobBoard = () => {
                                 FILTER
                                 {hasFilters && (
                                     <span className="w-4 h-4 bg-nile-green text-black rounded-full text-[7px] flex items-center justify-center font-semibold">
-                                        {(typeFilter !== 'ALL' ? 1 : 0) + (locationFilter !== 'ALL' ? 1 : 0)}
+                                        {(typeFilter !== 'ALL' ? 1 : 0) + (locationFilter !== 'ALL' ? 1 : 0) + (categoryFilter !== 'ALL' ? 1 : 0) + (remoteOnly ? 1 : 0)}
                                     </span>
                                 )}
                                 <ChevronDown size={12} strokeWidth={3} className={`transition-transform ${showFilters ? 'rotate-180' : ''}`} />
@@ -173,6 +162,33 @@ const JobBoard = () => {
                                         </div>
                                     </div>
 
+                                    <div className="space-y-2">
+                                        <p className="text-[8px] font-semibold text-black/40">EMPLOYMENT CATEGORY</p>
+                                        <div className="grid grid-cols-2 gap-1.5">
+                                            {EMPLOYMENT_CATEGORIES.map(c => (
+                                                <button
+                                                    key={c}
+                                                    onClick={() => setCategoryFilter(c)}
+                                                    className={`flex items-center justify-between px-3 py-2 border border-gray-100 rounded-lg font-semibold text-[8px] transition-all
+                                                        ${categoryFilter === c ? 'bg-nile-blue text-white' : 'bg-nile-white hover:bg-white'}`}
+                                                >
+                                                    {c.toUpperCase()}
+                                                    {categoryFilter === c && <Check size={9} strokeWidth={3} />}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <label className="flex items-center justify-between px-3 py-2 border border-gray-100 rounded-lg cursor-pointer">
+                                        <span className="text-[8px] font-semibold text-black/60">REMOTE ONLY</span>
+                                        <input
+                                            type="checkbox"
+                                            checked={remoteOnly}
+                                            onChange={e => setRemoteOnly(e.target.checked)}
+                                            className="accent-nile-blue"
+                                        />
+                                    </label>
+
                                     <Button fullWidth size="sm" onClick={() => setShowFilters(false)}>
                                         APPLY FILTERS {filtered.length > 0 ? `(${filtered.length})` : ''}
                                     </Button>
@@ -195,6 +211,18 @@ const JobBoard = () => {
                             <span className="flex items-center gap-1.5 px-3 py-1.5 bg-nile-blue text-white border border-gray-100 rounded-lg text-[8px] font-semibold shadow-card">
                                 LOCATION: {locationFilter}
                                 <button onClick={() => setLocationFilter('ALL')}><X size={9} strokeWidth={3} /></button>
+                            </span>
+                        )}
+                        {categoryFilter !== 'ALL' && (
+                            <span className="flex items-center gap-1.5 px-3 py-1.5 bg-nile-blue text-white border border-gray-100 rounded-lg text-[8px] font-semibold shadow-card">
+                                CATEGORY: {categoryFilter.toUpperCase()}
+                                <button onClick={() => setCategoryFilter('ALL')}><X size={9} strokeWidth={3} /></button>
+                            </span>
+                        )}
+                        {remoteOnly && (
+                            <span className="flex items-center gap-1.5 px-3 py-1.5 bg-nile-blue text-white border border-gray-100 rounded-lg text-[8px] font-semibold shadow-card">
+                                REMOTE ONLY
+                                <button onClick={() => setRemoteOnly(false)}><X size={9} strokeWidth={3} /></button>
                             </span>
                         )}
                     </div>
@@ -236,7 +264,7 @@ const JobBoard = () => {
                     />
                 )}
             </div>
-        </DashboardLayout>
+        </>
     );
 };
 

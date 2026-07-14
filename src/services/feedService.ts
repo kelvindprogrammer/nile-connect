@@ -1,5 +1,7 @@
 import { apiClient } from './api';
 
+export type PostKind = 'text' | 'job' | 'achievement' | 'announcement';
+
 export interface Post {
     id: string;
     author_id: string;
@@ -10,7 +12,15 @@ export interface Post {
     likes_count: number;
     comments_count: number;
     liked: boolean;
+    job_id?: string;
+    kind: PostKind;
     created_at: string;
+}
+
+export interface CreatePostOptions {
+    mediaUrl?: string;
+    jobId?: string;
+    kind?: PostKind;
 }
 
 export interface PostComment {
@@ -30,8 +40,13 @@ export const getPosts = async (): Promise<Post[]> => {
     return data.data.posts ?? [];
 };
 
-export const createPost = async (content: string, mediaUrl?: string): Promise<Post> => {
-    const { data } = await apiClient.post<Envelope<Post>>('/api/feed', { content, media_url: mediaUrl });
+export const createPost = async (content: string, opts: CreatePostOptions = {}): Promise<Post> => {
+    const { data } = await apiClient.post<Envelope<Post>>('/api/feed', {
+        content,
+        media_url: opts.mediaUrl,
+        job_id: opts.jobId,
+        kind: opts.kind,
+    });
     return data.data;
 };
 

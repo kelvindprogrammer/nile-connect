@@ -21,10 +21,15 @@
     { "source": "/api/auth/delete-account", "destination": "/api/auth?path=delete-account" },
 
     { "source": "/api/webhooks/campus-one", "destination": "/api/auth?path=webhook" },
+    { "source": "/api/auth/verify-email",   "destination": "/api/auth?path=verify-email" },
 
     { "source": "/api/student/profile",         "destination": "/api/student?path=profile" },
     { "source": "/api/student/applications",    "destination": "/api/student?path=applications" },
     { "source": "/api/student/services",        "destination": "/api/student?path=services" },
+    { "source": "/api/student/documents",       "destination": "/api/student?path=documents" },
+    { "source": "/api/student/documents/:id",   "destination": "/api/student?path=documents&id=:id" },
+    { "source": "/api/student/application-package", "destination": "/api/student?path=application-package" },
+    { "source": "/api/student/application-detail",  "destination": "/api/student?path=application-detail" },
 
     { "source": "/api/jobs/:id",                "destination": "/api/jobs?id=:id" },
 
@@ -44,7 +49,11 @@
 
     { "source": "/api/employer/profile",        "destination": "/api/employer?path=profile" },
     { "source": "/api/employer/jobs",           "destination": "/api/employer?path=jobs" },
+    { "source": "/api/employer/jobs/:id",       "destination": "/api/employer?path=job-detail&id=:id" },
     { "source": "/api/employer/applications",   "destination": "/api/employer?path=applications" },
+    { "source": "/api/employer/application-detail", "destination": "/api/employer?path=application-detail" },
+    { "source": "/api/employer/application-stage",  "destination": "/api/employer?path=application-stage" },
+    { "source": "/api/employer/application-notes",  "destination": "/api/employer?path=application-notes" },
 
     { "source": "/api/messages/conversations",  "destination": "/api/messages?path=conversations" },
     { "source": "/api/messages/thread/:toId",   "destination": "/api/messages?path=thread&toId=:toId" },
@@ -65,8 +74,17 @@
     { "source": "/api/connections",                 "destination": "/api/messages?path=connections" },
     { "source": "/api/connections/request/:toId",   "destination": "/api/messages?path=connections-request&toId=:toId" },
     { "source": "/api/connections/:id/respond",     "destination": "/api/messages?path=connections-respond&id=:id" },
+    { "source": "/api/connections/for/:userId",     "destination": "/api/messages?path=connections-for&userId=:userId" },
+    { "source": "/api/connections/suggestions",     "destination": "/api/messages?path=people-you-may-know" },
+
+    { "source": "/api/profile/:userId/view",        "destination": "/api/messages?path=profile-view&userId=:userId" },
+    { "source": "/api/profile/:userId/endorsements", "destination": "/api/messages?path=endorsements&userId=:userId" },
 
     { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ],
+
+  "crons": [
+    { "path": "/api/jobs?path=deadline-reminders", "schedule": "0 8 * * *" }
   ],
 
   "headers": [
