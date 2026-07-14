@@ -98,3 +98,4 @@ Required (Vercel + local `.env.local`):
 | `RESEND_API_KEY` | Resend API key — powers all transactional email (`lib/email`). Sends are skipped (logged only) when unset, so local dev works without it |
 | `RESEND_FROM` | Optional sender address override, e.g. `Nile Connect <notifications@yourdomain.com>` (falls back to a default) |
 | `CRON_SECRET` | Bearer token Vercel Cron sends to `/api/jobs?path=deadline-reminders`; the endpoint rejects requests without a matching `Authorization: Bearer <secret>` header |
+| `ROLE_OVERRIDE_SECRET` | Optional. If set, enables `POST /api/auth/dev-set-role` (`Authorization: Bearer <secret>`, body `{email, role, student_subtype?}`) for flipping an existing account's role during testing without needing separate Campus One accounts per role. Leave unset in real production to keep the endpoint disabled (404) |

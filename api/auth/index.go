@@ -156,6 +156,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		webhook(w, r)
 	case "verify-email":
 		verifyEmail(w, r)
+	case "dev-set-role":
+		devSetRole(w, r)
 	default:
 		respond.Error(w, http.StatusNotFound, "not found")
 	}
@@ -428,6 +430,81 @@ func logout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.Redirect(w, r, "/login", http.StatusFound)
+}
+
+// ── dev role override (testing only) ─────────────────────────────────────────
+
+// devSetRole lets you flip an already-created account's role for testing
+// student/employer/staff flows without needing three separate real Campus
+// One accounts. Gated by ROLE_OVERRIDE_SECRET — disabled entirely (404)
+// unless that env var is explicitly set, and never touches Campus One or
+// bypasses the SSO login itself, only the role we assign locally.
+//
+// Usage: POST /api/auth/dev-set-role
+//
+//	Authorization: Bearer <ROLE_OVERRIDE_SECRET>
+//	{ "email": "someone@nileuniversity.edu.ng", "role": "employer", "student_subtype": "" }
+func devSetRole(w http.ResponseWriter, r *http.Request) {
+	secret := os.Getenv("ROLE_OVERRIDE_SECRET")
+	if secret == "" {
+		respond.Error(w, http.StatusNotFound, "not found")
+		return
+	}
+	if r.Method != http.MethodPost {
+		respond.Error(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+	if r.Header.Get("Authorization") != "Bearer "+secret {
+		respond.Error(w, http.StatusUnauthorized, "unauthorized")
+		return
+	}
+
+	var req struct {
+		Email          string `json:"email"`
+		Role           string `json:"role"`
+		StudentSubtype string `json:"student_subtype"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		respond.Error(w, http.StatusBadRequest, "invalid request body")
+		return
+	}
+	allowedRoles := map[string]bool{"student": true, "employer": true, "staff": true}
+	if !allowedRoles[req.Role] {
+		respond.Error(w, http.StatusBadRequest, "role must be student, employer, or staff")
+		return
+	}
+	if req.Email == "" {
+		respond.Error(w, http.StatusBadRequest, "email is required")
+		return
+	}
+
+	database, err := db.Get()
+	if err != nil {
+		respond.Error(w, http.StatusInternalServerError, "database unavailable")
+		return
+	}
+	var user models.User
+	if err := database.Where("email = ? AND deleted_at IS NULL", req.Email).First(&user).Error; err != nil {
+		respond.Error(w, http.StatusNotFound, "no account with that email — sign in via Campus One at least once first")
+		return
+	}
+
+	subtype := req.StudentSubtype
+	if req.Role != "student" {
+		subtype = ""
+	}
+	database.Model(&user).Updates(map[string]any{"role": req.Role, "student_subtype": subtype})
+
+	// Employers need a profile row to access /api/employer/* — mirror the
+	// auto-create that normally happens on first employer SSO login.
+	if req.Role == "employer" {
+		var existing models.EmployerProfile
+		if database.Where("user_id = ? AND deleted_at IS NULL", user.ID).First(&existing).Error != nil {
+			database.Create(&models.EmployerProfile{UserID: user.ID, Status: "pending"})
+		}
+	}
+
+	respond.OK(w, map[string]any{"email": req.Email, "role": req.Role, "message": "role updated — API calls pick it up immediately; reload the page in-browser to refresh the cached session"})
 }
 
 // ── me ────────────────────────────────────────────────────────────────────────
