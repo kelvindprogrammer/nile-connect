@@ -23,6 +23,7 @@ Authentication is **Campus One SSO (OIDC)** — there is no username/password lo
 - [Email](#email)
 - [AI Features](#ai-features)
 - [Deployment & Constraints](#deployment--constraints)
+- [Team Notes — Codebase Review](#team-notes--codebase-review)
 - [Contributing](#contributing)
 
 ---
@@ -467,6 +468,18 @@ python api/ai/dev_server.py   # Flask dev server on :5001, proxied by vite.confi
 1. Connect the GitHub repo to Vercel.
 2. Set environment variables in the Vercel Dashboard (see [`CLAUDE.md`](./CLAUDE.md#environment-variables) for the full list).
 3. Push to `main` → Vercel auto-deploys. `vercel.json` handles rewrites, function config, the cron job, and headers.
+
+---
+
+## Team Notes — Codebase Review
+
+Running log from the team's architecture walkthrough. These are observations, not yet-fixed bugs — captured here so they don't get lost, and picked up as separate work once prioritized.
+
+| Date | Area | Note | Status |
+|---|---|---|---|
+| 2026-07-24 | `api/messages/index.go` | It's a single 992-line file handling 18 routes (messages, notifications, connections, presence, typing, endorsements, upload) bundled into one handler to stay under Vercel's 12-function cap. That deployment-unit bundling is a deliberate, necessary tradeoff and shouldn't change — but the *file* doesn't need to be one monolith. Vercel counts functions by folder, not file count, so this can be split into `api/messages/conversations.go`, `notifications.go`, `connections.go`, `presence.go`, etc. — all still `package handler`, still compiling into the same one deployed function, just easier to navigate. | Proposed, not yet done |
+| 2026-07-24 | `api/events/index.go` | `events` is the one domain with zero rewrite entries in `vercel.json`. Every other domain uses the `?path=` sub-action convention; `events` instead routes on raw `?id=` plus `r.Method`, relying on Vercel's automatic file-based routing. Not broken, but inconsistent — anyone adding a new `events` sub-route should match the existing `?id=`/method pattern in that file rather than reaching for the `?path=` convention used everywhere else. | Noted, no action needed unless it causes confusion |
+| 2026-07-24 | `backend/` (repo root) | A second, complete Go module (GoFiber + DDD-style `domain/` packages, own `go.mod`, 88 files) that predates the current architecture. `vercel.json` never references it — confirmed via grep, no build or deploy path touches it. Its own `API_DOCUMENTATION.md`/`ARCHITECTURE.md` already flag it as legacy. Risk is mainly that its domain folder names (`auth`, `employer`, `student`, `messages`, ...) closely mirror the real `api/` folders, so it's easy to edit the wrong file and have nothing change. Since it's unused and unreferenced, recommend deleting it outright rather than keeping it "for reference" — open item for the team to confirm before removal. | Proposed for deletion, pending team confirmation |
 
 ---
 
