@@ -4,8 +4,7 @@ import { apiClient } from '../../services/api';
 import {
     Mail, Sparkles, TrendingUp, ArrowUpRight, Users,
 } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import { useProfile, calculateProfileStrength } from '../../hooks/useProfile';
+import { useProfileCompletion } from '../../hooks/useProfileCompletion';
 import Card from '../../components/Card';
 
 const Bar = ({ value, color }: { value: number; color: string }) => (
@@ -22,9 +21,7 @@ interface EventsResponse { events: Event[]; }
 
 const StudentInsights = () => {
     const navigate = useNavigate();
-    const { user } = useAuth();
-    const { profile } = useProfile(user?.id);
-    const strength = calculateProfileStrength(profile, !!user?.name, !!user?.email);
+    const { profile, strength } = useProfileCompletion();
 
     const [appCount, setAppCount] = useState<number | null>(null);
     const [jobCount, setJobCount] = useState<number | null>(null);
@@ -34,7 +31,7 @@ const StudentInsights = () => {
         Promise.allSettled([
             apiClient.get<ApiEnvelope<ApplicationsResponse>>('/api/student/applications'),
             apiClient.get<ApiEnvelope<JobsResponse>>('/api/jobs'),
-            apiClient.get<ApiEnvelope<EventsResponse>>('/api/events'),
+            apiClient.get<ApiEnvelope<EventsResponse>>('/api/events?upcoming=1'),
         ]).then(([appsR, jobsR, eventsR]) => {
             if (appsR.status === 'fulfilled') {
                 const apps = appsR.value.data?.data?.applications ?? [];

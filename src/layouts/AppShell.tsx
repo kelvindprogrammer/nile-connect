@@ -31,8 +31,6 @@ interface NavConfig {
     primary: { to: string; label: string; icon: React.ElementType; exact?: boolean }[];
     more: { to: string; label: string; icon: React.ElementType; exact?: boolean }[];
     profilePath: string;
-    messagesPath: string;
-    settingsPath: string;
 }
 
 const CONFIG: Record<Role, NavConfig> = {
@@ -59,8 +57,6 @@ const CONFIG: Record<Role, NavConfig> = {
             { to: '/student/insights',     label: 'Insights', icon: Sparkles },
         ],
         profilePath: '/student/profile',
-        messagesPath: '/student/messages',
-        settingsPath: '/student/profile/edit',
     },
     employer: {
         accentBg: 'bg-nile-green', accentBgSoft: 'bg-nile-green/10', accentText: 'text-nile-green', accentShadow: 'shadow-green',
@@ -84,8 +80,6 @@ const CONFIG: Record<Role, NavConfig> = {
             { to: '/employer/settings',     label: 'Settings',     icon: Settings },
         ],
         profilePath: '/employer/profile',
-        messagesPath: '/employer/messages',
-        settingsPath: '/employer/settings',
     },
     staff: {
         accentBg: 'bg-gray-900', accentBgSoft: 'bg-gray-100', accentText: 'text-gray-900', accentShadow: 'shadow-soft-md',
@@ -110,8 +104,6 @@ const CONFIG: Record<Role, NavConfig> = {
             { to: '/staff/settings', label: 'Settings',  icon: Settings },
         ],
         profilePath: '/staff/profile',
-        messagesPath: '/staff/messages',
-        settingsPath: '/staff/settings',
     },
 };
 
@@ -405,20 +397,12 @@ const AppShell = () => {
                         </div>
                     </div>
 
+                    {/* Notifications only. The envelope and gear icons that used
+                        to sit here duplicated the sidebar's Messages entry and
+                        the profile menu's Settings link, spending header space
+                        on destinations already one click away. Notifications
+                        stay because there is no other route to the tray. */}
                     <div className="flex items-center gap-1 flex-shrink-0">
-                        <button onClick={() => navigate(cfg.messagesPath)}
-                            className="relative p-2 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors">
-                            <Mail size={18} />
-                            {unreadMsgCount > 0 && (
-                                <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1">
-                                    {unreadMsgCount > 9 ? '9+' : unreadMsgCount}
-                                </span>
-                            )}
-                        </button>
-                        <button onClick={() => navigate(cfg.settingsPath)}
-                            className="p-2 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors hidden sm:flex">
-                            <Settings size={18} />
-                        </button>
                         <div className="relative">
                             <button onClick={toggleNotifications}
                                 className={`relative p-2 rounded-xl transition-colors ${showNotifications ? cfg.notifActiveClasses : 'text-gray-400 hover:text-gray-700 hover:bg-gray-50'}`}>

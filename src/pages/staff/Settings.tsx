@@ -285,7 +285,7 @@ const StaffSettings = () => {
                             <p className="text-[9px] font-bold text-black/30">End your admin session securely.</p>
                         </div>
                         <button
-                            onClick={logout}
+                            onClick={() => logout()}
                             className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-100 rounded-lg font-semibold text-[8px] text-black hover:bg-black hover:text-white transition-all"
                         >
                             <LogOut size={10} /> SIGN OUT

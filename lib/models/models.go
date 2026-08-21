@@ -36,6 +36,22 @@ type User struct {
 
 	// ResumeURL points to the student's uploaded CV/resume (Vercel Blob).
 	ResumeURL string `gorm:"type:text"`
+
+	// Extended profile — previously held only in browser localStorage, which
+	// meant it never followed the user across devices and seeded every account
+	// with the same placeholder bio/links (making Profile Strength read 100%
+	// for a brand-new, empty profile). These columns are the source of truth.
+	Bio       string `gorm:"type:text"`
+	Location  string `gorm:"type:text"`
+	Phone     string `gorm:"type:text"`
+	LinkedIn  string `gorm:"type:text"`
+	Portfolio string `gorm:"type:text"`
+	GitHub    string `gorm:"type:text"`
+	// Skills is a JSON array of strings; Experiences a JSON array of
+	// {id,title,company,duration,description} objects. Stored as TEXT to keep
+	// the simple-protocol GORM driver happy.
+	Skills      string `gorm:"type:text"`
+	Experiences string `gorm:"type:text"`
 }
 
 type EmployerProfile struct {
@@ -177,6 +193,14 @@ type Event struct {
 	AttendanceCount    int            `gorm:"default:0"`
 	IsFeatured         bool           `gorm:"default:false"`
 	Status             string         `gorm:"type:text;default:'pending'"`
+
+	// SuggestedBy is set when a student proposes an event rather than a staff
+	// member or employer creating it directly. Such events stay in `pending`
+	// until staff publish or cancel them, at which point the reviewer is
+	// recorded here.
+	SuggestedBy string `gorm:"type:text;index"`
+	ReviewedBy  string `gorm:"type:text"`
+	ReviewedAt  *time.Time
 }
 
 type EventRegistration struct {

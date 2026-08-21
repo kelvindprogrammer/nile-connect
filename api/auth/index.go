@@ -170,6 +170,37 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 // ── login ─────────────────────────────────────────────────────────────────────
 
+// activeSessionRole reports whether the request carries a session that is still
+// good for a real, existing user, and returns that user's current role.
+//
+// Verifying the row still exists matters: a signed cookie alone is not enough.
+// If the account had been deleted (or the database reset) while the cookie
+// lived on, skipping straight to the dashboard would bounce the browser into
+// login -> dashboard -> /api/auth/me 401 -> login forever. The role is read
+// from the database rather than from the JWT claim for the same reason
+// role checks elsewhere are: the claim can be stale after a role change.
+func activeSessionRole(r *http.Request) (string, bool) {
+	cookie, err := r.Cookie("nile_session")
+	if err != nil || cookie.Value == "" {
+		return "", false
+	}
+	claims, err := jwtutil.ParseSession(cookie.Value)
+	if err != nil || claims.UserID == "" {
+		return "", false
+	}
+	database, err := db.Get()
+	if err != nil {
+		// Database unavailable: fall through to the normal SSO flow rather
+		// than redirecting into a dashboard that cannot load either.
+		return "", false
+	}
+	var user models.User
+	if err := database.Where("id = ? AND deleted_at IS NULL", claims.UserID).First(&user).Error; err != nil {
+		return "", false
+	}
+	return user.Role, true
+}
+
 // login initiates the Campus One OIDC PKCE authorization code flow.
 // The browser is redirected to Campus One's consent screen.
 func login(w http.ResponseWriter, r *http.Request) {
@@ -195,6 +226,22 @@ func login(w http.ResponseWriter, r *http.Request) {
 	next := r.URL.Query().Get("next")
 	if next == "" || !strings.HasPrefix(next, "/") {
 		next = ""
+	}
+
+	// Short-circuit when the browser already holds a valid session. Without
+	// this, every hit on /api/auth/login restarted the full OIDC dance and
+	// Campus One re-displayed its consent screen to a user who was already
+	// signed in — the "consent page appears again" QA report. `?prompt=login`
+	// forces a genuine re-authentication (account switching, staff testing).
+	if r.URL.Query().Get("prompt") != "login" {
+		if role, ok := activeSessionRole(r); ok {
+			dest := next
+			if dest == "" {
+				dest = roleDashboard(role)
+			}
+			http.Redirect(w, r, appBaseURL(r)+dest, http.StatusFound)
+			return
+		}
 	}
 
 	state := randBase64(16)

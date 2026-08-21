@@ -14,14 +14,14 @@ import { useToast } from '../../context/ToastContext';
 import { useProfile, type Experience } from '../../hooks/useProfile';
 import { useProfilePicture } from '../../hooks/useProfilePicture';
 import { uploadFile } from '../../services/messageService';
-import { apiClient } from '../../services/api';
+import { apiClient, getErrorMessage } from '../../services/api';
 
 
 const EditProfile = () => {
     const navigate = useNavigate();
     const { user, logout } = useAuth();
     const { showToast } = useToast();
-    const { profile, updateProfile } = useProfile(user?.id);
+    const { profile, updateProfile, isLoading: profileLoading } = useProfile(user?.id);
     const { picture, uploadPicture, removePicture } = useProfilePicture();
     const picInputRef = useRef<HTMLInputElement>(null);
     const [uploadingPic, setUploadingPic] = useState(false);
@@ -30,19 +30,39 @@ const EditProfile = () => {
     const [resumeUrl, setResumeUrl] = useState(user?.resumeUrl || '');
 
     const [name, setName] = useState(user?.name || '');
-    const [email, setEmail] = useState(user?.email || '');
-    const [bio, setBio] = useState(profile.bio || '');
-    const [major, setMajor] = useState(profile.major || user?.major || '');
+    const [bio, setBio] = useState('');
+    const [major, setMajor] = useState('');
     const [gpa, setGpa] = useState<string>('');
-    const [location, setLocation] = useState(profile.location || 'Abuja, Nigeria');
-    const [linkedIn, setLinkedIn] = useState(profile.linkedIn || '');
-    const [portfolio, setPortfolio] = useState(profile.portfolio || '');
-    const [github, setGithub] = useState(profile.github || '');
-    const [phone, setPhone] = useState(profile.phone || '');
-    const [skills, setSkills] = useState<string[]>(profile.skills || []);
+    const [location, setLocation] = useState('');
+    const [linkedIn, setLinkedIn] = useState('');
+    const [portfolio, setPortfolio] = useState('');
+    const [github, setGithub] = useState('');
+    const [phone, setPhone] = useState('');
+    const [skills, setSkills] = useState<string[]>([]);
     const [skillInput, setSkillInput] = useState('');
-    const [experiences, setExperiences] = useState<Experience[]>(profile.experiences || []);
+    const [experiences, setExperiences] = useState<Experience[]>([]);
     const [showAddExp, setShowAddExp] = useState(false);
+    const [saving, setSaving] = useState(false);
+
+    // Seed the form from the server profile exactly once, during render rather
+    // than in an effect so the fields are already populated on their first
+    // paint. Keying on the user id means it re-seeds on an account switch but
+    // never overwrites edits in progress on a re-render.
+    const hydrationKey = !profileLoading && user?.id ? user.id : null;
+    const [hydratedFor, setHydratedFor] = useState<string | null>(null);
+    if (hydrationKey && hydratedFor !== hydrationKey) {
+        setHydratedFor(hydrationKey);
+        setName(user?.name || '');
+        setBio(profile.bio);
+        setMajor(profile.major || user?.major || '');
+        setLocation(profile.location);
+        setLinkedIn(profile.linkedIn);
+        setPortfolio(profile.portfolio);
+        setGithub(profile.github);
+        setPhone(profile.phone);
+        setSkills(profile.skills);
+        setExperiences(profile.experiences);
+    }
     const [newExp, setNewExp] = useState<Omit<Experience, 'id'>>({
         title: '', company: '', duration: '', description: '',
     });
@@ -117,18 +137,37 @@ const EditProfile = () => {
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (saving) return;
+
+        if (!name.trim()) {
+            showToast('Your name cannot be empty', 'error');
+            return;
+        }
+        const gpaValue = gpa.trim() ? Number(gpa) : undefined;
+        if (gpaValue !== undefined && (Number.isNaN(gpaValue) || gpaValue < 0 || gpaValue > 5)) {
+            showToast('GPA must be a number between 0 and 5', 'error');
+            return;
+        }
+
+        setSaving(true);
         try {
-            const gpaValue = gpa.trim() ? Number(gpa) : undefined;
-            await apiClient.put('/api/student/profile', {
-                full_name: name,
-                major,
-                ...(gpaValue !== undefined && !Number.isNaN(gpaValue) ? { gpa: gpaValue } : {}),
+            // Core and extended fields land in the same PUT. They used to be
+            // split across an API call and a localStorage write, so a failed
+            // request still showed "Profile updated successfully" and left the
+            // two halves of the profile disagreeing.
+            await updateProfile({
+                bio, major, location, linkedIn, portfolio, github, phone, skills, experiences,
             });
-            updateProfile({ bio, major, location, linkedIn, portfolio, github, phone, skills, experiences });
+            await apiClient.put('/api/student/profile', {
+                full_name: name.trim(),
+                ...(gpaValue !== undefined ? { gpa: gpaValue } : {}),
+            });
             showToast('Profile updated successfully!', 'success');
             navigate('/student/profile');
-        } catch {
-            showToast('Failed to update profile.', 'error');
+        } catch (err) {
+            showToast(getErrorMessage(err, 'Failed to update profile.'), 'error');
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -226,7 +265,15 @@ const EditProfile = () => {
                         <h3 className="text-xs font-semibold text-black/50 border-b border-black/10 pb-2">BASIC INFORMATION</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <InputField label="FULL NAME" value={name} onChange={e => setName(e.target.value)} icon={<User size={14} />} />
-                            <InputField label="EMAIL ADDRESS" type="email" value={email} onChange={e => setEmail(e.target.value)} icon={<Mail size={14} />} />
+                            <InputField
+                                label="EMAIL ADDRESS"
+                                type="email"
+                                value={user?.email || ''}
+                                readOnly
+                                disabled
+                                icon={<Mail size={14} />}
+                                hint="Managed by Campus One SSO"
+                            />
                             <InputField label="ACADEMIC MAJOR" value={major} onChange={e => setMajor(e.target.value)} icon={<GraduationCap size={14} />} />
                             <InputField
                                 label="GPA / CGPA"
@@ -372,8 +419,8 @@ const EditProfile = () => {
                     </Card>
 
                     <div className="pt-4 border-t border-gray-100/5">
-                        <Button fullWidth size="md" type="submit">
-                            <Save size={14} className="mr-2" /> SAVE PROFILE
+                        <Button fullWidth size="md" type="submit" isLoading={saving} disabled={profileLoading}>
+                            <Save size={14} className="mr-2" /> {saving ? 'SAVING…' : 'SAVE PROFILE'}
                         </Button>
                     </div>
                 </form>

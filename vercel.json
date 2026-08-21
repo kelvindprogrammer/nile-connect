@@ -34,6 +34,10 @@
     { "source": "/api/student/application-package", "destination": "/api/student?path=application-package" },
     { "source": "/api/student/application-detail",  "destination": "/api/student?path=application-detail" },
 
+    { "source": "/api/events/register",         "destination": "/api/events?path=register" },
+    { "source": "/api/events/suggest",          "destination": "/api/events?path=suggest" },
+    { "source": "/api/events/categories",       "destination": "/api/events?path=categories" },
+
     { "source": "/api/jobs/:id",                "destination": "/api/jobs?id=:id" },
 
     { "source": "/api/feed/:id/like",           "destination": "/api/feed?path=like&id=:id" },

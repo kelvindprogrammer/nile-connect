@@ -10,7 +10,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import Button from '../../components/Button';
 import { apiClient } from '../../services/api';
-import { useProfile, calculateProfileStrength } from '../../hooks/useProfile';
+import { useProfileCompletion } from '../../hooks/useProfileCompletion';
 import { useProfilePicture } from '../../hooks/useProfilePicture';
 import { recordProfileView, getEndorsements, type EndorsementsResponse } from '../../services/profileService';
 import { getMyApplications } from '../../services/studentService';
@@ -34,7 +34,7 @@ const Profile = () => {
     const navigate = useNavigate();
     const { user, logout } = useAuth();
     const { showToast } = useToast();
-    const { profile } = useProfile(user?.id);
+    const { profile, completion } = useProfileCompletion();
     const { picture: profilePic, uploadPicture } = useProfilePicture();
     const [apiProfile, setApiProfile] = useState<StudentProfile | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -97,13 +97,13 @@ const Profile = () => {
     };
 
     const displayName = apiProfile?.full_name || user?.name || 'USER';
-    const major = profile.major || apiProfile?.major || user?.major || 'Computer Science';
+    const major = profile.major || apiProfile?.major || user?.major || '';
     const gradYear = apiProfile?.graduation_year || user?.graduationYear;
     const email = apiProfile?.email || user?.email || '';
     const isVerified = apiProfile?.is_verified ?? user?.isVerified ?? false;
     const bio = profile.bio || '';
-    const location = profile.location || 'Abuja, Nigeria';
-    const strength = calculateProfileStrength(profile, !!displayName, !!email);
+    const location = profile.location;
+    const strength = completion.percent;
 
     if (isLoading) {
         return (
@@ -170,12 +170,22 @@ const Profile = () => {
                                     )}
                                 </div>
                                 <p className="font-medium text-nile-blue text-sm">
-                                    {major} • Nile University{gradYear ? ` • ${gradYear}` : ''}
+                                    {[major, 'Nile University', gradYear].filter(Boolean).join(' • ')}
                                 </p>
-                                <div className="flex items-center gap-2 text-xs text-gray-400 pt-1">
-                                    <MapPin size={12} strokeWidth={3} />
-                                    <span>{location}</span>
-                                </div>
+                                {location ? (
+                                    <div className="flex items-center gap-2 text-xs text-gray-400 pt-1">
+                                        <MapPin size={12} strokeWidth={3} />
+                                        <span>{location}</span>
+                                    </div>
+                                ) : (
+                                    <button
+                                        onClick={() => navigate('/student/profile/edit')}
+                                        className="flex items-center gap-2 text-xs text-gray-300 hover:text-nile-blue transition-colors pt-1"
+                                    >
+                                        <MapPin size={12} strokeWidth={3} />
+                                        <span>Add your location</span>
+                                    </button>
+                                )}
                             </div>
                             <div className="flex gap-2 flex-shrink-0">
                                 <Button variant="outline" size="sm" onClick={handleShareProfile} title="Copy profile link">
@@ -204,7 +214,8 @@ const Profile = () => {
                 {strength < 80 && (
                     <div className="bg-nile-blue/5 border border-dashed border-nile-blue/20 rounded-2xl p-4 flex items-center justify-between gap-4">
                         <p className="text-sm font-medium text-nile-blue">
-                            Profile at {strength}% — {strength < 50 ? 'Add your bio, skills and experience to unlock more opportunities' : 'Add LinkedIn and portfolio to reach 100%'}
+                            Profile at {strength}% — still to add: {completion.missing.slice(0, 3).join(', ')}
+                            {completion.missing.length > 3 ? ` and ${completion.missing.length - 3} more` : ''}
                         </p>
                         <Button size="xs" variant="primary" onClick={() => navigate('/student/profile/edit')}>
                             Complete
@@ -260,8 +271,15 @@ const Profile = () => {
                             )}
                         </SectionCard>
 
-                        {profile.skills.length > 0 && (
-                            <SectionCard title="Skills">
+                        <SectionCard title="Skills">
+                            {profile.skills.length === 0 ? (
+                                <button
+                                    onClick={() => navigate('/student/profile/edit')}
+                                    className="w-full py-6 border border-dashed border-gray-200 rounded-2xl text-xs font-medium text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-all flex items-center justify-center gap-2"
+                                >
+                                    <Plus size={14} strokeWidth={4} /> Add your skills
+                                </button>
+                            ) : (
                                 <div className="flex flex-wrap gap-2">
                                     {profile.skills.map(s => {
                                         const count = endorsementCount(s);
@@ -277,8 +295,8 @@ const Profile = () => {
                                         );
                                     })}
                                 </div>
-                            </SectionCard>
-                        )}
+                            )}
+                        </SectionCard>
                     </div>
 
                     <div className="space-y-6 md:space-y-8">
@@ -289,7 +307,7 @@ const Profile = () => {
                                 </div>
                                 <div className="min-w-0">
                                     <p className="font-semibold text-gray-900 text-sm leading-none truncate">Nile University</p>
-                                    <p className="text-xs text-nile-blue mt-1">B.Sc. {major}</p>
+                                    <p className="text-xs text-nile-blue mt-1">{major ? `B.Sc. ${major}` : 'Course not set'}</p>
                                     {gradYear && <p className="text-xs text-gray-400 mt-2">Class of {gradYear}</p>}
                                 </div>
                             </div>

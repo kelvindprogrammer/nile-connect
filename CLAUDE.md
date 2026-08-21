@@ -18,10 +18,20 @@ vercel dev           # Starts React + all Go/Python serverless functions at loca
 pip install -r api/ai/requirements.txt
 python api/ai/dev_server.py   # Flask dev server on port 5001 (proxied by vite.config.ts)
 
-# Go (no dedicated test runner — verify by running vercel dev)
+# Go
+# (no dedicated runner for the handlers — verify those by running vercel dev)
 ```
 
-There are no automated tests. Manual verification is the only test strategy.
+```bash
+# Tests
+npm test             # Vitest (frontend unit tests, *.test.ts next to the source)
+go test ./...        # Go unit tests
+```
+
+Coverage is deliberately narrow: it guards the two contracts that silently broke
+in production — the event-category vocabulary shared across Go and TypeScript,
+and the profile-completeness calculation. Everything else is still verified by
+running the app.
 
 ## Architecture
 
@@ -59,6 +69,31 @@ Adding any new endpoint requires **both** a `case "xxx":` in the handler's `swit
 Must update in this exact order: `lib/models/models.go` → `lib/db/db.go` (explicit ALTER TABLE) → `api/auth/index.go:userToResponse` → `src/services/authService.ts:BackendUser` → `src/context/AuthContext.tsx:User` + `mapBackendUser`.
 
 **Applications pipeline / ATS:** `Application.Stage` (rich 9-value enum: submitted, under_review, shortlisted, interview_scheduled, assessment_sent, offer_extended, accepted, rejected, withdrawn — see `lib/pipeline`) drives the ATS UI; the legacy 5-value `Application.Status` is kept in sync via `pipeline.ToLegacyStatus()` so older readers still work. Every stage change is recorded in `ApplicationStageHistory`. Students attach reusable `Document` rows (resume/cover_letter/reference_letter/transcript/siwes_letter/certification/portfolio) to applications instead of re-uploading each time — see `api/student/index.go` (`documents`, `application-package` cases) and `api/jobs/index.go` (`apply` case validates `document_ids` against a job's `RequiredDocs`).
+
+**Events:** `Event.Category` is always one of the canonical slugs in `lib/eventcat`
+(`career_fair`, `workshop`, `networking`, `webinar`, `seminar`, `info_session`,
+`alumni_meetup`, `hackathon`, `tech_talk`, `other`). `eventcat.Normalize()` runs
+on every write and every read, and `lib/db` re-normalises existing rows on cold
+start. The frontend mirror is `EVENT_CATEGORIES` in `src/services/eventService.ts`
+— **the two lists must stay identical**; `src/services/eventService.test.ts`
+parses the Go file and fails the build if they drift. Three divergent spellings
+of the same category ("Career Fair" / "career_fair" / "FAIR") is what made
+category filtering return nothing.
+
+Event visibility is role-scoped in `listEvents`: staff see every row, employers
+see published events plus their own, students see published events plus their
+own suggestions, anonymous callers see published only. Registration is a real
+`EventRegistration` row behind a unique `(event_id, student_id)` index;
+`registrations_count` is always recomputed from those rows, never incremented.
+Sub-routes are `?path=register|suggest|categories` (see `vercel.json`).
+
+**Extended profile:** bio, location, phone, LinkedIn, portfolio, GitHub, skills
+and experiences are **columns on `users`**, served by `/api/student/profile`.
+They previously lived only in browser localStorage seeded with placeholder
+values, which made Profile Strength read 100% on an empty profile. `useProfile`
+treats an untouched profile as genuinely empty and keeps localStorage only as a
+render cache. Compute strength via `useProfileCompletion()` — never re-derive it
+per page, or different screens will disagree.
 
 **Email:** `lib/email` sends transactional email via Resend (fire-and-forget, logs and continues if `RESEND_API_KEY` is unset — never blocks the request). `notify.CreateAndEmail()` is the standard call site: it creates the in-app `Notification` row and sends the matching email template in one call. Add new events by writing a template function in `lib/email/templates.go` and calling `notify.CreateAndEmail` at the relevant handler site.
 

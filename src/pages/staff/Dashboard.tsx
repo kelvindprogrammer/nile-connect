@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ChevronRight, GraduationCap, Calendar as CalendarIcon, BarChart2, Sparkles, Settings } from 'lucide-react';
+import { ChevronRight, GraduationCap, Calendar as CalendarIcon, BarChart2, Sparkles, Settings, Briefcase, HeartHandshake, Mail } from 'lucide-react';
 import Feed from '../../components/Feed';
+import HomeLayout from '../../components/home/HomeLayout';
+import MobileQuickActions from '../../components/home/MobileQuickActions';
 import ProfileSnapshotCard from '../../components/home/ProfileSnapshotCard';
 import StaffStatsCard from '../../components/home/StaffStatsCard';
 import EventsCard from '../../components/home/EventsCard';
@@ -26,10 +28,8 @@ const StaffDashboard = () => {
     const totalPending = (stats?.pending_employers ?? 0) + (stats?.pending_jobs ?? 0);
 
     return (
-        <div className="max-w-[1180px] mx-auto p-4 md:py-6 grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[260px_minmax(0,1fr)_300px] gap-5 anime-fade-in font-sans pb-24 md:pb-6 items-start">
-
-            {/* ── Left rail: staff snapshot ────────────────────────────── */}
-            <div className="hidden lg:flex flex-col gap-5 sticky top-[76px]">
+        <HomeLayout
+            left={
                 <ProfileSnapshotCard
                     name={staffName}
                     headline={user?.department || 'Career Services'}
@@ -45,34 +45,49 @@ const StaffDashboard = () => {
                         { label: 'Settings', icon: Settings, to: '/staff/settings' },
                     ]}
                 />
-            </div>
+            }
+            right={
+                <>
+                    <StaffStatsCard stats={stats} />
+                    <EventsCard seeAllTo="/staff/events" />
+                </>
+            }
+            mobileHeader={
+                <MobileQuickActions
+                    greeting="Welcome"
+                    name={staffName.split(' ')[0]}
+                    subLabel={user?.department || 'Career Services'}
+                    accent="text-gray-900"
+                    stats={[
+                        { label: 'Pending employers', value: stats?.pending_employers ?? '—', to: '/staff/insights' },
+                        { label: 'Pending jobs', value: stats?.pending_jobs ?? '—', to: '/staff/jobs' },
+                        { label: 'Students', value: stats?.total_students ?? '—', to: '/staff/crm' },
+                    ]}
+                    actions={[
+                        { label: 'Services', icon: GraduationCap, to: '/staff/services' },
+                        { label: 'Events', icon: CalendarIcon, to: '/staff/events' },
+                        { label: 'Jobs', icon: Briefcase, to: '/staff/jobs' },
+                        { label: 'Network', icon: HeartHandshake, to: '/staff/crm' },
+                        { label: 'Reports', icon: BarChart2, to: '/staff/reports' },
+                        { label: 'Insights', icon: Sparkles, to: '/staff/insights', badge: totalPending },
+                        { label: 'Messages', icon: Mail, to: '/staff/messages' },
+                        { label: 'Settings', icon: Settings, to: '/staff/settings' },
+                    ]}
+                />
+            }
+        >
+            {totalPending > 0 && (
+                <button onClick={() => navigate('/staff/insights')}
+                    className="w-full flex items-center justify-between gap-3 px-4 py-3 mb-4 bg-red-50 border border-red-100 rounded-2xl hover:bg-red-100/60 transition-colors">
+                    <span className="text-sm font-medium text-red-600">
+                        {totalPending} pending approval{totalPending !== 1 ? 's' : ''} need your attention
+                    </span>
+                    <ChevronRight size={16} className="text-red-400 flex-shrink-0" />
+                </button>
+            )}
 
-            {/* ── Center: composer + feed ──────────────────────────────── */}
-            <div className="min-w-0">
-                <div className="lg:hidden mb-4">
-                    <h1 className="text-lg font-semibold text-gray-900 leading-tight">Welcome, {staffName.split(' ')[0]}</h1>
-                    <p className="text-xs text-gray-400 mt-0.5">{user?.department || 'Career Services'}</p>
-                </div>
-
-                {totalPending > 0 && (
-                    <button onClick={() => navigate('/staff/insights')}
-                        className="w-full flex items-center justify-between gap-3 px-4 py-3 mb-4 bg-red-50 border border-red-100 rounded-2xl hover:bg-red-100/60 transition-colors">
-                        <span className="text-sm font-medium text-red-600">
-                            {totalPending} pending approval{totalPending !== 1 ? 's' : ''} need your attention
-                        </span>
-                        <ChevronRight size={16} className="text-red-400 flex-shrink-0" />
-                    </button>
-                )}
-
-                <Feed />
-            </div>
-
-            {/* ── Right rail: stats, events ─────────────────────────────── */}
-            <div className="hidden xl:flex flex-col gap-5 sticky top-[76px]">
-                <StaffStatsCard stats={stats} />
-                <EventsCard seeAllTo="/staff/events" />
-            </div>
-        </div>
+            <Feed />
+        </HomeLayout>
     );
 };
 

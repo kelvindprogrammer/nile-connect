@@ -10,6 +10,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 
+	"nile-connect/lib/eventcat"
 	"nile-connect/lib/models"
 )
 
@@ -185,7 +186,57 @@ func migrate(db *gorm.DB) {
 		`CREATE INDEX IF NOT EXISTS idx_profile_views_subject ON profile_views(profile_user_id)`,
 		`CREATE INDEX IF NOT EXISTS idx_endorsements_subject ON endorsements(profile_user_id)`,
 		`CREATE UNIQUE INDEX IF NOT EXISTS idx_endorsements_unique ON endorsements(endorser_id, profile_user_id, skill)`,
+
+		// Extended profile — moved out of browser localStorage into the DB.
+		`ALTER TABLE users ADD COLUMN IF NOT EXISTS bio TEXT`,
+		`ALTER TABLE users ADD COLUMN IF NOT EXISTS location TEXT`,
+		`ALTER TABLE users ADD COLUMN IF NOT EXISTS phone TEXT`,
+		`ALTER TABLE users ADD COLUMN IF NOT EXISTS linked_in TEXT`,
+		`ALTER TABLE users ADD COLUMN IF NOT EXISTS portfolio TEXT`,
+		`ALTER TABLE users ADD COLUMN IF NOT EXISTS git_hub TEXT`,
+		`ALTER TABLE users ADD COLUMN IF NOT EXISTS skills TEXT`,
+		`ALTER TABLE users ADD COLUMN IF NOT EXISTS experiences TEXT`,
+
+		// Event registrations — one row per (event, student), enforced in the DB
+		// so a double-submitted Register click can never inflate the count.
+		`CREATE INDEX IF NOT EXISTS idx_event_registrations_event ON event_registrations(event_id)`,
+		`CREATE INDEX IF NOT EXISTS idx_event_registrations_student ON event_registrations(student_id)`,
+		`DELETE FROM event_registrations a USING event_registrations b
+		   WHERE a.ctid < b.ctid AND a.event_id = b.event_id AND a.student_id = b.student_id`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS idx_event_registrations_unique ON event_registrations(event_id, student_id)`,
+
+		// Events — suggestion trail for student-proposed events.
+		`ALTER TABLE events ADD COLUMN IF NOT EXISTS suggested_by TEXT`,
+		`ALTER TABLE events ADD COLUMN IF NOT EXISTS reviewed_by TEXT`,
+		`ALTER TABLE events ADD COLUMN IF NOT EXISTS reviewed_at TIMESTAMPTZ`,
+		`UPDATE events SET status = 'pending' WHERE status IS NULL OR status = ''`,
 	} {
 		db.Exec(stmt)
+	}
+
+	normalizeEventCategories(db)
+}
+
+// normalizeEventCategories rewrites legacy events.category spellings onto the
+// canonical eventcat slugs. Historically staff wrote "Career Fair" and
+// employers wrote "career_fair" for the same thing, so category filtering
+// matched nothing. Running this on every cold start is idempotent: rows that
+// already hold a canonical slug are skipped by the WHERE clause.
+func normalizeEventCategories(db *gorm.DB) {
+	var rows []struct {
+		ID       string
+		Category string
+	}
+	if err := db.Raw(`SELECT id, category FROM events WHERE deleted_at IS NULL`).Scan(&rows).Error; err != nil {
+		return
+	}
+	for _, row := range rows {
+		canonical := eventcat.Normalize(row.Category)
+		if canonical == row.Category {
+			continue
+		}
+		if err := db.Exec(`UPDATE events SET category = ? WHERE id = ?`, canonical, row.ID).Error; err != nil {
+			log.Printf("normalize event category %s: %v", row.ID, err)
+		}
 	}
 }

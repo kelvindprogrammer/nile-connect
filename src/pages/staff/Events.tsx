@@ -6,22 +6,22 @@ import {
 } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 import { apiClient } from '../../services/api';
+import {
+    EVENT_CATEGORIES, categoryLabel, type EventCategory as SharedEventCategory,
+} from '../../services/eventService';
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-type EventCategory =
-    | 'Career Fair'
-    | 'Workshop'
-    | 'Networking'
-    | 'Webinar'
-    | 'Info Session'
-    | 'Alumni Meetup'
-    | 'Hackathon';
+// Categories come from the shared vocabulary in eventService, which mirrors
+// lib/eventcat on the server. This page previously declared its own title-case
+// list ("Career Fair") while the employer console used snake_case and the
+// student page filtered on yet another spelling, so nothing ever matched.
+type EventCategory = SharedEventCategory;
 
 type EventStatus = 'pending' | 'published' | 'upcoming' | 'past' | 'cancelled';
-type StatusTab   = 'ALL' | 'UPCOMING' | 'PAST' | 'CANCELLED';
+type StatusTab   = 'ALL' | 'PENDING' | 'UPCOMING' | 'PAST' | 'CANCELLED';
 
 interface NileEvent {
     id:                 string;
@@ -35,7 +35,9 @@ interface NileEvent {
     registrations_count: number;
     is_featured:        boolean;
     status:             EventStatus;
-    organiser_type:     'staff' | 'employer';
+    organiser_type:     'staff' | 'employer' | 'student';
+    /** Set when a student proposed the event rather than staff creating it. */
+    suggested_by?:      string;
 }
 
 interface FormState {
@@ -53,19 +55,19 @@ interface FormState {
 // Constants
 // ---------------------------------------------------------------------------
 
-const CATEGORIES: EventCategory[] = [
-    'Career Fair', 'Workshop', 'Networking', 'Webinar',
-    'Info Session', 'Alumni Meetup', 'Hackathon',
-];
+const CATEGORIES = EVENT_CATEGORIES;
 
-const CATEGORY_STYLES: Record<EventCategory, { tag: string; bar: string; icon: React.ReactNode }> = {
-    'Career Fair':   { tag: 'bg-nile-blue/10 text-nile-blue border-nile-blue/30',        bar: '#1E499D', icon: <LayoutGrid size={11} /> },
-    'Workshop':      { tag: 'bg-purple-50 text-purple-600 border-purple-200',             bar: '#9333ea', icon: <BookOpen size={11} /> },
-    'Networking':    { tag: 'bg-nile-green/10 text-nile-green border-nile-green/30',      bar: '#6CBB56', icon: <Coffee size={11} /> },
-    'Webinar':       { tag: 'bg-orange-50 text-orange-500 border-orange-200',             bar: '#f97316', icon: <Radio size={11} /> },
-    'Info Session':  { tag: 'bg-yellow-50 text-yellow-600 border-yellow-200',             bar: '#ca8a04', icon: <Zap size={11} /> },
-    'Alumni Meetup': { tag: 'bg-pink-50 text-pink-600 border-pink-200',                   bar: '#ec4899', icon: <Award size={11} /> },
-    'Hackathon':     { tag: 'bg-black text-white border-black',                           bar: '#000000', icon: <Code2 size={11} /> },
+const CATEGORY_STYLES: Record<string, { tag: string; bar: string; icon: React.ReactNode }> = {
+    career_fair:   { tag: 'bg-nile-blue/10 text-nile-blue border-nile-blue/30',   bar: '#1E499D', icon: <LayoutGrid size={11} /> },
+    workshop:      { tag: 'bg-purple-50 text-purple-600 border-purple-200',       bar: '#9333ea', icon: <BookOpen size={11} /> },
+    networking:    { tag: 'bg-nile-green/10 text-nile-green border-nile-green/30', bar: '#6CBB56', icon: <Coffee size={11} /> },
+    webinar:       { tag: 'bg-orange-50 text-orange-500 border-orange-200',       bar: '#f97316', icon: <Radio size={11} /> },
+    seminar:       { tag: 'bg-gray-100 text-gray-600 border-gray-200',            bar: '#6b7280', icon: <BookOpen size={11} /> },
+    info_session:  { tag: 'bg-yellow-50 text-yellow-600 border-yellow-200',       bar: '#ca8a04', icon: <Zap size={11} /> },
+    alumni_meetup: { tag: 'bg-pink-50 text-pink-600 border-pink-200',             bar: '#ec4899', icon: <Award size={11} /> },
+    hackathon:     { tag: 'bg-black text-white border-black',                     bar: '#000000', icon: <Code2 size={11} /> },
+    tech_talk:     { tag: 'bg-nile-blue/10 text-nile-blue border-nile-blue/30',   bar: '#1E499D', icon: <Code2 size={11} /> },
+    other:         { tag: 'bg-gray-100 text-gray-500 border-gray-200',            bar: '#9ca3af', icon: <Globe size={11} /> },
 };
 
 const STATUS_STYLES: Record<string, string> = {
@@ -78,7 +80,7 @@ const STATUS_STYLES: Record<string, string> = {
 
 const EMPTY_FORM: FormState = {
     title:       '',
-    category:    'Career Fair',
+    category:    'career_fair',
     date:        '',
     time:        '09:00',
     location:    '',
@@ -87,7 +89,7 @@ const EMPTY_FORM: FormState = {
     is_featured: false,
 };
 
-const STATUS_TABS: StatusTab[] = ['ALL', 'UPCOMING', 'PAST', 'CANCELLED'];
+const STATUS_TABS: StatusTab[] = ['ALL', 'PENDING', 'UPCOMING', 'PAST', 'CANCELLED'];
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -173,6 +175,7 @@ const StaffEvents: React.FC = () => {
     // ── Filtered list ────────────────────────────────────────────────────────
     const filteredEvents = events.filter(event => {
         const effectiveStatus = getEffectiveStatus(event);
+        if (statusTab === 'PENDING'   && event.status !== 'pending')      return false;
         if (statusTab === 'UPCOMING'  && effectiveStatus !== 'upcoming')  return false;
         if (statusTab === 'PAST'      && effectiveStatus !== 'past')      return false;
         if (statusTab === 'CANCELLED' && event.status !== 'cancelled')    return false;
@@ -210,8 +213,15 @@ const StaffEvents: React.FC = () => {
         const key = `feat_${event.id}`;
         setAction(key, true);
         try {
-            await apiClient.put(`/api/events?id=${event.id}`, { is_featured: !event.is_featured });
-            setEvents(prev => prev.map(e => e.id === event.id ? { ...e, is_featured: !e.is_featured } : e));
+            const nextFeatured = !event.is_featured;
+            await apiClient.put(`/api/events?id=${event.id}`, { is_featured: nextFeatured });
+            // The server demotes every other event when one is featured, so
+            // mirror that here rather than showing two featured badges until
+            // the next reload.
+            setEvents(prev => prev.map(e =>
+                e.id === event.id
+                    ? { ...e, is_featured: nextFeatured }
+                    : nextFeatured ? { ...e, is_featured: false } : e));
             showToast(event.is_featured ? 'Removed from featured.' : 'Marked as featured!', 'success');
         } catch {
             showToast('Update failed.', 'error');
@@ -347,6 +357,8 @@ const StaffEvents: React.FC = () => {
                             {STATUS_TABS.map(tab => {
                                 const count = tab === 'ALL'
                                     ? events.length
+                                    : tab === 'PENDING'
+                                        ? events.filter(e => e.status === 'pending').length
                                     : tab === 'UPCOMING'
                                         ? events.filter(e => getEffectiveStatus(e) === 'upcoming').length
                                         : tab === 'PAST'
@@ -576,7 +588,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ form, setForm, onSubm
                             className="input-soft appearance-none pr-8 cursor-pointer"
                         >
                             {CATEGORIES.map(cat => (
-                                <option key={cat} value={cat}>{cat}</option>
+                                <option key={cat.value} value={cat.value}>{cat.label}</option>
                             ))}
                         </select>
                         <ChevronDown size={13} className="absolute right-3 top-1/2 -translate-y-1/2 text-black/40 pointer-events-none" />
@@ -711,7 +723,7 @@ const EventCard: React.FC<EventCardProps> = ({
     event, style, onStatusChange, onFeatureToggle, onDeleteRequest,
     actionLoading, openActionId, setOpenActionId, menuRef,
 }) => {
-    const catStyle      = CATEGORY_STYLES[event.category] ?? CATEGORY_STYLES['Career Fair'];
+    const catStyle      = CATEGORY_STYLES[event.category] ?? CATEGORY_STYLES.other;
     const effectiveStatus = getEffectiveStatus(event);
     const statusClass   = STATUS_STYLES[effectiveStatus] ?? STATUS_STYLES.pending;
     const regPct        = event.capacity > 0
@@ -746,7 +758,7 @@ const EventCard: React.FC<EventCardProps> = ({
                 <div className="flex flex-wrap gap-1.5">
                     {/* Category tag */}
                     <span className={`inline-flex items-center gap-1 text-[7px] font-semibold px-2 py-0.5 rounded-full border ${catStyle.tag}`}>
-                        {catStyle.icon} {event.category}
+                        {catStyle.icon} {categoryLabel(event.category)}
                     </span>
                     {/* Status tag */}
                     <span className={`text-[7px] font-semibold px-2 py-0.5 rounded-full border ${statusClass}`}>
@@ -756,6 +768,12 @@ const EventCard: React.FC<EventCardProps> = ({
                     {event.organiser_type === 'employer' && (
                         <span className="text-[7px] font-semibold px-2 py-0.5 rounded-full border bg-purple-50 text-purple-600 border-purple-200">
                             EMPLOYER
+                        </span>
+                    )}
+                    {/* Student suggestion — needs a publish/decline decision */}
+                    {event.suggested_by && (
+                        <span className="text-[7px] font-semibold px-2 py-0.5 rounded-full border bg-nile-blue/10 text-nile-blue border-nile-blue/30">
+                            STUDENT SUGGESTION
                         </span>
                     )}
                 </div>

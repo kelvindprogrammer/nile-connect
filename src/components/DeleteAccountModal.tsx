@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { AlertTriangle, Loader2, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import { useToast } from '../context/ToastContext';
 import { deleteAccount } from '../services/authService';
+import { clearOnboardingState } from '../utils/onboardingState';
 
 interface DeleteAccountModalProps {
     onClose: () => void;
@@ -11,7 +11,6 @@ interface DeleteAccountModalProps {
 
 const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ onClose }) => {
     const { logout } = useAuth();
-    const navigate = useNavigate();
     const { showToast } = useToast();
     const [confirmText, setConfirmText] = useState('');
     const [isDeleting, setIsDeleting] = useState(false);
@@ -23,9 +22,11 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ onClose }) => {
         setIsDeleting(true);
         try {
             await deleteAccount();
-            logout();
-            showToast('Account deleted. Sorry to see you go.', 'success');
-            navigate('/onboarding');
+            // A deleted account is a clean slate: show the intro again next
+            // time. `logout` performs the redirect itself, so the old
+            // `navigate('/onboarding')` here only raced it.
+            clearOnboardingState();
+            await logout('/onboarding');
         } catch {
             showToast('Deletion failed. Please try again.', 'error');
             setIsDeleting(false);

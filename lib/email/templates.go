@@ -128,3 +128,49 @@ func SendDeadlineReminder(to, studentName, jobTitle string, deadline time.Time) 
 	body := fmt.Sprintf("Hi %s, the application deadline for <strong>%s</strong> is coming up soon (%s). Don't miss it!", studentName, jobTitle, deadline.Format("Jan 2, 2006"))
 	Send(to, subject, wrap(subject, body))
 }
+
+// ── events ────────────────────────────────────────────────────────────────────
+
+// EventRegistrationTemplate confirms a student's place at a specific event.
+// QA flagged that registering produced no confirmation at all beyond the
+// button label flipping, so the copy names the event, date, time and venue.
+func EventRegistrationTemplate(studentName, eventTitle, date, eventTime, location string) (string, string) {
+	subject := "You're registered: " + eventTitle
+	when := date
+	if eventTime != "" {
+		when += " at " + eventTime
+	}
+	body := fmt.Sprintf(
+		"Hi %s, your place at <strong>%s</strong> is confirmed.<br><br>"+
+			"<strong>When:</strong> %s<br><strong>Where:</strong> %s<br><br>"+
+			"No further action is needed — just turn up. You can cancel any time from the Events page in Nile Connect.",
+		studentName, eventTitle, when, location)
+	return subject, wrap(subject, body)
+}
+
+// EventSuggestedTemplate tells staff a new event is waiting in the review queue.
+func EventSuggestedTemplate(suggesterName, eventTitle, date, location string) (string, string) {
+	subject := "Event suggested: " + eventTitle
+	body := fmt.Sprintf(
+		"%s suggested <strong>%s</strong> (%s, %s). Review it in the Events queue to publish or decline it.",
+		suggesterName, eventTitle, date, location)
+	return subject, wrap(subject, body)
+}
+
+// EventApprovedTemplate tells the proposer their event is live.
+func EventApprovedTemplate(eventTitle, date string) (string, string) {
+	subject := "Event approved: " + eventTitle
+	body := fmt.Sprintf(
+		"<strong>%s</strong> (%s) has been approved and is now live on the Nile Connect events calendar.",
+		eventTitle, date)
+	return subject, wrap(subject, body)
+}
+
+// EventCancelledTemplate tells the proposer and every registrant the event is off.
+func EventCancelledTemplate(eventTitle string) (string, string) {
+	subject := "Event cancelled: " + eventTitle
+	body := fmt.Sprintf(
+		"<strong>%s</strong> has been cancelled. If you had registered, your place has been released — no action is needed.",
+		eventTitle)
+	return subject, wrap(subject, body)
+}

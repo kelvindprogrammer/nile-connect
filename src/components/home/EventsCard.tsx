@@ -1,16 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Calendar } from 'lucide-react';
-import { apiClient } from '../../services/api';
+import { listEvents, type NileEvent } from '../../services/eventService';
 import SidebarCard from './SidebarCard';
-
-interface EventItem {
-    id: string;
-    title: string;
-    date: string;
-    location: string;
-}
-
-interface Envelope<T> { data: T; }
 
 const formatDate = (iso: string) => {
     const d = new Date(iso);
@@ -19,12 +10,20 @@ const formatDate = (iso: string) => {
 };
 
 const EventsCard: React.FC<{ seeAllTo: string }> = ({ seeAllTo }) => {
-    const [events, setEvents] = useState<EventItem[] | null>(null);
+    const [events, setEvents] = useState<NileEvent[] | null>(null);
 
     useEffect(() => {
-        apiClient.get<Envelope<{ events: EventItem[] }>>('/api/events')
-            .then(({ data }) => setEvents((data.data.events ?? []).slice(0, 3)))
-            .catch(() => setEvents([]));
+        let cancelled = false;
+        // "Upcoming" has to mean upcoming: this card previously listed whatever
+        // the API returned first, which included events whose date had already
+        // passed and drafts still awaiting review.
+        listEvents({ upcomingOnly: true })
+            .then(res => {
+                if (cancelled) return;
+                setEvents(res.events.filter(e => e.status === 'published').slice(0, 3));
+            })
+            .catch(() => { if (!cancelled) setEvents([]); });
+        return () => { cancelled = true; };
     }, []);
 
     return (
@@ -36,7 +35,12 @@ const EventsCard: React.FC<{ seeAllTo: string }> = ({ seeAllTo }) => {
                     </div>
                     <div className="min-w-0">
                         <p className="text-xs font-medium text-gray-800 truncate">{ev.title}</p>
-                        <p className="text-[11px] text-gray-400 mt-0.5">{formatDate(ev.date)}{ev.location ? ` · ${ev.location}` : ''}</p>
+                        <p className="text-[11px] text-gray-400 mt-0.5 truncate">
+                            {formatDate(ev.date)}{ev.location ? ` · ${ev.location}` : ''}
+                        </p>
+                        {ev.is_registered && (
+                            <p className="text-[10px] font-medium text-nile-green mt-0.5">✓ Registered</p>
+                        )}
                     </div>
                 </div>
             ))}

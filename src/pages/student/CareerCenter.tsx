@@ -6,8 +6,7 @@ import {
 } from 'lucide-react';
 import Button from '../../components/Button';
 import { useToast } from '../../context/ToastContext';
-import { useProfile, calculateProfileStrength } from '../../hooks/useProfile';
-import { useAuth } from '../../context/AuthContext';
+import { useProfileCompletion } from '../../hooks/useProfileCompletion';
 import { apiClient, getErrorMessage } from '../../services/api';
 
 interface ServiceRequestItem {
@@ -51,9 +50,7 @@ const formatDate = (iso: string | null) => {
 const CareerCenter = () => {
     const navigate = useNavigate();
     const { showToast } = useToast();
-    const { user } = useAuth();
-    const { profile } = useProfile(user?.id);
-    const strength = calculateProfileStrength(profile, !!user?.name, !!user?.email);
+    const { completion, strength } = useProfileCompletion();
 
     const [sessionLink, setSessionLink] = useState('');
     const [showSessionModal, setShowSessionModal] = useState(false);
@@ -139,7 +136,9 @@ const CareerCenter = () => {
                             <span className="font-semibold text-white text-lg">{strength}%</span>
                         </div>
                         <p className="text-[9px] font-bold text-white/70">
-                            {strength < 60 ? 'COMPLETE YOUR PROFILE TO UNLOCK MORE OPPORTUNITIES.' : strength < 85 ? 'GREAT PROGRESS! ADD LINKS TO REACH 100%.' : 'EXCELLENT! YOUR PROFILE IS STRONG.'}
+                            {completion.missing.length === 0
+                                ? 'EXCELLENT! YOUR PROFILE IS COMPLETE.'
+                                : `NEXT UP: ${completion.missing.slice(0, 2).join(', ').toUpperCase()}.`}
                         </p>
                     </div>
                     <button

@@ -18,7 +18,7 @@ func CascadeDeleteUser(database *gorm.DB, userID string) {
 	database.Where("student_id = ?", userID).Delete(&models.Application{})
 	database.Where("employer_id = ?", userID).Delete(&models.Job{})
 	database.Where("organiser_id = ?", userID).Delete(&models.Event{})
-	database.Where("student_id = ?", userID).Delete(&models.EventRegistration{})
+	releaseEventRegistrations(database, userID)
 	database.Where("requester_id = ? OR recipient_id = ?", userID, userID).Delete(&models.Connection{})
 	database.Where("user_id = ? OR actor_id = ?", userID, userID).Delete(&models.Notification{})
 	database.Where("student_id = ? OR staff_id = ?", userID, userID).Delete(&models.ServiceRequest{})
@@ -30,4 +30,32 @@ func CascadeDeleteUser(database *gorm.DB, userID string) {
 	database.Where("viewer_id = ? OR profile_user_id = ?", userID, userID).Delete(&models.ProfileView{})
 	database.Where("endorser_id = ? OR profile_user_id = ?", userID, userID).Delete(&models.Endorsement{})
 	database.Delete(&models.User{}, "id = ?", userID)
+}
+
+// releaseEventRegistrations removes the user's event places and brings each
+// affected event's registrations_count back in line.
+//
+// The rows are hard-deleted rather than soft-deleted for two reasons: the
+// unique (event_id, student_id) index does not consider deleted_at, so a
+// tombstone would permanently block that pair; and a soft-deleted row still
+// counts as "gone" to the recount below, which would otherwise leave every
+// event the user had registered for reporting a place that nobody holds.
+func releaseEventRegistrations(database *gorm.DB, userID string) {
+	var eventIDs []string
+	if err := database.Model(&models.EventRegistration{}).
+		Where("student_id = ?", userID).
+		Pluck("event_id", &eventIDs).Error; err != nil {
+		return
+	}
+	if err := database.Unscoped().
+		Where("student_id = ?", userID).
+		Delete(&models.EventRegistration{}).Error; err != nil {
+		return
+	}
+	for _, eventID := range eventIDs {
+		database.Exec(`UPDATE events SET registrations_count = (
+				SELECT COUNT(*) FROM event_registrations
+				WHERE event_id = ? AND deleted_at IS NULL
+			) WHERE id = ?`, eventID, eventID)
+	}
 }

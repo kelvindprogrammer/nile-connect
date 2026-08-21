@@ -8,6 +8,7 @@ import { AuthProvider } from './context/AuthContext';
 import Onboarding         from './pages/auth/Onboarding';
 import Login              from './pages/auth/Login';
 import VerifyEmail        from './pages/VerifyEmail';
+import RootRedirect       from './components/RootRedirect';
 
 
 // ── Layout ────────────────────────────────────────────────────────────────
@@ -71,7 +72,7 @@ const App = () => (
             <Router>
                 <Routes>
                     {/* Public entry */}
-                    <Route path="/"           element={<Navigate to="/onboarding" replace />} />
+                    <Route path="/"           element={<RootRedirect />} />
                     <Route path="/onboarding" element={<T><Onboarding /></T>} />
                     <Route path="/login"           element={<T><Login /></T>} />
                     <Route path="/verify-email"    element={<T><VerifyEmail /></T>} />

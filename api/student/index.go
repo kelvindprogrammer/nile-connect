@@ -3,6 +3,8 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	"nile-connect/lib/db"
@@ -53,6 +55,14 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 // ── profile ───────────────────────────────────────────────────────────────────
 
+type experienceItem struct {
+	ID          string `json:"id"`
+	Title       string `json:"title"`
+	Company     string `json:"company"`
+	Duration    string `json:"duration"`
+	Description string `json:"description"`
+}
+
 type profileResp struct {
 	ID             string  `json:"id"`
 	FullName       string  `json:"full_name"`
@@ -65,6 +75,46 @@ type profileResp struct {
 	GPA            float64 `json:"gpa"`
 	IsVerified     bool    `json:"is_verified"`
 	ResumeURL      string  `json:"resume_url"`
+
+	// Extended profile. These used to live only in browser localStorage,
+	// pre-seeded with a placeholder bio and links, which is why a brand-new
+	// empty profile scored 100% strength. They are now real columns, empty
+	// until the student fills them in.
+	Bio         string           `json:"bio"`
+	Location    string           `json:"location"`
+	Phone       string           `json:"phone"`
+	LinkedIn    string           `json:"linked_in"`
+	Portfolio   string           `json:"portfolio"`
+	GitHub      string           `json:"github"`
+	Skills      []string         `json:"skills"`
+	Experiences []experienceItem `json:"experiences"`
+}
+
+// decodeExperiences reads the JSON-encoded experiences column. Like
+// jsonutil.StringSlice it always returns a non-nil slice so the frontend can
+// map over it without a null guard.
+func decodeExperiences(raw string) []experienceItem {
+	out := []experienceItem{}
+	if raw == "" {
+		return out
+	}
+	if err := json.Unmarshal([]byte(raw), &out); err != nil {
+		return []experienceItem{}
+	}
+	if out == nil {
+		return []experienceItem{}
+	}
+	return out
+}
+
+// encodeJSON marshals v for storage in a TEXT column, returning "" on failure
+// so a bad payload clears the field rather than writing malformed JSON.
+func encodeJSON(v any) string {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return ""
+	}
+	return string(b)
 }
 
 func toProfileResp(u *models.User) profileResp {
@@ -79,6 +129,14 @@ func toProfileResp(u *models.User) profileResp {
 		GPA:            u.GPA,
 		IsVerified:     u.IsVerified,
 		ResumeURL:      u.ResumeURL,
+		Bio:            u.Bio,
+		Location:       u.Location,
+		Phone:          u.Phone,
+		LinkedIn:       u.LinkedIn,
+		Portfolio:      u.Portfolio,
+		GitHub:         u.GitHub,
+		Skills:         jsonutil.StringSlice(u.Skills),
+		Experiences:    decodeExperiences(u.Experiences),
 	}
 	if u.StudentSubtype != "" {
 		st := u.StudentSubtype
@@ -110,6 +168,15 @@ func studentProfile(w http.ResponseWriter, r *http.Request, auth *mw.AuthCtx) {
 			GraduationYear *int     `json:"graduation_year"`
 			GPA            *float64 `json:"gpa"`
 			ResumeURL      *string  `json:"resume_url"`
+			Bio            *string  `json:"bio"`
+			Location       *string  `json:"location"`
+			Phone          *string  `json:"phone"`
+			LinkedIn       *string  `json:"linked_in"`
+			Portfolio      *string  `json:"portfolio"`
+			GitHub         *string  `json:"github"`
+
+			Skills      *[]string         `json:"skills"`
+			Experiences *[]experienceItem `json:"experiences"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			respond.Error(w, http.StatusBadRequest, "invalid request body")
@@ -130,6 +197,49 @@ func studentProfile(w http.ResponseWriter, r *http.Request, auth *mw.AuthCtx) {
 		}
 		if req.ResumeURL != nil {
 			updates["resume_url"] = *req.ResumeURL
+		}
+		// Extended profile. Each field is a pointer so an omitted key leaves
+		// the stored value alone, while an explicit "" clears it — a PATCH
+		// semantic the strength calculation depends on to stay honest.
+		for key, val := range map[string]*string{
+			"bio":       req.Bio,
+			"location":  req.Location,
+			"phone":     req.Phone,
+			"linked_in": req.LinkedIn,
+			"portfolio": req.Portfolio,
+			"git_hub":   req.GitHub,
+		} {
+			if val != nil {
+				updates[key] = strings.TrimSpace(*val)
+			}
+		}
+		if req.Skills != nil {
+			skills := make([]string, 0, len(*req.Skills))
+			seen := map[string]bool{}
+			for _, raw := range *req.Skills {
+				s := strings.TrimSpace(raw)
+				if s == "" || seen[strings.ToLower(s)] {
+					continue
+				}
+				seen[strings.ToLower(s)] = true
+				skills = append(skills, s)
+			}
+			updates["skills"] = encodeJSON(skills)
+		}
+		if req.Experiences != nil {
+			exps := make([]experienceItem, 0, len(*req.Experiences))
+			for _, e := range *req.Experiences {
+				e.Title = strings.TrimSpace(e.Title)
+				e.Company = strings.TrimSpace(e.Company)
+				if e.Title == "" || e.Company == "" {
+					continue // an experience without a role or an employer is noise
+				}
+				if e.ID == "" {
+					e.ID = strconv.FormatInt(time.Now().UnixNano(), 36)
+				}
+				exps = append(exps, e)
+			}
+			updates["experiences"] = encodeJSON(exps)
 		}
 		if len(updates) > 0 {
 			database.Model(&models.User{}).Where("id = ?", auth.UserID).Updates(updates)

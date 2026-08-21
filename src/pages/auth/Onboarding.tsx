@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { ArrowRight, Briefcase, Users, Calendar } from 'lucide-react';
 import NileConnectLogo from '../../components/NileConnectLogo';
+import { useAuth } from '../../context/AuthContext';
+import { markOnboardingSeen, dashboardPathForRole } from '../../utils/onboardingState';
 
 const slides = [
     {
@@ -33,15 +35,35 @@ const slides = [
 const Onboarding = () => {
     const [step, setStep] = useState(0);
     const navigate = useNavigate();
+    const { user, isLoading } = useAuth();
     const slide = slides[step];
 
-    const handleNext = () => {
-        if (step < slides.length - 1) {
-            setStep(step + 1);
-        } else {
-            navigate('/join-as');
-        }
+    // Leaving the carousel — by finishing it or skipping it — records that it
+    // has been seen, so it stops reappearing on later visits to the app root.
+    // It goes straight to /login: routing via /join-as only bounced through a
+    // redirect to the same place.
+    const finish = () => {
+        markOnboardingSeen();
+        navigate('/login', { replace: true });
     };
+
+    const handleNext = () => {
+        if (step < slides.length - 1) setStep(step + 1);
+        else finish();
+    };
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-nile-white">
+                <div className="w-8 h-8 rounded-full border-2 border-nile-blue border-t-transparent animate-spin" />
+            </div>
+        );
+    }
+
+    // An already-signed-in user has no business being shown the intro; before
+    // this, landing here restarted the SSO flow and Campus One re-prompted for
+    // consent.
+    if (user) return <Navigate to={dashboardPathForRole(user.role)} replace />;
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-nile-white p-6 font-sans overflow-hidden relative">
@@ -117,13 +139,13 @@ const Onboarding = () => {
                         {/* Skip / Already have account */}
                         <div className="pt-4 border-t-[2px] border-black/5 flex justify-between items-center">
                             <button
-                                onClick={() => navigate('/login')}
+                                onClick={finish}
                                 className="text-[9px] font-black text-nile-blue/40 hover:text-black transition-colors uppercase tracking-[0.15em] border-b-[1px] border-transparent hover:border-black/20 pb-0.5"
                             >
                                 ALREADY HAVE AN ACCOUNT?
                             </button>
                             <button
-                                onClick={() => navigate('/join-as')}
+                                onClick={finish}
                                 className="text-[9px] font-black text-black/20 hover:text-nile-blue transition-colors uppercase tracking-[0.15em]"
                             >
                                 SKIP →

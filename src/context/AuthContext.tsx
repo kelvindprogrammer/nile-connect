@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { getCurrentUser, signIn as ssoSignIn, signOut as ssoSignOut } from '../services/authService';
 import type { BackendUser } from '../services/authService';
+import { clearLocalUserData } from '../utils/localUserData';
 
 export interface User {
     id: string;
@@ -30,7 +31,8 @@ interface AuthContextType {
     isAuthenticated: boolean;
     /** Full-page redirect to Campus One SSO. Pass `next` to return to a specific path. */
     signIn: (next?: string) => void;
-    logout: () => Promise<void>;
+    /** Ends the session and hard-redirects. Defaults to /login. */
+    logout: (redirectTo?: string) => Promise<void>;
     // Kept for backward compatibility — these are no-ops in the OIDC flow.
     token: string | null;
     login: (user: User) => void;
@@ -71,10 +73,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ssoSignIn(next);
     }, []);
 
-    const logout = useCallback(async () => {
+    const logout = useCallback(async (redirectTo = '/login') => {
         await ssoSignOut();
+        // Drop browser-local per-user state before the redirect, so the next
+        // person to sign in on this machine does not inherit the previous
+        // account's cached avatar or profile.
+        clearLocalUserData();
         setUser(null);
-        window.location.replace('/login');
+        window.location.replace(redirectTo);
     }, []);
 
     // ── Backward-compat no-op ─────────────────────────────────────────────────

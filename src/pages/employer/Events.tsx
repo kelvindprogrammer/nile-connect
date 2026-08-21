@@ -3,16 +3,21 @@ import { Calendar, Plus, MapPin, Users, Send, Loader2, Clock } from 'lucide-reac
 import { useToast } from '../../context/ToastContext';
 import { getEvents, createEvent, StaffEvent, CreateEventRequest } from '../../services/staffService';
 import { useAuth } from '../../context/AuthContext';
+import { EVENT_CATEGORIES, categoryLabel } from '../../services/eventService';
 
 type Tab = 'ALL EVENTS' | 'MY EVENTS' | 'CREATE';
 
 const categoryColors: Record<string, string> = {
-    career_fair: 'bg-nile-blue/10 text-nile-blue border-nile-blue/20',
-    workshop:    'bg-purple-50 text-purple-600 border-purple-200',
-    networking:  'bg-nile-green/10 text-nile-green border-nile-green/20',
-    webinar:     'bg-yellow-50 text-yellow-600 border-yellow-200',
-    seminar:     'bg-orange-50 text-orange-500 border-orange-200',
-    other:       'bg-black/5 text-black/50 border-black/10',
+    career_fair:   'bg-nile-blue/10 text-nile-blue border-nile-blue/20',
+    workshop:      'bg-purple-50 text-purple-600 border-purple-200',
+    networking:    'bg-nile-green/10 text-nile-green border-nile-green/20',
+    webinar:       'bg-yellow-50 text-yellow-600 border-yellow-200',
+    seminar:       'bg-orange-50 text-orange-500 border-orange-200',
+    info_session:  'bg-yellow-50 text-yellow-600 border-yellow-200',
+    alumni_meetup: 'bg-pink-50 text-pink-600 border-pink-200',
+    hackathon:     'bg-black text-white border-black',
+    tech_talk:     'bg-nile-blue/10 text-nile-blue border-nile-blue/20',
+    other:         'bg-black/5 text-black/50 border-black/10',
 };
 
 const EMPTY_FORM: CreateEventRequest = {
@@ -161,12 +166,9 @@ const EmployerEvents = () => {
                                 <F label="CATEGORY">
                                     <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))}
                                         className="w-full border border-gray-100 rounded-xl py-3 px-4 font-semibold text-xs outline-none bg-white cursor-pointer">
-                                        <option value="networking">Networking</option>
-                                        <option value="career_fair">Career Fair</option>
-                                        <option value="workshop">Workshop</option>
-                                        <option value="webinar">Webinar</option>
-                                        <option value="seminar">Seminar</option>
-                                        <option value="other">Other</option>
+                                        {EVENT_CATEGORIES.map(c => (
+                                            <option key={c.value} value={c.value}>{c.label}</option>
+                                        ))}
                                     </select>
                                 </F>
                                 <F label="CAPACITY">
@@ -212,7 +214,7 @@ const EventCard = ({ event }: { event: StaffEvent }) => {
     return (
         <div className="bg-white border border-gray-100 rounded-[24px] p-5 flex flex-col gap-4 hover:translate-y-[-1px] shadow-card hover:shadow-blue transition-all">
             <div className="flex flex-wrap gap-2">
-                <span className={`text-[7px] font-semibold px-2 py-0.5 rounded-full border ${catColor}`}>{event.category.replace('_', ' ')}</span>
+                <span className={`text-[7px] font-semibold px-2 py-0.5 rounded-full border ${catColor}`}>{categoryLabel(event.category)}</span>
                 <span className={`text-[7px] font-semibold px-2 py-0.5 rounded-full border ${event.status === 'published' ? 'bg-nile-green/20 text-nile-green border-nile-green/30' : 'bg-yellow-50 text-yellow-600 border-yellow-200'}`}>
                     {event.status}
                 </span>
