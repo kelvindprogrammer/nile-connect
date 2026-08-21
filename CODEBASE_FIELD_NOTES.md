@@ -2,6 +2,8 @@
 
 Engineering onboarding notes and a catalogued issue ledger, compiled by reading `lib/`, `api/`, and `src/` in full, plus `git log -40` and `git show` on the most-touched recent commits. Cross-referenced against `CLAUDE.md`, `README.md`, and the two legacy `backend/*.md` files. No code was changed to produce this document — it's a snapshot as of **2026-07-25**.
 
+> **Update 2026-08-21** — the QA remediation commit ("resolve all 8 QA findings at root cause") closed several items below. Resolved entries are struck through and annotated rather than deleted, so the original reading still makes sense. Everything not annotated is still open.
+
 > Ongoing observations from the team's review of this document are tracked separately in the [Team Notes — Codebase Review](./README.md#team-notes--codebase-review) section of `README.md`, so they don't drift out of sync with this one.
 
 ---
@@ -14,9 +16,9 @@ Engineering onboarding notes and a catalogued issue ledger, compiled by reading 
 | GORM models | 21, one flat package, no ORM-level relations |
 | Serverless functions used / Hobby-plan cap | 11 / 12 |
 | Commits in the last 40 | 21 fix : 11 feat — stabilization mode |
-| Automated tests | 0, and no CI gate on PRs |
+| Automated tests | 18 (13 vitest + 5 Go) as of 2026-08-21, was 0. Still no CI gate on PRs |
 | Stray TODO/FIXME markers | 0 — genuinely clean on that front |
-| Issues catalogued below | 27, of which 4 are critical |
+| Issues catalogued below | 27, of which 4 are critical. 6 closed 2026-08-21 — all 4 critical items remain open |
 
 ---
 
@@ -46,7 +48,7 @@ mutex-guarded *gorm.DB per warm container
 
 **The single biggest thing to internalize:** `api/messages/index.go` alone is ~992 lines and covers messages, notifications, connections, presence, typing, profile views, endorsements, and file upload — 18 routes bundled into one handler, deliberately, to stay under the 12-function cap. When hunting for "where does X live," grep the sub-`switch` inside the nearest matching domain file before assuming it needs a new one. Adding a genuinely new top-level `api/` folder uses the last slot of headroom — CLAUDE.md is explicit that new functionality should extend an existing handler's `switch` instead.
 
-**`events` is the one domain that breaks the convention.** Every other domain has explicit `?path=` rewrite entries in `vercel.json`; `events` has zero. Instead `api/events/index.go` routes on raw `?id=` plus `r.Method`, relying on Vercel's automatic file-based routing rather than a rewrite rule. Not broken, just inconsistent — match the existing `?id=`/method pattern in that file rather than reaching for `?path=` when extending it.
+**~~`events` is the one domain that breaks the convention.~~** *(Resolved 2026-08-21.)* It used to have zero `?path=` rewrites, routing on raw `?id=` plus `r.Method` alone. It now carries `?path=register|suggest|categories` rewrites like every other domain, while keeping the bare `?id=`/method dispatch for plain event CRUD. **Extend it with a new `?path=` case**, matching the rest of the repo — the earlier advice to avoid `?path=` here is obsolete.
 
 **Ignore `backend/` entirely.** It's a second, complete Go module (GoFiber + DDD-style `domain/` packages, its own `go.mod`, 88 files) that predates the current architecture and isn't built or deployed by `vercel.json` — confirmed via grep, nothing in `vercel.json` references it. Its own `API_DOCUMENTATION.md`/`ARCHITECTURE.md` already say as much. Its domain folder names (`auth`, `employer`, `student`, `messages`, ...) closely mirror the real `api/` folders, which is exactly the trap: it's easy to edit the wrong file and have nothing change in the deployed app.
 
@@ -80,7 +82,7 @@ Every model uses a string UUID primary key and soft-delete via `gorm.DeletedAt`.
 | `ApplicationStageHistory` | Append-only audit trail | Written manually at 3 call sites, not via a GORM hook. |
 | `Document` | Reusable student file library | resume / cover_letter / reference_letter / transcript / siwes_letter / certification / portfolio — attach once, reuse across applications. |
 | `Post` / `Comment` / `PostLike` | Social feed | `Post.Kind='job'` links a share post back to a `Job` via `JobID`. |
-| `Event` / `EventRegistration` | Career events | `EventRegistration` is fully migrated but has zero API surface — see issue ledger. |
+| `Event` / `EventRegistration` | Career events | `EventRegistration` is live as of 2026-08-21: unique `(event_id, student_id)` index, and `Event.RegistrationsCount` is always recomputed from those rows, never incremented. |
 | `Connection` / `Message` / `Notification` | Networking + messaging | Real-time-*ish* only — polling, no websockets, throughout the frontend. |
 
 **The one pattern worth memorizing:** `Application.Stage` vs `.Status`. `Stage` is the real, 9-value ATS pipeline (`submitted → under_review → shortlisted → interview_scheduled → assessment_sent → offer_extended → accepted`, plus terminal `rejected`/`withdrawn`). `Status` is the legacy 4-bucket field older dashboards still read. `pipeline.ToLegacyStatus(stage)` maps one to the other — **there's no DB constraint enforcing they stay in sync.** Every write path that changes `Stage` has to remember to also write `Status` through that helper. Done correctly at the two places that mutate an *existing* application's stage (`api/employer/index.go:536`, `api/jobs/index.go:355`), but the *initial* `Status:"applied"`/`Stage:"submitted"` pair is hardcoded directly at creation (`api/jobs/index.go:295`) rather than going through the helper — a third place that could drift.
@@ -134,8 +136,8 @@ The last 40 commits run roughly **21 fixes to 11 features** — a codebase activ
 **No client-side check that a user's role matches the page they've navigated to.**
 `src/components/ProtectedRoute.tsx` (fully built, `allowedRoles` gating, unused) vs `src/layouts/AppShell.tsx:176-240` (the real gate — checks only "is someone logged in," not role-vs-route). `AppShell` derives its sidebar role from `user.role`, not the URL, so a student who manually navigates to `/staff/crm` renders the staff page shell before any API call 403s and bounces them. Not a data leak — the backend still enforces role — but fragile.
 
-**The exact null-crash bug class from git history is still open in one service.**
-`src/services/studentService.ts:19-55` — `getJobs`, `searchJobs`, `getJobDetails`, `getSavedJobs`, `getMyApplications` all lack the `?? []` fallback every sibling service function uses (`jobService.ts:8`, `employerService.ts:95`, `staffService.ts:83`, etc.) because Go marshals a nil slice as JSON `null`. Precisely the pattern behind `b9e6545` and `38391d4` (§4). Current callers happen to swallow the crash inside `.catch()` chains, but that's incidental, not structural.
+**~~The exact null-crash bug class from git history is still open in one service.~~** *(Closed 2026-08-21 — `?? []` added to the four list-returning functions. `getJobDetails` returns a single object, where a null is a genuine "not found" for the caller to handle, so it is intentionally not guarded.)*
+`src/services/studentService.ts:19-55` — `getJobs`, `searchJobs`, `getJobDetails`, `getSavedJobs`, `getMyApplications` all lacked the `?? []` fallback every sibling service function uses (`jobService.ts:8`, `employerService.ts:95`, `staffService.ts:83`, etc.) because Go marshals a nil slice as JSON `null`. Precisely the pattern behind `b9e6545` and `38391d4` (§4). Current callers happen to swallow the crash inside `.catch()` chains, but that's incidental, not structural.
 
 ### Medium
 
@@ -143,11 +145,11 @@ The last 40 commits run roughly **21 fixes to 11 features** — a codebase activ
 |---|---|---|
 | Three different "is this caller staff" idioms coexist, no shared `mw.RequireRole()` | `api/staff/index.go:40`, `api/events/index.go:42`, `api/feed/index.go:132` | New contributors adding a staff-only route have no single obvious pattern to copy |
 | N+1 hydration is the default pattern across list endpoints | `api/jobs/index.go:141`, `api/employer/index.go:392`, `api/student/index.go:181` | Will degrade as volume grows; the fix is already written once, just not shared |
-| Account cascade-delete leaves orphaned rows | `lib/admin/cleanup.go:12-33` | History rows, other students' applications on employer delete, event registrations, authored-post comments/likes aren't cleaned up |
+| Account cascade-delete leaves orphaned rows — **partially closed 2026-08-21** | `lib/admin/cleanup.go` | Event registrations now hard-delete and recount the affected events. Still open: history rows, other students' applications on employer delete, authored-post comments/likes. |
 | GORM errors checked on Create but not on Update | `api/employer/index.go:131`, `api/staff/index.go:260`, `lib/notify/notify.go:19` | A failed profile/status update returns 200 with stale data |
-| `EventRegistration` is fully migrated but has zero API surface | `lib/models/models.go:182-190` | Students can't actually register for an event through the backend — abandoned scaffolding or an unfinished feature |
+| ~~`EventRegistration` has zero API surface~~ **CLOSED 2026-08-21** | `api/events/index.go` | Finished, not removed. `POST`/`DELETE /api/events/register` behind a unique index, with confirmation email, in-app notification and organiser notification. |
 | Notification coverage stops at the job/application lifecycle | `api/messages/index.go`, `api/feed/index.go`, `api/staff/index.go:644` | Messages, connections, likes/comments, endorsements, service-request status are in-app only, never emailed — inconsistent with the fully double-covered job/application flows |
-| `.env.example` is stale | `.env.example` (root) | Missing `STORAGE_DATABASE_URL_UNPOOLED`, `RESEND_API_KEY`, `RESEND_FROM`, `CRON_SECRET`, `ROLE_OVERRIDE_SECRET` — the UNPOOLED omission reproduces a bug already fixed once in prod (`6eeb4f1`) |
+| ~~`.env.example` is stale~~ **CLOSED 2026-08-21** | `.env.example` (root) | All five missing vars added and cross-checked against the `CLAUDE.md` table. |
 | Three near-identical ~650-line Messages pages | `src/pages/{student,staff,employer}/Messages.tsx` | A bugfix in one has to be manually ported to the other two — easy to miss one |
 | The same endpoint is polled from two places at two cadences | `src/pages/student/Messages.tsx:23,81` | `/api/messages/conversations` polled every 15s (global badge) and every 5s (page-local); redundant traffic, unnamed magic-number literal |
 
@@ -159,7 +161,7 @@ The last 40 commits run roughly **21 fixes to 11 features** — a codebase activ
 | `ThemeContext.tsx` is an empty stub | `src/context/ThemeContext.tsx` | Will confuse anyone who tries to `import { useTheme }` expecting it to exist |
 | Unused shadcn/Radix scaffold ships in the bundle graph | `components.json`, `package.json:14-17,23` | No `@` alias even configured in tsconfig/vite — 4 Radix packages + CVA support code nothing imports |
 | 9 orphaned legacy auth/onboarding pages | `src/pages/auth/*`, `src/pages/onboarding/*` | Every route to them hard-redirects to `/login` now that auth is SSO-only — files look alive but aren't wired in |
-| `AppShell.handleLogout` double-navigates | `src/layouts/AppShell.tsx:219` | Harmless — a hard `window.location.replace` inside `logout()` makes the follow-up `navigate()` unreachable — but confusing to read |
+| ~~`AppShell.handleLogout` double-navigates~~ **CLOSED 2026-08-21** | `src/layouts/AppShell.tsx` | Dead `navigate()` removed. `logout()` now also takes the destination as an argument and clears per-user localStorage. |
 | No shared `ApiEnvelope<T>` type | `jobService.ts`, `studentService.ts`, `employerService.ts`, … | Redeclared identically in ~10 service files |
 | Two different `getJobs` functions, different shapes, same endpoint | `jobService.ts:6`, `studentService.ts:19` | A genuine "which one do I import" trap |
 | `backend/` legacy module still tracked in git | repo root | See §1 — worth a team conversation about deleting it outright |
@@ -171,11 +173,11 @@ The last 40 commits run roughly **21 fixes to 11 features** — a codebase activ
 Three tiers, roughly by how much context you need before touching the code. There's no CI, so `vercel dev` plus manual verification of the affected role's flow is the actual test suite — good instinct to pick something from the first tier before taking on the third.
 
 **Quick, contained, low-risk**
-- Add the missing `?? []` guards in `studentService.ts` (5 functions) — same fix already applied 5+ other places
-- Fix `.env.example` to match `CLAUDE.md` — 5 missing vars, one of them a known footgun
+- ~~Add the missing `?? []` guards in `studentService.ts`~~ — done 2026-08-21
+- ~~Fix `.env.example` to match `CLAUDE.md`~~ — done 2026-08-21
 - Replace the four hand-rolled insertion sorts with `sort.Slice`
 - Delete `ThemeContext.tsx`, the unused shadcn/Radix scaffold, and the 9 orphaned legacy auth pages — independent cleanup PRs
-- Remove the redundant `navigate()` call in `AppShell.handleLogout`
+- ~~Remove the redundant `navigate()` call in `AppShell.handleLogout`~~ — done 2026-08-21
 
 **A focused week — needs a bit of design**
 - Add `mw.RequireRole(role)` and migrate the three existing idioms onto it
@@ -189,6 +191,6 @@ Three tiers, roughly by how much context you need before touching the code. Ther
 - Strip the PII-logging `Printf` calls from the OIDC flow, or route them through a redacting logger
 - Decide what a staff-posted job's ownership should mean, then fix `EmployerID` accordingly
 - Scope the deadline-reminder cron (by saved job / major / opt-in) before it hits real student volume
-- Either finish `EventRegistration` or remove it — right now it's neither
+- ~~Either finish `EventRegistration` or remove it~~ — finished 2026-08-21
 - Merge the three Messages pages into one component parameterized by role
 - Decide whether `backend/` gets deleted

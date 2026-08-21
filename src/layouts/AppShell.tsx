@@ -208,7 +208,10 @@ const AppShell = () => {
     const rootPath = `/${role}`;
     const crumbs = location.pathname.split('/').filter(x => x && x !== role);
 
-    const handleLogout = () => { logout(); navigate('/login', { replace: true }); };
+    // `logout` performs its own hard redirect, so the follow-up navigate() that
+    // used to sit here was unreachable — and actively misleading now that
+    // logout takes the destination as an argument.
+    const handleLogout = () => { void logout(); };
 
     const toggleNotifications = () => {
         setShowNotifications(v => {

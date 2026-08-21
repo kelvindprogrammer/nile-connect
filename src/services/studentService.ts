@@ -16,14 +16,14 @@ export interface StudentProfile {
     gpa?: number; resume_url?: string;
 }
 
-export const getJobs = async (params?: Record<string, string>) => {
+export const getJobs = async (params?: Record<string, string>): Promise<Job[]> => {
     const { data } = await apiClient.get<ApiEnvelope<Job[]>>('/api/jobs', { params });
-    return data.data;
+    return data.data ?? [];
 };
 
-export const searchJobs = async (query: string) => {
+export const searchJobs = async (query: string): Promise<Job[]> => {
     const { data } = await apiClient.get<ApiEnvelope<Job[]>>('/api/jobs/search', { params: { q: query } });
-    return data.data;
+    return data.data ?? [];
 };
 
 export const getJobDetails = async (id: string) => {
@@ -33,7 +33,7 @@ export const getJobDetails = async (id: string) => {
 
 export const getMyApplications = async (): Promise<Application[]> => {
     const { data } = await apiClient.get<ApiEnvelope<{ applications: Application[] }>>('/api/student/applications');
-    return data.data.applications;
+    return data.data?.applications ?? [];
 };
 
 export const applyToJob = async (jobId: string) => {
@@ -49,9 +49,9 @@ export const unsaveJob = async (jobId: string) => {
     await apiClient.delete(`/api/student/jobs/${jobId}/save`);
 };
 
-export const getSavedJobs = async () => {
+export const getSavedJobs = async (): Promise<Job[]> => {
     const { data } = await apiClient.get<ApiEnvelope<Job[]>>('/api/student/saved-jobs');
-    return data.data;
+    return data.data ?? [];
 };
 
 // ---------------------------------------------------------------------------
