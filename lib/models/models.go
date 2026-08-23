@@ -226,9 +226,56 @@ type Post struct {
 	CommentsCount int `gorm:"default:0"`
 
 	// JobID links a "job share" post to the live Job it references.
-	// Kind: text|job|achievement|announcement.
+	// Kind: see lib/posts for the full vocabulary.
 	JobID *string `gorm:"type:text;index"`
 	Kind  string  `gorm:"type:text;default:'text'"`
+
+	// ── Social layer (see lib/models/social.go for the surrounding domain) ──
+
+	// Audience gates who may read the post. Enforced server-side by
+	// lib/privacy on every read path, never by the client.
+	// everyone | connections | close_friends | only_me | group
+	Audience string `gorm:"type:text;default:'everyone';index"`
+
+	// GroupID scopes the post to a Group. When set, Audience is "group" and
+	// group membership — not the author's follower graph — decides visibility.
+	GroupID *string `gorm:"type:text;index"`
+
+	// RepostOfID is a bare repost (no commentary): the client renders the
+	// original post inline and this row carries no content of its own.
+	// QuoteOfID is a quote post: this row's Content is the commentary and the
+	// quoted post renders as an embedded card. Exactly one may be set.
+	RepostOfID *string `gorm:"type:text;index"`
+	QuoteOfID  *string `gorm:"type:text;index"`
+
+	// PollID attaches an interactive poll.
+	PollID *string `gorm:"type:text;index"`
+
+	// LinkURL powers link-preview posts.
+	LinkURL         string `gorm:"type:text"`
+	LinkTitle       string `gorm:"type:text"`
+	LinkDescription string `gorm:"type:text"`
+	LinkImageURL    string `gorm:"type:text"`
+
+	// Denormalised counters. Maintained by the service layer and always
+	// recomputed from their source rows rather than blindly incremented, so
+	// they cannot drift (the same discipline used for event registrations).
+	RepostsCount   int `gorm:"default:0"`
+	QuotesCount    int `gorm:"default:0"`
+	ReactionsCount int `gorm:"default:0"`
+	SharesCount    int `gorm:"default:0"`
+	// MediaCount lets the feed decide on a carousel layout without joining
+	// post_media for every row.
+	MediaCount int `gorm:"default:0"`
+
+	// EditedAt is nil until the author edits, then drives an "edited" label.
+	EditedAt *time.Time
+
+	// Moderation state. Hidden content stays in the table (so reports remain
+	// reviewable) but is filtered out of every read path.
+	ModerationStatus string `gorm:"type:text;default:'active';index"` // active | hidden | removed
+	// HotScore is the cached feed-ranking score; see lib/feedrank.
+	HotScore float64 `gorm:"default:0;index"`
 }
 
 // ProfileView records a debounced visit to a user's profile, powering a
@@ -294,6 +341,18 @@ type Notification struct {
 	Body      string         `gorm:"type:text"`
 	Link      string         `gorm:"type:text"`
 	IsRead    bool           `gorm:"default:false"`
+
+	// GroupKey collapses related notifications into one tray row ("Ada and 4
+	// others reacted to your post") instead of five. Notifications sharing a
+	// key inside the batching window are merged rather than appended — the
+	// primary defence against notification spam.
+	GroupKey string `gorm:"type:text;index"`
+	// ActorCount is the number of distinct actors merged into this row.
+	ActorCount int `gorm:"default:1"`
+	// SubjectType/SubjectID power deep-linking, and let a notification be
+	// invalidated when its subject is deleted.
+	SubjectType string `gorm:"type:text;index"`
+	SubjectID   string `gorm:"type:text;index"`
 }
 
 type Comment struct {
@@ -305,6 +364,18 @@ type Comment struct {
 	AuthorID   string         `gorm:"not null;index"`
 	AuthorType string         `gorm:"type:text;not null"`
 	Content    string         `gorm:"type:text;not null"`
+
+	// ParentID threads a reply under another comment. One level of nesting is
+	// enforced in the service layer: a reply to a reply re-parents to the
+	// top-level comment, which keeps rendering flat and predictable instead of
+	// producing arbitrarily deep unreadable chains.
+	ParentID *string `gorm:"type:text;index"`
+
+	RepliesCount   int `gorm:"default:0"`
+	ReactionsCount int `gorm:"default:0"`
+
+	EditedAt         *time.Time
+	ModerationStatus string `gorm:"type:text;default:'active';index"` // active | hidden | removed
 }
 
 type Connection struct {

@@ -95,11 +95,99 @@ treats an untouched profile as genuinely empty and keeps localStorage only as a
 render cache. Compute strength via `useProfileCompletion()` — never re-derive it
 per page, or different screens will disagree.
 
+## Social layer
+
+The social domain lives in `lib/` packages with one thin HTTP dispatcher at
+`api/social/index.go` (`?path=` routing, like `api/messages`). The single
+function is a **platform constraint** — the Hobby plan caps the project at 12
+serverless functions and all 12 are now in use — not an architectural choice.
+Domain rules belong in the `lib/` packages; the handler only parses, authorises
+and delegates.
+
+| Package | Owns |
+|---|---|
+| `lib/socialgraph` | follows, blocks, mutes, close friends; `Relation` resolution |
+| `lib/privacy` | audience + interaction gates; the server-side visibility engine |
+| `lib/moderation` | reports, sanctions, the immutable audit log |
+| `lib/reactions` | the 6-reaction vocabulary and toggle semantics |
+| `lib/feedrank` | feed scoring, suppression and author diversity |
+| `lib/textparse` | @mention / #hashtag extraction |
+| `lib/mediaguard` | upload byte-sniffing and the format allowlist |
+| `lib/ratelimit` | per-user quotas, counted from durable rows |
+| `lib/analytics` | privacy-conscious product events |
+
+**Rules that must not be broken:**
+
+- **Every visibility decision goes through `privacy.CanView`.** Blocks are
+  checked before everything else, including the "everyone" audience, and an
+  unrecognised audience value denies. Never add a read path that filters
+  visibility in the client.
+- **Blocks are filtered in SQL, not in Go.** `socialgraph.BlockedIDs` feeds a
+  `NOT IN` on the query. Filtering after the fetch returns short pages and
+  makes `has_more` wrong.
+- **Counters are recomputed, never incremented.** Reactions, reposts, comments
+  and tag counts all `UPDATE ... SET x = (SELECT COUNT(*) ...)`. A retried
+  request must not be able to drift them.
+- **Uploads are identified by their bytes.** `mediaguard.Detect` ignores the
+  client's Content-Type; the stored MIME type and extension both come from the
+  sniff. SVG and HTML are deliberately not on the allowlist — they execute.
+- **User text is never rendered as HTML.** `PostBody.tsx` tokenises and returns
+  React elements. `dangerouslySetInnerHTML` on user content is how a feed gets
+  stored XSS, and it is structurally absent here.
+- **Moderation writes its audit row in the same transaction as its effect.** If
+  the `ModerationAction` insert fails, the effect rolls back with it.
+- **Analytics uses a key allowlist** (`lib/analytics.allowedProps`), not a
+  length heuristic. A short sentence is still content; only reviewed dimension
+  names are stored.
+
+### Stories, Groups, Communities, Polls
+
+All four are built end-to-end (domain package -> `api/social?path=` route ->
+service -> UI). Notes worth carrying:
+
+- **Stories** (`lib/stories`) expire after 24h but are FILTERED on read, never
+  deleted — a story reported minutes before expiry must stay reviewable.
+  Viewer lists and completion rate are author-only, enforced server-side.
+- **Groups** (`lib/groups`) enforce a strict role hierarchy
+  (owner > admin > moderator > member). A member can never act on someone at or
+  above their own rank, and **the owner cannot leave without transferring
+  ownership** — a group with no owner is unadministrable. Visibility and join
+  policy are separate axes: "restricted" is findable but unreadable until you
+  join; "private" is invisible and returns 404, not 403, to non-members.
+- **Polls** (`lib/polls`) enforce one vote per person for single-choice in a
+  transaction — the unique index alone cannot express "at most one option".
+  `total_votes` counts DISTINCT VOTERS, not rows, or multi-choice percentages
+  are wrong. Anonymous polls never expose voters through any path, including
+  to the author.
+
+### Real-time and push
+
+- **SSE, not WebSockets** (`api/social?path=stream`). Vercel serverless cannot
+  hold a WebSocket. The handler streams for ~25s (inside the 30s function
+  limit), then emits a `reconnect` event carrying the resume cursor;
+  `useRealtime` reconnects immediately, so the seam loses nothing. Polling
+  remains as a fallback — if the stream cannot connect the app behaves exactly
+  as it did before.
+- **Web Push** (`lib/webpush`) is a from-scratch RFC 8291 + RFC 8292
+  implementation, so there is no new dependency. It needs `VAPID_PUBLIC_KEY`,
+  `VAPID_PRIVATE_KEY` and `VAPID_SUBJECT`; **without them push silently no-ops**
+  exactly like `lib/email` without a Resend key. Generate a keypair with
+  `webpush.GenerateKeys()`. Push fans out from `notify.Create`/`notify.Grouped`
+  so a new notification type gets push automatically — and only on the FIRST
+  notification of a group, or the device buzzes once per actor.
+
+**Feed ranking** is a closed-form sum of named signals in `lib/feedrank`, not a
+learned model — deliberately, so it can be audited by reading it. Engagement is
+log-compressed and capped so virality cannot dominate; author diversity is a
+hard post-ranking pass; and negative signals (`not_interested`, `hide_post`,
+mute, block) remove content outright rather than down-weighting it. `?mode=latest`
+is a real chronological escape hatch and must stay.
+
 **Email:** `lib/email` sends transactional email via Resend (fire-and-forget, logs and continues if `RESEND_API_KEY` is unset — never blocks the request). `notify.CreateAndEmail()` is the standard call site: it creates the in-app `Notification` row and sends the matching email template in one call. Add new events by writing a template function in `lib/email/templates.go` and calling `notify.CreateAndEmail` at the relevant handler site.
 
 ## Key Constraints
 
-- **Vercel function limit:** The hobby plan allows 12 serverless functions. Currently 8 Go `index.go` folders + `health.go` + 2 Python files = 11 (health is a single-file handler, not counted by Vercel the same way) — **1 slot of headroom**. New functionality should extend an existing handler with a new `case` rather than add a new top-level `api/` folder.
+- **Vercel function limit: FULL.** The hobby plan allows 12 and all 12 are used: 9 Go `index.go` folders (auth, employer, events, feed, jobs, messages, social, staff, student) + `api/health.go` + 2 Python AI files. `api/dev_server.py` is local-only tooling and is excluded via `.vercelignore` — do not remove that line or the build exceeds the cap. **There is no headroom**: new functionality MUST extend an existing handler's `?path=` switch. Also note Vercel's Go builder treats every `.go` file under `api/` as an entrypoint, so each `api/*/` folder must contain exactly one file, and that file must export `Handler`.
 - **No pgBouncer:** Go GORM needs `STORAGE_DATABASE_URL_UNPOOLED`. The pooled URL will cause prepared-statement errors.
 - **CORS:** `mw.HandlePreflight(w, r)` must be the first call in every Go handler — it sets CORS headers for all responses and handles OPTIONS preflight.
 - **Response envelope:** All Go API responses must use `respond.OK(w, payload)` → `{"data": payload}`. Frontend unwraps as `response.data.data`.

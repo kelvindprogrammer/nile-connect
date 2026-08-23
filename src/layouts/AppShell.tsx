@@ -4,7 +4,7 @@ import {
     Home, Briefcase, Calendar, UserRound, LogOut, Bell, Mail,
     ChevronRight, Search, HeartHandshake, BarChart2, Users,
     Settings, Grid3X3, X, GraduationCap, LayoutList, FileText,
-    Sparkles,
+    Sparkles, ShieldAlert,
 } from 'lucide-react';
 import Avatar from '../components/Avatar';
 import NileConnectLogo from '../components/NileConnectLogo';
@@ -12,6 +12,7 @@ import NotificationTray from '../components/NotificationTray';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../hooks/useNotifications';
 import { useUnreadMessages } from '../hooks/useUnreadMessages';
+import { useRealtime } from '../hooks/useRealtime';
 import { useProfilePicture } from '../hooks/useProfilePicture';
 
 type Role = 'student' | 'employer' | 'staff';
@@ -53,8 +54,10 @@ const CONFIG: Record<Role, NavConfig> = {
             { to: '/student/career',       label: 'Career',   icon: GraduationCap },
             { to: '/student/applications', label: 'Applied',  icon: LayoutList },
             { to: '/student/documents',    label: 'Docs',     icon: FileText },
+            { to: '/student/groups',       label: 'Groups',   icon: Users },
             { to: '/student/events',       label: 'Events',   icon: Calendar },
             { to: '/student/insights',     label: 'Insights', icon: Sparkles },
+            { to: '/student/privacy',      label: 'Privacy',  icon: ShieldAlert },
         ],
         profilePath: '/student/profile',
     },
@@ -99,6 +102,7 @@ const CONFIG: Record<Role, NavConfig> = {
         more: [
             { to: '/staff/services', label: 'Services', icon: GraduationCap },
             { to: '/staff/events',   label: 'Events',    icon: Calendar },
+            { to: '/staff/moderation', label: 'Safety',  icon: ShieldAlert },
             { to: '/staff/reports',  label: 'Reports',   icon: BarChart2 },
             { to: '/staff/insights', label: 'Insights',  icon: Sparkles },
             { to: '/staff/settings', label: 'Settings',  icon: Settings },
@@ -171,7 +175,17 @@ const AppShell = () => {
     const { user, logout, isLoading } = useAuth();
     const { picture: profilePic } = useProfilePicture();
     const { notifications, unreadCount: unreadNotifCount, loaded: notifsLoaded, refreshNotifications, markRead, markAllRead } = useNotifications();
-    const { unreadCount: unreadMsgCount } = useUnreadMessages();
+    const { unreadCount: unreadMsgCount, refresh: refreshUnreadMessages } = useUnreadMessages();
+
+    // Real-time delivery. Events arrive within ~2s over SSE instead of waiting
+    // for the 20s notification poll. The polls stay as a safety net: if the
+    // stream cannot connect (a restrictive network, an old browser), the app
+    // degrades to exactly the behaviour it had before rather than going quiet.
+    const { isLive } = useRealtime({
+        enabled: !!user,
+        onNotification: () => refreshNotifications(),
+        onMessage: () => refreshUnreadMessages?.(),
+    });
 
     const [showNotifications, setShowNotifications] = useState(false);
     const [showMoreMenu, setShowMoreMenu] = useState(false);
@@ -410,6 +424,13 @@ const AppShell = () => {
                             <button onClick={toggleNotifications}
                                 className={`relative p-2 rounded-xl transition-colors ${showNotifications ? cfg.notifActiveClasses : 'text-gray-400 hover:text-gray-700 hover:bg-gray-50'}`}>
                                 <Bell size={18} />
+                                {isLive && unreadNotifCount === 0 && (
+                                    <span
+                                        aria-label="Live updates connected"
+                                        title="Live"
+                                        className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-nile-green"
+                                    />
+                                )}
                                 {unreadNotifCount > 0 && (
                                     <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1">
                                         {unreadNotifCount > 9 ? '9+' : unreadNotifCount}

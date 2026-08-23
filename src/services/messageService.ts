@@ -73,10 +73,22 @@ export interface UploadResult {
     filename: string;
 }
 
-export const uploadFile = async (file: File): Promise<UploadResult> => {
+/**
+ * Uploads a file.
+ *
+ * `accept` narrows what the endpoint will take, and is enforced SERVER-side by
+ * lib/mediaguard against the file's actual bytes — not its name or its declared
+ * type. Passing "image" for an avatar means the endpoint cannot be used to host
+ * a PDF or a video even if the client is modified.
+ */
+export const uploadFile = async (
+    file: File,
+    accept?: 'image' | 'media' | 'document',
+): Promise<UploadResult> => {
     const form = new FormData();
     form.append('file', file);
-    const { data } = await apiClient.post<Envelope<UploadResult>>('/api/upload', form, {
+    const url = accept ? `/api/upload?accept=${accept}` : '/api/upload';
+    const { data } = await apiClient.post<Envelope<UploadResult>>(url, form, {
         headers: { 'Content-Type': 'multipart/form-data' },
     });
     return data.data;

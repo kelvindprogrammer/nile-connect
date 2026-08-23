@@ -8,15 +8,19 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
+	"strconv"
 	"time"
 
 	"gorm.io/gorm"
 
+	"nile-connect/lib/analytics"
 	"nile-connect/lib/db"
+	"nile-connect/lib/mediaguard"
 	"nile-connect/lib/models"
+	"nile-connect/lib/moderation"
 	"nile-connect/lib/mw"
 	"nile-connect/lib/notify"
+	"nile-connect/lib/ratelimit"
 	"nile-connect/lib/respond"
 )
 
@@ -900,12 +904,39 @@ func setTyping(w http.ResponseWriter, r *http.Request, auth *mw.AuthCtx) {
 
 const blobAPIBase = "https://blob.vercel-storage.com"
 
-// POST /api/messages?path=upload — multipart/form-data, field "file".
-// Streams the file to Vercel Blob and returns its public URL.
+// POST /api/messages?path=upload - multipart/form-data, field "file".
+//
+// Validates the file by SNIFFING ITS BYTES before anything is stored.
+//
+// The previous implementation forwarded the client-supplied Content-Type
+// header straight to blob storage. That is a content-type confusion hole: an
+// attacker uploads an HTML or SVG document declaring itself "image/png", the
+// blob store serves it back with that declared type, and any viewer who opens
+// the link executes the attacker's script. Because the blob URL is on a
+// trusted domain the user has no signal that anything is wrong.
+//
+// Everything below therefore derives from lib/mediaguard's inspection of the
+// actual bytes: the stored Content-Type, the stored extension, and the size
+// ceiling. The client's claims are read only to be discarded.
 func uploadFile(w http.ResponseWriter, r *http.Request, auth *mw.AuthCtx) {
 	if r.Method != http.MethodPost {
 		respond.Error(w, http.StatusMethodNotAllowed, "method not allowed")
 		return
+	}
+
+	database, dbErr := db.Get()
+	if dbErr == nil {
+		// A restricted or banned account must not be able to keep filling
+		// storage.
+		if restrictions := moderation.ActiveRestrictions(database, auth.UserID); restrictions.Banned {
+			respond.Error(w, http.StatusForbidden, restrictions.RestrictionMessage("upload"))
+			return
+		}
+		if d := ratelimit.Check(database, auth.UserID, ratelimit.ActionUpload); !d.Allowed {
+			w.Header().Set("Retry-After", strconv.Itoa(d.RetryAfterSeconds()))
+			respond.Error(w, http.StatusTooManyRequests, d.Message)
+			return
+		}
 	}
 
 	token := os.Getenv("BLOB_READ_WRITE_TOKEN")
@@ -914,8 +945,9 @@ func uploadFile(w http.ResponseWriter, r *http.Request, auth *mw.AuthCtx) {
 		return
 	}
 
-	if err := r.ParseMultipartForm(10 << 20); err != nil {
-		respond.Error(w, http.StatusBadRequest, "invalid upload (max 10MB)")
+	if err := r.ParseMultipartForm(mediaguard.MaxAnyBytes); err != nil {
+		respond.Error(w, http.StatusBadRequest,
+			"that file is too large (max "+mediaguard.HumanSize(mediaguard.MaxAnyBytes)+")")
 		return
 	}
 	file, fileHeader, err := r.FormFile("file")
@@ -925,12 +957,43 @@ func uploadFile(w http.ResponseWriter, r *http.Request, auth *mw.AuthCtx) {
 	}
 	defer file.Close()
 
-	contentType := fileHeader.Header.Get("Content-Type")
-	if contentType == "" {
-		contentType = "application/octet-stream"
+	// Read the header, identify the format, then rewind so the full file can
+	// still be streamed to storage without buffering it all in memory.
+	head := make([]byte, mediaguard.SniffLen)
+	n, err := io.ReadFull(file, head)
+	if err != nil && err != io.ErrUnexpectedEOF && err != io.EOF {
+		respond.Error(w, http.StatusBadRequest, "could not read that file")
+		return
+	}
+	head = head[:n]
+	if _, err := file.Seek(0, io.SeekStart); err != nil {
+		respond.Error(w, http.StatusInternalServerError, "could not read that file")
+		return
 	}
 
-	pathname := fmt.Sprintf("uploads/%s/%d-%s", auth.UserID, time.Now().UnixNano(), sanitizeFilename(fileHeader.Filename))
+	// Endpoint-scoped allowlist: ?accept=image restricts an avatar or story
+	// upload to images so it cannot be used to host arbitrary documents.
+	var allowed []mediaguard.Category
+	switch r.URL.Query().Get("accept") {
+	case "image":
+		allowed = []mediaguard.Category{mediaguard.CategoryImage}
+	case "media":
+		allowed = []mediaguard.Category{mediaguard.CategoryImage, mediaguard.CategoryVideo}
+	case "document":
+		allowed = []mediaguard.Category{mediaguard.CategoryDocument}
+	}
+
+	format, err := mediaguard.Validate(head, fileHeader.Size, allowed...)
+	if err != nil {
+		respond.Error(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	// The stored name takes its extension from the DETECTED format, so a file
+	// named "payload.html" cannot keep an extension that would make the blob
+	// store serve it as a document.
+	safeName := mediaguard.SafeFilename(fileHeader.Filename, format)
+	pathname := fmt.Sprintf("uploads/%s/%d-%s", auth.UserID, time.Now().UnixNano(), safeName)
 
 	req, err := http.NewRequest(http.MethodPut, blobAPIBase+"/"+pathname, file)
 	if err != nil {
@@ -939,8 +1002,14 @@ func uploadFile(w http.ResponseWriter, r *http.Request, auth *mw.AuthCtx) {
 	}
 	req.ContentLength = fileHeader.Size
 	req.Header.Set("Authorization", "Bearer "+token)
-	req.Header.Set("x-content-type", contentType)
+	// The sniffed type, never the claimed one.
+	req.Header.Set("x-content-type", format.MIME)
 	req.Header.Set("x-api-version", "7")
+	// Anything the browser would execute is served as an attachment rather
+	// than rendered inline on our origin.
+	if !mediaguard.IsRenderableInline(format) {
+		req.Header.Set("x-content-disposition", "attachment")
+	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -951,7 +1020,10 @@ func uploadFile(w http.ResponseWriter, r *http.Request, auth *mw.AuthCtx) {
 	respBody, _ := io.ReadAll(resp.Body)
 
 	if resp.StatusCode >= 300 {
-		respond.Error(w, http.StatusBadGateway, "upload failed: "+string(respBody))
+		// The upstream body can contain internal detail; log it, do not
+		// return it to the caller.
+		fmt.Printf("[UPLOAD] blob store returned %d: %s\n", resp.StatusCode, string(respBody))
+		respond.Error(w, http.StatusBadGateway, "upload failed, please try again")
 		return
 	}
 
@@ -959,34 +1031,29 @@ func uploadFile(w http.ResponseWriter, r *http.Request, auth *mw.AuthCtx) {
 		URL string `json:"url"`
 	}
 	if err := json.Unmarshal(respBody, &blobResp); err != nil || blobResp.URL == "" {
-		respond.Error(w, http.StatusBadGateway, "upload failed")
+		respond.Error(w, http.StatusBadGateway, "upload failed, please try again")
 		return
 	}
 
-	mediaType := "file"
-	if strings.HasPrefix(contentType, "image/") {
-		mediaType = "image"
+	// Audit row: powers the upload rate limit, storage accounting, and lets a
+	// moderator find every file an abusive account uploaded.
+	if dbErr == nil {
+		database.Create(&models.MediaUpload{
+			UserID: auth.UserID, URL: blobResp.URL,
+			MimeType: format.MIME, Kind: string(format.Category),
+			SizeBytes: fileHeader.Size, ModerationStatus: "active",
+		})
+		analytics.Track(database, auth.UserID, analytics.MediaUploaded, "media", "", analytics.Props{
+			"mime_category": string(format.Category),
+			"size_bucket":   mediaguard.HumanSize(fileHeader.Size),
+		})
 	}
 
 	respond.OK(w, map[string]any{
 		"url":          blobResp.URL,
-		"media_type":   mediaType,
-		"content_type": contentType,
-		"filename":     fileHeader.Filename,
+		"media_type":   string(format.Category),
+		"content_type": format.MIME,
+		"filename":     safeName,
+		"size_bytes":   fileHeader.Size,
 	})
-}
-
-func sanitizeFilename(name string) string {
-	name = strings.ReplaceAll(name, " ", "-")
-	var b strings.Builder
-	for _, ch := range name {
-		switch {
-		case ch >= 'a' && ch <= 'z', ch >= 'A' && ch <= 'Z', ch >= '0' && ch <= '9', ch == '.', ch == '-', ch == '_':
-			b.WriteRune(ch)
-		}
-	}
-	if b.Len() == 0 {
-		return "file"
-	}
-	return b.String()
 }

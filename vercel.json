@@ -3,109 +3,473 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "installCommand": "npm install",
-
   "functions": {
-    "api/ai/chat.py":  { "memory": 512,  "maxDuration": 30 },
-    "api/ai/review.py": { "memory": 1024, "maxDuration": 60 },
-    "api/**/*.go":     { "memory": 256,  "maxDuration": 30 }
+    "api/ai/chat.py": {
+      "memory": 512,
+      "maxDuration": 30
+    },
+    "api/ai/review.py": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
+    "api/**/*.go": {
+      "memory": 256,
+      "maxDuration": 30
+    }
   },
-
   "rewrites": [
-    { "source": "/api/ai/chat",   "destination": "/api/ai/chat.py" },
-    { "source": "/api/ai/review", "destination": "/api/ai/review.py" },
-
-    { "source": "/api/auth/login",     "destination": "/api/auth?path=login" },
-    { "source": "/api/auth/callback",  "destination": "/api/auth?path=callback" },
-    { "source": "/api/auth/logout",    "destination": "/api/auth?path=logout" },
-    { "source": "/api/auth/me",        "destination": "/api/auth?path=me" },
-    { "source": "/api/auth/delete-account", "destination": "/api/auth?path=delete-account" },
-
-    { "source": "/api/webhooks/campus-one", "destination": "/api/auth?path=webhook" },
-    { "source": "/api/auth/verify-email",   "destination": "/api/auth?path=verify-email" },
-    { "source": "/api/auth/dev-set-role",   "destination": "/api/auth?path=dev-set-role" },
-    { "source": "/api/auth/dev-list-users", "destination": "/api/auth?path=dev-list-users" },
-    { "source": "/api/auth/dev-delete-user","destination": "/api/auth?path=dev-delete-user" },
-
-    { "source": "/api/student/profile",         "destination": "/api/student?path=profile" },
-    { "source": "/api/student/applications",    "destination": "/api/student?path=applications" },
-    { "source": "/api/student/services",        "destination": "/api/student?path=services" },
-    { "source": "/api/student/documents",       "destination": "/api/student?path=documents" },
-    { "source": "/api/student/documents/:id",   "destination": "/api/student?path=documents&id=:id" },
-    { "source": "/api/student/application-package", "destination": "/api/student?path=application-package" },
-    { "source": "/api/student/application-detail",  "destination": "/api/student?path=application-detail" },
-
-    { "source": "/api/events/register",         "destination": "/api/events?path=register" },
-    { "source": "/api/events/suggest",          "destination": "/api/events?path=suggest" },
-    { "source": "/api/events/categories",       "destination": "/api/events?path=categories" },
-
-    { "source": "/api/jobs/:id",                "destination": "/api/jobs?id=:id" },
-
-    { "source": "/api/feed/:id/like",           "destination": "/api/feed?path=like&id=:id" },
-    { "source": "/api/feed/:postId/comments/:commentId", "destination": "/api/feed?path=comments&id=:postId&commentId=:commentId" },
-    { "source": "/api/feed/:id/comments",       "destination": "/api/feed?path=comments&id=:id" },
-    { "source": "/api/feed/:id",                "destination": "/api/feed?path=post&id=:id" },
-
-    { "source": "/api/staff/dashboard",         "destination": "/api/staff?path=dashboard" },
-    { "source": "/api/staff/applications",      "destination": "/api/staff?path=applications" },
-    { "source": "/api/staff/jobs",              "destination": "/api/staff?path=jobs" },
-    { "source": "/api/staff/employers",         "destination": "/api/staff?path=employers" },
-    { "source": "/api/staff/students",          "destination": "/api/staff?path=students" },
-    { "source": "/api/staff/student-detail",    "destination": "/api/staff?path=student-detail" },
-    { "source": "/api/staff/service-requests",  "destination": "/api/staff?path=service-requests" },
-    { "source": "/api/staff/cleanup",           "destination": "/api/staff?path=cleanup" },
-
-    { "source": "/api/employer/profile",        "destination": "/api/employer?path=profile" },
-    { "source": "/api/employer/jobs",           "destination": "/api/employer?path=jobs" },
-    { "source": "/api/employer/jobs/:id",       "destination": "/api/employer?path=job-detail&id=:id" },
-    { "source": "/api/employer/applications",   "destination": "/api/employer?path=applications" },
-    { "source": "/api/employer/application-detail", "destination": "/api/employer?path=application-detail" },
-    { "source": "/api/employer/application-stage",  "destination": "/api/employer?path=application-stage" },
-    { "source": "/api/employer/application-notes",  "destination": "/api/employer?path=application-notes" },
-
-    { "source": "/api/messages/conversations",  "destination": "/api/messages?path=conversations" },
-    { "source": "/api/messages/thread/:toId",   "destination": "/api/messages?path=thread&toId=:toId" },
-    { "source": "/api/messages/send/:toId",     "destination": "/api/messages?path=send&toId=:toId" },
-    { "source": "/api/messages/presence",       "destination": "/api/messages?path=presence" },
-    { "source": "/api/messages/typing/:toId",   "destination": "/api/messages?path=typing&toId=:toId" },
-
-    { "source": "/api/users/search",            "destination": "/api/messages?path=users-search" },
-    { "source": "/api/users/:id/presence",      "destination": "/api/messages?path=presence-status&userId=:id" },
-
-    { "source": "/api/upload",                  "destination": "/api/messages?path=upload" },
-
-    { "source": "/api/notifications",               "destination": "/api/messages?path=notifications" },
-    { "source": "/api/notifications/unread-count",  "destination": "/api/messages?path=notifications-unread-count" },
-    { "source": "/api/notifications/mark-all-read", "destination": "/api/messages?path=notifications-mark-all-read" },
-    { "source": "/api/notifications/:id/read",      "destination": "/api/messages?path=notifications-read&id=:id" },
-
-    { "source": "/api/connections",                 "destination": "/api/messages?path=connections" },
-    { "source": "/api/connections/request/:toId",   "destination": "/api/messages?path=connections-request&toId=:toId" },
-    { "source": "/api/connections/:id/respond",     "destination": "/api/messages?path=connections-respond&id=:id" },
-    { "source": "/api/connections/for/:userId",     "destination": "/api/messages?path=connections-for&userId=:userId" },
-    { "source": "/api/connections/suggestions",     "destination": "/api/messages?path=people-you-may-know" },
-
-    { "source": "/api/profile/:userId/view",        "destination": "/api/messages?path=profile-view&userId=:userId" },
-    { "source": "/api/profile/:userId/endorsements", "destination": "/api/messages?path=endorsements&userId=:userId" },
-
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    {
+      "source": "/api/ai/chat",
+      "destination": "/api/ai/chat.py"
+    },
+    {
+      "source": "/api/ai/review",
+      "destination": "/api/ai/review.py"
+    },
+    {
+      "source": "/api/auth/login",
+      "destination": "/api/auth?path=login"
+    },
+    {
+      "source": "/api/auth/callback",
+      "destination": "/api/auth?path=callback"
+    },
+    {
+      "source": "/api/auth/logout",
+      "destination": "/api/auth?path=logout"
+    },
+    {
+      "source": "/api/auth/me",
+      "destination": "/api/auth?path=me"
+    },
+    {
+      "source": "/api/auth/delete-account",
+      "destination": "/api/auth?path=delete-account"
+    },
+    {
+      "source": "/api/webhooks/campus-one",
+      "destination": "/api/auth?path=webhook"
+    },
+    {
+      "source": "/api/auth/verify-email",
+      "destination": "/api/auth?path=verify-email"
+    },
+    {
+      "source": "/api/auth/dev-set-role",
+      "destination": "/api/auth?path=dev-set-role"
+    },
+    {
+      "source": "/api/auth/dev-list-users",
+      "destination": "/api/auth?path=dev-list-users"
+    },
+    {
+      "source": "/api/auth/dev-delete-user",
+      "destination": "/api/auth?path=dev-delete-user"
+    },
+    {
+      "source": "/api/student/profile",
+      "destination": "/api/student?path=profile"
+    },
+    {
+      "source": "/api/student/applications",
+      "destination": "/api/student?path=applications"
+    },
+    {
+      "source": "/api/student/services",
+      "destination": "/api/student?path=services"
+    },
+    {
+      "source": "/api/student/documents",
+      "destination": "/api/student?path=documents"
+    },
+    {
+      "source": "/api/student/documents/:id",
+      "destination": "/api/student?path=documents&id=:id"
+    },
+    {
+      "source": "/api/student/application-package",
+      "destination": "/api/student?path=application-package"
+    },
+    {
+      "source": "/api/student/application-detail",
+      "destination": "/api/student?path=application-detail"
+    },
+    {
+      "source": "/api/events/register",
+      "destination": "/api/events?path=register"
+    },
+    {
+      "source": "/api/events/suggest",
+      "destination": "/api/events?path=suggest"
+    },
+    {
+      "source": "/api/events/categories",
+      "destination": "/api/events?path=categories"
+    },
+    {
+      "source": "/api/jobs/:id",
+      "destination": "/api/jobs?id=:id"
+    },
+    {
+      "source": "/api/feed/:id/like",
+      "destination": "/api/feed?path=like&id=:id"
+    },
+    {
+      "source": "/api/feed/:postId/comments/:commentId",
+      "destination": "/api/feed?path=comments&id=:postId&commentId=:commentId"
+    },
+    {
+      "source": "/api/feed/:id/comments",
+      "destination": "/api/feed?path=comments&id=:id"
+    },
+    {
+      "source": "/api/feed/:id/repost",
+      "destination": "/api/feed?path=repost&id=:id"
+    },
+    {
+      "source": "/api/feed/:id",
+      "destination": "/api/feed?path=post&id=:id"
+    },
+    {
+      "source": "/api/staff/dashboard",
+      "destination": "/api/staff?path=dashboard"
+    },
+    {
+      "source": "/api/staff/applications",
+      "destination": "/api/staff?path=applications"
+    },
+    {
+      "source": "/api/staff/jobs",
+      "destination": "/api/staff?path=jobs"
+    },
+    {
+      "source": "/api/staff/employers",
+      "destination": "/api/staff?path=employers"
+    },
+    {
+      "source": "/api/staff/students",
+      "destination": "/api/staff?path=students"
+    },
+    {
+      "source": "/api/staff/student-detail",
+      "destination": "/api/staff?path=student-detail"
+    },
+    {
+      "source": "/api/staff/service-requests",
+      "destination": "/api/staff?path=service-requests"
+    },
+    {
+      "source": "/api/staff/cleanup",
+      "destination": "/api/staff?path=cleanup"
+    },
+    {
+      "source": "/api/employer/profile",
+      "destination": "/api/employer?path=profile"
+    },
+    {
+      "source": "/api/employer/jobs",
+      "destination": "/api/employer?path=jobs"
+    },
+    {
+      "source": "/api/employer/jobs/:id",
+      "destination": "/api/employer?path=job-detail&id=:id"
+    },
+    {
+      "source": "/api/employer/applications",
+      "destination": "/api/employer?path=applications"
+    },
+    {
+      "source": "/api/employer/application-detail",
+      "destination": "/api/employer?path=application-detail"
+    },
+    {
+      "source": "/api/employer/application-stage",
+      "destination": "/api/employer?path=application-stage"
+    },
+    {
+      "source": "/api/employer/application-notes",
+      "destination": "/api/employer?path=application-notes"
+    },
+    {
+      "source": "/api/messages/conversations",
+      "destination": "/api/messages?path=conversations"
+    },
+    {
+      "source": "/api/messages/thread/:toId",
+      "destination": "/api/messages?path=thread&toId=:toId"
+    },
+    {
+      "source": "/api/messages/send/:toId",
+      "destination": "/api/messages?path=send&toId=:toId"
+    },
+    {
+      "source": "/api/messages/presence",
+      "destination": "/api/messages?path=presence"
+    },
+    {
+      "source": "/api/messages/typing/:toId",
+      "destination": "/api/messages?path=typing&toId=:toId"
+    },
+    {
+      "source": "/api/users/search",
+      "destination": "/api/messages?path=users-search"
+    },
+    {
+      "source": "/api/users/:id/presence",
+      "destination": "/api/messages?path=presence-status&userId=:id"
+    },
+    {
+      "source": "/api/upload",
+      "destination": "/api/messages?path=upload"
+    },
+    {
+      "source": "/api/notifications",
+      "destination": "/api/messages?path=notifications"
+    },
+    {
+      "source": "/api/notifications/unread-count",
+      "destination": "/api/messages?path=notifications-unread-count"
+    },
+    {
+      "source": "/api/notifications/mark-all-read",
+      "destination": "/api/messages?path=notifications-mark-all-read"
+    },
+    {
+      "source": "/api/notifications/:id/read",
+      "destination": "/api/messages?path=notifications-read&id=:id"
+    },
+    {
+      "source": "/api/connections",
+      "destination": "/api/messages?path=connections"
+    },
+    {
+      "source": "/api/connections/request/:toId",
+      "destination": "/api/messages?path=connections-request&toId=:toId"
+    },
+    {
+      "source": "/api/connections/:id/respond",
+      "destination": "/api/messages?path=connections-respond&id=:id"
+    },
+    {
+      "source": "/api/connections/for/:userId",
+      "destination": "/api/messages?path=connections-for&userId=:userId"
+    },
+    {
+      "source": "/api/connections/suggestions",
+      "destination": "/api/messages?path=people-you-may-know"
+    },
+    {
+      "source": "/api/profile/:userId/view",
+      "destination": "/api/messages?path=profile-view&userId=:userId"
+    },
+    {
+      "source": "/api/profile/:userId/endorsements",
+      "destination": "/api/messages?path=endorsements&userId=:userId"
+    },
+    {
+      "source": "/api/social/follow",
+      "destination": "/api/social?path=follow"
+    },
+    {
+      "source": "/api/social/block",
+      "destination": "/api/social?path=block"
+    },
+    {
+      "source": "/api/social/mute",
+      "destination": "/api/social?path=mute"
+    },
+    {
+      "source": "/api/social/close-friends",
+      "destination": "/api/social?path=close-friends"
+    },
+    {
+      "source": "/api/social/relation",
+      "destination": "/api/social?path=relation"
+    },
+    {
+      "source": "/api/social/followers",
+      "destination": "/api/social?path=followers"
+    },
+    {
+      "source": "/api/social/following",
+      "destination": "/api/social?path=following"
+    },
+    {
+      "source": "/api/social/privacy",
+      "destination": "/api/social?path=privacy"
+    },
+    {
+      "source": "/api/social/react",
+      "destination": "/api/social?path=react"
+    },
+    {
+      "source": "/api/social/reactions",
+      "destination": "/api/social?path=reactions"
+    },
+    {
+      "source": "/api/social/reaction-catalog",
+      "destination": "/api/social?path=reaction-catalog"
+    },
+    {
+      "source": "/api/social/bookmark",
+      "destination": "/api/social?path=bookmark"
+    },
+    {
+      "source": "/api/social/bookmarks",
+      "destination": "/api/social?path=bookmarks"
+    },
+    {
+      "source": "/api/social/collections",
+      "destination": "/api/social?path=collections"
+    },
+    {
+      "source": "/api/social/feed-signal",
+      "destination": "/api/social?path=feed-signal"
+    },
+    {
+      "source": "/api/social/report",
+      "destination": "/api/social?path=report"
+    },
+    {
+      "source": "/api/social/report-reasons",
+      "destination": "/api/social?path=report-reasons"
+    },
+    {
+      "source": "/api/social/mod/queue",
+      "destination": "/api/social?path=mod-queue"
+    },
+    {
+      "source": "/api/social/mod/resolve",
+      "destination": "/api/social?path=mod-resolve"
+    },
+    {
+      "source": "/api/social/mod/content",
+      "destination": "/api/social?path=mod-content"
+    },
+    {
+      "source": "/api/social/mod/restrict",
+      "destination": "/api/social?path=mod-restrict"
+    },
+    {
+      "source": "/api/social/mod/history",
+      "destination": "/api/social?path=mod-history"
+    },
+    {
+      "source": "/api/social/mod/stats",
+      "destination": "/api/social?path=mod-stats"
+    },
+    {
+      "source": "/api/social/mention-search",
+      "destination": "/api/social?path=mention-search"
+    },
+    {
+      "source": "/api/social/hashtag",
+      "destination": "/api/social?path=hashtag"
+    },
+    {
+      "source": "/api/social/trending",
+      "destination": "/api/social?path=trending"
+    },
+    {
+      "source": "/api/social/story-tray",
+      "destination": "/api/social?path=story-tray"
+    },
+    {
+      "source": "/api/social/stories",
+      "destination": "/api/social?path=stories"
+    },
+    {
+      "source": "/api/social/story-view",
+      "destination": "/api/social?path=story-view"
+    },
+    {
+      "source": "/api/social/story-insights",
+      "destination": "/api/social?path=story-insights"
+    },
+    {
+      "source": "/api/social/story-reply",
+      "destination": "/api/social?path=story-reply"
+    },
+    {
+      "source": "/api/social/poll",
+      "destination": "/api/social?path=poll"
+    },
+    {
+      "source": "/api/social/poll-vote",
+      "destination": "/api/social?path=poll-vote"
+    },
+    {
+      "source": "/api/social/poll-voters",
+      "destination": "/api/social?path=poll-voters"
+    },
+    {
+      "source": "/api/social/groups",
+      "destination": "/api/social?path=groups"
+    },
+    {
+      "source": "/api/social/group-membership",
+      "destination": "/api/social?path=group-membership"
+    },
+    {
+      "source": "/api/social/group-members",
+      "destination": "/api/social?path=group-members"
+    },
+    {
+      "source": "/api/social/group-invites",
+      "destination": "/api/social?path=group-invites"
+    },
+    {
+      "source": "/api/social/group-posts",
+      "destination": "/api/social?path=group-posts"
+    },
+    {
+      "source": "/api/social/communities",
+      "destination": "/api/social?path=communities"
+    },
+    {
+      "source": "/api/social/stream",
+      "destination": "/api/social?path=stream"
+    },
+    {
+      "source": "/api/social/push-subscribe",
+      "destination": "/api/social?path=push-subscribe"
+    },
+    {
+      "source": "/api/social/push-key",
+      "destination": "/api/social?path=push-key"
+    },
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
+    }
   ],
-
   "crons": [
-    { "path": "/api/jobs?path=deadline-reminders", "schedule": "0 8 * * *" }
+    {
+      "path": "/api/jobs?path=deadline-reminders",
+      "schedule": "0 8 * * *"
+    }
   ],
-
   "headers": [
     {
       "source": "/api/(.*)",
       "headers": [
-        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, PUT, DELETE, OPTIONS" },
-        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization"
+        }
       ]
     },
     {
       "source": "/assets/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
       ]
     }
   ]

@@ -32,3 +32,6 @@ backend/tmp/
 # ── Logs ─────────────────────────────────────────────────────────────────
 *.log
 npm-debug.log*
+.auth/
+test-results/
+playwright-report/

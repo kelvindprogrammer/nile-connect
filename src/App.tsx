@@ -31,6 +31,8 @@ import Network            from './pages/student/Network';
 import StudentMessages    from './pages/student/Messages';
 import StudentDocuments   from './pages/student/Documents';
 import StudentInsights    from './pages/student/Insights';
+import PrivacySettings    from './pages/student/PrivacySettings';
+import GroupsPage         from './pages/student/Groups';
 
 // ── Staff Section ─────────────────────────────────────────────────────────
 import StaffDashboard     from './pages/staff/Dashboard';
@@ -45,6 +47,7 @@ import StaffReports       from './pages/staff/Reports';
 import StudentActivity    from './pages/staff/StudentActivity';
 import StaffStudentDetail from './pages/staff/StudentDetail';
 import StaffInsights      from './pages/staff/Insights';
+import StaffModeration    from './pages/staff/Moderation';
 
 // ── Employer Section ──────────────────────────────────────────────────────
 import EmployerDashboard      from './pages/employer/Dashboard';
@@ -103,6 +106,8 @@ const App = () => (
                         <Route path="insights"         element={<StudentInsights />} />
                         <Route path="profile"          element={<StudentProfile />} />
                         <Route path="profile/edit"     element={<EditProfile />} />
+                        <Route path="privacy"          element={<PrivacySettings />} />
+                        <Route path="groups"           element={<GroupsPage />} />
                         <Route path="network"          element={<Network />} />
                         <Route path="messages"         element={<StudentMessages />} />
                     </Route>
@@ -123,6 +128,7 @@ const App = () => (
                         <Route path="services"     element={<StaffServices />} />
                         <Route path="reports"      element={<StaffReports />} />
                         <Route path="insights"     element={<StaffInsights />} />
+                        <Route path="moderation"   element={<StaffModeration />} />
                         <Route path="profile"      element={<StaffProfile />} />
                         <Route path="messages"     element={<StaffMessages />} />
                         <Route path="settings"     element={<StaffSettings />} />

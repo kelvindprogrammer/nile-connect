@@ -9,7 +9,13 @@
         "preview": "vite preview",
         "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
         "test": "vitest run",
-        "test:watch": "vitest"
+        "test:watch": "vitest",
+        "test:e2e": "playwright test",
+        "typecheck:e2e": "tsc -p tsconfig.e2e.json --noEmit",
+        "test:e2e:public": "playwright test --project=public-desktop --project=public-mobile",
+        "test:load": "go test ./lib/feedrank/ -run TestRank -v",
+        "bench": "go test ./lib/feedrank/ -bench=. -benchmem -run=^$",
+        "verify": "npx tsc --noEmit && npm run typecheck:e2e && npm run lint && npm test && go build ./... && go vet ./... && go test ./... && npm run build"
     },
     "dependencies": {
         "@radix-ui/react-dialog": "^1.1.15",
@@ -30,6 +36,7 @@
         "tailwindcss-animate": "^1.0.7"
     },
     "devDependencies": {
+        "@playwright/test": "^1.62.1",
         "@types/react": "^18.2.16",
         "@types/react-dom": "^18.2.6",
         "@typescript-eslint/eslint-plugin": "^7.18.0",

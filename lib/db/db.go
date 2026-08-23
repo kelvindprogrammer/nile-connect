@@ -105,6 +105,38 @@ func migrate(db *gorm.DB) {
 		&models.EmailVerification{},
 		&models.ProfileView{},
 		&models.Endorsement{},
+
+		// -- Social layer --
+		&models.Follow{},
+		&models.Block{},
+		&models.Mute{},
+		&models.CloseFriend{},
+		&models.PrivacySettings{},
+		&models.Reaction{},
+		&models.Mention{},
+		&models.Hashtag{},
+		&models.PostHashtag{},
+		&models.PostMedia{},
+		&models.Collection{},
+		&models.Bookmark{},
+		&models.FeedSignal{},
+		&models.MediaUpload{},
+		&models.Report{},
+		&models.ModerationAction{},
+		&models.UserRestriction{},
+		&models.Story{},
+		&models.StoryAudienceMember{},
+		&models.StoryView{},
+		&models.Poll{},
+		&models.PollOption{},
+		&models.PollVote{},
+		&models.Community{},
+		&models.Group{},
+		&models.GroupMember{},
+		&models.CommunityMember{},
+		&models.GroupInvite{},
+		&models.AnalyticsEvent{},
+		&models.PushSubscription{},
 	} {
 		if err := db.AutoMigrate(model); err != nil {
 			log.Printf("automigrate %T: %v", model, err)
@@ -210,6 +242,128 @@ func migrate(db *gorm.DB) {
 		`ALTER TABLE events ADD COLUMN IF NOT EXISTS reviewed_by TEXT`,
 		`ALTER TABLE events ADD COLUMN IF NOT EXISTS reviewed_at TIMESTAMPTZ`,
 		`UPDATE events SET status = 'pending' WHERE status IS NULL OR status = ''`,
+
+		// -- Social layer --
+		// Posts: audience, repost/quote links, counters, moderation state.
+		`ALTER TABLE posts ADD COLUMN IF NOT EXISTS audience TEXT DEFAULT 'everyone'`,
+		`ALTER TABLE posts ADD COLUMN IF NOT EXISTS group_id TEXT`,
+		`ALTER TABLE posts ADD COLUMN IF NOT EXISTS repost_of_id TEXT`,
+		`ALTER TABLE posts ADD COLUMN IF NOT EXISTS quote_of_id TEXT`,
+		`ALTER TABLE posts ADD COLUMN IF NOT EXISTS poll_id TEXT`,
+		`ALTER TABLE posts ADD COLUMN IF NOT EXISTS link_url TEXT`,
+		`ALTER TABLE posts ADD COLUMN IF NOT EXISTS link_title TEXT`,
+		`ALTER TABLE posts ADD COLUMN IF NOT EXISTS link_description TEXT`,
+		`ALTER TABLE posts ADD COLUMN IF NOT EXISTS link_image_url TEXT`,
+		`ALTER TABLE posts ADD COLUMN IF NOT EXISTS reposts_count INTEGER DEFAULT 0`,
+		`ALTER TABLE posts ADD COLUMN IF NOT EXISTS quotes_count INTEGER DEFAULT 0`,
+		`ALTER TABLE posts ADD COLUMN IF NOT EXISTS reactions_count INTEGER DEFAULT 0`,
+		`ALTER TABLE posts ADD COLUMN IF NOT EXISTS shares_count INTEGER DEFAULT 0`,
+		`ALTER TABLE posts ADD COLUMN IF NOT EXISTS media_count INTEGER DEFAULT 0`,
+		`ALTER TABLE posts ADD COLUMN IF NOT EXISTS edited_at TIMESTAMPTZ`,
+		`ALTER TABLE posts ADD COLUMN IF NOT EXISTS moderation_status TEXT DEFAULT 'active'`,
+		`ALTER TABLE posts ADD COLUMN IF NOT EXISTS hot_score DOUBLE PRECISION DEFAULT 0`,
+		// Backfill: rows written before these columns existed hold NULL, and a
+		// NULL audience fails the visibility check closed, which would hide
+		// every pre-existing post from everyone.
+		`UPDATE posts SET audience = 'everyone' WHERE audience IS NULL OR audience = ''`,
+		`UPDATE posts SET moderation_status = 'active' WHERE moderation_status IS NULL OR moderation_status = ''`,
+		`UPDATE posts SET reactions_count = COALESCE(likes_count, 0) WHERE reactions_count IS NULL`,
+
+		// Comments: one level of threading, reaction counter, moderation.
+		`ALTER TABLE comments ADD COLUMN IF NOT EXISTS parent_id TEXT`,
+		`ALTER TABLE comments ADD COLUMN IF NOT EXISTS replies_count INTEGER DEFAULT 0`,
+		`ALTER TABLE comments ADD COLUMN IF NOT EXISTS reactions_count INTEGER DEFAULT 0`,
+		`ALTER TABLE comments ADD COLUMN IF NOT EXISTS edited_at TIMESTAMPTZ`,
+		`ALTER TABLE comments ADD COLUMN IF NOT EXISTS moderation_status TEXT DEFAULT 'active'`,
+		`UPDATE comments SET moderation_status = 'active' WHERE moderation_status IS NULL OR moderation_status = ''`,
+
+		// Notifications: grouping key + deep-link subject.
+		`ALTER TABLE notifications ADD COLUMN IF NOT EXISTS group_key TEXT`,
+		`ALTER TABLE notifications ADD COLUMN IF NOT EXISTS actor_count INTEGER DEFAULT 1`,
+		`ALTER TABLE notifications ADD COLUMN IF NOT EXISTS subject_type TEXT`,
+		`ALTER TABLE notifications ADD COLUMN IF NOT EXISTS subject_id TEXT`,
+		`UPDATE notifications SET actor_count = 1 WHERE actor_count IS NULL OR actor_count < 1`,
+
+		// Social graph edges. Each unique index is what makes the ON CONFLICT
+		// clauses in lib/socialgraph idempotent -- without them a double-tapped
+		// Follow inserts twice. The de-dupe DELETE runs first so the index can
+		// be built on data that may already contain duplicates.
+		`DELETE FROM follows a USING follows b WHERE a.ctid < b.ctid AND a.follower_id = b.follower_id AND a.followee_id = b.followee_id`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS idx_follows_unique ON follows(follower_id, followee_id)`,
+		`DELETE FROM blocks a USING blocks b WHERE a.ctid < b.ctid AND a.blocker_id = b.blocker_id AND a.blocked_id = b.blocked_id`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS idx_blocks_unique ON blocks(blocker_id, blocked_id)`,
+		`DELETE FROM mutes a USING mutes b WHERE a.ctid < b.ctid AND a.muter_id = b.muter_id AND a.muted_id = b.muted_id`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS idx_mutes_unique ON mutes(muter_id, muted_id)`,
+		`DELETE FROM close_friends a USING close_friends b WHERE a.ctid < b.ctid AND a.owner_id = b.owner_id AND a.friend_id = b.friend_id`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS idx_close_friends_unique ON close_friends(owner_id, friend_id)`,
+		`DELETE FROM reactions a USING reactions b WHERE a.ctid < b.ctid AND a.subject_type = b.subject_type AND a.subject_id = b.subject_id AND a.user_id = b.user_id`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS idx_reactions_unique ON reactions(subject_type, subject_id, user_id)`,
+		`DELETE FROM post_hashtags a USING post_hashtags b WHERE a.ctid < b.ctid AND a.post_id = b.post_id AND a.tag = b.tag`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS idx_post_hashtags_unique ON post_hashtags(post_id, tag)`,
+		`DELETE FROM bookmarks a USING bookmarks b WHERE a.ctid < b.ctid AND a.user_id = b.user_id AND a.subject_type = b.subject_type AND a.subject_id = b.subject_id`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS idx_bookmarks_unique ON bookmarks(user_id, subject_type, subject_id)`,
+		`DELETE FROM feed_signals a USING feed_signals b WHERE a.ctid < b.ctid AND a.user_id = b.user_id AND a.signal = b.signal AND a.subject_type = b.subject_type AND a.subject_id = b.subject_id`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS idx_feed_signals_unique ON feed_signals(user_id, signal, subject_type, subject_id)`,
+		`DELETE FROM story_views a USING story_views b WHERE a.ctid < b.ctid AND a.story_id = b.story_id AND a.viewer_id = b.viewer_id`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS idx_story_views_unique ON story_views(story_id, viewer_id)`,
+		`DELETE FROM poll_votes a USING poll_votes b WHERE a.ctid < b.ctid AND a.poll_id = b.poll_id AND a.user_id = b.user_id AND a.option_id = b.option_id`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS idx_poll_votes_unique ON poll_votes(poll_id, user_id, option_id)`,
+		`DELETE FROM group_members a USING group_members b WHERE a.ctid < b.ctid AND a.group_id = b.group_id AND a.user_id = b.user_id`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS idx_group_members_unique ON group_members(group_id, user_id)`,
+		`DELETE FROM community_members a USING community_members b WHERE a.ctid < b.ctid AND a.community_id = b.community_id AND a.user_id = b.user_id`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS idx_community_members_unique ON community_members(community_id, user_id)`,
+		`DELETE FROM story_audience_members a USING story_audience_members b WHERE a.ctid < b.ctid AND a.story_id = b.story_id AND a.user_id = b.user_id`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS idx_story_audience_unique ON story_audience_members(story_id, user_id)`,
+
+		// Read-path indexes.
+		`CREATE INDEX IF NOT EXISTS idx_follows_followee ON follows(followee_id)`,
+		`CREATE INDEX IF NOT EXISTS idx_blocks_blocked ON blocks(blocked_id)`,
+		`CREATE INDEX IF NOT EXISTS idx_reactions_subject ON reactions(subject_type, subject_id)`,
+		`CREATE INDEX IF NOT EXISTS idx_reactions_user ON reactions(user_id)`,
+		`CREATE INDEX IF NOT EXISTS idx_mentions_user ON mentions(mentioned_user_id)`,
+		`CREATE INDEX IF NOT EXISTS idx_mentions_subject ON mentions(subject_type, subject_id)`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS idx_hashtags_tag ON hashtags(tag)`,
+		`CREATE INDEX IF NOT EXISTS idx_post_hashtags_tag ON post_hashtags(tag)`,
+		`CREATE INDEX IF NOT EXISTS idx_post_media_post ON post_media(post_id, position)`,
+		`CREATE INDEX IF NOT EXISTS idx_bookmarks_collection ON bookmarks(collection_id)`,
+		`CREATE INDEX IF NOT EXISTS idx_collections_user ON collections(user_id)`,
+		`CREATE INDEX IF NOT EXISTS idx_feed_signals_user ON feed_signals(user_id)`,
+		`CREATE INDEX IF NOT EXISTS idx_media_uploads_user_time ON media_uploads(user_id, created_at)`,
+		`CREATE INDEX IF NOT EXISTS idx_media_uploads_attached ON media_uploads(attached_type, attached_id)`,
+
+		// Moderation queue and audit trail.
+		`CREATE INDEX IF NOT EXISTS idx_reports_queue ON reports(status, priority, created_at)`,
+		`CREATE INDEX IF NOT EXISTS idx_reports_subject ON reports(subject_type, subject_id)`,
+		`CREATE INDEX IF NOT EXISTS idx_reports_owner ON reports(subject_owner_id)`,
+		`CREATE INDEX IF NOT EXISTS idx_reports_reporter ON reports(reporter_id, created_at)`,
+		`CREATE INDEX IF NOT EXISTS idx_mod_actions_subject ON moderation_actions(subject_type, subject_id, created_at)`,
+		`CREATE INDEX IF NOT EXISTS idx_mod_actions_owner ON moderation_actions(subject_owner_id, created_at)`,
+		`CREATE INDEX IF NOT EXISTS idx_mod_actions_actor ON moderation_actions(actor_id, created_at)`,
+		`CREATE INDEX IF NOT EXISTS idx_user_restrictions_active ON user_restrictions(user_id, type, lifted_at)`,
+
+		// Stories, polls, groups.
+		`CREATE INDEX IF NOT EXISTS idx_stories_author_expiry ON stories(author_id, expires_at)`,
+		`CREATE INDEX IF NOT EXISTS idx_stories_expiry ON stories(expires_at)`,
+		`CREATE INDEX IF NOT EXISTS idx_poll_options_poll ON poll_options(poll_id, position)`,
+		`CREATE INDEX IF NOT EXISTS idx_poll_votes_poll ON poll_votes(poll_id)`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS idx_communities_slug ON communities(slug)`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS idx_groups_slug ON groups(slug)`,
+		`CREATE INDEX IF NOT EXISTS idx_groups_community ON groups(community_id)`,
+		`CREATE INDEX IF NOT EXISTS idx_group_members_user ON group_members(user_id, status)`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS idx_group_invites_code ON group_invites(code)`,
+
+		// Feed read path. Without these a 15,000-student feed is a seq scan.
+		`CREATE INDEX IF NOT EXISTS idx_posts_author_time ON posts(author_id, created_at DESC)`,
+		`CREATE INDEX IF NOT EXISTS idx_posts_group_time ON posts(group_id, created_at DESC)`,
+		`CREATE INDEX IF NOT EXISTS idx_posts_created ON posts(created_at DESC)`,
+		`CREATE INDEX IF NOT EXISTS idx_comments_post_parent ON comments(post_id, parent_id, created_at)`,
+		`CREATE INDEX IF NOT EXISTS idx_analytics_name_time ON analytics_events(name, created_at)`,
+		`CREATE INDEX IF NOT EXISTS idx_analytics_actor ON analytics_events(actor_id, created_at)`,
+
+		// Push subscriptions. Endpoint is unique so a device re-subscribing
+		// replaces its row instead of leaving a dead endpoint behind.
+		`CREATE UNIQUE INDEX IF NOT EXISTS idx_push_subs_endpoint ON push_subscriptions(endpoint)`,
+		`CREATE INDEX IF NOT EXISTS idx_push_subs_user ON push_subscriptions(user_id)`,
 	} {
 		db.Exec(stmt)
 	}
