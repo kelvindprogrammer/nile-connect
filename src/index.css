@@ -1,16 +1,15 @@
+@import "./styles/tokens.css";
+
 :root {
-    --nile-blue: #1E499D;
-    --nile-green: #6CBB56;
-    --nile-white: #FFFFFE;
-    --nile-black: #000000;
+    --nile-blue: var(--harbour-500, #26658C);
+    --nile-green: var(--status-success, #2f7a4d);
+    --nile-white: var(--paper-000, #ffffff);
+    --nile-black: var(--ink-900, #0b0d14);
     --brutalist-border: 2px;
     --brutalist-shadow-sm: 3px;
     --brutalist-shadow-lg: 6px;
-    --radius-sm: 6px;
-    --radius-md: 12px;
-    --radius-lg: 24px;
-    --radius-full: 9999px;
 }
+
 
 @tailwind base;
 @tailwind components;

@@ -254,25 +254,25 @@ const AppShell = () => {
                 style={{ width: `${progress}%`, opacity: progress >= 100 ? 0 : 1 }} />
 
             {/* ── Desktop Sidebar ─────────────────────────────────────────── */}
-            <aside className="hidden md:flex w-[236px] bg-white border-r border-gray-100 flex-col py-5 z-30 flex-shrink-0">
-                <button onClick={() => navigate(rootPath)} className="flex items-center gap-2 px-4 mb-6 hover:opacity-80 transition-opacity flex-shrink-0">
+            <aside className="hidden md:flex w-[232px] bg-[#f4f7f9] border-r border-paper-300 flex-col py-4 z-30 flex-shrink-0">
+                <button onClick={() => navigate(rootPath)} className="flex items-center gap-2 px-4 mb-5 hover:opacity-80 transition-opacity flex-shrink-0">
                     <NileConnectLogo size="xs" showText showTagline={false} animated />
                 </button>
 
-                <div className="px-4 mb-4">
-                    <p className="text-[11px] font-semibold text-gray-300 uppercase tracking-wider">{cfg.hubLabel}</p>
+                <div className="px-4 mb-3">
+                    <p className="text-[10.5px] font-semibold text-gray-400 uppercase tracking-wider">{cfg.hubLabel}</p>
                 </div>
 
-                <nav className="flex-1 flex flex-col gap-0.5 w-full overflow-y-auto px-3">
+                <nav className="flex-1 flex flex-col gap-0.5 w-full overflow-y-auto px-2.5">
                     {cfg.primary.map(item => (
                         <RailItem key={item.to} to={item.to} Icon={item.icon} label={item.label}
                             active={isActive(item.to, location.pathname, item.exact)}
                             badge={navBadge(item.label)} accentText={cfg.accentText} accentBgSoft={cfg.accentBgSoft} accentBg={cfg.accentBg} />
                     ))}
 
-                    <div className="w-full h-px bg-gray-100 my-3" />
+                    <div className="w-full h-px bg-paper-300 my-2.5" />
 
-                    <p className="px-3.5 mb-1 text-[10px] font-semibold text-gray-300 uppercase tracking-wider">More</p>
+                    <p className="px-3 mb-1 text-[10.5px] font-semibold text-gray-400 uppercase tracking-wider">More</p>
                     {cfg.more.map(item => (
                         <RailItem key={item.to} to={item.to} Icon={item.icon} label={item.label}
                             active={isActive(item.to, location.pathname, item.exact)}
@@ -363,7 +363,7 @@ const AppShell = () => {
 
             {/* ── Main ──────────────────────────────────────────────────── */}
             <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-                <header className="h-[60px] bg-white border-b border-gray-100 flex items-center justify-between px-4 md:px-6 sticky top-0 z-20 flex-shrink-0 gap-3">
+                <header className="h-[56px] bg-white border-b border-paper-300 flex items-center justify-between px-4 md:px-5 sticky top-0 z-20 flex-shrink-0 gap-3">
                     <div className="flex items-center gap-1.5 flex-shrink-0 min-w-0">
                         <button onClick={() => navigate(cfg.profilePath)} className="md:hidden w-8 h-8 rounded-xl overflow-hidden flex-shrink-0">
                             <Avatar name={userName} size="sm" src={profilePic || undefined} />

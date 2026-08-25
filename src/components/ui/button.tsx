@@ -8,19 +8,19 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        default: "bg-app-accent text-white hover:bg-harbour-600 shadow-soft-xs",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+          "bg-red-600 text-white hover:bg-red-700 shadow-soft-xs",
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+          "border border-paper-300 bg-white hover:bg-paper-100 text-gray-800",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+          "bg-paper-100 text-gray-800 hover:bg-paper-200 border border-paper-300",
+        ghost: "hover:bg-paper-100 text-gray-700",
+        link: "text-app-accent underline-offset-4 hover:underline",
         // Nile Custom
-        nile: "bg-nile-blue text-white border-[2px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-px hover:translate-y-px hover:shadow-none transition-all font-black uppercase tracking-widest",
-        "nile-green": "bg-nile-green text-white border-[2px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-px hover:translate-y-px hover:shadow-none transition-all font-black uppercase tracking-widest",
-        "nile-outline": "bg-white text-black border-[2px] border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-px hover:translate-y-px hover:shadow-none transition-all font-black uppercase tracking-widest",
+        nile: "bg-app-accent text-white border border-transparent shadow-soft-xs hover:bg-harbour-600 transition-all font-medium",
+        "nile-green": "bg-green-600 text-white border border-transparent shadow-soft-xs hover:bg-green-700 transition-all font-medium",
+        "nile-outline": "bg-white text-gray-800 border border-paper-400 shadow-soft-xs hover:bg-paper-100 transition-all font-medium",
       },
       size: {
         default: "h-10 px-4 py-2",

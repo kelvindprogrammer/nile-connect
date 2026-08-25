@@ -56,14 +56,9 @@ const Avatar: React.FC<AvatarProps> = ({
 
     const displaySrc = src || (isSelf ? selfPic : null);
 
-    // Color palette for initials avatars (deterministic by name)
-    const colorPairs = [
-        ['#1E499D', '#fff'], ['#6CBB56', '#fff'], ['#0d1f47', '#6CBB56'],
-        ['#f59e0b', '#000'], ['#ef4444', '#fff'], ['#8b5cf6', '#fff'],
-        ['#0891b2', '#fff'], ['#d97706', '#fff'],
-    ];
-    const colorIdx = name.charCodeAt(0) % colorPairs.length;
-    const [bg, fg] = colorPairs[colorIdx];
+    // OneConnect app tint for initials avatar
+    const bg = 'var(--app-tint, #eaf2f7)';
+    const fg = 'var(--app-accent, #26658c)';
 
     return (
         <div className="relative inline-flex flex-shrink-0">
@@ -74,10 +69,10 @@ const Avatar: React.FC<AvatarProps> = ({
                     <img src={displaySrc} alt={name} className="w-full h-full object-cover" />
                 ) : (
                     <div
-                        className="w-full h-full flex items-center justify-center"
-                        style={{ background: bg }}
+                        className="w-full h-full flex items-center justify-center font-semibold"
+                        style={{ background: bg, color: fg }}
                     >
-                        <span className="font-semibold" style={{ color: fg }}>{initials}</span>
+                        <span>{initials}</span>
                     </div>
                 )}
             </div>

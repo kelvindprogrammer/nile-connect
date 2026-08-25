@@ -23,14 +23,14 @@ const Card: React.FC<CardProps> = ({
     noPadding = false,
 }) => {
     const variants = {
-        default:  'bg-white border border-gray-100 shadow-card',
-        elevated: 'bg-white border border-gray-100 shadow-soft hover:shadow-card-hover transition-shadow duration-300',
-        flat:     'bg-white border border-gray-100',
-        tinted:   'bg-nile-blue-50/40 border border-nile-blue-100/60',
+        default:  'bg-white border border-paper-300 shadow-soft-xs',
+        elevated: 'bg-white border border-paper-300 shadow-soft hover:shadow-card-hover transition-shadow duration-300',
+        flat:     'bg-white border border-paper-300',
+        tinted:   'bg-paper-100 border border-paper-300',
     };
 
     return (
-        <div className={cn('rounded-2xl overflow-hidden', variants[variant], className)}>
+        <div className={cn('rounded-xl overflow-hidden', variants[variant], className)}>
             {(title || action) && (
                 <div className="px-5 py-4 flex items-center justify-between border-b border-gray-50">
                     <div>

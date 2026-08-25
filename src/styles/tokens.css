@@ -1,0 +1,254 @@
+/* OneConnect Design Tokens & Shared Foundation */
+
+/* ── 1. Fonts ─────────────────────────────────────────── */
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+
+:root {
+  --font-display: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-serif: var(--font-display);
+}
+
+/* ── 2. Palette ────────────────────────────────────────── */
+:root {
+  --ink-900: #0b0d14;
+  --ink-800: #0d1220;
+  --ink-700: #171b28;
+  --ink-600: #232733;
+  --ink-500: #2e3340;
+
+  --paper-000: #ffffff;
+  --paper-050: #faf9f6;
+  --paper-100: #f8f7f4;
+  --paper-200: #f1efea;
+  --paper-300: #e9e6df;
+  --paper-400: #d8d4cb;
+  --paper-500: #b6b1a6;
+  --paper-600: #8b877e;
+  --paper-700: #6b6a66;
+
+  --nile-50: #eef2fb;
+  --nile-100: #d9e1f3;
+  --nile-200: #b3c3e7;
+  --nile-300: #8da5db;
+  --nile-400: #4f74bb;
+  --nile-500: #1e499d;
+  --nile-600: #1a3f87;
+  --nile-700: #163571;
+  --nile-800: #112759;
+  --nile-900: #0c1c40;
+
+  --harbour-500: #26658c;
+  --harbour-600: #1f5476;
+  --harbour-050: #eaf2f7;
+
+  --amethyst-500: #6b3fd4;
+  --amethyst-600: #5b32bb;
+  --amethyst-050: #f3eefe;
+
+  --verdigris-500: #0f7a6c;
+  --verdigris-600: #0b6559;
+  --verdigris-050: #e6f3f1;
+
+  --ember-500: #c2521f;
+  --ember-600: #a6441a;
+  --ember-050: #fdf0e8;
+
+  --balm-500: #b0576b;
+  --balm-600: #97485a;
+  --balm-050: #fbf0f2;
+
+  --green-600: #2f7a4d;
+  --green-050: #e8f3ec;
+  --amber-600: #b8722b;
+  --amber-050: #fbf2e6;
+  --red-600: #b54043;
+  --red-050: #fbe9e9;
+}
+
+/* ── 3. Semantic Aliases ──────────────────────────────── */
+:root {
+  --background: var(--paper-000);
+  --surface-sunken: #f4f7f9;
+  --surface-card: var(--paper-000);
+  --surface-raised: var(--paper-000);
+  --surface-inverse: var(--ink-800);
+
+  --text-body: var(--ink-800);
+  --text-muted: var(--paper-700);
+  --text-subtle: var(--paper-600);
+  --text-on-accent: #ffffff;
+  --text-on-inverse: #ecebe6;
+
+  --border: var(--paper-300);
+  --border-strong: var(--paper-400);
+  --border-inverse: rgba(255, 255, 255, 0.16);
+
+  --field: var(--paper-000);
+  --field-disabled: var(--paper-200);
+  --overlay: rgba(11, 13, 20, 0.42);
+
+  --status-success: var(--green-600);
+  --status-success-tint: var(--green-050);
+  --status-warning: var(--amber-600);
+  --status-warning-tint: var(--amber-050);
+  --status-danger: var(--red-600);
+  --status-danger-tint: var(--red-050);
+  --status-info: var(--app-500);
+  --status-info-tint: var(--app-tint);
+
+  --foreground: var(--text-body);
+  --muted: var(--paper-200);
+  --muted-foreground: var(--text-muted);
+  --card: var(--surface-card);
+  --background-subtle: var(--surface-sunken);
+  --input: var(--field);
+}
+
+[data-theme="dark"] {
+  --background: var(--ink-900);
+  --surface-sunken: #10131c;
+  --surface-card: #11141d;
+  --surface-raised: #161a24;
+  --surface-inverse: #ecebe6;
+
+  --text-body: #ecebe6;
+  --text-muted: #9a978f;
+  --text-subtle: #7a7873;
+  --text-on-inverse: var(--ink-900);
+
+  --border: var(--ink-600);
+  --border-strong: var(--ink-500);
+  --border-inverse: rgba(0, 0, 0, 0.24);
+
+  --field: #14171f;
+  --field-disabled: #1a1e28;
+  --overlay: rgba(4, 5, 9, 0.62);
+
+  --status-success: #4ea273;
+  --status-success-tint: #163322;
+  --status-warning: #d49355;
+  --status-warning-tint: #2e2114;
+  --status-danger: #d97073;
+  --status-danger-tint: #2e1718;
+}
+
+/* ── 4. App Scope: OneConnect (Harbour Blue #26658C) ── */
+:root,
+[data-app="oneconnect"] {
+  --app-name: "OneConnect";
+  --app-400: #5b91b3;
+  --app-500: var(--harbour-500);
+  --app-600: var(--harbour-600);
+  --app-ink: #0e2f42;
+  --app-tint: var(--harbour-050);
+  --app-accent: var(--harbour-500);
+  --focus-ring: var(--harbour-500);
+  --surface-sunken: #f4f7f9;
+  --radius-md: 8px; --radius-lg: 12px; --radius-xl: 16px; --radius-2xl: 22px;
+  --control-h: 36px; --control-h-sm: 28px; --card-pad: 24px; --row-pad-y: 14px;
+}
+
+[data-theme="dark"] [data-app="oneconnect"],
+[data-app="oneconnect"][data-theme="dark"],
+[data-theme="dark"]:root {
+  --app-accent: #5b91b3;
+  --focus-ring: #5b91b3;
+  --app-tint: #142d3c;
+  --app-ink: #10222e;
+}
+
+/* ── 5. Spacing Scale ─────────────────────────────────── */
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  --control-h: 36px;
+  --control-h-sm: 28px;
+  --field-pad-x: 12px;
+  --card-pad: 24px;
+  --row-pad-y: 14px;
+  --section-gap: var(--space-8);
+
+  --page-max: 1240px;
+  --page-gutter: var(--space-8);
+  --reading-max: 68ch;
+}
+
+/* ── 6. Corner Radius ─────────────────────────────────── */
+:root {
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 22px;
+  --radius-full: 9999px;
+}
+
+/* ── 7. Typography ────────────────────────────────────── */
+:root {
+  --text-display-1: 96px;
+  --text-display-2: 72px;
+  --text-display-3: 56px;
+  --text-display-4: 44px;
+  --text-display-5: 34px;
+
+  --text-2xl: 22px;
+  --text-xl: 18px;
+  --text-lg: 15px;
+  --text-md: 13.5px;
+  --text-sm: 12.5px;
+  --text-xs: 11.5px;
+
+  --leading-display: 1.02;
+  --leading-tight: 1.2;
+  --leading-body: 1.55;
+
+  --tracking-display: -0.022em;
+  --tracking-tight: -0.01em;
+  --tracking-ui: -0.005em;
+  --tracking-eyebrow: 0.14em;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+}
+
+.co-display { font-family: var(--font-display); font-weight: var(--weight-regular); letter-spacing: var(--tracking-display); line-height: var(--leading-display); color: var(--text-body); }
+.co-display em { font-style: italic; }
+.co-eyebrow { font-family: var(--font-sans); font-size: var(--text-sm); font-weight: var(--weight-medium); letter-spacing: var(--tracking-eyebrow); text-transform: uppercase; color: var(--text-muted); }
+.co-lede { font-family: var(--font-sans); font-size: var(--text-xl); line-height: var(--leading-body); color: var(--text-muted); max-width: 56ch; text-wrap: pretty; }
+.co-body { font-family: var(--font-sans); font-size: var(--text-md); line-height: var(--leading-body); color: var(--text-body); text-wrap: pretty; }
+.co-mono { font-family: var(--font-mono); font-feature-settings: "liga" off; font-size: var(--text-sm); }
+
+/* ── 8. Motion ────────────────────────────────────────── */
+:root {
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-instant: 80ms;
+  --dur-fast: 120ms;
+  --dur-base: 180ms;
+  --dur-slow: 320ms;
+}
+
+/* ── 9. Elevation ─────────────────────────────────────── */
+:root {
+  --shadow-xs: 0 1px 2px rgba(13, 18, 32, 0.04);
+  --shadow-sm: 0 1px 2px rgba(13, 18, 32, 0.05), 0 1px 3px rgba(13, 18, 32, 0.06);
+  --shadow-md: 0 4px 12px rgba(13, 18, 32, 0.06), 0 2px 4px rgba(13, 18, 32, 0.04);
+  --shadow-lg: 0 16px 40px rgba(13, 18, 32, 0.08), 0 4px 12px rgba(13, 18, 32, 0.05);
+  --shadow-overlay: 0 32px 64px -16px rgba(13, 18, 32, 0.24), 0 8px 20px -8px rgba(13, 18, 32, 0.12);
+}
