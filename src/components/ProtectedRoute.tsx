@@ -13,7 +13,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-screen bg-white">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-paper-400"></div>
             </div>
         );
     }
@@ -24,14 +24,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
 
     if (allowedRoles && user && !allowedRoles.includes(user.role)) {
         return (
-            <div className="flex flex-col items-center justify-center h-screen bg-gray-50 font-sans">
-                <h1 className="text-4xl font-black text-red-600 mb-4 uppercase tracking-widest">Access Denied</h1>
+            <div className="flex flex-col items-center justify-center h-screen bg-paper-100 font-sans">
+                <h1 className="text-4xl font-semibold text-red-600 mb-4 tracking-tight">Access Denied</h1>
                 <p className="text-xl font-bold text-black mb-8 text-center max-w-md">
                     Your current role ({user.role}) does not have permission to access this portal.
                 </p>
                 <button
                     onClick={() => window.location.href = '/login'}
-                    className="px-6 py-3 bg-black text-white font-black uppercase tracking-widest border-2 border-black hover:bg-blue-800 transition-colors"
+                    className="px-6 py-3 bg-black text-white font-semibold tracking-tight border-2 border-paper-400 hover:bg-blue-800 transition-colors"
                 >
                     Return to Login
                 </button>

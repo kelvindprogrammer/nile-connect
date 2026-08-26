@@ -153,7 +153,7 @@ const StudentActivity = () => {
         <div className="p-4 md:p-8 space-y-8 anime-fade-in font-sans text-left pb-24 md:pb-8">
 
             {/* Header */}
-            <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-100 pb-6">
+            <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-paper-300 pb-6">
                 <div className="space-y-1">
                     <h2 className="text-3xl md:text-5xl font-semibold text-black">Activity Monitor .</h2>
                     <p className="text-[10px] font-semibold text-nile-blue/50">OVERSIGHT OF STUDENT-EMPLOYER INTERACTIONS</p>
@@ -161,7 +161,7 @@ const StudentActivity = () => {
                 <button
                     onClick={handleExport}
                     disabled={isLoading || filtered.length === 0}
-                    className="flex items-center gap-2 px-4 py-2.5 border border-gray-100 rounded-xl font-semibold text-[9px] hover:bg-black hover:text-white transition-all shadow-card hover:shadow-none disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 px-4 py-2.5 border border-paper-300 rounded-xl font-semibold text-[9px] hover:bg-black hover:text-white transition-all shadow-card hover:shadow-none disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                     <Download size={13} /> EXPORT REPORT
                 </button>
@@ -192,12 +192,12 @@ const StudentActivity = () => {
                         textColor: 'text-nile-green',
                     },
                 ].map(c => (
-                    <div key={c.label} className={`bg-white border border-gray-100 rounded-[24px] p-5 shadow-card flex items-center justify-between`}>
+                    <div key={c.label} className={`bg-white border border-paper-300 rounded-[24px] p-5 shadow-card flex items-center justify-between`}>
                         <div className="space-y-1.5">
                             <p className="text-[8px] font-semibold text-black/30">{c.label}</p>
                             <h4 className="text-3xl font-semibold text-black leading-none">{c.value}</h4>
                         </div>
-                        <div className={`w-12 h-12 rounded-[16px] border border-gray-100 flex items-center justify-center ${c.color} ${c.textColor}`}>
+                        <div className={`w-12 h-12 rounded-[16px] border border-paper-300 flex items-center justify-center ${c.color} ${c.textColor}`}>
                             {c.icon}
                         </div>
                     </div>
@@ -205,10 +205,10 @@ const StudentActivity = () => {
             </div>
 
             {/* Table */}
-            <div className="bg-white border border-gray-100 rounded-[24px] overflow-hidden shadow-card">
+            <div className="bg-white border border-paper-300 rounded-[24px] overflow-hidden shadow-card">
 
                 {/* Search bar */}
-                <div className="p-5 border-b border-gray-100/5 bg-nile-white/30 flex flex-col sm:flex-row gap-3">
+                <div className="p-5 border-b border-paper-300/5 bg-nile-white/30 flex flex-col sm:flex-row gap-3">
                     <div className="relative flex-1">
                         <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-black/30" />
                         <input
@@ -216,7 +216,7 @@ const StudentActivity = () => {
                             placeholder="SEARCH BY STUDENT OR COMPANY..."
                             value={search}
                             onChange={e => setSearch(e.target.value)}
-                            className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-100 rounded-xl font-semibold text-[9px] outline-none focus:shadow-card transition-all"
+                            className="w-full pl-9 pr-4 py-2.5 bg-white border border-paper-300 rounded-xl font-semibold text-[9px] outline-none focus:shadow-card transition-all"
                         />
                     </div>
                     <div className="text-[8px] font-semibold text-black/30 self-center whitespace-nowrap">
@@ -227,7 +227,7 @@ const StudentActivity = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead>
-                            <tr className="border-b border-gray-100/5 bg-nile-white/50">
+                            <tr className="border-b border-paper-300/5 bg-nile-white/50">
                                 {['STUDENT', 'ACTION', 'EMPLOYER', 'TIMESTAMP', 'STATUS', ''].map(h => (
                                     <th key={h} className="px-5 py-3.5 text-[8px] font-semibold text-black/30">{h}</th>
                                 ))}
@@ -250,7 +250,7 @@ const StudentActivity = () => {
                                     </td>
                                 </tr>
                             ) : filtered.map(row => (
-                                <tr key={row.id} className="border-b border-black/5 hover:bg-nile-white/30 transition-colors">
+                                <tr key={row.id} className="border-b border-paper-400/5 hover:bg-nile-white/30 transition-colors">
                                     <td className="px-5 py-4">
                                         <div className="flex items-center gap-2.5">
                                             <div className="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center font-semibold text-[10px] flex-shrink-0">
@@ -261,7 +261,7 @@ const StudentActivity = () => {
                                     </td>
                                     <td className="px-5 py-4">
                                         <div className="flex items-center gap-2">
-                                            <div className="p-1.5 rounded-lg bg-white border border-black/10 flex-shrink-0">
+                                            <div className="p-1.5 rounded-lg bg-white border border-paper-400/10 flex-shrink-0">
                                                 {actionIcon[row.action]}
                                             </div>
                                             <p className="text-[9px] font-semibold text-black/50 tracking-wider">{actionLabel[row.action]}</p>
@@ -282,7 +282,7 @@ const StudentActivity = () => {
                                         <button
                                             onClick={() => navigate(`/staff/students/${row.studentId}`)}
                                             disabled={!row.studentId}
-                                            className="p-2 rounded-lg text-black/20 hover:bg-black hover:text-white border border-transparent hover:border-black transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                                            className="p-2 rounded-lg text-black/20 hover:bg-black hover:text-white border border-transparent hover:border-paper-400 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                                             title="View student profile"
                                         >
                                             <Eye size={13} />

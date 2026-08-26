@@ -26,7 +26,7 @@ function renderInline(text: string): React.ReactNode[] {
     const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g);
     return parts.map((part, i) => {
         if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
-            return <strong key={i} className="font-black text-current">{part.slice(2, -2)}</strong>;
+            return <strong key={i} className="font-semibold text-current">{part.slice(2, -2)}</strong>;
         }
         if (part.startsWith('*') && part.endsWith('*') && part.length > 2 && !part.startsWith('**')) {
             return <em key={i}>{part.slice(1, -1)}</em>;
@@ -56,7 +56,7 @@ export function formatMarkdown(text: string, className?: string): React.ReactNod
                     <li key={i} className="flex items-start gap-2">
                         {listType === 'ul'
                             ? <span className="mt-[5px] w-1.5 h-1.5 rounded-full bg-current opacity-40 flex-shrink-0" />
-                            : <span className="font-black text-current opacity-50 flex-shrink-0 min-w-[1.2em]">{i + 1}.</span>
+                            : <span className="font-semibold text-current opacity-50 flex-shrink-0 min-w-[1.2em]">{i + 1}.</span>
                         }
                         <span className="leading-relaxed">{renderInline(item)}</span>
                     </li>
@@ -72,21 +72,21 @@ export function formatMarkdown(text: string, className?: string): React.ReactNod
         if (trimmed.startsWith('### ')) {
             flushList();
             elements.push(
-                <h4 key={i} className="font-black text-current text-sm mt-3 mb-1 pb-0.5 border-b border-current/10 uppercase tracking-tight">
+                <h4 key={i} className="font-semibold text-current text-sm mt-3 mb-1 pb-0.5 border-b border-current/10 uppercase tracking-tight">
                     {renderInline(trimmed.slice(4))}
                 </h4>
             );
         } else if (trimmed.startsWith('## ')) {
             flushList();
             elements.push(
-                <h3 key={i} className="font-black text-current text-base mt-4 mb-1.5 uppercase tracking-tighter">
+                <h3 key={i} className="font-semibold text-current text-base mt-4 mb-1.5 uppercase tracking-tighter">
                     {renderInline(trimmed.slice(3))}
                 </h3>
             );
         } else if (trimmed.startsWith('# ')) {
             flushList();
             elements.push(
-                <h2 key={i} className="font-black text-current text-lg mt-4 mb-2 uppercase tracking-tighter">
+                <h2 key={i} className="font-semibold text-current text-lg mt-4 mb-2 uppercase tracking-tighter">
                     {renderInline(trimmed.slice(2))}
                 </h2>
             );

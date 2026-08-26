@@ -219,7 +219,7 @@ const Feed: React.FC = () => {
                     {post.media.slice(0, 4).map((m, i) => (
                         <div
                             key={m.id || i}
-                            className="social-media relative overflow-hidden rounded-xl bg-gray-50"
+                            className="social-media relative overflow-hidden rounded-xl bg-paper-100"
                             // Reserving the aspect box before load is what stops
                             // the feed shifting under the reader's thumb.
                             style={m.width && m.height ? { aspectRatio: `${m.width} / ${m.height}` } : undefined}
@@ -263,18 +263,18 @@ const Feed: React.FC = () => {
 
     /** The embedded original inside a quote post. */
     const renderQuoted = (quoted: Post) => (
-        <div className="mx-4 mb-2 border border-gray-100 rounded-xl overflow-hidden bg-gray-50/50">
+        <div className="mx-4 mb-2 border border-paper-300 rounded-xl overflow-hidden bg-paper-100/50">
             <div className="p-3 pb-1.5 flex items-center gap-2">
                 <Avatar name={quoted.author?.name || quoted.author_name || 'Member'} size="sm" />
                 <div className="min-w-0">
-                    <p className="text-xs font-semibold text-gray-800 truncate">
+                    <p className="text-xs font-semibold text-ink-800 truncate">
                         {quoted.author?.name || quoted.author_name || 'Community member'}
                     </p>
-                    <p className="text-[10px] text-gray-400">{timeAgo(quoted.created_at)}</p>
+                    <p className="text-[10px] text-paper-600">{timeAgo(quoted.created_at)}</p>
                 </div>
             </div>
             <div className="px-3 pb-3">
-                <PostBody content={quoted.content} className="text-xs text-gray-700" />
+                <PostBody content={quoted.content} className="text-xs text-ink-700" />
             </div>
         </div>
     );
@@ -290,7 +290,7 @@ const Feed: React.FC = () => {
         return (
             <article key={post.id} className="social-card overflow-hidden">
                 {isBareRepost && (
-                    <div className="px-4 pt-3 flex items-center gap-1.5 text-[11px] text-gray-400">
+                    <div className="px-4 pt-3 flex items-center gap-1.5 text-[11px] text-paper-600">
                         <Repeat2 size={12} />
                         <span>{authorName(post)} reposted</span>
                     </div>
@@ -304,10 +304,10 @@ const Feed: React.FC = () => {
                             isSelf={user?.id === display.author_id}
                         />
                         <div className="text-left min-w-0">
-                            <h4 className="font-semibold text-gray-900 text-sm leading-tight truncate">
+                            <h4 className="font-semibold text-ink-800 text-sm leading-tight truncate">
                                 {authorName(display)}
                             </h4>
-                            <p className="text-xs text-gray-400 mt-0.5 flex items-center gap-1.5 flex-wrap">
+                            <p className="text-xs text-paper-600 mt-0.5 flex items-center gap-1.5 flex-wrap">
                                 <span>{roleTag(display)}</span>
                                 <span aria-hidden>·</span>
                                 <span>{timeAgo(display.created_at)}</span>
@@ -372,7 +372,7 @@ const Feed: React.FC = () => {
                 {display.kind === 'job' && display.job_id && <JobShareCard jobId={display.job_id} />}
 
                 {(post.reactions.total > 0 || post.comments_count > 0 || post.reposts_count > 0) && (
-                    <div className="px-4 py-2 flex justify-between items-center text-xs text-gray-400">
+                    <div className="px-4 py-2 flex justify-between items-center text-xs text-paper-600">
                         <ReactionCount summary={post.reactions} />
                         <div className="flex items-center gap-3">
                             {post.reposts_count > 0 && (
@@ -381,7 +381,7 @@ const Feed: React.FC = () => {
                             {post.comments_count > 0 && (
                                 <button
                                     onClick={() => toggleComments(post.id)}
-                                    className="hover:text-gray-700 transition-colors"
+                                    className="hover:text-ink-700 transition-colors"
                                 >
                                     {post.comments_count} {post.comments_count === 1 ? 'comment' : 'comments'}
                                 </button>
@@ -390,7 +390,7 @@ const Feed: React.FC = () => {
                     </div>
                 )}
 
-                <div className="px-2 py-1 flex items-center justify-between gap-1 border-t border-gray-100">
+                <div className="px-2 py-1 flex items-center justify-between gap-1 border-t border-paper-300">
                     <ReactionBar
                         subjectType="post"
                         subjectId={post.id}
@@ -452,7 +452,7 @@ const Feed: React.FC = () => {
                         aria-selected={mode === value}
                         onClick={() => setMode(value)}
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors
-                            ${mode === value ? 'bg-nile-blue text-white' : 'text-gray-500 hover:bg-gray-100'}`}
+                            ${mode === value ? 'bg-nile-blue text-white' : 'text-paper-700 hover:bg-paper-200'}`}
                     >
                         <Icon size={12} />
                         {label}
@@ -467,15 +467,15 @@ const Feed: React.FC = () => {
                     {[0, 1, 2].map(i => (
                         <div key={i} className="social-card p-4 space-y-3 animate-pulse">
                             <div className="flex gap-3">
-                                <div className="w-9 h-9 rounded-xl bg-gray-100" />
+                                <div className="w-9 h-9 rounded-xl bg-paper-200" />
                                 <div className="flex-1 space-y-2 pt-1">
-                                    <div className="h-3 bg-gray-100 rounded w-1/3" />
-                                    <div className="h-2 bg-gray-100 rounded w-1/4" />
+                                    <div className="h-3 bg-paper-200 rounded w-1/3" />
+                                    <div className="h-2 bg-paper-200 rounded w-1/4" />
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <div className="h-3 bg-gray-100 rounded w-full" />
-                                <div className="h-3 bg-gray-100 rounded w-4/5" />
+                                <div className="h-3 bg-paper-200 rounded w-full" />
+                                <div className="h-3 bg-paper-200 rounded w-4/5" />
                             </div>
                         </div>
                     ))}
@@ -483,7 +483,7 @@ const Feed: React.FC = () => {
             ) : error ? (
                 <div className="social-card py-12 text-center space-y-3">
                     <AlertCircle size={26} className="text-red-300 mx-auto" />
-                    <p className="text-sm text-gray-600">{error}</p>
+                    <p className="text-sm text-paper-700">{error}</p>
                     <button
                         onClick={() => setReloadToken(t => t + 1)}
                         className="text-xs font-medium text-nile-blue hover:underline"
@@ -493,9 +493,9 @@ const Feed: React.FC = () => {
                 </div>
             ) : posts.length === 0 ? (
                 <div className="social-card py-14 text-center">
-                    <MessageCircle size={28} className="text-gray-200 mx-auto mb-3" />
-                    <p className="text-sm text-gray-500">Your feed is quiet right now.</p>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <MessageCircle size={28} className="text-paper-400 mx-auto mb-3" />
+                    <p className="text-sm text-paper-700">Your feed is quiet right now.</p>
+                    <p className="text-xs text-paper-600 mt-1">
                         Follow a few classmates or share something to get started.
                     </p>
                 </div>
@@ -507,11 +507,11 @@ const Feed: React.FC = () => {
             {hasMore && !isLoading && !error && (
                 <div ref={sentinelRef} className="py-6 flex items-center justify-center">
                     {loadingMore ? (
-                        <Loader2 size={18} className="animate-spin text-gray-300" />
+                        <Loader2 size={18} className="animate-spin text-paper-500" />
                     ) : (
                         <button
                             onClick={loadMore}
-                            className="text-xs font-medium text-gray-400 hover:text-gray-600 transition-colors"
+                            className="text-xs font-medium text-paper-600 hover:text-paper-700 transition-colors"
                         >
                             Load more
                         </button>
@@ -520,7 +520,7 @@ const Feed: React.FC = () => {
             )}
 
             {!hasMore && posts.length > 0 && !isLoading && (
-                <p className="py-6 text-center text-xs text-gray-300">You're all caught up.</p>
+                <p className="py-6 text-center text-xs text-paper-500">You're all caught up.</p>
             )}
 
             {sharePost && (

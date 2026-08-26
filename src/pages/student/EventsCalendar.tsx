@@ -15,12 +15,12 @@ const catColors: Record<string, string> = {
     workshop: 'bg-purple-50 text-purple-600',
     networking: 'bg-nile-green/10 text-nile-green',
     webinar: 'bg-orange-50 text-orange-500',
-    seminar: 'bg-gray-100 text-gray-500',
+    seminar: 'bg-paper-200 text-paper-700',
     info_session: 'bg-yellow-50 text-yellow-600',
     alumni_meetup: 'bg-pink-50 text-pink-600',
-    hackathon: 'bg-gray-900 text-white',
+    hackathon: 'bg-ink-900 text-white',
     tech_talk: 'bg-nile-blue/10 text-nile-blue',
-    other: 'bg-gray-100 text-gray-500',
+    other: 'bg-paper-200 text-paper-700',
 };
 
 function formatDate(dateStr: string): string {
@@ -131,10 +131,10 @@ const EventsCalendar = () => {
         <>
             <div className="p-4 md:p-10 space-y-6 md:space-y-10 font-sans bg-nile-white min-h-full pb-24 text-left">
                 {/* Header */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-gray-100 pb-6 md:pb-10">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-paper-300 pb-6 md:pb-10">
                     <div className="space-y-1 md:space-y-2">
-                        <h2 className="text-3xl md:text-5xl font-semibold text-gray-900 leading-tight">Events</h2>
-                        <p className="text-sm text-gray-600">Stay connected with your campus</p>
+                        <h2 className="text-3xl md:text-5xl font-semibold text-ink-800 leading-tight">Events</h2>
+                        <p className="text-sm text-paper-700">Stay connected with your campus</p>
                     </div>
                     <Button variant="nile" size="sm" onClick={() => setShowSuggest(true)}>
                         <Plus size={14} className="mr-1.5" /> Suggest event
@@ -149,10 +149,10 @@ const EventsCalendar = () => {
                             <button
                                 key={tab.value}
                                 onClick={() => setActive(tab.value)}
-                                className={`px-4 md:px-5 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-colors whitespace-nowrap ${activeTab === tab.value ? 'bg-nile-blue text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
+                                className={`px-4 md:px-5 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-colors whitespace-nowrap ${activeTab === tab.value ? 'bg-nile-blue text-white' : 'bg-paper-200 text-paper-700 hover:bg-paper-300'}`}
                             >
                                 {tab.label}
-                                <span className={`ml-1.5 ${activeTab === tab.value ? 'text-white/70' : 'text-gray-400'}`}>{tab.count}</span>
+                                <span className={`ml-1.5 ${activeTab === tab.value ? 'text-white/70' : 'text-paper-600'}`}>{tab.count}</span>
                             </button>
                         ))}
                     </div>
@@ -163,7 +163,7 @@ const EventsCalendar = () => {
                         <Loader2 size={32} className="animate-spin text-nile-blue/40" />
                     </div>
                 ) : loadError ? (
-                    <div className="py-16 text-center border border-dashed border-red-200 bg-red-50/40 rounded-2xl space-y-3">
+                    <div className="py-16 text-center border border-dashed border-red-200 bg-red-50/40 rounded-xl space-y-3">
                         <AlertCircle size={22} className="mx-auto text-red-400" />
                         <p className="text-sm text-red-600">{loadError}</p>
                         <Button variant="outline" size="sm" onClick={() => { setIsLoading(true); reload(); }}>
@@ -171,9 +171,9 @@ const EventsCalendar = () => {
                         </Button>
                     </div>
                 ) : filtered.length === 0 ? (
-                    <div className="py-20 text-center border border-dashed border-gray-200 rounded-2xl space-y-3">
-                        <CalendarDays size={22} className="mx-auto text-gray-300" />
-                        <p className="text-sm text-gray-400">
+                    <div className="py-20 text-center border border-dashed border-paper-300 rounded-xl space-y-3">
+                        <CalendarDays size={22} className="mx-auto text-paper-500" />
+                        <p className="text-sm text-paper-600">
                             {activeTab === ALL
                                 ? 'No events scheduled yet — be the first to suggest one.'
                                 : `No ${categoryLabel(activeTab).toLowerCase()} events right now.`}
@@ -235,18 +235,18 @@ const RegistrationConfirmation = ({ event, onClose }: { event: NileEvent | null;
                         <Check size={18} strokeWidth={3} />
                     </div>
                     <div className="min-w-0">
-                        <p className="text-sm font-semibold text-gray-900">{event.title}</p>
-                        <p className="text-xs text-gray-500 mt-0.5">Your place is confirmed.</p>
+                        <p className="text-sm font-semibold text-ink-800">{event.title}</p>
+                        <p className="text-xs text-paper-700 mt-0.5">Your place is confirmed.</p>
                     </div>
                 </div>
 
-                <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4 space-y-2 text-sm text-gray-600">
+                <div className="rounded-xl border border-paper-300 bg-paper-100 p-4 space-y-2 text-sm text-paper-700">
                     <div className="flex items-center gap-2"><CalendarDays size={14} /><span>{formatDate(event.date)}{event.time ? ` · ${event.time}` : ''}</span></div>
                     <div className="flex items-center gap-2"><MapPin size={14} /><span>{event.location}</span></div>
                     <div className="flex items-center gap-2"><Users size={14} /><span>{event.registrations_count} registered</span></div>
                 </div>
 
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-paper-700">
                     A confirmation email with these details is on its way. You can cancel any time from this page.
                 </p>
 
@@ -312,14 +312,14 @@ const SuggestEventModal = ({ onClose, onSubmitted }: {
         }
     };
 
-    const field = 'w-full border border-gray-200 rounded-xl py-2.5 px-3.5 text-sm outline-none transition-all bg-white focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10';
-    const labelCls = 'block text-xs font-medium text-gray-600 mb-1.5';
+    const field = 'w-full border border-paper-300 rounded-xl py-2.5 px-3.5 text-sm outline-none transition-all bg-white focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10';
+    const labelCls = 'block text-xs font-medium text-paper-700 mb-1.5';
     const errCls = 'text-[11px] text-red-500 mt-1';
 
     return (
         <Modal isOpen onClose={onClose} title="Suggest an event">
             <form onSubmit={handleSubmit} className="space-y-4 text-left">
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-paper-700">
                     Your suggestion goes to Career Services for review. You'll be notified once it's published.
                 </p>
 
@@ -347,13 +347,13 @@ const SuggestEventModal = ({ onClose, onSubmitted }: {
                         {errors.location && <p className={errCls}>{errors.location}</p>}
                     </div>
                     <div>
-                        <label className={labelCls} htmlFor="suggest-date">Preferred date <span className="text-gray-400">(optional)</span></label>
+                        <label className={labelCls} htmlFor="suggest-date">Preferred date <span className="text-paper-600">(optional)</span></label>
                         <input id="suggest-date" type="date" className={field} value={form.date}
                             onChange={e => set('date', e.target.value)} />
                         {errors.date && <p className={errCls}>{errors.date}</p>}
                     </div>
                     <div>
-                        <label className={labelCls} htmlFor="suggest-time">Preferred time <span className="text-gray-400">(optional)</span></label>
+                        <label className={labelCls} htmlFor="suggest-time">Preferred time <span className="text-paper-600">(optional)</span></label>
                         <input id="suggest-time" type="time" className={field} value={form.time}
                             onChange={e => set('time', e.target.value)} />
                     </div>
@@ -403,7 +403,7 @@ const PendingBadge = () => (
 );
 
 const FeaturedEvent = ({ event, pending, onToggle }: { event: NileEvent; pending: boolean; onToggle: () => void }) => (
-    <div className="bg-nile-green text-white p-6 md:p-10 rounded-3xl relative overflow-hidden group shadow-card">
+    <div className="bg-nile-green text-white p-6 md:p-10 rounded-2xl relative overflow-hidden group shadow-card">
         <div className="absolute top-4 right-4 bg-white/20 text-white text-xs font-medium px-3 md:px-4 py-1 rounded-full z-10">
             Featured
         </div>
@@ -421,7 +421,7 @@ const FeaturedEvent = ({ event, pending, onToggle }: { event: NileEvent; pending
             <Button
                 variant="outline"
                 size="sm"
-                className="bg-white border-white text-gray-900 hover:bg-white/90 w-full sm:w-auto disabled:opacity-60"
+                className="bg-white border-white text-ink-800 hover:bg-white/90 w-full sm:w-auto disabled:opacity-60"
                 onClick={onToggle}
                 isLoading={pending}
                 disabled={registerDisabled(event, pending)}
@@ -446,21 +446,21 @@ const EventCard = ({ event, pending, onToggle }: { event: NileEvent; pending: bo
                 </span>
                 {event.status === 'pending'
                     ? <PendingBadge />
-                    : <span className="text-xs text-gray-400 capitalize">{event.organiser_type}</span>}
+                    : <span className="text-xs text-paper-600 capitalize">{event.organiser_type}</span>}
             </div>
 
-            <h3 className="text-lg md:text-2xl font-semibold text-gray-900 mb-4 md:mb-6 leading-tight">{event.title}</h3>
+            <h3 className="text-lg md:text-2xl font-semibold text-ink-800 mb-4 md:mb-6 leading-tight">{event.title}</h3>
 
             <div className="space-y-2 md:space-y-3 mb-6 md:mb-8 flex-1">
-                <div className="flex items-center space-x-2.5 text-sm text-gray-600">
+                <div className="flex items-center space-x-2.5 text-sm text-paper-700">
                     <CalendarDays size={14} strokeWidth={2} />
                     <span>{formatDate(event.date)}{event.time ? ` • ${event.time}` : ''}</span>
                 </div>
-                <div className="flex items-center space-x-2.5 text-sm text-gray-600">
+                <div className="flex items-center space-x-2.5 text-sm text-paper-700">
                     <MapPin size={14} strokeWidth={2} />
                     <span>{event.location}</span>
                 </div>
-                <div className="flex items-center space-x-2.5 text-sm text-gray-600">
+                <div className="flex items-center space-x-2.5 text-sm text-paper-700">
                     <Users size={14} strokeWidth={2} />
                     <span>
                         {event.registrations_count} / {event.capacity} going
@@ -474,7 +474,7 @@ const EventCard = ({ event, pending, onToggle }: { event: NileEvent; pending: bo
                 disabled={disabled}
                 aria-label={`${event.is_registered ? 'Cancel registration for' : 'Register for'} ${event.title}`}
                 className={`w-full font-medium py-3 md:py-4 rounded-full transition-colors text-sm flex items-center justify-center gap-2
-                    ${disabled ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    ${disabled ? 'bg-paper-200 text-paper-600 cursor-not-allowed'
                         : event.is_registered ? 'bg-nile-green text-white hover:bg-nile-green-600'
                             : 'bg-nile-blue text-white hover:bg-nile-blue-600'}`}
             >

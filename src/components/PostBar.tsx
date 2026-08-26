@@ -95,7 +95,7 @@ const PostBar: React.FC<PostBarProps> = ({ onPostCreated, prefillJobId, prefillC
                     {!expanded ? (
                         <button
                             onClick={() => setExpanded(true)}
-                            className="w-full text-left bg-gray-50 hover:bg-gray-100 rounded-full py-2.5 px-4 text-sm text-gray-400 transition-colors"
+                            className="w-full text-left bg-paper-100 hover:bg-paper-200 rounded-full py-2.5 px-4 text-sm text-paper-600 transition-colors"
                         >
                             What's on your mind, {firstName}?
                         </button>
@@ -106,7 +106,7 @@ const PostBar: React.FC<PostBarProps> = ({ onPostCreated, prefillJobId, prefillC
                             onChange={e => setContent(e.target.value)}
                             placeholder={`What's on your mind, ${firstName}?`}
                             rows={3}
-                            className="w-full border border-gray-200 rounded-2xl p-3 text-sm text-gray-800 placeholder:text-gray-400 outline-none focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10 transition-all resize-none"
+                            className="w-full border border-paper-300 rounded-xl p-3 text-sm text-ink-800 placeholder:text-paper-600 outline-none focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10 transition-all resize-none"
                         />
                     )}
 
@@ -131,7 +131,7 @@ const PostBar: React.FC<PostBarProps> = ({ onPostCreated, prefillJobId, prefillC
                                     className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
                                         kind === opt.value
                                             ? 'bg-nile-blue text-white border-nile-blue'
-                                            : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
+                                            : 'bg-white text-paper-700 border-paper-300 hover:border-paper-400'
                                     }`}
                                 >
                                     {opt.label}
@@ -141,7 +141,7 @@ const PostBar: React.FC<PostBarProps> = ({ onPostCreated, prefillJobId, prefillC
                     )}
 
                     {expanded && (
-                        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+                        <div className="flex items-center justify-between mt-3 pt-3 border-t border-paper-300">
                             <button onClick={() => fileRef.current?.click()} className="action-btn">
                                 <ImageIcon size={16} /> Photo
                             </button>
@@ -150,7 +150,7 @@ const PostBar: React.FC<PostBarProps> = ({ onPostCreated, prefillJobId, prefillC
                             <div className="flex items-center gap-2">
                                 <button
                                     onClick={handleCancel}
-                                    className="px-3 py-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+                                    className="px-3 py-1.5 text-sm text-paper-700 hover:text-ink-700 transition-colors"
                                 >
                                     Cancel
                                 </button>

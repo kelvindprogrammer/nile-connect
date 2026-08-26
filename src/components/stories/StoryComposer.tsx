@@ -178,10 +178,10 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ onClose, onPosted }) => {
             aria-label="Create a story"
             className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4"
         >
-            <div className="bg-white w-full sm:max-w-md sm:rounded-3xl rounded-t-3xl max-h-[92vh] overflow-y-auto">
-                <div className="sticky top-0 bg-white z-10 flex items-center justify-between px-4 py-3 border-b border-gray-100">
-                    <h2 className="text-base font-semibold text-gray-900">Create a story</h2>
-                    <button onClick={onClose} aria-label="Close" className="p-2 rounded-xl hover:bg-gray-100 text-gray-500">
+            <div className="bg-white w-full sm:max-w-md sm:rounded-2xl rounded-t-3xl max-h-[92vh] overflow-y-auto">
+                <div className="sticky top-0 bg-white z-10 flex items-center justify-between px-4 py-3 border-b border-paper-300">
+                    <h2 className="text-base font-semibold text-ink-800">Create a story</h2>
+                    <button onClick={onClose} aria-label="Close" className="p-2 rounded-xl hover:bg-paper-200 text-paper-700">
                         <X size={18} />
                     </button>
                 </div>
@@ -197,7 +197,7 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ onClose, onPosted }) => {
                                 className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-medium transition-colors
                                     ${mode === value || (value === 'image' && mode === 'video')
                                         ? 'bg-nile-blue text-white'
-                                        : 'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}
+                                        : 'bg-paper-100 text-paper-700 hover:bg-paper-200'}`}
                             >
                                 <Icon size={13} />
                                 {label}
@@ -207,7 +207,7 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ onClose, onPosted }) => {
 
                     {/* Live preview — people should see what they are publishing. */}
                     <div
-                        className="rounded-2xl overflow-hidden aspect-[9/16] max-h-64 flex items-center justify-center relative"
+                        className="rounded-xl overflow-hidden aspect-[9/16] max-h-64 flex items-center justify-center relative"
                         style={{
                             background: mode === 'image' || mode === 'video'
                                 ? '#111'
@@ -242,10 +242,10 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ onClose, onPosted }) => {
                                     rows={3}
                                     placeholder="What's happening?"
                                     aria-label="Story text"
-                                    className="w-full border border-gray-200 rounded-xl p-3 text-sm resize-none outline-none
+                                    className="w-full border border-paper-300 rounded-xl p-3 text-sm resize-none outline-none
                                                focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10"
                                 />
-                                <p className="text-[11px] text-gray-400 text-right mt-1">
+                                <p className="text-[11px] text-paper-600 text-right mt-1">
                                     {text.length}/{MAX_TEXT}
                                 </p>
                             </div>
@@ -278,8 +278,8 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ onClose, onPosted }) => {
                             <button
                                 onClick={() => fileRef.current?.click()}
                                 disabled={uploading}
-                                className="w-full py-3 border-2 border-dashed border-gray-200 rounded-xl text-xs
-                                           font-medium text-gray-500 hover:border-nile-blue hover:text-nile-blue
+                                className="w-full py-3 border-2 border-dashed border-paper-300 rounded-xl text-xs
+                                           font-medium text-paper-700 hover:border-nile-blue hover:text-nile-blue
                                            transition-colors disabled:opacity-50"
                             >
                                 {mediaUrl ? 'Choose a different file' : 'Choose a photo or video'}
@@ -289,7 +289,7 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ onClose, onPosted }) => {
                                 onChange={e => setText(e.target.value.slice(0, MAX_TEXT))}
                                 placeholder="Add a caption (optional)"
                                 aria-label="Caption"
-                                className="w-full border border-gray-200 rounded-xl py-2.5 px-3 text-sm outline-none
+                                className="w-full border border-paper-300 rounded-xl py-2.5 px-3 text-sm outline-none
                                            focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10"
                             />
                         </>
@@ -302,7 +302,7 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ onClose, onPosted }) => {
                                 onChange={e => setPollQuestion(e.target.value.slice(0, POLL_LIMITS.maxQuestionLength))}
                                 placeholder="Ask a question"
                                 aria-label="Poll question"
-                                className="w-full border border-gray-200 rounded-xl py-2.5 px-3 text-sm outline-none
+                                className="w-full border border-paper-300 rounded-xl py-2.5 px-3 text-sm outline-none
                                            focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10"
                             />
                             {pollOptions.map((option, i) => (
@@ -316,14 +316,14 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ onClose, onPosted }) => {
                                         }}
                                         placeholder={`Option ${i + 1}`}
                                         aria-label={`Poll option ${i + 1}`}
-                                        className="flex-1 border border-gray-200 rounded-xl py-2 px-3 text-sm outline-none
+                                        className="flex-1 border border-paper-300 rounded-xl py-2 px-3 text-sm outline-none
                                                    focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10"
                                     />
                                     {pollOptions.length > POLL_LIMITS.minOptions && (
                                         <button
                                             onClick={() => setPollOptions(pollOptions.filter((_, j) => j !== i))}
                                             aria-label={`Remove option ${i + 1}`}
-                                            className="px-2 text-gray-400 hover:text-red-500"
+                                            className="px-2 text-paper-600 hover:text-red-500"
                                         >
                                             <Trash2 size={14} />
                                         </button>
@@ -338,7 +338,7 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ onClose, onPosted }) => {
                                     <Plus size={12} /> Add option
                                 </button>
                             )}
-                            <label className="flex items-center gap-2 text-xs text-gray-600 pt-1">
+                            <label className="flex items-center gap-2 text-xs text-paper-700 pt-1">
                                 <input
                                     type="checkbox"
                                     checked={pollAnonymous}
@@ -351,7 +351,7 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ onClose, onPosted }) => {
                     )}
 
                     <div>
-                        <p className="text-[11px] font-medium text-gray-500 mb-1.5">Who can see this?</p>
+                        <p className="text-[11px] font-medium text-paper-700 mb-1.5">Who can see this?</p>
                         <div className="flex gap-1.5" role="radiogroup" aria-label="Story audience">
                             {AUDIENCE_OPTIONS.filter(o => allowedAudiences.includes(o.value)).map(({ value, label, Icon }) => (
                                 <button
@@ -363,7 +363,7 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ onClose, onPosted }) => {
                                                 font-medium transition-colors
                                         ${audience === value
                                             ? 'bg-nile-blue/10 text-nile-blue ring-1 ring-nile-blue/30'
-                                            : 'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}
+                                            : 'bg-paper-100 text-paper-700 hover:bg-paper-200'}`}
                                 >
                                     <Icon size={12} />
                                     {label}
@@ -388,7 +388,7 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ onClose, onPosted }) => {
                         {posting ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
                         {posting ? 'Sharing…' : 'Share to your story'}
                     </button>
-                    <p className="text-[11px] text-gray-400 text-center">
+                    <p className="text-[11px] text-paper-600 text-center">
                         Your story disappears after 24 hours.
                     </p>
                 </div>

@@ -20,12 +20,12 @@ const NeedsReviewCard: React.FC = () => {
                 <button
                     key={app.id}
                     onClick={() => navigate('/employer/applications')}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors text-left"
+                    className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-paper-100 transition-colors text-left"
                 >
                     <Avatar name={app.student_name} size="sm" />
                     <div className="min-w-0 flex-1">
-                        <p className="text-xs font-medium text-gray-800 truncate">{app.student_name}</p>
-                        <p className="text-[11px] text-gray-400 truncate">{app.job_title}</p>
+                        <p className="text-xs font-medium text-ink-800 truncate">{app.student_name}</p>
+                        <p className="text-[11px] text-paper-600 truncate">{app.job_title}</p>
                     </div>
                 </button>
             ))}

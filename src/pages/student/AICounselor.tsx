@@ -35,7 +35,7 @@ const buildProfile = (user: ReturnType<typeof useAuth>['user']): StudentProfile 
 // ---------------------------------------------------------------------------
 
 const Badge = ({ label }: { label: string }) => (
-    <span className="px-3 py-1 bg-nile-white border border-gray-100 rounded-lg text-[8px] md:text-[9px] font-semibold text-black shadow-sm">
+    <span className="px-3 py-1 bg-nile-white border border-paper-300 rounded-lg text-[8px] md:text-[9px] font-semibold text-black shadow-sm">
         {label}
     </span>
 );
@@ -46,10 +46,10 @@ const AnalysisCard = ({
     icon: React.ReactNode; title: string; items: string[]; alert?: boolean;
 }) => (
     <div
-        className={`bg-white border border-gray-100 rounded-[28px] p-6 md:p-8 flex flex-col transition-all shadow-card hover:shadow-card-hover text-left ${alert ? 'border-red-500/20' : ''}`}
+        className={`bg-white border border-paper-300 rounded-[28px] p-6 md:p-8 flex flex-col transition-all shadow-card hover:shadow-card-hover text-left ${alert ? 'border-red-500/20' : ''}`}
     >
         <div className="flex items-center space-x-3 mb-6">
-            <div className="p-2.5 bg-nile-white border border-gray-100 rounded-xl">{icon}</div>
+            <div className="p-2.5 bg-nile-white border border-paper-300 rounded-xl">{icon}</div>
             <h4 className="text-[11px] md:text-sm font-semibold text-black">{title}</h4>
         </div>
         <ul className="space-y-3 flex-1">
@@ -65,7 +65,7 @@ const AnalysisCard = ({
 
 const OptimizationStep = ({ num, task, desc }: { num: string; task: string; desc: string }) => (
     <div className="flex gap-6 group text-left">
-        <div className="flex-shrink-0 w-10 md:w-12 h-10 md:h-12 bg-white text-black border border-gray-100 rounded-xl flex items-center justify-center font-semibold text-sm group-hover:bg-nile-green transition-colors">
+        <div className="flex-shrink-0 w-10 md:w-12 h-10 md:h-12 bg-white text-black border border-paper-300 rounded-xl flex items-center justify-center font-semibold text-sm group-hover:bg-nile-green transition-colors">
             {num}
         </div>
         <div className="space-y-1">
@@ -238,7 +238,7 @@ const AICounselor = () => {
             <div className="p-4 md:p-6 font-sans bg-nile-white min-h-full pb-24 md:pb-4 text-left">
 
                 {/* Header */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-gray-100 pb-5 mb-6">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-paper-300 pb-5 mb-6">
                     <div className="space-y-2">
                         <div className="flex items-center space-x-2 text-nile-green mb-1">
                             <Cpu size={18} strokeWidth={2.5} />
@@ -277,9 +277,9 @@ const AICounselor = () => {
                             className={`cursor-pointer border-3 border-dashed rounded-[40px] p-12 flex flex-col items-center justify-center space-y-4 transition-all group
                                 ${cvFile
                                     ? 'border-nile-green bg-nile-green/5'
-                                    : 'border-black/20 hover:border-nile-green hover:bg-nile-green/5'}`}
+                                    : 'border-paper-400/20 hover:border-nile-green hover:bg-nile-green/5'}`}
                         >
-                            <div className="w-24 h-24 bg-white border border-gray-100 rounded-[28px] flex items-center justify-center shadow-green relative overflow-hidden">
+                            <div className="w-24 h-24 bg-white border border-paper-300 rounded-[28px] flex items-center justify-center shadow-green relative overflow-hidden">
                                 {analyzing ? (
                                     <Loader2 size={40} className="text-nile-green animate-spin" />
                                 ) : cvFile ? (
@@ -337,7 +337,7 @@ const AICounselor = () => {
                         {/* LEFT: Report Card */}
                         <div className="lg:col-span-8 space-y-8 md:space-y-12">
                             {/* Executive Summary */}
-                            <div className="bg-white border border-gray-100 rounded-[32px] md:rounded-[48px] p-6 md:p-12 shadow-card flex flex-col md:flex-row gap-8 items-start">
+                            <div className="bg-white border border-paper-300 rounded-[32px] md:rounded-[48px] p-6 md:p-12 shadow-card flex flex-col md:flex-row gap-8 items-start">
                                 <div className="space-y-6 flex-1">
                                     <h4 className="text-xs font-semibold text-nile-blue/40">EXECUTIVE SUMMARY</h4>
                                     <p className="text-base md:text-xl font-semibold text-black leading-snug">
@@ -350,7 +350,7 @@ const AICounselor = () => {
                                     </div>
                                 </div>
                                 {parsed?.grade && (
-                                    <div className="w-full md:w-32 flex flex-col items-center justify-center p-6 bg-black text-white rounded-[24px] border border-gray-100 border-dashed">
+                                    <div className="w-full md:w-32 flex flex-col items-center justify-center p-6 bg-black text-white rounded-[24px] border border-paper-300 border-dashed">
                                         <span className="text-4xl font-semibold">{parsed.grade}</span>
                                         <span className="text-[8px] font-semibold mt-2">CV GRADE</span>
                                     </div>
@@ -395,7 +395,7 @@ const AICounselor = () => {
                             </div>
 
                             {/* Full Review Text */}
-                            <div className="bg-black text-white border border-gray-100 rounded-[32px] md:rounded-[40px] p-8 md:p-12 shadow-green">
+                            <div className="bg-black text-white border border-paper-300 rounded-[32px] md:rounded-[40px] p-8 md:p-12 shadow-green">
                                 <div className="flex items-center space-x-4 mb-8">
                                     <Sparkles className="text-nile-green" size={28} />
                                     <h3 className="text-2xl md:text-3xl font-semibold">FULL AI REVIEW</h3>
@@ -416,8 +416,8 @@ const AICounselor = () => {
 
                         {/* RIGHT: Sidebar */}
                         <div className="lg:col-span-4 space-y-8">
-                            <div className="bg-white border border-gray-100 rounded-[32px] p-8 shadow-card space-y-6">
-                                <div className="flex items-center space-x-3 pb-4 border-b-2 border-dashed border-black/10">
+                            <div className="bg-white border border-paper-300 rounded-[32px] p-8 shadow-card space-y-6">
+                                <div className="flex items-center space-x-3 pb-4 border-b-2 border-dashed border-paper-400/10">
                                     <Avatar name="Career AI" size="sm" />
                                     <div className="text-left">
                                         <p className="text-[10px] font-semibold text-black">AI ARCHITECT</p>
@@ -430,7 +430,7 @@ const AICounselor = () => {
                                     </p>
                                     <button
                                         onClick={() => setShowChat(true)}
-                                        className="w-full py-4 bg-nile-blue text-white border border-gray-100 rounded-xl font-semibold text-[10px] hover:bg-black transition-all flex items-center justify-center space-x-2 shadow-card"
+                                        className="w-full py-4 bg-nile-blue text-white border border-paper-300 rounded-xl font-semibold text-[10px] hover:bg-black transition-all flex items-center justify-center space-x-2 shadow-card"
                                     >
                                         <MessageSquare size={14} />
                                         <span>CHAT WITH ARCHITECT</span>
@@ -438,8 +438,8 @@ const AICounselor = () => {
                                 </div>
                             </div>
 
-                            <div className="bg-nile-green/5 border border-gray-100 border-dashed rounded-[32px] p-8 text-center space-y-6">
-                                <div className="w-16 h-16 bg-white border border-gray-100 rounded-2xl flex items-center justify-center mx-auto shadow-card">
+                            <div className="bg-nile-green/5 border border-paper-300 border-dashed rounded-[32px] p-8 text-center space-y-6">
+                                <div className="w-16 h-16 bg-white border border-paper-300 rounded-xl flex items-center justify-center mx-auto shadow-card">
                                     <Zap size={28} className="text-nile-green" />
                                 </div>
                                 <div className="space-y-2">
@@ -466,9 +466,9 @@ const AICounselor = () => {
 
                 {/* ── RIGHT: Career Architect Chat — ALWAYS VISIBLE ── */}
                 <div className="xl:col-span-4">
-                    <div className="sticky top-20 flex flex-col bg-white border border-gray-100 rounded-[28px] shadow-card overflow-hidden h-[calc(100vh-180px)] min-h-[480px]">
+                    <div className="sticky top-20 flex flex-col bg-white border border-paper-300 rounded-[28px] shadow-card overflow-hidden h-[calc(100vh-180px)] min-h-[480px]">
                         {/* Chat header */}
-                        <div className="p-4 border-b border-gray-100 flex items-center gap-3 bg-black text-white flex-shrink-0">
+                        <div className="p-4 border-b border-paper-300 flex items-center gap-3 bg-black text-white flex-shrink-0">
                             <div className="w-9 h-9 bg-nile-green rounded-xl flex items-center justify-center border-2 border-white flex-shrink-0">
                                 <Cpu size={16} />
                             </div>
@@ -493,7 +493,7 @@ const AICounselor = () => {
                                             <Cpu size={10} className="text-nile-green" />
                                         </div>
                                     )}
-                                    <div className={`max-w-[82%] px-3.5 py-3 border border-gray-100 rounded-2xl text-[10px] leading-relaxed
+                                    <div className={`max-w-[82%] px-3.5 py-3 border border-paper-300 rounded-xl text-[10px] leading-relaxed
                                         ${m.role === 'user'
                                             ? 'bg-nile-blue text-white rounded-tr-sm shadow-green font-semibold'
                                             : 'bg-white text-black rounded-tl-sm shadow-card font-bold'}`}
@@ -507,7 +507,7 @@ const AICounselor = () => {
                                     <div className="w-6 h-6 rounded-full bg-black flex items-center justify-center flex-shrink-0 mr-2">
                                         <Cpu size={10} className="text-nile-green" />
                                     </div>
-                                    <div className="px-4 py-3 border border-gray-100 rounded-2xl rounded-tl-sm bg-white shadow-card flex items-center gap-2">
+                                    <div className="px-4 py-3 border border-paper-300 rounded-xl rounded-tl-sm bg-white shadow-card flex items-center gap-2">
                                         <Loader2 size={12} className="text-nile-blue animate-spin" />
                                         <span className="text-[8px] font-semibold text-black/40 tracking-wider">Thinking...</span>
                                     </div>
@@ -517,7 +517,7 @@ const AICounselor = () => {
                         </div>
 
                         {/* Input */}
-                        <form onSubmit={handleSendMessage} className="p-3 border-t border-gray-100 bg-white flex-shrink-0">
+                        <form onSubmit={handleSendMessage} className="p-3 border-t border-paper-300 bg-white flex-shrink-0">
                             <div className="relative">
                                 <input
                                     type="text"
@@ -525,7 +525,7 @@ const AICounselor = () => {
                                     onChange={(e) => setInputValue(e.target.value)}
                                     placeholder="Ask about skills, salary, career paths..."
                                     disabled={chatLoading}
-                                    className="w-full bg-nile-white border border-gray-100 rounded-xl py-2.5 pl-4 pr-11 font-bold text-[10px] outline-none focus:shadow-card transition-all disabled:opacity-50"
+                                    className="w-full bg-nile-white border border-paper-300 rounded-xl py-2.5 pl-4 pr-11 font-bold text-[10px] outline-none focus:shadow-card transition-all disabled:opacity-50"
                                 />
                                 <button
                                     type="submit"

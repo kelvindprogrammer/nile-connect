@@ -43,7 +43,7 @@ const VerifyEmail = () => {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-nile-white p-4 font-sans">
-            <div className="max-w-md w-full bg-white border-[2px] border-black rounded-[28px] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-8 text-center space-y-6">
+            <div className="max-w-md w-full bg-white border-[2px] border-paper-400 rounded-[28px] shadow-soft-sm p-8 text-center space-y-6">
                 <div className="flex justify-center">
                     <NileConnectLogo />
                 </div>
@@ -51,19 +51,19 @@ const VerifyEmail = () => {
                     {cfg.icon}
                 </div>
                 <div className="space-y-2">
-                    <h1 className="text-xl font-black uppercase tracking-wide text-black">{cfg.title}</h1>
+                    <h1 className="text-xl font-semibold uppercase tracking-wide text-black">{cfg.title}</h1>
                     <p className="text-sm font-semibold text-black/60 leading-relaxed">{cfg.message}</p>
                 </div>
                 <div className="flex flex-col gap-3 pt-2">
                     <Link
                         to="/employer"
-                        className="w-full py-3 bg-black text-white border-[2px] border-black rounded-xl font-black text-xs uppercase tracking-widest hover:bg-nile-blue transition-colors"
+                        className="w-full py-3 bg-black text-white border-[2px] border-paper-400 rounded-xl font-semibold text-xs tracking-tight hover:bg-nile-blue transition-colors"
                     >
                         Go to employer dashboard
                     </Link>
                     <Link
                         to="/login"
-                        className="w-full py-3 bg-white text-black border-[2px] border-black rounded-xl font-black text-xs uppercase tracking-widest hover:bg-nile-white transition-colors"
+                        className="w-full py-3 bg-white text-black border-[2px] border-paper-400 rounded-xl font-semibold text-xs tracking-tight hover:bg-nile-white transition-colors"
                     >
                         Back to login
                     </Link>

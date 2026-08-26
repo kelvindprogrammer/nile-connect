@@ -23,7 +23,7 @@ const LearningPath = () => {
     return (
         <>
             <div className="p-4 md:p-8 space-y-8 anime-fade-in text-left max-w-6xl mx-auto pb-24 md:pb-8">
-                <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-100 pb-6">
+                <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-paper-300 pb-6">
                     <div className="space-y-1">
                         <h2 className="text-3xl md:text-5xl font-semibold text-black">Learning Path .</h2>
                         <p className="text-[10px] font-semibold text-nile-blue/50">AI-DRIVEN SKILL DEVELOPMENT & TRACKING</p>
@@ -39,7 +39,7 @@ const LearningPath = () => {
                     <StatCard label="GOALS SET" value={tasks.length} icon={<Target size={18} />} />
                     <StatCard label="IN PROGRESS" value={stats.inProgress} icon={<Clock size={18} />} color="text-nile-blue" />
                     <StatCard label="COMPLETED" value={stats.completed} icon={<Trophy size={18} />} color="text-nile-green" />
-                    <div className="bg-black text-white border border-gray-100 rounded-[24px] p-6 shadow-green flex flex-col justify-between">
+                    <div className="bg-black text-white border border-paper-300 rounded-[24px] p-6 shadow-green flex flex-col justify-between">
                         <p className="text-[9px] font-semibold opacity-50">COMPLETION RATE</p>
                         <div className="flex items-end justify-between mt-4">
                             <h4 className="text-4xl font-semibold">{completionRate}%</h4>
@@ -62,7 +62,7 @@ const LearningPath = () => {
                         </div>
 
                         {tasks.length === 0 ? (
-                            <div className="py-20 text-center border-[3px] border-dashed border-black/10 rounded-[32px] bg-white space-y-4">
+                            <div className="py-20 text-center border-[3px] border-dashed border-paper-400/10 rounded-[32px] bg-white space-y-4">
                                 <BookOpen size={48} className="mx-auto text-black/10" strokeWidth={1.5} />
                                 <div className="space-y-1">
                                     <p className="font-semibold text-sm text-black">Your learning path is empty</p>
@@ -88,7 +88,7 @@ const LearningPath = () => {
 
                     {/* Side Info */}
                     <div className="lg:col-span-4 space-y-6">
-                        <div className="bg-nile-blue text-white border border-gray-100 rounded-[28px] p-6 shadow-card">
+                        <div className="bg-nile-blue text-white border border-paper-300 rounded-[28px] p-6 shadow-card">
                             <div className="flex items-center gap-2 mb-4">
                                 <Zap size={18} className="text-yellow-400" fill="currentColor" />
                                 <h4 className="text-sm font-semibold tracking-tight">AI RECOMMENDATION</h4>
@@ -101,7 +101,7 @@ const LearningPath = () => {
                             </Button>
                         </div>
 
-                        <div className="bg-white border border-gray-100 rounded-[28px] p-6 shadow-blue">
+                        <div className="bg-white border border-paper-300 rounded-[28px] p-6 shadow-blue">
                             <h4 className="text-[10px] font-semibold text-black/40 mb-4">QUICK TIPS</h4>
                             <div className="space-y-4">
                                 <TipItem icon={<Star size={14} />} text="Complete 2 tasks this week to earn the 'Active Learner' badge." />
@@ -125,11 +125,11 @@ const TaskItem = ({ task, onStatusUpdate, onDelete }: {
 
     return (
         <div className={`
-            group flex items-start gap-4 p-5 bg-white border border-gray-100 rounded-[20px] shadow-card transition-all
+            group flex items-start gap-4 p-5 bg-white border border-paper-300 rounded-[20px] shadow-card transition-all
             ${isCompleted ? 'opacity-60 grayscale' : ''}
         `}>
             <div className={`
-                w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 border border-gray-100
+                w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 border border-paper-300
                 ${task.category === 'course' ? 'bg-nile-blue text-white' : 'bg-yellow-400 text-black'}
             `}>
                 {task.category === 'course' ? <Play size={20} /> : <Zap size={20} />}
@@ -138,7 +138,7 @@ const TaskItem = ({ task, onStatusUpdate, onDelete }: {
             <div className="flex-1 min-w-0 text-left">
                 <div className="flex items-center gap-2 flex-wrap">
                     <p className="font-semibold text-sm truncate leading-none">{task.title}</p>
-                    <span className="text-[7px] font-semibold px-2 py-0.5 bg-black/5 rounded-full border border-black/10">
+                    <span className="text-[7px] font-semibold px-2 py-0.5 bg-black/5 rounded-full border border-paper-400/10">
                         {task.source}
                     </span>
                 </div>
@@ -179,9 +179,9 @@ const TaskItem = ({ task, onStatusUpdate, onDelete }: {
 };
 
 const StatCard = ({ label, value, icon, color = 'text-black' }: { label: string, value: number, icon: React.ReactNode, color?: string }) => (
-    <div className="bg-white border border-gray-100 rounded-[24px] p-6 shadow-card">
+    <div className="bg-white border border-paper-300 rounded-[24px] p-6 shadow-card">
         <div className="flex items-center gap-2 mb-4">
-            <div className={`p-2 rounded-lg bg-nile-white border border-black/10 ${color}`}>{icon}</div>
+            <div className={`p-2 rounded-lg bg-nile-white border border-paper-400/10 ${color}`}>{icon}</div>
             <p className="text-[9px] font-semibold text-black/30">{label}</p>
         </div>
         <h4 className="text-4xl font-semibold text-black">{value}</h4>
@@ -190,7 +190,7 @@ const StatCard = ({ label, value, icon, color = 'text-black' }: { label: string,
 
 const TipItem = ({ icon, text }: { icon: React.ReactNode, text: string }) => (
     <div className="flex gap-3 items-start">
-        <div className="p-1.5 bg-black text-white rounded-lg border border-black flex-shrink-0">
+        <div className="p-1.5 bg-black text-white rounded-lg border border-paper-400 flex-shrink-0">
             {icon}
         </div>
         <p className="text-[9px] font-bold text-black/60 leading-relaxed tracking-wider">{text}</p>

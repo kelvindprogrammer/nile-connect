@@ -140,7 +140,7 @@ const CRMManager = () => {
         <div className="p-4 md:p-8 space-y-8 anime-fade-in font-sans pb-20 text-left min-h-full">
 
             {/* Header */}
-            <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 border-b border-gray-100 pb-6">
+            <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 border-b border-paper-300 pb-6">
                 <div>
                     <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">CRM Manager .</h2>
                     <p className="text-[9px] font-semibold text-black/40 mt-1">
@@ -148,7 +148,7 @@ const CRMManager = () => {
                     </p>
                 </div>
                 <button onClick={() => setShowCompose(true)}
-                    className="flex items-center gap-2 px-5 py-3 bg-black text-white border border-gray-100 rounded-xl font-semibold text-[9px] shadow-green transition-all">
+                    className="flex items-center gap-2 px-5 py-3 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all">
                     <Plus size={14} strokeWidth={3} /> NEW REMINDER
                 </button>
             </div>
@@ -184,18 +184,18 @@ const CRMManager = () => {
                 <div className="xl:col-span-8 space-y-4">
                     <h3 className="text-[10px] font-semibold text-black/40">SCHEDULED REMINDERS ({reminders.length})</h3>
                     {reminders.length === 0 ? (
-                        <div className="py-16 text-center border-[2px] border-dashed border-black/10 rounded-[24px]">
+                        <div className="py-16 text-center border-[2px] border-dashed border-paper-400/10 rounded-[24px]">
                             <Bell size={24} className="text-black/15 mx-auto mb-3" />
                             <p className="text-[9px] font-semibold text-black/20">No reminders yet — create one above</p>
                         </div>
                     ) : reminders.map(r => {
                         const t = templateMessages[r.type];
                         return (
-                            <div key={r.id} className={`bg-white border border-gray-100 rounded-[20px] p-5 shadow-card transition-all
+                            <div key={r.id} className={`bg-white border border-paper-300 rounded-[20px] p-5 shadow-card transition-all
                                 ${r.sent ? 'opacity-50' : 'hover:translate-y-[-1px] hover:shadow-green'}`}>
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="flex items-start gap-3 flex-1 min-w-0">
-                                        <div className={`w-9 h-9 rounded-xl border border-gray-100 flex items-center justify-center flex-shrink-0 ${t.color}`}>
+                                        <div className={`w-9 h-9 rounded-xl border border-paper-300 flex items-center justify-center flex-shrink-0 ${t.color}`}>
                                             {t.icon}
                                         </div>
                                         <div className="flex-1 min-w-0">
@@ -217,7 +217,7 @@ const CRMManager = () => {
                                     <div className="flex items-center gap-2 flex-shrink-0">
                                         {!r.sent && (
                                             <button onClick={() => handleSendNow(r)} disabled={sending === r.id}
-                                                className="flex items-center gap-1.5 px-3 py-2 bg-nile-blue text-white text-[8px] font-semibold rounded-lg border border-gray-100 shadow-card transition-all disabled:opacity-40">
+                                                className="flex items-center gap-1.5 px-3 py-2 bg-nile-blue text-white text-[8px] font-semibold rounded-lg border border-paper-300 shadow-card transition-all disabled:opacity-40">
                                                 {sending === r.id ? <Loader2 size={10} className="animate-spin" /> : <Send size={10} strokeWidth={3} />}
                                                 SEND
                                             </button>
@@ -228,7 +228,7 @@ const CRMManager = () => {
                                     </div>
                                 </div>
                                 {r.message && (
-                                    <div className="mt-3 p-3 bg-nile-white rounded-xl text-[10px] font-bold text-black/50 leading-relaxed italic border border-black/5">
+                                    <div className="mt-3 p-3 bg-nile-white rounded-xl text-[10px] font-bold text-black/50 leading-relaxed italic border border-paper-400/5">
                                         "{r.message.slice(0, 140)}{r.message.length > 140 ? '…' : ''}"
                                     </div>
                                 )}
@@ -239,8 +239,8 @@ const CRMManager = () => {
 
                 {/* Right: Employer health */}
                 <div className="xl:col-span-4 space-y-5">
-                    <div className="bg-white border border-gray-100 rounded-[24px] p-5 shadow-blue">
-                        <h3 className="text-[10px] font-semibold tracking-tight mb-4 pb-3 border-b border-gray-100">
+                    <div className="bg-white border border-paper-300 rounded-[24px] p-5 shadow-blue">
+                        <h3 className="text-[10px] font-semibold tracking-tight mb-4 pb-3 border-b border-paper-300">
                             EMPLOYER HEALTH ({employers.length})
                         </h3>
                         {loadingEmployers ? (
@@ -250,9 +250,9 @@ const CRMManager = () => {
                         ) : employers.slice(0, 6).map(emp => {
                             const eng = engagementLabel(emp);
                             return (
-                                <div key={emp.id} className="flex items-center gap-3 p-3 border border-gray-100/5 rounded-xl hover:border-black transition-all cursor-pointer group mb-2"
+                                <div key={emp.id} className="flex items-center gap-3 p-3 border border-paper-300/5 rounded-xl hover:border-paper-400 transition-all cursor-pointer group mb-2"
                                     onClick={() => { setSelectedEmployerIds([emp.id]); setShowCompose(true); }}>
-                                    <div className="w-8 h-8 rounded-full bg-nile-blue text-white flex items-center justify-center font-semibold text-xs flex-shrink-0 border border-gray-100">
+                                    <div className="w-8 h-8 rounded-full bg-nile-blue text-white flex items-center justify-center font-semibold text-xs flex-shrink-0 border border-paper-300">
                                         <Building2 size={13} />
                                     </div>
                                     <div className="flex-1 min-w-0">
@@ -269,7 +269,7 @@ const CRMManager = () => {
                     </div>
 
                     {/* Quick outreach */}
-                    <div className="bg-nile-blue text-white border border-gray-100 rounded-[24px] p-5 shadow-card">
+                    <div className="bg-nile-blue text-white border border-paper-300 rounded-[24px] p-5 shadow-card">
                         <h3 className="text-[10px] font-semibold tracking-tight mb-4">QUICK OUTREACH</h3>
                         <div className="space-y-2">
                             {(Object.entries(templateMessages) as [ReminderType, typeof templateMessages[ReminderType]][])
@@ -290,10 +290,10 @@ const CRMManager = () => {
             {/* Compose Modal */}
             {showCompose && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setShowCompose(false)}>
-                    <div className="bg-white border border-gray-100 rounded-[28px] shadow-card max-w-lg w-full p-6 md:p-8 space-y-5 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+                    <div className="bg-white border border-paper-300 rounded-[28px] shadow-card max-w-lg w-full p-6 md:p-8 space-y-5 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center justify-between">
                             <h3 className="text-xl font-semibold tracking-tight">New CRM Reminder</h3>
-                            <button onClick={() => setShowCompose(false)} className="p-1.5 border border-gray-100/10 rounded-lg hover:bg-black/5">
+                            <button onClick={() => setShowCompose(false)} className="p-1.5 border border-paper-300/10 rounded-lg hover:bg-black/5">
                                 <X size={16} strokeWidth={3} />
                             </button>
                         </div>
@@ -304,7 +304,7 @@ const CRMManager = () => {
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                                 {(Object.entries(templateMessages) as [ReminderType, typeof templateMessages[ReminderType]][]).map(([key, t]) => (
                                     <button key={key} onClick={() => setSelectedType(key)}
-                                        className={`flex items-center gap-2 p-2.5 border border-gray-100 rounded-xl transition-all text-left
+                                        className={`flex items-center gap-2 p-2.5 border border-paper-300 rounded-xl transition-all text-left
                                             ${selectedType === key ? 'shadow-green bg-white' : 'bg-nile-white hover:bg-white'}`}>
                                         <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${t.color}`}>{t.icon}</div>
                                         <span className="text-[8px] font-semibold">{t.title.split(' ').slice(0, 2).join(' ')}</span>
@@ -316,7 +316,7 @@ const CRMManager = () => {
                         <div className="space-y-1.5">
                             <label className="text-[9px] font-semibold text-black/50">MESSAGE</label>
                             <textarea rows={4}
-                                className="w-full h-24 border border-gray-100 rounded-xl p-4 font-bold text-xs outline-none focus:shadow-blue bg-nile-white/40 resize-none transition-all"
+                                className="w-full h-24 border border-paper-300 rounded-xl p-4 font-bold text-xs outline-none focus:shadow-blue bg-nile-white/40 resize-none transition-all"
                                 value={selectedType === 'custom' ? customMsg : template.message}
                                 onChange={e => selectedType === 'custom' && setCustomMsg(e.target.value)}
                                 readOnly={selectedType !== 'custom'}
@@ -334,7 +334,7 @@ const CRMManager = () => {
                             ) : (
                                 <div className="space-y-2 max-h-40 overflow-y-auto">
                                     {employers.map(emp => (
-                                        <label key={emp.id} className="flex items-center gap-3 p-3 border border-gray-100 rounded-xl cursor-pointer hover:bg-nile-white transition-all">
+                                        <label key={emp.id} className="flex items-center gap-3 p-3 border border-paper-300 rounded-xl cursor-pointer hover:bg-nile-white transition-all">
                                             <input type="checkbox" checked={selectedEmployerIds.includes(emp.id)} onChange={() => toggleEmployer(emp.id)} className="w-4 h-4 accent-nile-blue" />
                                             <div className="flex-1 min-w-0">
                                                 <p className="font-semibold text-[10px] truncate">{emp.company_name}</p>
@@ -353,7 +353,7 @@ const CRMManager = () => {
                             <div className="space-y-1.5">
                                 <label className="text-[9px] font-semibold text-black/50">CHANNEL</label>
                                 <select value={selectedChannel} onChange={e => setSelectedChannel(e.target.value as Channel)}
-                                    className="w-full border border-gray-100 rounded-xl py-2.5 px-3 font-semibold text-xs outline-none bg-nile-white/40">
+                                    className="w-full border border-paper-300 rounded-xl py-2.5 px-3 font-semibold text-xs outline-none bg-nile-white/40">
                                     <option value="email">Email</option>
                                     <option value="sms">SMS</option>
                                     <option value="platform">Platform</option>
@@ -362,13 +362,13 @@ const CRMManager = () => {
                             <div className="space-y-1.5">
                                 <label className="text-[9px] font-semibold text-black/50">DUE DATE</label>
                                 <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)}
-                                    className="w-full border border-gray-100 rounded-xl py-2.5 px-3 font-semibold text-xs outline-none bg-nile-white/40" />
+                                    className="w-full border border-paper-300 rounded-xl py-2.5 px-3 font-semibold text-xs outline-none bg-nile-white/40" />
                             </div>
                         </div>
 
                         <div className="flex gap-3 pt-2">
-                            <button onClick={() => setShowCompose(false)} className="flex-1 py-3 border border-gray-100 rounded-xl font-semibold text-[9px] hover:bg-black hover:text-white transition-all">CANCEL</button>
-                            <button onClick={handleSave} className="flex-1 py-3 bg-black text-white border border-gray-100 rounded-xl font-semibold text-[9px] shadow-green transition-all flex items-center justify-center gap-2">
+                            <button onClick={() => setShowCompose(false)} className="flex-1 py-3 border border-paper-300 rounded-xl font-semibold text-[9px] hover:bg-black hover:text-white transition-all">CANCEL</button>
+                            <button onClick={handleSave} className="flex-1 py-3 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all flex items-center justify-center gap-2">
                                 <Bell size={13} /> SAVE REMINDER
                             </button>
                         </div>

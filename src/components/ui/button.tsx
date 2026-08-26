@@ -12,15 +12,15 @@ const buttonVariants = cva(
         destructive:
           "bg-red-600 text-white hover:bg-red-700 shadow-soft-xs",
         outline:
-          "border border-paper-300 bg-white hover:bg-paper-100 text-gray-800",
+          "border border-paper-300 bg-white hover:bg-paper-100 text-ink-800",
         secondary:
-          "bg-paper-100 text-gray-800 hover:bg-paper-200 border border-paper-300",
-        ghost: "hover:bg-paper-100 text-gray-700",
+          "bg-paper-100 text-ink-800 hover:bg-paper-200 border border-paper-300",
+        ghost: "hover:bg-paper-100 text-ink-700",
         link: "text-app-accent underline-offset-4 hover:underline",
         // Nile Custom
         nile: "bg-app-accent text-white border border-transparent shadow-soft-xs hover:bg-harbour-600 transition-all font-medium",
         "nile-green": "bg-green-600 text-white border border-transparent shadow-soft-xs hover:bg-green-700 transition-all font-medium",
-        "nile-outline": "bg-white text-gray-800 border border-paper-400 shadow-soft-xs hover:bg-paper-100 transition-all font-medium",
+        "nile-outline": "bg-white text-ink-800 border border-paper-400 shadow-soft-xs hover:bg-paper-100 transition-all font-medium",
       },
       size: {
         default: "h-10 px-4 py-2",

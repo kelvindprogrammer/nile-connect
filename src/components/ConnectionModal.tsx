@@ -43,12 +43,12 @@ const ConnectionModal: React.FC<ConnectionModalProps> = ({ isOpen, onClose, onSe
             onClick={onClose}
         >
             <div
-                className="bg-white rounded-2xl shadow-soft-lg border border-gray-100 w-full max-w-sm overflow-hidden"
+                className="bg-white rounded-xl shadow-soft-lg border border-paper-300 w-full max-w-sm overflow-hidden"
                 onClick={e => e.stopPropagation()}
             >
-                <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-                    <h3 className="font-semibold text-sm text-gray-900">Send connection request</h3>
-                    <button onClick={onClose} className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors">
+                <div className="px-5 py-4 border-b border-paper-300 flex items-center justify-between">
+                    <h3 className="font-semibold text-sm text-ink-800">Send connection request</h3>
+                    <button onClick={onClose} className="p-1.5 rounded-lg text-paper-600 hover:bg-paper-200 hover:text-ink-700 transition-colors">
                         <X size={16} />
                     </button>
                 </div>
@@ -56,19 +56,19 @@ const ConnectionModal: React.FC<ConnectionModalProps> = ({ isOpen, onClose, onSe
                 <div className="p-5 flex items-center gap-3">
                     <Avatar name={name} size="md" />
                     <div className="min-w-0">
-                        <p className="font-semibold text-gray-900 text-sm truncate">{name}</p>
-                        <p className="text-xs text-gray-400 mt-0.5">{role}</p>
+                        <p className="font-semibold text-ink-800 text-sm truncate">{name}</p>
+                        <p className="text-xs text-paper-600 mt-0.5">{role}</p>
                     </div>
                 </div>
 
-                <p className="px-5 pb-1 text-sm text-gray-500">
+                <p className="px-5 pb-1 text-sm text-paper-700">
                     {name.split(' ')[0]} will be notified and can accept your request to connect.
                 </p>
 
                 <div className="p-5 flex justify-end gap-2">
                     <button
                         onClick={onClose}
-                        className="px-4 py-2 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-100 transition-colors"
+                        className="px-4 py-2 rounded-xl text-sm font-medium text-paper-700 hover:bg-paper-200 transition-colors"
                     >
                         Cancel
                     </button>

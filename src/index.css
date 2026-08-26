@@ -115,24 +115,24 @@ button,
 }
 
 .card-hover:hover {
-    transform: translateY(-4px);
-    box-shadow: 8px 12px 0px 0px rgba(0, 0, 0, 1);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 .shadow-brutalist-blue {
-    box-shadow: 8px 8px 0px 0px #1E499D;
+    box-shadow: var(--shadow-sm);
 }
 
 .shadow-brutalist-green {
-    box-shadow: 8px 8px 0px 0px #6CBB56;
+    box-shadow: var(--shadow-sm);
 }
 
 .shadow-brutalist-sm-blue {
-    box-shadow: 4px 4px 0px 0px #1E499D;
+    box-shadow: var(--shadow-sm);
 }
 
 .shadow-brutalist-sm-green {
-    box-shadow: 4px 4px 0px 0px #6CBB56;
+    box-shadow: var(--shadow-sm);
 }
 
 .transition-perfect {
@@ -152,7 +152,7 @@ button,
     bottom: -2px;
     width: 0;
     height: 2px;
-    background: #1E499D;
+    background: var(--app-accent);
     transition: width 0.3s ease;
 }
 
@@ -201,7 +201,7 @@ button,
     transform: translateY(-50%);
     width: 3px;
     height: 0;
-    background: #6CBB56;
+    background: var(--status-success);
     border-radius: 0 4px 4px 0;
     transition: height 0.25s ease;
 }
@@ -216,7 +216,7 @@ input:focus,
 textarea:focus,
 select:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(108, 187, 86, 0.3), 3px 3px 0px 0px #000;
+    box-shadow: 0 0 0 3px rgb(var(--nile-green-500-rgb) / 0.3), 3px 3px 0px 0px #000;
     transition: box-shadow 0.2s ease;
 }
 
@@ -230,13 +230,13 @@ select:focus {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #1E499D;
+    background: var(--app-accent);
     border-radius: 4px;
     border: 2px solid #FFFFFE;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #6CBB56;
+    background: var(--status-success);
 }
 
 /* === Floating Label Inputs === */
@@ -265,7 +265,7 @@ select:focus {
 .float-label-group input:not(:placeholder-shown)~label {
     top: 0.35rem;
     font-size: 0.6rem;
-    color: #1E499D;
+    color: var(--app-accent);
 }
 
 /* === Brutalist Stat Number Pop === */
@@ -292,23 +292,23 @@ select:focus {
     display: inline-block;
     width: 8px;
     height: 8px;
-    background: #6CBB56;
+    background: var(--status-success);
     border-radius: 50%;
-    box-shadow: 0 0 0 0 rgba(108, 187, 86, 0.6);
+    box-shadow: 0 0 0 0 rgb(var(--nile-green-500-rgb) / 0.6);
     animation: pulse-green 1.8s infinite;
 }
 
 @keyframes pulse-green {
     0% {
-        box-shadow: 0 0 0 0 rgba(108, 187, 86, 0.6);
+        box-shadow: 0 0 0 0 rgb(var(--nile-green-500-rgb) / 0.6);
     }
 
     70% {
-        box-shadow: 0 0 0 10px rgba(108, 187, 86, 0);
+        box-shadow: 0 0 0 10px rgb(var(--nile-green-500-rgb) / 0);
     }
 
     100% {
-        box-shadow: 0 0 0 0 rgba(108, 187, 86, 0);
+        box-shadow: 0 0 0 0 rgb(var(--nile-green-500-rgb) / 0);
     }
 }
 
@@ -317,23 +317,23 @@ select:focus {
     display: inline-block;
     width: 8px;
     height: 8px;
-    background: #1E499D;
+    background: var(--app-accent);
     border-radius: 50%;
-    box-shadow: 0 0 0 0 rgba(30, 73, 157, 0.5);
+    box-shadow: 0 0 0 0 rgb(var(--app-accent-rgb) / 0.5);
     animation: pulse-blue 1.8s infinite;
 }
 
 @keyframes pulse-blue {
     0% {
-        box-shadow: 0 0 0 0 rgba(30, 73, 157, 0.5);
+        box-shadow: 0 0 0 0 rgb(var(--app-accent-rgb) / 0.5);
     }
 
     70% {
-        box-shadow: 0 0 0 10px rgba(30, 73, 157, 0);
+        box-shadow: 0 0 0 10px rgb(var(--app-accent-rgb) / 0);
     }
 
     100% {
-        box-shadow: 0 0 0 0 rgba(30, 73, 157, 0);
+        box-shadow: 0 0 0 0 rgb(var(--app-accent-rgb) / 0);
     }
 }
 
@@ -341,7 +341,7 @@ select:focus {
 .page-wipe {
     position: fixed;
     inset: 0;
-    background: #1E499D;
+    background: var(--app-accent);
     z-index: 9999;
     transform-origin: top;
     pointer-events: none;
@@ -361,8 +361,8 @@ select:focus {
     50%       { transform: translateY(-12px); }
 }
 @keyframes ncPulseGlow {
-    0%, 100% { box-shadow: 0 0 20px 4px rgba(30,73,157,0.3); }
-    50%       { box-shadow: 0 0 40px 10px rgba(108,187,86,0.4); }
+    0%, 100% { box-shadow: 0 0 20px 4px rgb(var(--app-accent-rgb) / 0.3); }
+    50%       { box-shadow: 0 0 40px 10px rgb(var(--nile-green-500-rgb) / 0.4); }
 }
 @keyframes ncReveal {
     from { opacity: 0; transform: translateY(30px) scale(0.95); }
@@ -426,7 +426,7 @@ select:focus {
 /* === Brutalist focus ring === */
 .focus-ring:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px #fff, 0 0 0 5px #1E499D;
+    box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--app-accent);
     border-radius: 4px;
 }
 
@@ -520,7 +520,7 @@ select:focus {
 .rail-scroll:hover,
 .rail-scroll:focus-within {
     scrollbar-width: thin;
-    scrollbar-color: rgba(30, 73, 157, 0.25) transparent;
+    scrollbar-color: rgb(var(--app-accent-rgb) / 0.25) transparent;
 }
 .rail-scroll:hover::-webkit-scrollbar,
 .rail-scroll:focus-within::-webkit-scrollbar {
@@ -528,20 +528,20 @@ select:focus {
 }
 .rail-scroll:hover::-webkit-scrollbar-thumb,
 .rail-scroll:focus-within::-webkit-scrollbar-thumb {
-    background: rgba(30, 73, 157, 0.25);
+    background: rgb(var(--app-accent-rgb) / 0.25);
     border-radius: 999px;
 }
 
 /* === Custom Scrollbar === */
 .custom-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: #1E499D transparent;
+    scrollbar-color: var(--app-accent) transparent;
 }
 .custom-scrollbar::-webkit-scrollbar {
     width: 4px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #1E499D;
+    background: var(--app-accent);
     border-radius: 4px;
 }
 
@@ -638,7 +638,7 @@ select:focus {
 }
 .input-brutalist:focus {
     background: #fff;
-    box-shadow: 3px 3px 0px 0px #1E499D;
+    box-shadow: var(--shadow-sm);
 }
 .input-brutalist::placeholder {
     color: rgba(0,0,0,0.25);
@@ -659,8 +659,8 @@ select:focus {
     transition: box-shadow 0.15s ease, border-color 0.15s ease;
 }
 .input-soft:focus {
-    border-color: #1E499D;
-    box-shadow: 0 0 0 3px rgba(30,73,157,0.1);
+    border-color: var(--app-accent);
+    box-shadow: 0 0 0 3px rgb(var(--app-accent-rgb) / 0.1);
 }
 .input-soft::placeholder {
     color: rgb(156 163 175);
@@ -672,7 +672,7 @@ select:focus {
 }
 .input-focus-grow:focus {
     transform: scaleY(1.015);
-    box-shadow: 3px 3px 0px 0px #1E499D;
+    box-shadow: var(--shadow-sm);
 }
 
 /* === Nav item active indicator slide === */
@@ -686,7 +686,7 @@ select:focus {
     bottom: 0; left: 50%;
     transform: translateX(-50%) scaleX(0);
     width: 60%; height: 2px;
-    background: #6CBB56;
+    background: var(--status-success);
     border-radius: 2px 2px 0 0;
     transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     transform-origin: center;
@@ -732,9 +732,9 @@ select:focus {
 
 /* === Floating action button pulse === */
 @keyframes fabPulse {
-    0%   { box-shadow: 0 0 0 0 rgba(108,187,86,0.5); }
-    70%  { box-shadow: 0 0 0 12px rgba(108,187,86,0); }
-    100% { box-shadow: 0 0 0 0 rgba(108,187,86,0); }
+    0%   { box-shadow: 0 0 0 0 rgb(var(--nile-green-500-rgb) / 0.5); }
+    70%  { box-shadow: 0 0 0 12px rgb(var(--nile-green-500-rgb) / 0); }
+    100% { box-shadow: 0 0 0 0 rgb(var(--nile-green-500-rgb) / 0); }
 }
 .fab-pulse { animation: fabPulse 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
 
@@ -778,7 +778,7 @@ select:focus {
 
 /* === Sidebar active item glow === */
 .sidebar-active-glow {
-    box-shadow: inset 3px 0 0 #6CBB56, 0 0 20px rgba(108,187,86,0.08);
+    box-shadow: inset 3px 0 0 var(--status-success), 0 0 20px rgb(var(--nile-green-500-rgb) / 0.08);
 }
 
 /* === Swipe-hint for mobile cards === */
@@ -800,17 +800,17 @@ select:focus {
     content: '|';
     margin-left: 1px;
     animation: cursorBlink 1s step-end infinite;
-    color: #6CBB56;
+    color: var(--status-success);
 }
 
 /* === Focus visible ring (accessibility) === */
 *:focus-visible {
-    outline: 2.5px solid #6CBB56;
+    outline: 2.5px solid var(--status-success);
     outline-offset: 2px;
     border-radius: 4px;
 }
 button:focus-visible, a:focus-visible {
-    outline: 2.5px solid #6CBB56;
+    outline: 2.5px solid var(--status-success);
     outline-offset: 3px;
 }
 
@@ -851,7 +851,7 @@ button:focus-visible, a:focus-visible {
 }
 .action-btn.active {
     color: var(--nile-blue);
-    background-color: rgba(30,73,157,0.08);
+    background-color: rgb(var(--app-accent-rgb) / 0.08);
 }
 
 /* Typing indicator — three bouncing dots */

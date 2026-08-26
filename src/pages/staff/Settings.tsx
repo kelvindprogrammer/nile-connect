@@ -78,7 +78,7 @@ const StaffSettings = () => {
         <div className="p-4 md:p-8 space-y-8 font-sans bg-nile-white min-h-full anime-fade-in text-left pb-24 md:pb-8">
 
             {/* Hero Header */}
-            <div className="bg-white border border-gray-100 rounded-[24px] shadow-card p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+            <div className="bg-white border border-paper-300 rounded-[24px] shadow-card p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-1/3 h-full bg-black/[0.03] -skew-x-12 translate-x-1/4 pointer-events-none" />
                 <div className="space-y-2 z-10">
                     <span className="px-3 py-1 bg-black text-white text-[8px] font-semibold rounded-full">ADMIN CONFIG</span>
@@ -86,7 +86,7 @@ const StaffSettings = () => {
                     <p className="text-[10px] font-bold text-black/40">Administrative controls and platform security protocols.</p>
                 </div>
                 <div className="hidden md:flex items-center gap-4 z-10">
-                    <div className="w-14 h-14 bg-black text-nile-green rounded-[18px] border border-gray-100 flex items-center justify-center shadow-green">
+                    <div className="w-14 h-14 bg-black text-nile-green rounded-[18px] border border-paper-300 flex items-center justify-center shadow-green">
                         <ShieldCheck size={26} />
                     </div>
                     <div>
@@ -108,7 +108,7 @@ const StaffSettings = () => {
                     <button
                         key={a.label}
                         onClick={() => navigate(a.path)}
-                        className={`bg-white border border-gray-100 rounded-[16px] p-4 flex flex-col items-start gap-2.5 transition-all shadow-card ${a.color}`}
+                        className={`bg-white border border-paper-300 rounded-[16px] p-4 flex flex-col items-start gap-2.5 transition-all shadow-card ${a.color}`}
                     >
                         {a.icon}
                         <span className="text-[9px] font-semibold leading-none">{a.label}</span>
@@ -144,7 +144,7 @@ const StaffSettings = () => {
                         </div>
                         <button
                             onClick={() => navigate('/staff')}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-black text-white border border-gray-100 rounded-lg font-semibold text-[8px] shadow-card transition-all"
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-black text-white border border-paper-300 rounded-lg font-semibold text-[8px] shadow-card transition-all"
                         >
                             VIEW
                         </button>
@@ -209,7 +209,7 @@ const StaffSettings = () => {
                         </div>
                         <button
                             onClick={() => navigate('/staff/reports')}
-                            className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-100 rounded-lg font-semibold text-[8px] hover:bg-black hover:text-white transition-all"
+                            className="flex items-center gap-1.5 px-3 py-1.5 border border-paper-300 rounded-lg font-semibold text-[8px] hover:bg-black hover:text-white transition-all"
                         >
                             <BarChart2 size={10} /> REPORTS
                         </button>
@@ -221,7 +221,7 @@ const StaffSettings = () => {
                     <button
                         onClick={handleSave}
                         disabled={saving}
-                        className="flex items-center gap-2 px-8 py-3 bg-black text-white border border-gray-100 rounded-xl font-semibold text-[10px] shadow-card transition-all disabled:opacity-50 disabled:pointer-events-none"
+                        className="flex items-center gap-2 px-8 py-3 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[10px] shadow-card transition-all disabled:opacity-50 disabled:pointer-events-none"
                     >
                         {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                         {saving ? 'COMMITTING...' : 'COMMIT CHANGES'}
@@ -247,7 +247,7 @@ const StaffSettings = () => {
                                     onClick={fetchCleanup}
                                     disabled={cleanupLoading}
                                     title="Rescan database"
-                                    className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-100 rounded-lg font-semibold text-[8px] text-black hover:bg-black hover:text-white transition-all disabled:opacity-40"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 border border-paper-300 rounded-lg font-semibold text-[8px] text-black hover:bg-black hover:text-white transition-all disabled:opacity-40"
                                 >
                                     <RefreshCw size={10} className={cleanupLoading ? 'animate-spin' : ''} /> RESCAN
                                 </button>
@@ -286,7 +286,7 @@ const StaffSettings = () => {
                         </div>
                         <button
                             onClick={() => logout()}
-                            className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-100 rounded-lg font-semibold text-[8px] text-black hover:bg-black hover:text-white transition-all"
+                            className="flex items-center gap-1.5 px-3 py-1.5 border border-paper-300 rounded-lg font-semibold text-[8px] text-black hover:bg-black hover:text-white transition-all"
                         >
                             <LogOut size={10} /> SIGN OUT
                         </button>
@@ -301,7 +301,7 @@ const StaffSettings = () => {
                     onClick={() => !cleanupRunning && setShowCleanupConfirm(false)}
                 >
                     <div
-                        className="bg-white rounded-[24px] shadow-card border border-gray-100 p-6 max-w-sm w-full space-y-4"
+                        className="bg-white rounded-[24px] shadow-card border border-paper-300 p-6 max-w-sm w-full space-y-4"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center gap-2 text-red-500">
@@ -317,7 +317,7 @@ const StaffSettings = () => {
                             <button
                                 onClick={() => setShowCleanupConfirm(false)}
                                 disabled={cleanupRunning}
-                                className="px-4 py-2 border border-gray-100 rounded-xl font-semibold text-[9px] hover:bg-black/5 transition-all disabled:opacity-40"
+                                className="px-4 py-2 border border-paper-300 rounded-xl font-semibold text-[9px] hover:bg-black/5 transition-all disabled:opacity-40"
                             >
                                 CANCEL
                             </button>
@@ -346,13 +346,13 @@ const Section = ({ icon, label, children, danger = false }: {
         <h3 className={`text-[9px] font-semibold flex items-center gap-2 ${danger ? 'text-red-500' : 'text-black/40'}`}>
             {icon} {label}
         </h3>
-        <div className={`bg-white border border-gray-100 rounded-[20px] p-5 shadow-card space-y-3 ${danger ? 'border-red-200' : ''}`}>
+        <div className={`bg-white border border-paper-300 rounded-[20px] p-5 shadow-card space-y-3 ${danger ? 'border-red-200' : ''}`}>
             {children}
         </div>
     </section>
 );
 
-const Divider = () => <div className="border-t border-dashed border-black/5" />;
+const Divider = () => <div className="border-t border-dashed border-paper-400/5" />;
 
 const ToggleRow = ({ label, desc, on, onFlip }: { label: string; desc: string; on: boolean; onFlip: () => void }) => (
     <div className="flex items-center justify-between py-1">

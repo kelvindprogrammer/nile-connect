@@ -78,8 +78,8 @@ const StoryTrayRail: React.FC = () => {
             <div className="flex gap-3 px-1 py-2 overflow-hidden" aria-busy="true" aria-label="Loading stories">
                 {[0, 1, 2, 3].map(i => (
                     <div key={i} className="flex flex-col items-center gap-1.5 flex-shrink-0">
-                        <div className="w-16 h-16 rounded-full bg-gray-100 animate-pulse" />
-                        <div className="w-12 h-2 rounded bg-gray-100 animate-pulse" />
+                        <div className="w-16 h-16 rounded-full bg-paper-200 animate-pulse" />
+                        <div className="w-12 h-2 rounded bg-paper-200 animate-pulse" />
                     </div>
                 ))}
             </div>
@@ -103,7 +103,7 @@ const StoryTrayRail: React.FC = () => {
                     aria-label="Add to your story"
                 >
                     <div className="relative w-16 h-16">
-                        <div className="w-16 h-16 rounded-full overflow-hidden ring-2 ring-gray-100">
+                        <div className="w-16 h-16 rounded-full overflow-hidden ring-2 ring-paper-300">
                             <Avatar name={user?.name || 'You'} size="lg" isSelf />
                         </div>
                         <span className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-nile-blue text-white
@@ -111,7 +111,7 @@ const StoryTrayRail: React.FC = () => {
                             <Plus size={12} strokeWidth={3} />
                         </span>
                     </div>
-                    <span className="text-[11px] text-gray-600 font-medium">Your story</span>
+                    <span className="text-[11px] text-paper-700 font-medium">Your story</span>
                 </button>
 
                 {trays.filter(t => !t.is_self || t.items.length > 0).map((tray, i) => {
@@ -129,14 +129,14 @@ const StoryTrayRail: React.FC = () => {
                                 className={`w-16 h-16 rounded-full p-[2px] transition-transform group-active:scale-95 ${
                                     tray.has_unseen
                                         ? 'bg-gradient-to-tr from-nile-blue via-nile-green to-nile-blue'
-                                        : 'bg-gray-200'
+                                        : 'bg-paper-300'
                                 }`}
                             >
                                 <div className="w-full h-full rounded-full overflow-hidden ring-2 ring-white bg-white">
                                     <Avatar name={author?.name ?? 'Member'} size="lg" isSelf={tray.is_self} />
                                 </div>
                             </div>
-                            <span className="text-[11px] text-gray-600 max-w-[68px] truncate">
+                            <span className="text-[11px] text-paper-700 max-w-[68px] truncate">
                                 {tray.is_self ? 'You' : author?.name?.split(' ')[0] ?? 'Member'}
                             </span>
                         </button>

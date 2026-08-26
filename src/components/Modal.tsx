@@ -52,10 +52,10 @@ const Modal: React.FC<ModalProps> = ({
 
                 {/* Header */}
                 <div className="flex justify-between items-center px-6 py-4 border-b border-paper-200">
-                    <h2 className="text-xl font-display font-normal text-gray-900">{title}</h2>
+                    <h2 className="text-xl font-display font-normal text-ink-800">{title}</h2>
                     <button
                         onClick={onClose}
-                        className="text-gray-400 hover:text-gray-700 hover:bg-paper-100 rounded-md p-1.5 transition-colors"
+                        className="text-paper-600 hover:text-ink-700 hover:bg-paper-100 rounded-md p-1.5 transition-colors"
                     >
                         <X size={18} />
                     </button>

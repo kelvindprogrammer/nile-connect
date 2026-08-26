@@ -139,17 +139,17 @@ const QuickApplyModal: React.FC<QuickApplyModalProps> = ({ isOpen, onClose, jobT
         const busy = uploadingType === type;
         return (
             <div key={type} className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 flex items-center gap-1.5">
+                <label className="text-sm font-medium text-ink-700 flex items-center gap-1.5">
                     {docLabel(type)}
                     {required
                         ? <span className="text-red-500">*</span>
-                        : <span className="text-xs text-gray-400 font-normal">(optional)</span>}
+                        : <span className="text-xs text-paper-600 font-normal">(optional)</span>}
                 </label>
                 {docs.length > 0 && (
                     <select
                         value={selected}
                         onChange={e => setSelectedDocs(prev => ({ ...prev, [type]: e.target.value }))}
-                        className="w-full border border-gray-200 rounded-xl p-3 text-sm text-gray-800 outline-none focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10 transition-all bg-white"
+                        className="w-full border border-paper-300 rounded-xl p-3 text-sm text-ink-800 outline-none focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10 transition-all bg-white"
                     >
                         {!required && <option value="">— None —</option>}
                         {docs.map(d => (
@@ -161,7 +161,7 @@ const QuickApplyModal: React.FC<QuickApplyModalProps> = ({ isOpen, onClose, jobT
                     type="button"
                     onClick={() => handleUploadNew(type)}
                     disabled={busy}
-                    className="w-full border border-dashed border-gray-200 rounded-xl p-3 flex items-center justify-center gap-2 bg-gray-50 hover:bg-gray-100 transition-all text-sm font-medium text-gray-600"
+                    className="w-full border border-dashed border-paper-300 rounded-xl p-3 flex items-center justify-center gap-2 bg-paper-100 hover:bg-paper-200 transition-all text-sm font-medium text-paper-700"
                 >
                     {busy ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
                     {busy ? 'Uploading…' : docs.length > 0 ? 'Upload another' : `Upload ${docLabel(type).toLowerCase()}`}
@@ -175,10 +175,10 @@ const QuickApplyModal: React.FC<QuickApplyModalProps> = ({ isOpen, onClose, jobT
             <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileChange} />
             {step === 1 ? (
                 <form onSubmit={handleSubmit} className="space-y-6 font-sans">
-                    <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100">
+                    <div className="bg-paper-100 p-5 rounded-xl border border-paper-300">
                         <p className="text-xs font-medium text-nile-blue mb-1">Applying for</p>
-                        <h3 className="text-lg font-semibold text-gray-900 leading-tight">{jobTitle}</h3>
-                        <p className="text-sm text-gray-500 mt-0.5">{company}</p>
+                        <h3 className="text-lg font-semibold text-ink-800 leading-tight">{jobTitle}</h3>
+                        <p className="text-sm text-paper-700 mt-0.5">{company}</p>
                     </div>
 
                     {loadingPackage ? (
@@ -192,7 +192,7 @@ const QuickApplyModal: React.FC<QuickApplyModalProps> = ({ isOpen, onClose, jobT
                     ) : (
                         <div className="space-y-5">
                             {pkg.required_docs.length === 0 && pkg.optional_docs.length === 0 && (
-                                <div className="flex items-center gap-2 p-4 border border-gray-100 rounded-xl bg-gray-50 text-sm font-medium text-gray-600">
+                                <div className="flex items-center gap-2 p-4 border border-paper-300 rounded-xl bg-paper-100 text-sm font-medium text-paper-700">
                                     <FileText size={16} className="text-nile-blue" /> No documents required for this role.
                                 </div>
                             )}
@@ -202,9 +202,9 @@ const QuickApplyModal: React.FC<QuickApplyModalProps> = ({ isOpen, onClose, jobT
                     )}
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700">Cover note (optional)</label>
+                        <label className="text-sm font-medium text-ink-700">Cover note (optional)</label>
                         <textarea
-                            className="w-full h-28 border border-gray-200 rounded-xl p-4 text-sm text-gray-800 outline-none focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10 transition-all resize-none"
+                            className="w-full h-28 border border-paper-300 rounded-xl p-4 text-sm text-ink-800 outline-none focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10 transition-all resize-none"
                             placeholder="Why are you a good fit?"
                             value={coverLetter}
                             onChange={e => setCoverLetter(e.target.value)}
@@ -222,8 +222,8 @@ const QuickApplyModal: React.FC<QuickApplyModalProps> = ({ isOpen, onClose, jobT
                         <CheckCircle2 size={40} />
                     </div>
                     <div className="space-y-1.5">
-                        <h3 className="text-xl font-semibold text-gray-900">You're all set!</h3>
-                        <p className="text-sm text-gray-500 max-w-xs">
+                        <h3 className="text-xl font-semibold text-ink-800">You're all set!</h3>
+                        <p className="text-sm text-paper-700 max-w-xs">
                             Your application has been sent to the recruiting team at <span className="text-nile-blue font-medium">{company}</span>.
                         </p>
                     </div>

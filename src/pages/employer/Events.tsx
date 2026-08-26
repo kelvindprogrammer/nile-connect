@@ -15,9 +15,9 @@ const categoryColors: Record<string, string> = {
     seminar:       'bg-orange-50 text-orange-500 border-orange-200',
     info_session:  'bg-yellow-50 text-yellow-600 border-yellow-200',
     alumni_meetup: 'bg-pink-50 text-pink-600 border-pink-200',
-    hackathon:     'bg-black text-white border-black',
+    hackathon:     'bg-black text-white border-paper-400',
     tech_talk:     'bg-nile-blue/10 text-nile-blue border-nile-blue/20',
-    other:         'bg-black/5 text-black/50 border-black/10',
+    other:         'bg-black/5 text-black/50 border-paper-400/10',
 };
 
 const EMPTY_FORM: CreateEventRequest = {
@@ -72,7 +72,7 @@ const EmployerEvents = () => {
 
     if (loading) return (
         <div className="p-4 md:p-8 space-y-6 animate-pulse">
-            <div className="h-12 bg-black/5 rounded-2xl w-64" />
+            <div className="h-12 bg-black/5 rounded-xl w-64" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {[1,2,3,4].map(i => <div key={i} className="h-48 bg-black/5 rounded-[24px]" />)}
             </div>
@@ -82,14 +82,14 @@ const EmployerEvents = () => {
     return (
         <div className="p-4 md:p-8 space-y-8 anime-fade-in font-sans pb-20 text-left min-h-full">
 
-            <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-4 border-b border-gray-100 pb-6">
+            <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-4 border-b border-paper-300 pb-6">
                 <div>
                     <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">Events .</h2>
                     <p className="text-[9px] font-semibold text-black/40 mt-1">
                         CAMPUS EVENTS · {upcoming.length} UPCOMING
                     </p>
                 </div>
-                <div className="flex bg-white p-1 border border-gray-100 rounded-2xl shadow-sm">
+                <div className="flex bg-white p-1 border border-paper-300 rounded-xl shadow-sm">
                     {(['ALL EVENTS', 'MY EVENTS', 'CREATE'] as Tab[]).map(t => (
                         <button key={t} onClick={() => setTab(t)}
                             className={`flex items-center gap-1.5 px-3 md:px-5 py-2 rounded-xl font-semibold text-[8px] transition-all whitespace-nowrap
@@ -105,11 +105,11 @@ const EmployerEvents = () => {
             {tab !== 'CREATE' && (
                 <div className="space-y-8 anime-fade-in">
                     {tab === 'MY EVENTS' && myEvents.length === 0 && (
-                        <div className="py-20 text-center border-[2px] border-dashed border-black/10 rounded-[28px]">
+                        <div className="py-20 text-center border-[2px] border-dashed border-paper-400/10 rounded-[28px]">
                             <Calendar size={28} className="text-black/15 mx-auto mb-4" />
                             <p className="text-[9px] font-semibold text-black/30">You haven't created any events yet</p>
                             <button onClick={() => setTab('CREATE')}
-                                className="mt-5 px-5 py-2.5 bg-black text-white border border-gray-100 rounded-xl font-semibold text-[9px] shadow-green transition-all">
+                                className="mt-5 px-5 py-2.5 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all">
                                 <Plus size={11} className="inline mr-1.5" /> CREATE EVENT
                             </button>
                         </div>
@@ -134,7 +134,7 @@ const EmployerEvents = () => {
                     )}
 
                     {displayed.length === 0 && tab === 'ALL EVENTS' && (
-                        <div className="py-20 text-center border-[2px] border-dashed border-black/10 rounded-[28px]">
+                        <div className="py-20 text-center border-[2px] border-dashed border-paper-400/10 rounded-[28px]">
                             <Calendar size={28} className="text-black/15 mx-auto mb-4" />
                             <p className="text-[9px] font-semibold text-black/30">No events on the platform yet</p>
                         </div>
@@ -145,8 +145,8 @@ const EmployerEvents = () => {
             {/* ── Create form ─────────────────────────────── */}
             {tab === 'CREATE' && (
                 <div className="max-w-2xl anime-fade-in">
-                    <div className="bg-white border border-gray-100 rounded-[28px] p-6 md:p-8 shadow-card">
-                        <div className="flex items-center gap-3 mb-6 pb-5 border-b border-gray-100/5">
+                    <div className="bg-white border border-paper-300 rounded-[28px] p-6 md:p-8 shadow-card">
+                        <div className="flex items-center gap-3 mb-6 pb-5 border-b border-paper-300/5">
                             <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center">
                                 <Calendar size={18} className="text-nile-green" />
                             </div>
@@ -160,12 +160,12 @@ const EmployerEvents = () => {
                             <F label="EVENT TITLE *">
                                 <input type="text" value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
                                     placeholder="e.g. Tech Talent Info Session"
-                                    className="w-full border border-gray-100 rounded-xl py-3 px-4 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40 focus:bg-white transition-all" />
+                                    className="w-full border border-paper-300 rounded-xl py-3 px-4 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40 focus:bg-white transition-all" />
                             </F>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <F label="CATEGORY">
                                     <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))}
-                                        className="w-full border border-gray-100 rounded-xl py-3 px-4 font-semibold text-xs outline-none bg-white cursor-pointer">
+                                        className="w-full border border-paper-300 rounded-xl py-3 px-4 font-semibold text-xs outline-none bg-white cursor-pointer">
                                         {EVENT_CATEGORIES.map(c => (
                                             <option key={c.value} value={c.value}>{c.label}</option>
                                         ))}
@@ -173,30 +173,30 @@ const EmployerEvents = () => {
                                 </F>
                                 <F label="CAPACITY">
                                     <input type="number" min={1} value={form.capacity} onChange={e => setForm(p => ({ ...p, capacity: Number(e.target.value) }))}
-                                        className="w-full border border-gray-100 rounded-xl py-3 px-4 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40 focus:bg-white transition-all" />
+                                        className="w-full border border-paper-300 rounded-xl py-3 px-4 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40 focus:bg-white transition-all" />
                                 </F>
                                 <F label="DATE *">
                                     <input type="date" value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))}
                                         min={new Date().toISOString().split('T')[0]}
-                                        className="w-full border border-gray-100 rounded-xl py-3 px-4 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40 focus:bg-white transition-all" />
+                                        className="w-full border border-paper-300 rounded-xl py-3 px-4 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40 focus:bg-white transition-all" />
                                 </F>
                                 <F label="TIME *">
                                     <input type="time" value={form.time} onChange={e => setForm(p => ({ ...p, time: e.target.value }))}
-                                        className="w-full border border-gray-100 rounded-xl py-3 px-4 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40 focus:bg-white transition-all" />
+                                        className="w-full border border-paper-300 rounded-xl py-3 px-4 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40 focus:bg-white transition-all" />
                                 </F>
                             </div>
                             <F label="LOCATION *">
                                 <input type="text" value={form.location} onChange={e => setForm(p => ({ ...p, location: e.target.value }))}
                                     placeholder="e.g. Nile University Hall A / Online (Teams)"
-                                    className="w-full border border-gray-100 rounded-xl py-3 px-4 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40 focus:bg-white transition-all" />
+                                    className="w-full border border-paper-300 rounded-xl py-3 px-4 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40 focus:bg-white transition-all" />
                             </F>
                             <F label="DESCRIPTION *">
                                 <textarea rows={4} value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
                                     placeholder="Describe your event and what attendees will gain..."
-                                    className="w-full border border-gray-100 rounded-xl py-3 px-4 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40 focus:bg-white transition-all resize-none" />
+                                    className="w-full border border-paper-300 rounded-xl py-3 px-4 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40 focus:bg-white transition-all resize-none" />
                             </F>
                             <button type="submit" disabled={submitting}
-                                className="w-full py-4 bg-black text-white border border-gray-100 rounded-xl font-semibold text-[9px] shadow-green transition-all disabled:opacity-40 flex items-center justify-center gap-2">
+                                className="w-full py-4 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all disabled:opacity-40 flex items-center justify-center gap-2">
                                 {submitting ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
                                 {submitting ? 'SUBMITTING...' : 'SUBMIT FOR APPROVAL'}
                             </button>
@@ -212,7 +212,7 @@ const EventCard = ({ event }: { event: StaffEvent }) => {
     const catColor = categoryColors[event.category] || categoryColors.other;
     const regPct = event.capacity > 0 ? Math.min(100, Math.round((event.registrations_count / event.capacity) * 100)) : 0;
     return (
-        <div className="bg-white border border-gray-100 rounded-[24px] p-5 flex flex-col gap-4 hover:translate-y-[-1px] shadow-card hover:shadow-blue transition-all">
+        <div className="bg-white border border-paper-300 rounded-[24px] p-5 flex flex-col gap-4 hover:translate-y-[-1px] shadow-card hover:shadow-blue transition-all">
             <div className="flex flex-wrap gap-2">
                 <span className={`text-[7px] font-semibold px-2 py-0.5 rounded-full border ${catColor}`}>{categoryLabel(event.category)}</span>
                 <span className={`text-[7px] font-semibold px-2 py-0.5 rounded-full border ${event.status === 'published' ? 'bg-nile-green/20 text-nile-green border-nile-green/30' : 'bg-yellow-50 text-yellow-600 border-yellow-200'}`}>
@@ -235,8 +235,8 @@ const EventCard = ({ event }: { event: StaffEvent }) => {
                     <span className="flex items-center gap-1"><Users size={9} />{event.registrations_count}/{event.capacity}</span>
                     <span>{regPct}%</span>
                 </div>
-                <div className="h-1.5 bg-nile-white border border-black/10 rounded-full overflow-hidden">
-                    <div className="h-full rounded-full transition-all" style={{ width: `${regPct}%`, background: regPct >= 90 ? '#ef4444' : '#6CBB56' }} />
+                <div className="h-1.5 bg-nile-white border border-paper-400/10 rounded-full overflow-hidden">
+                    <div className="h-full rounded-full transition-all" style={{ width: `${regPct}%`, background: regPct >= 90 ? '#ef4444' : 'var(--status-success)' }} />
                 </div>
             </div>
         </div>

@@ -73,11 +73,11 @@ const Moderation: React.FC = () => {
         <div className="max-w-5xl mx-auto p-4 md:p-6 pb-24 space-y-5 font-sans">
             <header className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
-                    <h1 className="text-xl md:text-3xl font-semibold text-gray-900 flex items-center gap-2">
+                    <h1 className="text-xl md:text-3xl font-semibold text-ink-800 flex items-center gap-2">
                         <Shield size={22} className="text-nile-blue" />
                         Moderation
                     </h1>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-paper-600 mt-1">
                         Every action here is recorded in the audit log with your name against it.
                     </p>
                 </div>
@@ -100,7 +100,7 @@ const Moderation: React.FC = () => {
             {stats && stats.urgent > 0 && (
                 <div
                     role="alert"
-                    className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-red-50 border border-red-200"
+                    className="flex items-center gap-2.5 p-3.5 rounded-xl bg-red-50 border border-red-200"
                 >
                     <AlertTriangle size={16} className="text-red-500 flex-shrink-0" />
                     <p className="text-xs text-red-700">
@@ -119,7 +119,7 @@ const Moderation: React.FC = () => {
                         onClick={() => setTab(value)}
                         className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium
                                     whitespace-nowrap transition-colors
-                            ${tab === value ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-100'}`}
+                            ${tab === value ? 'bg-ink-900 text-white' : 'text-paper-700 hover:bg-paper-200'}`}
                     >
                         <Icon size={13} />
                         {label}
@@ -131,21 +131,21 @@ const Moderation: React.FC = () => {
                 <div className="space-y-3" aria-busy="true">
                     {[0, 1, 2].map(i => (
                         <div key={i} className="social-card p-4 animate-pulse space-y-2">
-                            <div className="h-3 bg-gray-100 rounded w-1/3" />
-                            <div className="h-3 bg-gray-100 rounded w-2/3" />
+                            <div className="h-3 bg-paper-200 rounded w-1/3" />
+                            <div className="h-3 bg-paper-200 rounded w-2/3" />
                         </div>
                     ))}
                 </div>
             ) : error ? (
                 <div className="social-card py-12 text-center space-y-3">
                     <AlertTriangle size={24} className="text-red-300 mx-auto" />
-                    <p className="text-sm text-gray-600">{error}</p>
+                    <p className="text-sm text-paper-700">{error}</p>
                     <Button size="sm" variant="outline" onClick={reload}>Try again</Button>
                 </div>
             ) : items.length === 0 ? (
                 <div className="social-card py-16 text-center">
                     <Check size={26} className="text-nile-green/40 mx-auto mb-3" />
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-paper-700">
                         {tab === 'open' ? 'Nothing waiting. The queue is clear.' : `No ${tab} reports.`}
                     </p>
                 </div>
@@ -155,7 +155,7 @@ const Moderation: React.FC = () => {
                         <li key={item.report.id}>
                             <button
                                 onClick={() => setActive(item)}
-                                className="w-full text-left social-card p-4 hover:border-gray-200 transition-colors"
+                                className="w-full text-left social-card p-4 hover:border-paper-300 transition-colors"
                             >
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="min-w-0 flex-1">
@@ -165,25 +165,25 @@ const Moderation: React.FC = () => {
                                                     Urgent
                                                 </span>
                                             )}
-                                            <span className="px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 text-[10px] font-medium">
+                                            <span className="px-2 py-0.5 rounded-full bg-paper-200 text-paper-700 text-[10px] font-medium">
                                                 {item.report.reason.replace(/_/g, ' ')}
                                             </span>
-                                            <span className="px-2 py-0.5 rounded-full bg-gray-50 text-gray-500 text-[10px]">
+                                            <span className="px-2 py-0.5 rounded-full bg-paper-100 text-paper-700 text-[10px]">
                                                 {item.report.subject_type}
                                             </span>
-                                            <span className="text-[10px] text-gray-400">
+                                            <span className="text-[10px] text-paper-600">
                                                 {timeAgo(item.report.created_at)}
                                             </span>
                                         </div>
-                                        <p className="text-sm text-gray-800 line-clamp-2">
-                                            {item.report.snapshot_content || <em className="text-gray-400">No content snapshot</em>}
+                                        <p className="text-sm text-ink-800 line-clamp-2">
+                                            {item.report.snapshot_content || <em className="text-paper-600">No content snapshot</em>}
                                         </p>
-                                        <p className="text-[11px] text-gray-400 mt-1.5">
+                                        <p className="text-[11px] text-paper-600 mt-1.5">
                                             Reported by {item.reporter?.name || 'a user'}
                                             {item.subject_owner?.name && <> · about {item.subject_owner.name}</>}
                                         </p>
                                     </div>
-                                    <ChevronRight size={16} className="text-gray-300 flex-shrink-0 mt-1" />
+                                    <ChevronRight size={16} className="text-paper-500 flex-shrink-0 mt-1" />
                                 </div>
                             </button>
                         </li>
@@ -204,9 +204,9 @@ const Moderation: React.FC = () => {
 };
 
 const StatCard: React.FC<{ label: string; value: number; tone?: 'danger' }> = ({ label, value, tone }) => (
-    <div className={`bg-white border rounded-2xl p-3.5 shadow-card ${tone === 'danger' ? 'border-red-200' : 'border-gray-100'}`}>
-        <p className={`text-2xl font-semibold ${tone === 'danger' ? 'text-red-600' : 'text-gray-900'}`}>{value}</p>
-        <p className="text-[11px] text-gray-400 mt-0.5">{label}</p>
+    <div className={`bg-white border rounded-xl p-3.5 shadow-card ${tone === 'danger' ? 'border-red-200' : 'border-paper-300'}`}>
+        <p className={`text-2xl font-semibold ${tone === 'danger' ? 'text-red-600' : 'text-ink-800'}`}>{value}</p>
+        <p className="text-[11px] text-paper-600 mt-0.5">{label}</p>
     </div>
 );
 
@@ -259,67 +259,67 @@ const ReviewModal: React.FC<{
     return (
         <Modal isOpen onClose={onClose} title="Review report" maxWidth="lg">
             <div className="space-y-5 text-left">
-                <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4 space-y-2">
+                <div className="rounded-xl border border-paper-300 bg-paper-100 p-4 space-y-2">
                     <div className="flex items-center gap-2 flex-wrap">
                         {item.is_urgent && (
                             <span className="px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-[10px] font-bold uppercase">
                                 Urgent
                             </span>
                         )}
-                        <span className="text-xs font-semibold text-gray-800">
+                        <span className="text-xs font-semibold text-ink-800">
                             {item.report.reason.replace(/_/g, ' ')}
                         </span>
-                        <span className="text-[11px] text-gray-400">· {timeAgo(item.report.created_at)}</span>
+                        <span className="text-[11px] text-paper-600">· {timeAgo(item.report.created_at)}</span>
                     </div>
-                    <p className="text-[11px] text-gray-500">
+                    <p className="text-[11px] text-paper-700">
                         Reported by <strong>{item.reporter?.name || 'a user'}</strong>
                         {item.subject_owner?.name && <> · about <strong>{item.subject_owner.name}</strong></>}
                     </p>
                     {item.report.details && (
-                        <p className="text-xs text-gray-700 bg-white rounded-xl p-3 border border-gray-100">
+                        <p className="text-xs text-ink-700 bg-white rounded-xl p-3 border border-paper-300">
                             "{item.report.details}"
                         </p>
                     )}
                 </div>
 
                 <div>
-                    <p className="text-[11px] font-medium text-gray-500 mb-1.5 flex items-center gap-1.5">
+                    <p className="text-[11px] font-medium text-paper-700 mb-1.5 flex items-center gap-1.5">
                         <FileText size={12} />
                         Content as reported
                     </p>
-                    <div className="rounded-xl border border-gray-100 p-3.5 text-sm text-gray-800 whitespace-pre-wrap break-words max-h-48 overflow-y-auto">
+                    <div className="rounded-xl border border-paper-300 p-3.5 text-sm text-ink-800 whitespace-pre-wrap break-words max-h-48 overflow-y-auto">
                         {item.report.snapshot_content || (
-                            <em className="text-gray-400">
+                            <em className="text-paper-600">
                                 No snapshot was captured. The content may have been deleted before the report.
                             </em>
                         )}
                     </div>
-                    <p className="text-[10px] text-gray-400 mt-1">
+                    <p className="text-[10px] text-paper-600 mt-1">
                         This is a snapshot taken when the report was filed, so edits since then don't hide the original.
                     </p>
                 </div>
 
                 <div>
-                    <p className="text-[11px] font-medium text-gray-500 mb-1.5 flex items-center gap-1.5">
+                    <p className="text-[11px] font-medium text-paper-700 mb-1.5 flex items-center gap-1.5">
                         <History size={12} />
                         This user's record
                     </p>
                     {historyLoading ? (
                         <div className="py-4 flex justify-center">
-                            <Loader2 size={14} className="animate-spin text-gray-300" />
+                            <Loader2 size={14} className="animate-spin text-paper-500" />
                         </div>
                     ) : history.length === 0 ? (
-                        <p className="text-xs text-gray-400 py-2">
+                        <p className="text-xs text-paper-600 py-2">
                             No prior moderation actions — this appears to be a first report.
                         </p>
                     ) : (
                         <ul className="space-y-1.5 max-h-40 overflow-y-auto">
                             {history.slice(0, 10).map(a => (
-                                <li key={a.id} className="text-[11px] text-gray-600 flex items-center gap-2">
-                                    <span className="px-1.5 py-0.5 rounded bg-gray-100 font-medium">
+                                <li key={a.id} className="text-[11px] text-paper-700 flex items-center gap-2">
+                                    <span className="px-1.5 py-0.5 rounded bg-paper-200 font-medium">
                                         {a.action_type.replace(/_/g, ' ')}
                                     </span>
-                                    <span className="text-gray-400">
+                                    <span className="text-paper-600">
                                         {timeAgo(a.created_at)}
                                         {people[a.actor_id]?.name && <> by {people[a.actor_id].name}</>}
                                     </span>
@@ -330,8 +330,8 @@ const ReviewModal: React.FC<{
                 </div>
 
                 <div>
-                    <label htmlFor="mod-note" className="block text-[11px] font-medium text-gray-500 mb-1.5">
-                        Decision note <span className="text-gray-400">(recorded in the audit log)</span>
+                    <label htmlFor="mod-note" className="block text-[11px] font-medium text-paper-700 mb-1.5">
+                        Decision note <span className="text-paper-600">(recorded in the audit log)</span>
                     </label>
                     <textarea
                         id="mod-note"
@@ -339,13 +339,13 @@ const ReviewModal: React.FC<{
                         onChange={e => setNote(e.target.value)}
                         rows={2}
                         placeholder="Why you're taking this action."
-                        className="w-full border border-gray-200 rounded-xl py-2.5 px-3.5 text-sm outline-none
+                        className="w-full border border-paper-300 rounded-xl py-2.5 px-3.5 text-sm outline-none
                                    resize-none focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10"
                     />
                 </div>
 
                 <div className="space-y-2">
-                    <p className="text-[11px] font-medium text-gray-500">Actions</p>
+                    <p className="text-[11px] font-medium text-paper-700">Actions</p>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <Button

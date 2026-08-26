@@ -23,7 +23,7 @@ type EmployerSubTab = 'PENDING' | 'APPROVED' | 'REJECTED';
 
 const LoadingSkeleton = () => (
     <div className="p-4 md:p-8 space-y-8 animate-pulse">
-        <div className="h-14 bg-black/5 rounded-2xl w-72" />
+        <div className="h-14 bg-black/5 rounded-xl w-72" />
         <div className="flex gap-2">
             {[1, 2].map(i => <div key={i} className="h-10 bg-black/5 rounded-xl w-48" />)}
         </div>
@@ -147,7 +147,7 @@ const StaffApplications = () => {
         <div className="p-4 md:p-8 space-y-8 anime-fade-in font-sans pb-20 text-left min-h-full">
 
             {/* Header */}
-            <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 border-b border-gray-100 pb-6">
+            <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 border-b border-paper-300 pb-6">
                 <div className="space-y-1">
                     <h2 className="text-3xl md:text-4xl font-semibold text-black leading-none">
                         Pipeline Hub
@@ -157,7 +157,7 @@ const StaffApplications = () => {
                     </p>
                 </div>
 
-                <div className="flex flex-wrap gap-1 bg-white p-1 border border-gray-100 rounded-2xl shadow-sm">
+                <div className="flex flex-wrap gap-1 bg-white p-1 border border-paper-300 rounded-xl shadow-sm">
                     {(['PIPELINE', 'EMPLOYER VERIFICATION'] as MainTab[]).map(tab => (
                         <button
                             key={tab}
@@ -183,7 +183,7 @@ const StaffApplications = () => {
                 <div className="space-y-6 anime-fade-in">
                     {/* Count */}
                     <div className="flex flex-wrap gap-3 items-center">
-                        <span className="px-4 py-2 bg-black text-white border border-gray-100 rounded-xl font-semibold text-[9px]">
+                        <span className="px-4 py-2 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[9px]">
                             {filteredApps.length} {filteredApps.length === 1 ? 'APPLICATION' : 'APPLICATIONS'}
                         </span>
                         {statusFilter !== 'ALL' && (
@@ -204,7 +204,7 @@ const StaffApplications = () => {
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                             placeholder="SEARCH BY STUDENT, JOB TITLE, OR COMPANY..."
-                            className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-100 font-semibold text-[9px] outline-none focus:shadow-card transition-all bg-nile-white/60 focus:bg-white"
+                            className="w-full pl-10 pr-4 py-3 rounded-xl border border-paper-300 font-semibold text-[9px] outline-none focus:shadow-card transition-all bg-nile-white/60 focus:bg-white"
                         />
                     </div>
 
@@ -217,7 +217,7 @@ const StaffApplications = () => {
                                 <button
                                     key={sf}
                                     onClick={() => setStatusFilter(sf)}
-                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-100 font-semibold text-[8px] transition-all
+                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-paper-300 font-semibold text-[8px] transition-all
                                         ${statusFilter === sf ? 'bg-black text-white' : 'bg-white text-black hover:bg-black/5'}`}
                                 >
                                     {sf}
@@ -237,7 +237,7 @@ const StaffApplications = () => {
                             {filteredApps.map(app => {
                                 const sc = getStatusConfig(app.status);
                                 return (
-                                    <div key={app.id} className="bg-white border border-gray-100 rounded-[20px] p-4 md:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 hover:shadow-card transition-all">
+                                    <div key={app.id} className="bg-white border border-paper-300 rounded-[20px] p-4 md:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 hover:shadow-card transition-all">
                                         <div className="flex items-center gap-4 min-w-0 flex-1">
                                             <Avatar name={app.student_name || '?'} size="sm" />
                                             <div className="min-w-0">
@@ -253,7 +253,7 @@ const StaffApplications = () => {
                                                 )}
                                             </div>
                                         </div>
-                                        <span className={`shrink-0 text-[8px] font-semibold px-3 py-1.5 rounded-xl border border-gray-100 ${sc.bg} ${sc.text}`}>
+                                        <span className={`shrink-0 text-[8px] font-semibold px-3 py-1.5 rounded-xl border border-paper-300 ${sc.bg} ${sc.text}`}>
                                             {sc.label}
                                         </span>
                                     </div>
@@ -268,7 +268,7 @@ const StaffApplications = () => {
             {mainTab === 'EMPLOYER VERIFICATION' && (
                 <div className="space-y-6 anime-fade-in">
                     {/* Sub-tab bar */}
-                    <div className="flex flex-wrap gap-1 bg-white p-1 border border-gray-100 rounded-2xl shadow-sm w-fit">
+                    <div className="flex flex-wrap gap-1 bg-white p-1 border border-paper-300 rounded-xl shadow-sm w-fit">
                         {(['PENDING', 'APPROVED', 'REJECTED'] as EmployerSubTab[]).map(sub => {
                             const counts: Record<EmployerSubTab, number> = {
                                 PENDING: pendingEmployers.length,
@@ -303,9 +303,9 @@ const StaffApplications = () => {
                     ) : (
                         <div className="space-y-3">
                             {empsBySubTab.map(emp => (
-                                <div key={emp.id} className="bg-white border border-gray-100 rounded-[20px] shadow-card p-4 md:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:shadow-card transition-all">
+                                <div key={emp.id} className="bg-white border border-paper-300 rounded-[20px] shadow-card p-4 md:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:shadow-card transition-all">
                                     <div className="flex items-center gap-4 min-w-0 flex-1">
-                                        <div className="w-11 h-11 bg-black text-white rounded-xl flex items-center justify-center font-semibold text-lg flex-shrink-0 border border-gray-100">
+                                        <div className="w-11 h-11 bg-black text-white rounded-xl flex items-center justify-center font-semibold text-lg flex-shrink-0 border border-paper-300">
                                             {emp.company_name.charAt(0).toUpperCase()}
                                         </div>
                                         <div className="min-w-0 flex-1">
@@ -334,7 +334,7 @@ const StaffApplications = () => {
                                             <button
                                                 onClick={() => handleEmployerAction(emp, 'approved')}
                                                 disabled={actionLoading[emp.id]}
-                                                className="flex items-center gap-1.5 px-3 py-2 bg-nile-green text-white border border-gray-100 rounded-xl font-semibold text-[9px] shadow-card transition-all disabled:opacity-50"
+                                                className="flex items-center gap-1.5 px-3 py-2 bg-nile-green text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-card transition-all disabled:opacity-50"
                                             >
                                                 {actionLoading[emp.id] ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle2 size={12} strokeWidth={3} />}
                                                 <span className="hidden sm:inline">APPROVE</span>
@@ -342,7 +342,7 @@ const StaffApplications = () => {
                                             <button
                                                 onClick={() => handleEmployerAction(emp, 'rejected')}
                                                 disabled={actionLoading[emp.id]}
-                                                className="flex items-center gap-1.5 px-3 py-2 bg-white text-red-500 border border-gray-100 rounded-xl font-semibold text-[9px] shadow-card transition-all disabled:opacity-50 hover:bg-red-50"
+                                                className="flex items-center gap-1.5 px-3 py-2 bg-white text-red-500 border border-paper-300 rounded-xl font-semibold text-[9px] shadow-card transition-all disabled:opacity-50 hover:bg-red-50"
                                             >
                                                 {actionLoading[emp.id] ? <Loader2 size={12} className="animate-spin" /> : <XCircle size={12} strokeWidth={3} />}
                                                 <span className="hidden sm:inline">REJECT</span>
@@ -355,7 +355,7 @@ const StaffApplications = () => {
                                             <button
                                                 onClick={() => handleToggleVerified(emp)}
                                                 disabled={actionLoading[`verify-${emp.id}`]}
-                                                className={`flex items-center gap-1.5 px-3 py-2 border border-gray-100 rounded-xl font-semibold text-[9px] shadow-card transition-all disabled:opacity-50
+                                                className={`flex items-center gap-1.5 px-3 py-2 border border-paper-300 rounded-xl font-semibold text-[9px] shadow-card transition-all disabled:opacity-50
                                                     ${emp.is_verified ? 'bg-white text-black/50 hover:bg-black/5' : 'bg-nile-blue text-white'}`}
                                             >
                                                 {actionLoading[`verify-${emp.id}`]
@@ -378,7 +378,7 @@ const StaffApplications = () => {
 // ── Sub-components ────────────────────────────────────────────────────────────
 
 const EmptyState = ({ label, icon }: { label: string; icon: React.ReactNode }) => (
-    <div className="py-20 text-center border-2 border-dashed border-black/10 rounded-[28px]">
+    <div className="py-20 text-center border-2 border-dashed border-paper-400/10 rounded-[28px]">
         <div className="text-black/20 mx-auto mb-3 flex justify-center">{icon}</div>
         <p className="text-[9px] font-semibold text-black/30">{label}</p>
     </div>
@@ -392,7 +392,7 @@ const StatusBadge = ({ status }: { status: string }) => {
     };
     const cls = configs[status] ?? 'bg-black/5 text-black/60';
     return (
-        <span className={`text-[7px] font-semibold px-2 py-0.5 rounded border border-gray-100 ${cls}`}>
+        <span className={`text-[7px] font-semibold px-2 py-0.5 rounded border border-paper-300 ${cls}`}>
             {status.toUpperCase()}
         </span>
     );

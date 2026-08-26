@@ -28,14 +28,14 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({ onSelect, onClose }) => {
     return (
         <div
             ref={ref}
-            className="absolute bottom-full right-0 mb-2 bg-white border border-gray-100 rounded-2xl shadow-soft-lg p-3 w-64 grid grid-cols-8 gap-1 z-20 anime-fade-in"
+            className="absolute bottom-full right-0 mb-2 bg-white border border-paper-300 rounded-xl shadow-soft-lg p-3 w-64 grid grid-cols-8 gap-1 z-20 anime-fade-in"
         >
             {EMOJIS.map(emoji => (
                 <button
                     key={emoji}
                     type="button"
                     onClick={() => onSelect(emoji)}
-                    className="text-lg leading-none p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                    className="text-lg leading-none p-1.5 rounded-lg hover:bg-paper-200 transition-colors"
                 >
                     {emoji}
                 </button>

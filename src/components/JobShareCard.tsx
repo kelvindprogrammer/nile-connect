@@ -38,14 +38,14 @@ const JobShareCard: React.FC<JobShareCardProps> = ({ jobId }) => {
 
     if (loading) {
         return (
-            <div className="mx-4 mb-2 rounded-2xl border border-gray-100 bg-gray-50 p-4 flex items-center justify-center">
-                <Loader2 size={16} className="animate-spin text-gray-300" />
+            <div className="mx-4 mb-2 rounded-xl border border-paper-300 bg-paper-100 p-4 flex items-center justify-center">
+                <Loader2 size={16} className="animate-spin text-paper-500" />
             </div>
         );
     }
     if (failed || !job) {
         return (
-            <div className="mx-4 mb-2 rounded-2xl border border-gray-100 bg-gray-50 p-4 text-xs text-gray-400">
+            <div className="mx-4 mb-2 rounded-xl border border-paper-300 bg-paper-100 p-4 text-xs text-paper-600">
                 This job is no longer available.
             </div>
         );
@@ -54,7 +54,7 @@ const JobShareCard: React.FC<JobShareCardProps> = ({ jobId }) => {
     return (
         <Link
             to={viewHref}
-            className="mx-4 mb-2 block rounded-2xl border border-gray-100 bg-gray-50 hover:bg-gray-100 hover:border-nile-blue/20 transition-colors p-4"
+            className="mx-4 mb-2 block rounded-xl border border-paper-300 bg-paper-100 hover:bg-paper-200 hover:border-nile-blue/20 transition-colors p-4"
         >
             <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-xl bg-nile-blue/10 text-nile-blue flex items-center justify-center flex-shrink-0">
@@ -62,11 +62,11 @@ const JobShareCard: React.FC<JobShareCardProps> = ({ jobId }) => {
                 </div>
                 <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
-                        <h5 className="font-semibold text-sm text-gray-900 truncate">{job.title}</h5>
+                        <h5 className="font-semibold text-sm text-ink-800 truncate">{job.title}</h5>
                         {job.employer.is_verified && <BadgeCheck size={14} className="text-nile-blue flex-shrink-0" />}
                     </div>
-                    <p className="text-xs text-gray-500 truncate">{job.employer.company_name}</p>
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-xs text-gray-400">
+                    <p className="text-xs text-paper-700 truncate">{job.employer.company_name}</p>
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-xs text-paper-600">
                         <span className="flex items-center gap-1"><MapPin size={12} />{job.location}</span>
                         {job.is_remote && <span className="flex items-center gap-1"><Wifi size={12} />Remote</span>}
                         <span className="px-2 py-0.5 rounded-full bg-nile-blue/10 text-nile-blue font-medium">
@@ -76,7 +76,7 @@ const JobShareCard: React.FC<JobShareCardProps> = ({ jobId }) => {
                     </div>
                 </div>
             </div>
-            <div className="mt-3 pt-3 border-t border-gray-200/60 text-xs font-medium text-nile-blue">
+            <div className="mt-3 pt-3 border-t border-paper-300/60 text-xs font-medium text-nile-blue">
                 View job →
             </div>
         </Link>

@@ -58,23 +58,23 @@ interface FormState {
 const CATEGORIES = EVENT_CATEGORIES;
 
 const CATEGORY_STYLES: Record<string, { tag: string; bar: string; icon: React.ReactNode }> = {
-    career_fair:   { tag: 'bg-nile-blue/10 text-nile-blue border-nile-blue/30',   bar: '#1E499D', icon: <LayoutGrid size={11} /> },
+    career_fair:   { tag: 'bg-nile-blue/10 text-nile-blue border-nile-blue/30',   bar: 'var(--app-accent)', icon: <LayoutGrid size={11} /> },
     workshop:      { tag: 'bg-purple-50 text-purple-600 border-purple-200',       bar: '#9333ea', icon: <BookOpen size={11} /> },
-    networking:    { tag: 'bg-nile-green/10 text-nile-green border-nile-green/30', bar: '#6CBB56', icon: <Coffee size={11} /> },
+    networking:    { tag: 'bg-nile-green/10 text-nile-green border-nile-green/30', bar: 'var(--status-success)', icon: <Coffee size={11} /> },
     webinar:       { tag: 'bg-orange-50 text-orange-500 border-orange-200',       bar: '#f97316', icon: <Radio size={11} /> },
-    seminar:       { tag: 'bg-gray-100 text-gray-600 border-gray-200',            bar: '#6b7280', icon: <BookOpen size={11} /> },
+    seminar:       { tag: 'bg-paper-200 text-paper-700 border-paper-300',            bar: '#6b7280', icon: <BookOpen size={11} /> },
     info_session:  { tag: 'bg-yellow-50 text-yellow-600 border-yellow-200',       bar: '#ca8a04', icon: <Zap size={11} /> },
     alumni_meetup: { tag: 'bg-pink-50 text-pink-600 border-pink-200',             bar: '#ec4899', icon: <Award size={11} /> },
-    hackathon:     { tag: 'bg-black text-white border-black',                     bar: '#000000', icon: <Code2 size={11} /> },
-    tech_talk:     { tag: 'bg-nile-blue/10 text-nile-blue border-nile-blue/30',   bar: '#1E499D', icon: <Code2 size={11} /> },
-    other:         { tag: 'bg-gray-100 text-gray-500 border-gray-200',            bar: '#9ca3af', icon: <Globe size={11} /> },
+    hackathon:     { tag: 'bg-black text-white border-paper-400',                     bar: '#000000', icon: <Code2 size={11} /> },
+    tech_talk:     { tag: 'bg-nile-blue/10 text-nile-blue border-nile-blue/30',   bar: 'var(--app-accent)', icon: <Code2 size={11} /> },
+    other:         { tag: 'bg-paper-200 text-paper-700 border-paper-300',            bar: '#9ca3af', icon: <Globe size={11} /> },
 };
 
 const STATUS_STYLES: Record<string, string> = {
     pending:   'bg-yellow-50 text-yellow-600 border-yellow-200',
     published: 'bg-nile-green/20 text-nile-green border-nile-green/30',
     upcoming:  'bg-nile-blue/10 text-nile-blue border-nile-blue/30',
-    past:      'bg-black/5 text-black/40 border-black/10',
+    past:      'bg-black/5 text-black/40 border-paper-400/10',
     cancelled: 'bg-red-50 text-red-500 border-red-200',
 };
 
@@ -282,9 +282,9 @@ const StaffEvents: React.FC = () => {
     // ── Loading skeleton ─────────────────────────────────────────────────────
     if (loading) return (
         <div className="p-4 md:p-8 space-y-6 animate-pulse">
-            <div className="h-14 bg-black/5 rounded-2xl w-80" />
+            <div className="h-14 bg-black/5 rounded-xl w-80" />
             <div className="flex gap-3">
-                {[1, 2, 3].map(i => <div key={i} className="h-20 bg-black/5 rounded-2xl flex-1" />)}
+                {[1, 2, 3].map(i => <div key={i} className="h-20 bg-black/5 rounded-xl flex-1" />)}
             </div>
             <div className="flex gap-2">
                 {[1, 2, 3, 4].map(i => <div key={i} className="h-9 bg-black/5 rounded-xl w-24" />)}
@@ -300,7 +300,7 @@ const StaffEvents: React.FC = () => {
         <div className="p-4 md:p-8 pb-24 space-y-8 anime-fade-in font-sans text-left min-h-full">
 
             {/* ── PAGE HEADER ──────────────────────────────────────────────── */}
-            <div className="border-b border-gray-100 pb-6">
+            <div className="border-b border-paper-300 pb-6">
                 <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">
                     Events .
                 </h2>
@@ -353,7 +353,7 @@ const StaffEvents: React.FC = () => {
                     {/* Status filter + search bar */}
                     <div className="flex flex-col sm:flex-row gap-3">
                         {/* Status tabs */}
-                        <div className="flex bg-white p-1 border border-gray-100 rounded-xl gap-0.5 flex-shrink-0">
+                        <div className="flex bg-white p-1 border border-paper-300 rounded-xl gap-0.5 flex-shrink-0">
                             {STATUS_TABS.map(tab => {
                                 const count = tab === 'ALL'
                                     ? events.length
@@ -393,7 +393,7 @@ const StaffEvents: React.FC = () => {
                                 value={search}
                                 onChange={e => setSearch(e.target.value)}
                                 placeholder="SEARCH EVENTS..."
-                                className="w-full pl-9 pr-9 py-2.5 rounded-xl border border-gray-100 font-semibold text-[9px] outline-none focus:shadow-card bg-white/60 focus:bg-white transition-all"
+                                className="w-full pl-9 pr-9 py-2.5 rounded-xl border border-paper-300 font-semibold text-[9px] outline-none focus:shadow-card bg-white/60 focus:bg-white transition-all"
                             />
                             {search && (
                                 <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-black/30 hover:text-black transition-colors">
@@ -412,7 +412,7 @@ const StaffEvents: React.FC = () => {
 
                     {/* Empty state */}
                     {filteredEvents.length === 0 ? (
-                        <div className="py-24 border-[2px] border-dashed border-black/10 rounded-[32px] flex flex-col items-center justify-center text-center gap-4 anime-fade-in">
+                        <div className="py-24 border-[2px] border-dashed border-paper-400/10 rounded-[32px] flex flex-col items-center justify-center text-center gap-4 anime-fade-in">
                             <Calendar size={36} className="text-black/15" />
                             <div>
                                 <p className="text-[9px] font-semibold text-black/30">
@@ -427,7 +427,7 @@ const StaffEvents: React.FC = () => {
                             {!search && statusTab === 'ALL' && (
                                 <button
                                     onClick={() => setShowMobileForm(true)}
-                                    className="lg:hidden flex items-center gap-2 px-5 py-2.5 bg-black text-white border border-gray-100 rounded-xl font-semibold text-[9px] shadow-green transition-all"
+                                    className="lg:hidden flex items-center gap-2 px-5 py-2.5 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all"
                                 >
                                     <Plus size={12} strokeWidth={3} /> CREATE EVENT
                                 </button>
@@ -457,7 +457,7 @@ const StaffEvents: React.FC = () => {
             {/* ── MOBILE FAB: show form ─────────────────────────────────────── */}
             <button
                 onClick={() => setShowMobileForm(true)}
-                className="lg:hidden fixed bottom-6 right-6 z-30 w-14 h-14 bg-black text-white border border-gray-100 rounded-full flex items-center justify-center shadow-green transition-all"
+                className="lg:hidden fixed bottom-6 right-6 z-30 w-14 h-14 bg-black text-white border border-paper-300 rounded-full flex items-center justify-center shadow-green transition-all"
                 aria-label="Create event"
             >
                 <Plus size={22} strokeWidth={2.5} />
@@ -491,7 +491,7 @@ const StaffEvents: React.FC = () => {
                     onClick={() => setConfirmDelete(null)}
                 >
                     <div
-                        className="bg-white border border-gray-100 rounded-[24px] shadow-card max-w-sm w-full p-6 space-y-5"
+                        className="bg-white border border-paper-300 rounded-[24px] shadow-card max-w-sm w-full p-6 space-y-5"
                         onClick={e => e.stopPropagation()}
                     >
                         <div className="flex items-center gap-3">
@@ -506,14 +506,14 @@ const StaffEvents: React.FC = () => {
                         <div className="flex gap-3">
                             <button
                                 onClick={() => setConfirmDelete(null)}
-                                className="flex-1 py-3 border border-gray-100 rounded-xl font-semibold text-[9px] hover:bg-black hover:text-white transition-all"
+                                className="flex-1 py-3 border border-paper-300 rounded-xl font-semibold text-[9px] hover:bg-black hover:text-white transition-all"
                             >
                                 CANCEL
                             </button>
                             <button
                                 onClick={() => handleDelete(confirmDelete)}
                                 disabled={actionLoading[confirmDelete]}
-                                className="flex-1 py-3 bg-red-500 text-white border border-gray-100 rounded-xl font-semibold text-[9px] shadow-card transition-all disabled:opacity-40 flex items-center justify-center gap-2"
+                                className="flex-1 py-3 bg-red-500 text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-card transition-all disabled:opacity-40 flex items-center justify-center gap-2"
                             >
                                 {actionLoading[confirmDelete]
                                     ? <Loader2 size={12} className="animate-spin" />
@@ -546,9 +546,9 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ form, setForm, onSubm
         setForm(prev => ({ ...prev, [key]: val }));
 
     return (
-        <div className="bg-white border border-gray-100 rounded-[28px] shadow-card overflow-hidden">
+        <div className="bg-white border border-paper-300 rounded-[28px] shadow-card overflow-hidden">
             {/* Form header */}
-            <div className="flex items-center justify-between gap-3 p-5 border-b border-gray-100 bg-black">
+            <div className="flex items-center justify-between gap-3 p-5 border-b border-paper-300 bg-black">
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-nile-green rounded-xl flex items-center justify-center flex-shrink-0">
                         <Calendar size={15} className="text-white" />
@@ -659,7 +659,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ form, setForm, onSubm
                 </FormField>
 
                 {/* Featured toggle */}
-                <div className="flex items-center justify-between py-2 px-3 border border-gray-100/10 rounded-xl hover:border-black/20 transition-colors">
+                <div className="flex items-center justify-between py-2 px-3 border border-paper-300/10 rounded-xl hover:border-paper-400/20 transition-colors">
                     <div>
                         <p className="font-semibold text-[9px]">FEATURED EVENT</p>
                         <p className="text-[7px] font-semibold text-black/30 mt-0.5">SHOW ON HOMEPAGE SPOTLIGHT</p>
@@ -667,12 +667,12 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ form, setForm, onSubm
                     <button
                         type="button"
                         onClick={() => f('is_featured', !form.is_featured)}
-                        className={`relative w-10 h-5 rounded-full border border-gray-100 transition-colors flex-shrink-0 ${
+                        className={`relative w-10 h-5 rounded-full border border-paper-300 transition-colors flex-shrink-0 ${
                             form.is_featured ? 'bg-nile-green' : 'bg-black/10'
                         }`}
                         aria-label="Toggle featured"
                     >
-                        <span className={`absolute top-0.5 w-3 h-3 bg-white border border-gray-100 rounded-full transition-all ${
+                        <span className={`absolute top-0.5 w-3 h-3 bg-white border border-paper-300 rounded-full transition-all ${
                             form.is_featured ? 'left-[18px]' : 'left-0.5'
                         }`} />
                     </button>
@@ -683,14 +683,14 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ form, setForm, onSubm
                     <button
                         type="button"
                         onClick={() => setForm(EMPTY_FORM)}
-                        className="px-4 py-3 border border-gray-100 rounded-xl font-semibold text-[8px] hover:bg-black hover:text-white transition-all"
+                        className="px-4 py-3 border border-paper-300 rounded-xl font-semibold text-[8px] hover:bg-black hover:text-white transition-all"
                     >
                         CLEAR
                     </button>
                     <button
                         type="submit"
                         disabled={submitting}
-                        className="flex-1 flex items-center justify-center gap-2 py-3 bg-black text-white border border-gray-100 rounded-xl font-semibold text-[9px] shadow-green transition-all disabled:opacity-40"
+                        className="flex-1 flex items-center justify-center gap-2 py-3 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all disabled:opacity-40"
                     >
                         {submitting
                             ? <><Loader2 size={12} className="animate-spin" /> CREATING...</>
@@ -741,14 +741,14 @@ const EventCard: React.FC<EventCardProps> = ({
     return (
         <div
             style={style}
-            className="relative bg-white border border-gray-100 rounded-[24px] p-5 flex flex-col gap-4
+            className="relative bg-white border border-paper-300 rounded-[24px] p-5 flex flex-col gap-4
                        shadow-card
                        hover:shadow-blue
                        hover:-translate-y-[2px] transition-all duration-200 anime-fade-in"
         >
             {/* Featured badge */}
             {event.is_featured && (
-                <div className="absolute -top-2.5 -right-2.5 w-8 h-8 bg-yellow-400 border border-gray-100 rounded-full flex items-center justify-center shadow-card">
+                <div className="absolute -top-2.5 -right-2.5 w-8 h-8 bg-yellow-400 border border-paper-300 rounded-full flex items-center justify-center shadow-card">
                     <Star size={13} className="text-black" fill="currentColor" />
                 </div>
             )}
@@ -783,7 +783,7 @@ const EventCard: React.FC<EventCardProps> = ({
                     <button
                         onClick={() => setOpenActionId(isOpen ? null : event.id)}
                         disabled={!!anyLoading}
-                        className="p-1.5 border border-gray-100/10 rounded-xl hover:border-black transition-colors disabled:opacity-40 flex items-center gap-1"
+                        className="p-1.5 border border-paper-300/10 rounded-xl hover:border-paper-400 transition-colors disabled:opacity-40 flex items-center gap-1"
                     >
                         {anyLoading
                             ? <Loader2 size={12} className="animate-spin" />
@@ -792,7 +792,7 @@ const EventCard: React.FC<EventCardProps> = ({
                     </button>
 
                     {isOpen && (
-                        <div className="absolute right-0 top-full mt-1.5 bg-white border border-gray-100 rounded-[16px] shadow-card z-20 min-w-[170px] overflow-hidden">
+                        <div className="absolute right-0 top-full mt-1.5 bg-white border border-paper-300 rounded-[16px] shadow-card z-20 min-w-[170px] overflow-hidden">
                             {effectiveStatus !== 'cancelled' && event.status !== 'published' && (
                                 <DropdownItem
                                     label="PUBLISH"
@@ -823,7 +823,7 @@ const EventCard: React.FC<EventCardProps> = ({
                                 color="text-yellow-600"
                                 onClick={() => onFeatureToggle(event)}
                             />
-                            <div className="border-t border-black/10 mt-0.5">
+                            <div className="border-t border-paper-400/10 mt-0.5">
                                 <DropdownItem
                                     label="DELETE"
                                     icon={<Trash2 size={11} />}
@@ -870,7 +870,7 @@ const EventCard: React.FC<EventCardProps> = ({
                         {regPct}%{isFull ? ' · FULL' : ''}
                     </span>
                 </div>
-                <div className="h-2 bg-black/5 border border-gray-100 rounded-full overflow-hidden p-[1.5px]">
+                <div className="h-2 bg-black/5 border border-paper-300 rounded-full overflow-hidden p-[1.5px]">
                     <div
                         className="h-full rounded-full transition-all duration-700"
                         style={{ width: `${regPct}%`, background: regBarColor }}
@@ -890,7 +890,7 @@ const EventCard: React.FC<EventCardProps> = ({
                 <button
                     onClick={() => onStatusChange(event, 'published')}
                     disabled={!!actionLoading[statusKey]}
-                    className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-nile-green text-white border border-gray-100 rounded-xl font-semibold text-[8px] shadow-card transition-all disabled:opacity-40"
+                    className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-nile-green text-white border border-paper-300 rounded-xl font-semibold text-[8px] shadow-card transition-all disabled:opacity-40"
                 >
                     {actionLoading[statusKey]
                         ? <Loader2 size={11} className="animate-spin" />
@@ -917,7 +917,7 @@ const StatCard: React.FC<{
     const isDark = color.includes('bg-black');
     return (
         <div
-            className={`border border-gray-100 rounded-[20px] p-4 md:p-5 ${isDark ? color : `bg-white`}`}
+            className={`border border-paper-300 rounded-[20px] p-4 md:p-5 ${isDark ? color : `bg-white`}`}
             style={{ boxShadow: `3px 3px 0px 0px ${shadowColor}` }}
         >
             <div className={`w-8 h-8 rounded-xl flex items-center justify-center mb-3 ${isDark ? 'bg-white/10' : color}`}>

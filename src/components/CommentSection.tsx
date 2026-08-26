@@ -64,29 +64,29 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId, onCommentAdded,
     };
 
     return (
-        <div className="px-4 py-4 bg-gray-50/60 border-t border-gray-100 space-y-3">
+        <div className="px-4 py-4 bg-paper-100/60 border-t border-paper-300 space-y-3">
             <div className="space-y-3 max-h-72 overflow-y-auto pr-1 custom-scrollbar">
                 {loading ? (
                     <div className="flex items-center justify-center py-4">
-                        <Loader2 size={18} className="animate-spin text-gray-300" />
+                        <Loader2 size={18} className="animate-spin text-paper-500" />
                     </div>
                 ) : comments.length === 0 ? (
-                    <p className="text-xs text-gray-400 text-center py-2">No comments yet — start the conversation.</p>
+                    <p className="text-xs text-paper-600 text-center py-2">No comments yet — start the conversation.</p>
                 ) : comments.map(c => (
                     <div key={c.id} className="flex gap-2.5 items-start group">
                         <Avatar name={c.author_name} size="sm" />
-                        <div className="flex-1 bg-white border border-gray-100 rounded-2xl px-3 py-2 shadow-soft-xs">
+                        <div className="flex-1 bg-white border border-paper-300 rounded-xl px-3 py-2 shadow-soft-xs">
                             <div className="flex items-center justify-between gap-2 mb-0.5">
-                                <span className="text-xs font-semibold text-gray-900 truncate">{c.author_name}</span>
-                                <span className="text-[11px] text-gray-400 flex-shrink-0">{timeAgo(c.created_at)}</span>
+                                <span className="text-xs font-semibold text-ink-800 truncate">{c.author_name}</span>
+                                <span className="text-[11px] text-paper-600 flex-shrink-0">{timeAgo(c.created_at)}</span>
                             </div>
-                            <p className="text-sm text-gray-700 leading-relaxed">{c.content}</p>
+                            <p className="text-sm text-ink-700 leading-relaxed">{c.content}</p>
                         </div>
                         {(canModerate || c.author_id === user?.id) && (
                             <button
                                 onClick={() => handleDelete(c.id)}
                                 title="Delete comment"
-                                className="p-1.5 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors flex-shrink-0 opacity-0 group-hover:opacity-100"
+                                className="p-1.5 rounded-lg text-paper-500 hover:text-red-500 hover:bg-red-50 transition-colors flex-shrink-0 opacity-0 group-hover:opacity-100"
                             >
                                 <Trash2 size={13} />
                             </button>
@@ -103,7 +103,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId, onCommentAdded,
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
                         placeholder="Add a comment..."
-                        className="w-full bg-white border border-gray-200 rounded-full py-2.5 pl-4 pr-11 text-sm text-gray-800 placeholder:text-gray-400 outline-none focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10 transition-all"
+                        className="w-full bg-white border border-paper-300 rounded-full py-2.5 pl-4 pr-11 text-sm text-ink-800 placeholder:text-paper-600 outline-none focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10 transition-all"
                     />
                     <button
                         type="submit"

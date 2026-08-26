@@ -83,7 +83,7 @@ const EmployerDashboard = () => {
 const VerificationNotice = ({ status }: { status?: string }) => {
     if (status === 'pending') {
         return (
-            <div className="bg-yellow-50 border border-yellow-100 rounded-2xl p-4 flex items-start gap-2.5">
+            <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-4 flex items-start gap-2.5">
                 <Clock size={15} className="text-yellow-600 flex-shrink-0 mt-0.5" />
                 <p className="text-xs text-yellow-700 leading-relaxed">
                     Your company profile is pending staff approval. You'll be notified once it's verified.
@@ -93,7 +93,7 @@ const VerificationNotice = ({ status }: { status?: string }) => {
     }
     if (status === 'approved') {
         return (
-            <div className="bg-nile-green/5 border border-nile-green/20 rounded-2xl p-4 flex items-start gap-2.5">
+            <div className="bg-nile-green/5 border border-nile-green/20 rounded-xl p-4 flex items-start gap-2.5">
                 <CheckCircle2 size={15} className="text-nile-green flex-shrink-0 mt-0.5" />
                 <p className="text-xs text-nile-green-700 leading-relaxed">
                     Your company is verified and visible to students.

@@ -56,15 +56,15 @@ const PollCard: React.FC<PollCardProps> = ({ pollId, variant = 'feed', initial }
 
     if (loading) {
         return (
-            <div className={`rounded-2xl p-4 flex items-center justify-center ${isStory ? 'bg-black/50 backdrop-blur' : 'border border-gray-100 bg-gray-50'}`}>
-                <Loader2 size={16} className={`animate-spin ${isStory ? 'text-white/70' : 'text-gray-300'}`} />
+            <div className={`rounded-xl p-4 flex items-center justify-center ${isStory ? 'bg-black/50 backdrop-blur' : 'border border-paper-300 bg-paper-100'}`}>
+                <Loader2 size={16} className={`animate-spin ${isStory ? 'text-white/70' : 'text-paper-500'}`} />
             </div>
         );
     }
 
     if (error || !poll) {
         return (
-            <div className={`rounded-2xl p-4 text-center text-xs ${isStory ? 'bg-black/50 text-white/80 backdrop-blur' : 'border border-gray-100 bg-gray-50 text-gray-500'}`}>
+            <div className={`rounded-xl p-4 text-center text-xs ${isStory ? 'bg-black/50 text-white/80 backdrop-blur' : 'border border-paper-300 bg-paper-100 text-paper-700'}`}>
                 {error ?? 'This poll is no longer available.'}
             </div>
         );
@@ -74,12 +74,12 @@ const PollCard: React.FC<PollCardProps> = ({ pollId, variant = 'feed', initial }
 
     const surface = isStory
         ? 'bg-black/55 backdrop-blur-sm border border-white/20'
-        : 'bg-gray-50 border border-gray-100';
-    const titleColor = isStory ? 'text-white' : 'text-gray-900';
-    const metaColor = isStory ? 'text-white/70' : 'text-gray-500';
+        : 'bg-paper-100 border border-paper-300';
+    const titleColor = isStory ? 'text-white' : 'text-ink-800';
+    const metaColor = isStory ? 'text-white/70' : 'text-paper-700';
 
     return (
-        <div className={`rounded-2xl p-4 ${surface}`}>
+        <div className={`rounded-xl p-4 ${surface}`}>
             <div className="flex items-start justify-between gap-2 mb-3">
                 <p className={`text-sm font-semibold leading-snug ${titleColor}`}>{poll.question}</p>
                 {poll.is_anonymous && (
@@ -109,7 +109,7 @@ const PollCard: React.FC<PollCardProps> = ({ pollId, variant = 'feed', initial }
                                     : option.text
                             }
                             className={`relative w-full text-left rounded-xl overflow-hidden transition-all
-                                ${isStory ? 'border border-white/25' : 'border border-gray-200 bg-white'}
+                                ${isStory ? 'border border-white/25' : 'border border-paper-300 bg-white'}
                                 ${poll.can_vote ? 'hover:border-nile-blue cursor-pointer' : 'cursor-default'}
                                 ${option.chosen ? 'border-nile-blue ring-1 ring-nile-blue/30' : ''}`}
                         >
@@ -121,7 +121,7 @@ const PollCard: React.FC<PollCardProps> = ({ pollId, variant = 'feed', initial }
                                     className={`absolute inset-y-0 left-0 transition-all duration-500 ${
                                         option.chosen
                                             ? 'bg-nile-blue/25'
-                                            : isStory ? 'bg-white/15' : 'bg-gray-100'
+                                            : isStory ? 'bg-white/15' : 'bg-paper-200'
                                     }`}
                                     style={{ width: `${pct}%` }}
                                 />

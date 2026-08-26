@@ -19,14 +19,14 @@ const JobsForYouCard: React.FC = () => {
                 <button
                     key={job.id}
                     onClick={() => navigate(`/student/jobs/${job.id}`)}
-                    className="w-full flex items-start gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors text-left"
+                    className="w-full flex items-start gap-3 px-4 py-2.5 hover:bg-paper-100 transition-colors text-left"
                 >
                     <div className="w-9 h-9 rounded-lg bg-nile-blue/10 text-nile-blue flex items-center justify-center flex-shrink-0">
                         <Briefcase size={14} />
                     </div>
                     <div className="min-w-0">
-                        <p className="text-xs font-medium text-gray-800 truncate">{job.title}</p>
-                        <p className="text-[11px] text-gray-400 truncate">{job.company_name}{job.location ? ` · ${job.location}` : ''}</p>
+                        <p className="text-xs font-medium text-ink-800 truncate">{job.title}</p>
+                        <p className="text-[11px] text-paper-600 truncate">{job.company_name}{job.location ? ` · ${job.location}` : ''}</p>
                     </div>
                 </button>
             ))}

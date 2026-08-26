@@ -19,7 +19,7 @@ const statusBadge: Record<string, string> = {
     offer_extended:       'bg-nile-green/20 text-nile-green border-nile-green/30',
     accepted:             'bg-nile-green/20 text-nile-green border-nile-green/30',
     rejected:             'bg-red-50 text-red-500 border-red-200',
-    withdrawn:            'bg-black/5 text-black/40 border-black/10',
+    withdrawn:            'bg-black/5 text-black/40 border-paper-400/10',
 };
 
 const stageLabel = (s: string) => APPLICATION_STAGES.find(x => x.value === s)?.label ?? s;
@@ -76,7 +76,7 @@ const EmployerCandidates = () => {
 
     if (loading) return (
         <div className="p-4 md:p-8 space-y-6 animate-pulse">
-            <div className="h-12 bg-black/5 rounded-2xl w-64" />
+            <div className="h-12 bg-black/5 rounded-xl w-64" />
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {[1,2,3,4,5,6].map(i => <div key={i} className="h-48 bg-black/5 rounded-[24px]" />)}
             </div>
@@ -87,7 +87,7 @@ const EmployerCandidates = () => {
         <div className="p-4 md:p-8 space-y-8 anime-fade-in font-sans pb-20 text-left min-h-full">
 
             {/* Header */}
-            <div className="border-b border-gray-100 pb-6">
+            <div className="border-b border-paper-300 pb-6">
                 <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">Talent Pool .</h2>
                 <p className="text-[9px] font-semibold text-black/40 mt-1">
                     {candidates.length} UNIQUE CANDIDATES · ALL APPLIED TO YOUR LISTINGS
@@ -100,9 +100,9 @@ const EmployerCandidates = () => {
                     <Search size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-black/30" />
                     <input type="text" value={search} onChange={e => setSearch(e.target.value)}
                         placeholder="SEARCH BY NAME, MAJOR OR ROLE..."
-                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-100 font-semibold text-[9px] outline-none focus:shadow-card bg-nile-white/60 focus:bg-white transition-all" />
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-paper-300 font-semibold text-[9px] outline-none focus:shadow-card bg-nile-white/60 focus:bg-white transition-all" />
                 </div>
-                <div className="flex bg-white p-1 border border-gray-100 rounded-xl gap-0.5 overflow-x-auto">
+                <div className="flex bg-white p-1 border border-paper-300 rounded-xl gap-0.5 overflow-x-auto">
                     <button onClick={() => setFilterStatus('all')}
                         className={`px-2.5 py-1.5 rounded-lg font-semibold text-[7px] tracking-wider transition-all whitespace-nowrap
                             ${filterStatus === 'all' ? 'bg-black text-white' : 'text-black/40 hover:text-black'}`}>
@@ -120,7 +120,7 @@ const EmployerCandidates = () => {
 
             {/* Candidates grid */}
             {filtered.length === 0 ? (
-                <div className="py-24 text-center border-[2px] border-dashed border-black/10 rounded-[32px]">
+                <div className="py-24 text-center border-[2px] border-dashed border-paper-400/10 rounded-[32px]">
                     <Users size={32} className="text-black/15 mx-auto mb-4" />
                     <p className="text-[9px] font-semibold text-black/30">
                         {search ? 'No candidates match your search' : applications.length === 0 ? 'No candidates yet — post jobs to attract talent' : `No ${stageLabel(filterStatus).toLowerCase()} candidates`}
@@ -147,14 +147,14 @@ const CandidateCard = ({ candidate, onMessage, onView }: {
     onMessage: () => void;
     onView: () => void;
 }) => {
-    const badge = statusBadge[candidate.stage] || 'bg-black/5 text-black/40 border-black/10';
+    const badge = statusBadge[candidate.stage] || 'bg-black/5 text-black/40 border-paper-400/10';
     const initials = (candidate.student_name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
 
     return (
-        <div className="bg-white border border-gray-100 rounded-[24px] p-5 flex flex-col gap-4 hover:translate-y-[-2px] shadow-card hover:shadow-blue transition-all">
+        <div className="bg-white border border-paper-300 rounded-[24px] p-5 flex flex-col gap-4 hover:translate-y-[-2px] shadow-card hover:shadow-blue transition-all">
             <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-nile-blue text-white rounded-2xl flex items-center justify-center font-semibold text-base flex-shrink-0">
+                    <div className="w-12 h-12 bg-nile-blue text-white rounded-xl flex items-center justify-center font-semibold text-base flex-shrink-0">
                         {initials}
                     </div>
                     <div className="min-w-0">
@@ -192,11 +192,11 @@ const CandidateCard = ({ candidate, onMessage, onView }: {
 
             <div className="flex gap-2 mt-auto">
                 <button onClick={onMessage}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 border border-gray-100 rounded-xl font-semibold text-[8px] hover:bg-black hover:text-white transition-all">
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 border border-paper-300 rounded-xl font-semibold text-[8px] hover:bg-black hover:text-white transition-all">
                     <MessageSquare size={12} /> MESSAGE
                 </button>
                 <button onClick={onView} title="View candidate"
-                    className="p-2.5 border border-gray-100 rounded-xl text-black/40 hover:border-nile-blue hover:text-nile-blue transition-all">
+                    className="p-2.5 border border-paper-300 rounded-xl text-black/40 hover:border-nile-blue hover:text-nile-blue transition-all">
                     <ArrowUpRight size={14} />
                 </button>
             </div>

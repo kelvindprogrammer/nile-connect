@@ -71,10 +71,10 @@ const Onboarding = () => {
             <div className="absolute top-0 right-0 w-[40%] h-full bg-nile-blue/5 -skew-x-12 translate-x-1/2" />
 
             {/* Main Card */}
-            <div className="w-full max-w-4xl flex flex-col md:flex-row bg-white border-[2px] border-black shadow-[8px_8px_0px_0px_rgba(30,73,157,1)] rounded-[40px] overflow-hidden min-h-[500px] anime-fade-in relative z-10">
+            <div className="w-full max-w-4xl flex flex-col md:flex-row bg-white border-[2px] border-paper-400 shadow-[8px_8px_0px_0px_rgba(30,73,157,1)] rounded-[40px] overflow-hidden min-h-[500px] anime-fade-in relative z-10">
 
                 {/* Brand Side Panel */}
-                <div className="w-full md:w-[42%] bg-nile-blue text-white border-r-[2px] border-black flex flex-col items-center justify-center p-12 relative overflow-hidden">
+                <div className="w-full md:w-[42%] bg-nile-blue text-white border-r-[2px] border-paper-400 flex flex-col items-center justify-center p-12 relative overflow-hidden">
                     <div className="absolute inset-0 bg-white/5 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
 
                     <div className="relative z-10 flex flex-col items-center text-center">
@@ -88,10 +88,10 @@ const Onboarding = () => {
                         </div>
 
                         <div className="space-y-1">
-                            <p className="text-2xl font-black text-white uppercase leading-none tracking-[0.2em]">
+                            <p className="text-2xl font-semibold text-white uppercase leading-none tracking-[0.2em]">
                                 {slide.leftLabel}
                             </p>
-                            <p className="text-[9px] font-black text-white/50 uppercase tracking-[0.4em]">
+                            <p className="text-[9px] font-semibold text-white/50 uppercase tracking-[0.4em]">
                                 {slide.leftSub}
                             </p>
                         </div>
@@ -104,10 +104,10 @@ const Onboarding = () => {
 
                         {/* Slide Text */}
                         <div className="space-y-3 text-left" key={`text-${step}`} style={{ animation: 'fadeIn 0.4s ease-out' }}>
-                            <h1 className="text-4xl font-black text-black uppercase tracking-tight leading-none">
+                            <h1 className="text-4xl font-semibold text-black uppercase tracking-tight leading-none">
                                 {slide.heading}
                             </h1>
-                            <p className="text-[9px] font-black text-nile-blue uppercase tracking-[0.2em] leading-relaxed">
+                            <p className="text-[9px] font-semibold text-nile-blue uppercase tracking-[0.2em] leading-relaxed">
                                 {slide.description}
                             </p>
                         </div>
@@ -115,7 +115,7 @@ const Onboarding = () => {
                         {/* CTA */}
                         <button
                             onClick={handleNext}
-                            className="w-full bg-nile-blue text-white font-black py-4 px-6 rounded-2xl border-[2px] border-black shadow-[4px_4px_0px_0px_rgba(108,187,86,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all uppercase tracking-[0.2em] text-xs flex items-center justify-center space-x-3"
+                            className="w-full bg-nile-blue text-white font-semibold py-4 px-6 rounded-xl border-[2px] border-paper-400 shadow-[4px_4px_0px_0px_rgba(108,187,86,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all uppercase tracking-[0.2em] text-xs flex items-center justify-center space-x-3"
                         >
                             <span>{slide.cta}</span>
                             <ArrowRight size={16} strokeWidth={3} />
@@ -127,7 +127,7 @@ const Onboarding = () => {
                                 <button
                                     key={i}
                                     onClick={() => setStep(i)}
-                                    className={`rounded-full transition-all duration-300 border-[2px] border-black ${
+                                    className={`rounded-full transition-all duration-300 border-[2px] border-paper-400 ${
                                         i === step
                                             ? 'w-8 h-2.5 bg-nile-blue'
                                             : 'w-2.5 h-2.5 bg-transparent hover:bg-nile-blue/20'
@@ -137,16 +137,16 @@ const Onboarding = () => {
                         </div>
 
                         {/* Skip / Already have account */}
-                        <div className="pt-4 border-t-[2px] border-black/5 flex justify-between items-center">
+                        <div className="pt-4 border-t-[2px] border-paper-400/5 flex justify-between items-center">
                             <button
                                 onClick={finish}
-                                className="text-[9px] font-black text-nile-blue/40 hover:text-black transition-colors uppercase tracking-[0.15em] border-b-[1px] border-transparent hover:border-black/20 pb-0.5"
+                                className="text-[9px] font-semibold text-nile-blue/40 hover:text-black transition-colors uppercase tracking-[0.15em] border-b-[1px] border-transparent hover:border-paper-400/20 pb-0.5"
                             >
                                 ALREADY HAVE AN ACCOUNT?
                             </button>
                             <button
                                 onClick={finish}
-                                className="text-[9px] font-black text-black/20 hover:text-nile-blue transition-colors uppercase tracking-[0.15em]"
+                                className="text-[9px] font-semibold text-black/20 hover:text-nile-blue transition-colors uppercase tracking-[0.15em]"
                             >
                                 SKIP →
                             </button>

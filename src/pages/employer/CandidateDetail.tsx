@@ -23,7 +23,7 @@ const stageBadge: Record<string, string> = {
     offer_extended:       'bg-nile-green/20 text-nile-green border-nile-green/30',
     accepted:             'bg-nile-green/20 text-nile-green border-nile-green/30',
     rejected:             'bg-red-50 text-red-500 border-red-200',
-    withdrawn:            'bg-black/5 text-black/40 border-black/10',
+    withdrawn:            'bg-black/5 text-black/40 border-paper-400/10',
 };
 
 const stageLabel = (s: string) => APPLICATION_STAGES.find(x => x.value === s)?.label ?? s;
@@ -103,14 +103,14 @@ const CandidateDetail = () => {
                 className="flex items-center gap-2 text-black/40 font-semibold text-[9px] hover:text-black transition-colors">
                 <ArrowLeft size={14} strokeWidth={3} /> BACK TO TALENT POOL
             </button>
-            <div className="py-24 text-center border-[2px] border-dashed border-black/10 rounded-[32px]">
+            <div className="py-24 text-center border-[2px] border-dashed border-paper-400/10 rounded-[32px]">
                 <AlertCircle size={32} className="text-black/20 mx-auto mb-4" />
                 <p className="text-[9px] font-semibold text-black/30">Candidate not found or no applications</p>
             </div>
         </div>
     );
 
-    const badge = stageBadge[app.stage] || 'bg-black/5 text-black/40 border-black/10';
+    const badge = stageBadge[app.stage] || 'bg-black/5 text-black/40 border-paper-400/10';
 
     return (
         <div className="p-4 md:p-8 space-y-6 anime-fade-in font-sans pb-20 text-left min-h-full">
@@ -125,7 +125,7 @@ const CandidateDetail = () => {
             <Card className="!p-6 md:!p-8 border-nile-green/30">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div className="flex items-center gap-5">
-                        <div className="w-20 h-20 md:w-24 md:h-24 rounded-[28px] border border-gray-100 shadow-blue overflow-hidden flex-shrink-0">
+                        <div className="w-20 h-20 md:w-24 md:h-24 rounded-[28px] border border-paper-300 shadow-blue overflow-hidden flex-shrink-0">
                             <Avatar name={app.student_name || 'Candidate'} size="lg" />
                         </div>
                         <div className="space-y-1.5">
@@ -188,7 +188,7 @@ const CandidateDetail = () => {
                             </p>
                         )}
                         {app.cover_letter && (
-                            <div className="pt-3 border-t border-black/5">
+                            <div className="pt-3 border-t border-paper-400/5">
                                 <p className="text-[8px] font-semibold text-black/30 mb-1.5">COVER LETTER</p>
                                 <p className="text-[10px] font-medium text-black/70 whitespace-pre-line leading-relaxed">{app.cover_letter}</p>
                             </div>
@@ -204,14 +204,14 @@ const CandidateDetail = () => {
                             <div className="space-y-2">
                                 {app.resume_url && (!app.documents || !app.documents.some(d => d.type === 'resume')) && (
                                     <a href={app.resume_url} target="_blank" rel="noreferrer"
-                                        className="flex items-center gap-3 p-3 border border-gray-100 rounded-xl hover:shadow-card transition-all">
+                                        className="flex items-center gap-3 p-3 border border-paper-300 rounded-xl hover:shadow-card transition-all">
                                         <FileText size={14} className="text-nile-blue flex-shrink-0" />
                                         <span className="text-[9px] font-semibold text-black truncate">Resume / CV</span>
                                     </a>
                                 )}
                                 {app.documents?.map(doc => (
                                     <a key={doc.id} href={doc.file_url} target="_blank" rel="noreferrer"
-                                        className="flex items-center gap-3 p-3 border border-gray-100 rounded-xl hover:shadow-card transition-all">
+                                        className="flex items-center gap-3 p-3 border border-paper-300 rounded-xl hover:shadow-card transition-all">
                                         <FileText size={14} className="text-nile-blue flex-shrink-0" />
                                         <div className="min-w-0">
                                             <p className="text-[9px] font-semibold text-black truncate">{doc.title}</p>
@@ -299,7 +299,7 @@ const CandidateDetail = () => {
                             onChange={e => setNoteBody(e.target.value)}
                             rows={4}
                             placeholder="Private notes about this candidate (only visible to your team)..."
-                            className="w-full border border-gray-100 rounded-xl p-3 font-medium text-[10px] outline-none focus:shadow-blue bg-[#F8F9FB]/60 focus:bg-white transition-all resize-none"
+                            className="w-full border border-paper-300 rounded-xl p-3 font-medium text-[10px] outline-none focus:shadow-blue bg-paper-100 focus:bg-white transition-all resize-none"
                         />
                         <Button size="sm" fullWidth isLoading={savingNote} onClick={handleSaveNote}>
                             SAVE NOTE

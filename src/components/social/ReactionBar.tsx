@@ -161,7 +161,7 @@ const ReactionBar: React.FC<ReactionBarProps> = ({
                 aria-expanded={pickerOpen}
                 className={`flex items-center gap-1.5 rounded-lg transition-colors disabled:opacity-50
                     ${compact ? 'px-2 py-1 text-[11px]' : 'px-3 py-1.5 text-xs'}
-                    ${mine ? 'text-nile-blue font-semibold bg-nile-blue/5' : 'text-gray-500 hover:bg-gray-50'}`}
+                    ${mine ? 'text-nile-blue font-semibold bg-nile-blue/5' : 'text-paper-700 hover:bg-paper-100'}`}
             >
                 {busy ? (
                     <Loader2 size={size} className="animate-spin" />
@@ -172,7 +172,7 @@ const ReactionBar: React.FC<ReactionBarProps> = ({
                 )}
                 <span>{label}</span>
                 {safeSummary.total > 0 && (
-                    <span className={mine ? 'text-nile-blue' : 'text-gray-400'}>{safeSummary.total}</span>
+                    <span className={mine ? 'text-nile-blue' : 'text-paper-600'}>{safeSummary.total}</span>
                 )}
             </button>
 
@@ -181,7 +181,7 @@ const ReactionBar: React.FC<ReactionBarProps> = ({
                     role="menu"
                     aria-label="Choose a reaction"
                     className="absolute bottom-full left-0 mb-2 z-30 flex items-center gap-0.5 bg-white
-                               border border-gray-100 rounded-full shadow-soft-md px-1.5 py-1
+                               border border-paper-300 rounded-full shadow-soft-md px-1.5 py-1
                                animate-in fade-in slide-in-from-bottom-1 duration-150"
                 >
                     {catalog.map(meta => (
@@ -194,7 +194,7 @@ const ReactionBar: React.FC<ReactionBarProps> = ({
                             aria-label={meta.label}
                             className={`w-9 h-9 rounded-full flex items-center justify-center text-lg
                                         transition-transform hover:scale-125 active:scale-110
-                                        ${meta.kind === mine ? 'bg-nile-blue/10' : 'hover:bg-gray-50'}`}
+                                        ${meta.kind === mine ? 'bg-nile-blue/10' : 'hover:bg-paper-100'}`}
                         >
                             <span aria-hidden>{meta.emoji}</span>
                         </button>
@@ -226,8 +226,8 @@ export const ReactionCount: React.FC<{
             onClick={onClick}
             disabled={!onClick}
             aria-label={`${safe.total} ${safe.total === 1 ? 'reaction' : 'reactions'}`}
-            className="flex items-center gap-1 text-[11px] text-gray-500 hover:text-gray-700
-                       transition-colors disabled:hover:text-gray-500 disabled:cursor-default"
+            className="flex items-center gap-1 text-[11px] text-paper-700 hover:text-ink-700
+                       transition-colors disabled:hover:text-paper-700 disabled:cursor-default"
         >
             <span className="flex -space-x-1" aria-hidden>
                 {top.map(kind => {
@@ -235,7 +235,7 @@ export const ReactionCount: React.FC<{
                     return (
                         <span
                             key={kind}
-                            className="w-4 h-4 rounded-full bg-white ring-1 ring-gray-100 flex items-center justify-center text-[10px]"
+                            className="w-4 h-4 rounded-full bg-white ring-1 ring-paper-300 flex items-center justify-center text-[10px]"
                         >
                             {meta?.emoji ?? '👍'}
                         </span>

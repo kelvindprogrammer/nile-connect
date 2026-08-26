@@ -33,8 +33,8 @@ const StaffDashboard = () => {
                 <ProfileSnapshotCard
                     name={staffName}
                     headline={user?.department || 'Career Services'}
-                    coverClassName="bg-gray-900"
-                    accentText="text-gray-900"
+                    coverClassName="bg-ink-900"
+                    accentText="text-ink-800"
                     profilePath="/staff/profile"
                     stats={[]}
                     shortcuts={[
@@ -57,7 +57,7 @@ const StaffDashboard = () => {
                     greeting="Welcome"
                     name={staffName.split(' ')[0]}
                     subLabel={user?.department || 'Career Services'}
-                    accent="text-gray-900"
+                    accent="text-ink-800"
                     stats={[
                         { label: 'Pending employers', value: stats?.pending_employers ?? '—', to: '/staff/insights' },
                         { label: 'Pending jobs', value: stats?.pending_jobs ?? '—', to: '/staff/jobs' },
@@ -78,7 +78,7 @@ const StaffDashboard = () => {
         >
             {totalPending > 0 && (
                 <button onClick={() => navigate('/staff/insights')}
-                    className="w-full flex items-center justify-between gap-3 px-4 py-3 mb-4 bg-red-50 border border-red-100 rounded-2xl hover:bg-red-100/60 transition-colors">
+                    className="w-full flex items-center justify-between gap-3 px-4 py-3 mb-4 bg-red-50 border border-red-100 rounded-xl hover:bg-red-100/60 transition-colors">
                     <span className="text-sm font-medium text-red-600">
                         {totalPending} pending approval{totalPending !== 1 ? 's' : ''} need your attention
                     </span>

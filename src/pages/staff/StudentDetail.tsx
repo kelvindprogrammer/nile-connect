@@ -120,7 +120,7 @@ const StaffStudentDetail = () => {
                 className="flex items-center gap-2 text-black/40 font-semibold text-[9px] hover:text-black transition-colors">
                 <ArrowLeft size={14} strokeWidth={3} /> BACK
             </button>
-            <div className="py-24 text-center border-[2px] border-dashed border-black/10 rounded-[32px]">
+            <div className="py-24 text-center border-[2px] border-dashed border-paper-400/10 rounded-[32px]">
                 <AlertCircle size={32} className="text-black/20 mx-auto mb-4" />
                 <p className="text-[9px] font-semibold text-black/30">Student not found</p>
             </div>
@@ -142,7 +142,7 @@ const StaffStudentDetail = () => {
             <Card className="!p-6 md:!p-8 border-nile-blue/30">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div className="flex items-center gap-5">
-                        <div className="w-20 h-20 md:w-24 md:h-24 rounded-[28px] border border-gray-100 shadow-blue overflow-hidden flex-shrink-0">
+                        <div className="w-20 h-20 md:w-24 md:h-24 rounded-[28px] border border-paper-300 shadow-blue overflow-hidden flex-shrink-0">
                             <Avatar name={student.full_name || 'Student'} size="lg" />
                         </div>
                         <div className="space-y-1.5">
@@ -216,13 +216,13 @@ const StaffStudentDetail = () => {
                                         {req.staff_name && ` · Handled by ${req.staff_name}`}
                                     </p>
                                 </div>
-                                <span className={`flex items-center gap-1 text-[7px] font-semibold px-2.5 py-1 rounded-full border flex-shrink-0 ${SERVICE_STATUS_BADGE[req.status] || 'bg-black/5 text-black/40 border-black/10'}`}>
+                                <span className={`flex items-center gap-1 text-[7px] font-semibold px-2.5 py-1 rounded-full border flex-shrink-0 ${SERVICE_STATUS_BADGE[req.status] || 'bg-black/5 text-black/40 border-paper-400/10'}`}>
                                     {SERVICE_STATUS_ICON[req.status]}
                                     {req.status.toUpperCase()}
                                 </span>
                             </div>
                             {req.notes && (
-                                <p className="text-[9px] font-semibold text-black/50 leading-relaxed border-t border-black/5 pt-3">{req.notes}</p>
+                                <p className="text-[9px] font-semibold text-black/50 leading-relaxed border-t border-paper-400/5 pt-3">{req.notes}</p>
                             )}
                             {req.status === 'completed' && req.feedback && (
                                 <div className="p-3 bg-nile-green/5 border border-nile-green/20 rounded-xl">
@@ -233,7 +233,7 @@ const StaffStudentDetail = () => {
                             {req.status === 'scheduled' && req.room_id && (
                                 <button
                                     onClick={() => navigate(`/staff/session/${req.room_id}`)}
-                                    className="flex items-center gap-1.5 px-3 py-2 bg-black text-white border border-gray-100 rounded-xl font-semibold text-[8px] shadow-green transition-all w-fit"
+                                    className="flex items-center gap-1.5 px-3 py-2 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[8px] shadow-green transition-all w-fit"
                                 >
                                     <Zap size={11} /> JOIN SESSION
                                 </button>
@@ -269,12 +269,12 @@ const StaffStudentDetail = () => {
                                     </p>
                                 )}
                             </div>
-                            <span className={`text-[7px] font-semibold px-2.5 py-1 rounded-full border flex-shrink-0 ${APP_STATUS_BADGE[app.status] || 'bg-black/5 text-black/40 border-black/10'}`}>
+                            <span className={`text-[7px] font-semibold px-2.5 py-1 rounded-full border flex-shrink-0 ${APP_STATUS_BADGE[app.status] || 'bg-black/5 text-black/40 border-paper-400/10'}`}>
                                 {app.status.toUpperCase()}
                             </span>
                         </div>
                         {app.cover_letter && (
-                            <p className="text-[9px] font-semibold text-black/50 leading-relaxed border-t border-black/5 pt-3">{app.cover_letter}</p>
+                            <p className="text-[9px] font-semibold text-black/50 leading-relaxed border-t border-paper-400/5 pt-3">{app.cover_letter}</p>
                         )}
                         {app.resume_url && (
                             <a

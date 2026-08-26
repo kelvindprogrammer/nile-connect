@@ -104,11 +104,11 @@ const GroupsPage: React.FC = () => {
         <div className="max-w-3xl mx-auto p-4 md:p-6 pb-24 space-y-5 font-sans">
             <header className="flex items-start justify-between gap-3 flex-wrap">
                 <div>
-                    <h1 className="text-xl md:text-3xl font-semibold text-gray-900 flex items-center gap-2">
+                    <h1 className="text-xl md:text-3xl font-semibold text-ink-800 flex items-center gap-2">
                         <Users size={22} className="text-nile-blue" />
                         Groups
                     </h1>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-paper-600 mt-1">
                         Study groups, clubs and course spaces.
                     </p>
                 </div>
@@ -128,7 +128,7 @@ const GroupsPage: React.FC = () => {
                         aria-selected={tab === value}
                         onClick={() => setTab(value)}
                         className={`px-4 py-2 rounded-xl text-xs font-medium transition-colors
-                            ${tab === value ? 'bg-nile-blue text-white' : 'text-gray-500 hover:bg-gray-100'}`}
+                            ${tab === value ? 'bg-nile-blue text-white' : 'text-paper-700 hover:bg-paper-200'}`}
                     >
                         {label}
                     </button>
@@ -137,13 +137,13 @@ const GroupsPage: React.FC = () => {
 
             {tab === 'discover' && (
                 <div className="relative">
-                    <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                    <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-paper-600 pointer-events-none" />
                     <input
                         value={query}
                         onChange={e => setQuery(e.target.value)}
                         placeholder="Search groups…"
                         aria-label="Search groups"
-                        className="w-full h-10 pl-10 pr-4 rounded-xl border border-gray-200 text-sm outline-none
+                        className="w-full h-10 pl-10 pr-4 rounded-xl border border-paper-300 text-sm outline-none
                                    focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10"
                     />
                 </div>
@@ -153,21 +153,21 @@ const GroupsPage: React.FC = () => {
                 <div className="space-y-3" aria-busy="true">
                     {[0, 1, 2].map(i => (
                         <div key={i} className="social-card p-4 animate-pulse space-y-2">
-                            <div className="h-4 bg-gray-100 rounded w-1/3" />
-                            <div className="h-3 bg-gray-100 rounded w-2/3" />
+                            <div className="h-4 bg-paper-200 rounded w-1/3" />
+                            <div className="h-3 bg-paper-200 rounded w-2/3" />
                         </div>
                     ))}
                 </div>
             ) : error ? (
                 <div className="social-card py-12 text-center space-y-3">
                     <AlertCircle size={24} className="text-red-300 mx-auto" />
-                    <p className="text-sm text-gray-600">{error}</p>
+                    <p className="text-sm text-paper-700">{error}</p>
                     <Button size="sm" variant="outline" onClick={reload}>Try again</Button>
                 </div>
             ) : list.length === 0 ? (
                 <div className="social-card py-14 text-center space-y-2">
-                    <Users size={26} className="text-gray-200 mx-auto" />
-                    <p className="text-sm text-gray-500">
+                    <Users size={26} className="text-paper-400 mx-auto" />
+                    <p className="text-sm text-paper-700">
                         {tab === 'mine' ? "You haven't joined any groups yet." : 'No groups match that search.'}
                     </p>
                     {tab === 'mine' && (
@@ -233,15 +233,15 @@ const GroupRow: React.FC<{ group: Group; onOpen: () => void; onChanged: () => vo
 
     return (
         <li>
-            <button onClick={onOpen} className="w-full text-left social-card p-4 hover:border-gray-200 transition-colors">
+            <button onClick={onOpen} className="w-full text-left social-card p-4 hover:border-paper-300 transition-colors">
                 <div className="flex items-start gap-3">
                     <div className="w-11 h-11 rounded-xl bg-nile-blue/10 text-nile-blue flex items-center justify-center flex-shrink-0">
                         <KindIcon size={18} />
                     </div>
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                            <h3 className="text-sm font-semibold text-gray-900 truncate">{group.name}</h3>
-                            <span className="flex items-center gap-1 text-[10px] text-gray-400" title={VISIBILITY_LABELS[group.visibility]?.label}>
+                            <h3 className="text-sm font-semibold text-ink-800 truncate">{group.name}</h3>
+                            <span className="flex items-center gap-1 text-[10px] text-paper-600" title={VISIBILITY_LABELS[group.visibility]?.label}>
                                 <VisIcon size={10} />
                             </span>
                             {group.my_role === 'owner' && (
@@ -250,15 +250,15 @@ const GroupRow: React.FC<{ group: Group; onOpen: () => void; onChanged: () => vo
                                 </span>
                             )}
                             {group.my_status === 'pending' && (
-                                <span className="px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-500 text-[10px]">
+                                <span className="px-1.5 py-0.5 rounded-full bg-paper-200 text-paper-700 text-[10px]">
                                     Requested
                                 </span>
                             )}
                         </div>
                         {group.description && (
-                            <p className="text-xs text-gray-500 mt-1 line-clamp-2">{group.description}</p>
+                            <p className="text-xs text-paper-700 mt-1 line-clamp-2">{group.description}</p>
                         )}
-                        <p className="text-[11px] text-gray-400 mt-1.5">
+                        <p className="text-[11px] text-paper-600 mt-1.5">
                             {group.members_count} {group.members_count === 1 ? 'member' : 'members'}
                             {group.posts_count > 0 && <> · {group.posts_count} posts</>}
                         </p>
@@ -318,37 +318,37 @@ const CreateGroupModal: React.FC<{ onClose: () => void; onCreated: (g: Group) =>
         }
     };
 
-    const field = 'w-full border border-gray-200 rounded-xl py-2.5 px-3.5 text-sm outline-none focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10';
+    const field = 'w-full border border-paper-300 rounded-xl py-2.5 px-3.5 text-sm outline-none focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10';
 
     return (
         <Modal isOpen onClose={onClose} title="Create a group" maxWidth="sm">
             <form onSubmit={submit} className="space-y-4 text-left">
                 <div>
-                    <label htmlFor="g-name" className="block text-xs font-medium text-gray-700 mb-1.5">Name</label>
+                    <label htmlFor="g-name" className="block text-xs font-medium text-ink-700 mb-1.5">Name</label>
                     <input id="g-name" value={name} onChange={e => setName(e.target.value)}
                         placeholder="e.g. CS 101 Study Group" className={field} maxLength={80} />
                 </div>
                 <div>
-                    <label htmlFor="g-desc" className="block text-xs font-medium text-gray-700 mb-1.5">
-                        What's it for? <span className="text-gray-400">(optional)</span>
+                    <label htmlFor="g-desc" className="block text-xs font-medium text-ink-700 mb-1.5">
+                        What's it for? <span className="text-paper-600">(optional)</span>
                     </label>
                     <textarea id="g-desc" value={description} onChange={e => setDescription(e.target.value)}
                         rows={2} className={`${field} resize-none`} maxLength={500} />
                 </div>
 
                 <fieldset>
-                    <legend className="text-xs font-medium text-gray-700 mb-1.5">Type</legend>
+                    <legend className="text-xs font-medium text-ink-700 mb-1.5">Type</legend>
                     <div className="grid grid-cols-2 gap-2">
                         {(Object.keys(KIND_LABELS) as GroupKind[]).map(k => {
                             const Icon = KIND_ICONS[k];
                             return (
                                 <button key={k} type="button" onClick={() => setKind(k)}
                                     className={`p-2.5 rounded-xl border text-left transition-colors
-                                        ${kind === k ? 'border-nile-blue bg-nile-blue/5' : 'border-gray-200 hover:bg-gray-50'}`}>
-                                    <span className="flex items-center gap-1.5 text-xs font-medium text-gray-800">
+                                        ${kind === k ? 'border-nile-blue bg-nile-blue/5' : 'border-paper-300 hover:bg-paper-100'}`}>
+                                    <span className="flex items-center gap-1.5 text-xs font-medium text-ink-800">
                                         <Icon size={12} /> {KIND_LABELS[k].label}
                                     </span>
-                                    <span className="block text-[10px] text-gray-500 mt-0.5">{KIND_LABELS[k].help}</span>
+                                    <span className="block text-[10px] text-paper-700 mt-0.5">{KIND_LABELS[k].help}</span>
                                 </button>
                             );
                         })}
@@ -356,23 +356,23 @@ const CreateGroupModal: React.FC<{ onClose: () => void; onCreated: (g: Group) =>
                 </fieldset>
 
                 <div>
-                    <label htmlFor="g-vis" className="block text-xs font-medium text-gray-700 mb-1.5">Who can find it</label>
+                    <label htmlFor="g-vis" className="block text-xs font-medium text-ink-700 mb-1.5">Who can find it</label>
                     <select id="g-vis" value={visibility} onChange={e => setVisibility(e.target.value as GroupVisibility)} className={field}>
                         {(Object.keys(VISIBILITY_LABELS) as GroupVisibility[]).map(v => (
                             <option key={v} value={v}>{VISIBILITY_LABELS[v].label}</option>
                         ))}
                     </select>
-                    <p className="text-[11px] text-gray-500 mt-1">{VISIBILITY_LABELS[visibility].help}</p>
+                    <p className="text-[11px] text-paper-700 mt-1">{VISIBILITY_LABELS[visibility].help}</p>
                 </div>
 
                 <div>
-                    <label htmlFor="g-join" className="block text-xs font-medium text-gray-700 mb-1.5">How people join</label>
+                    <label htmlFor="g-join" className="block text-xs font-medium text-ink-700 mb-1.5">How people join</label>
                     <select id="g-join" value={joinPolicy} onChange={e => setJoinPolicy(e.target.value as JoinPolicy)} className={field}>
                         {(Object.keys(JOIN_LABELS) as JoinPolicy[])
                             .filter(j => !(visibility === 'private' && j === 'open'))
                             .map(j => <option key={j} value={j}>{JOIN_LABELS[j].label}</option>)}
                     </select>
-                    <p className="text-[11px] text-gray-500 mt-1">{JOIN_LABELS[joinPolicy].help}</p>
+                    <p className="text-[11px] text-paper-700 mt-1">{JOIN_LABELS[joinPolicy].help}</p>
                 </div>
 
                 {error && (
@@ -456,12 +456,12 @@ const GroupDetailModal: React.FC<{
     return (
         <Modal isOpen onClose={onClose} title={group?.name ?? 'Group'} maxWidth="md">
             {loading ? (
-                <div className="py-10 flex justify-center"><Loader2 size={20} className="animate-spin text-gray-300" /></div>
+                <div className="py-10 flex justify-center"><Loader2 size={20} className="animate-spin text-paper-500" /></div>
             ) : error || !group ? (
-                <p className="py-8 text-center text-sm text-gray-500">{error}</p>
+                <p className="py-8 text-center text-sm text-paper-700">{error}</p>
             ) : (
                 <div className="space-y-5 text-left">
-                    {group.description && <p className="text-sm text-gray-700">{group.description}</p>}
+                    {group.description && <p className="text-sm text-ink-700">{group.description}</p>}
 
                     <div className="flex flex-wrap gap-2 text-[11px]">
                         <Badge>{KIND_LABELS[group.kind]?.label}</Badge>
@@ -471,7 +471,7 @@ const GroupDetailModal: React.FC<{
                     </div>
 
                     {group.kind === 'announcement' && !group.can_post && group.is_member && (
-                        <p className="text-[11px] text-gray-500 flex items-center gap-1.5 p-2.5 rounded-xl bg-gray-50">
+                        <p className="text-[11px] text-paper-700 flex items-center gap-1.5 p-2.5 rounded-xl bg-paper-100">
                             <Megaphone size={12} /> Only admins post here. You'll see every announcement.
                         </p>
                     )}
@@ -479,15 +479,15 @@ const GroupDetailModal: React.FC<{
                     {/* Join requests, admins only */}
                     {group.can_moderate && pending.length > 0 && (
                         <section>
-                            <h3 className="text-xs font-medium text-gray-700 mb-2">
+                            <h3 className="text-xs font-medium text-ink-700 mb-2">
                                 Join requests ({pending.length})
                             </h3>
                             <ul className="space-y-1.5">
                                 {pending.map(row => (
-                                    <li key={row.user.id} className="flex items-center justify-between gap-2 p-2 rounded-xl bg-gray-50">
+                                    <li key={row.user.id} className="flex items-center justify-between gap-2 p-2 rounded-xl bg-paper-100">
                                         <div className="flex items-center gap-2 min-w-0">
                                             <Avatar name={row.user.name} size="sm" />
-                                            <span className="text-sm text-gray-800 truncate">{row.user.name}</span>
+                                            <span className="text-sm text-ink-800 truncate">{row.user.name}</span>
                                         </div>
                                         <div className="flex gap-1.5 flex-shrink-0">
                                             <Button size="xs" isLoading={busy === `a-${row.user.id}`}
@@ -511,15 +511,15 @@ const GroupDetailModal: React.FC<{
 
                     {group.is_member && members.length > 0 && (
                         <section>
-                            <h3 className="text-xs font-medium text-gray-700 mb-2">Members</h3>
-                            <ul className="divide-y divide-gray-50 max-h-56 overflow-y-auto">
+                            <h3 className="text-xs font-medium text-ink-700 mb-2">Members</h3>
+                            <ul className="divide-y divide-paper-200 max-h-56 overflow-y-auto">
                                 {members.map(row => (
                                     <li key={row.user.id} className="flex items-center justify-between gap-2 py-2">
                                         <div className="flex items-center gap-2 min-w-0">
                                             <Avatar name={row.user.name} size="sm" />
                                             <div className="min-w-0">
-                                                <p className="text-sm text-gray-800 truncate">{row.user.name}</p>
-                                                <p className="text-[11px] text-gray-400 capitalize">{row.role}</p>
+                                                <p className="text-sm text-ink-800 truncate">{row.user.name}</p>
+                                                <p className="text-[11px] text-paper-600 capitalize">{row.role}</p>
                                             </div>
                                         </div>
                                         {group.can_administer && row.role !== 'owner' && (
@@ -559,7 +559,7 @@ const GroupDetailModal: React.FC<{
                     </div>
 
                     {group.my_role === 'owner' && (
-                        <p className="text-[11px] text-gray-400 flex items-start gap-1.5">
+                        <p className="text-[11px] text-paper-600 flex items-start gap-1.5">
                             <Settings size={11} className="flex-shrink-0 mt-0.5" />
                             As owner you must transfer ownership before you can leave, so the group is never left unadministered.
                         </p>
@@ -571,7 +571,7 @@ const GroupDetailModal: React.FC<{
 };
 
 const Badge: React.FC<{ children: React.ReactNode; tone?: 'accent' }> = ({ children, tone }) => (
-    <span className={`px-2 py-0.5 rounded-full ${tone === 'accent' ? 'bg-nile-blue/10 text-nile-blue' : 'bg-gray-100 text-gray-600'}`}>
+    <span className={`px-2 py-0.5 rounded-full ${tone === 'accent' ? 'bg-nile-blue/10 text-nile-blue' : 'bg-paper-200 text-paper-700'}`}>
         {children}
     </span>
 );

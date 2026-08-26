@@ -85,11 +85,11 @@ const CONFIG: Record<Role, NavConfig> = {
         profilePath: '/employer/profile',
     },
     staff: {
-        accentBg: 'bg-gray-900', accentBgSoft: 'bg-gray-100', accentText: 'text-gray-900', accentShadow: 'shadow-soft-md',
-        accentSpin: 'border-gray-900',
-        avatarHoverRing: 'hover:ring-gray-900', avatarGroupRing: 'group-hover:ring-gray-400',
-        inputFocusClasses: 'focus:border-gray-400 focus:bg-white focus:ring-2 focus:ring-gray-100',
-        notifActiveClasses: 'text-gray-900 bg-gray-100',
+        accentBg: 'bg-ink-900', accentBgSoft: 'bg-paper-200', accentText: 'text-ink-800', accentShadow: 'shadow-soft-md',
+        accentSpin: 'border-ink-900',
+        avatarHoverRing: 'hover:ring-ink-900', avatarGroupRing: 'group-hover:ring-paper-500',
+        inputFocusClasses: 'focus:border-paper-500 focus:bg-white focus:ring-2 focus:ring-paper-300',
+        notifActiveClasses: 'text-ink-800 bg-paper-200',
         hubLabel: 'Staff Hub',
         searchPlaceholder: 'Quick search…',
         primary: [
@@ -133,7 +133,7 @@ const NavItem = ({ to, Icon, label, active, badge, accentText, accentBgSoft }: {
                     </span>
                 )}
             </div>
-            <span className={`mt-1 leading-none text-[9px] font-medium transition-colors whitespace-nowrap ${active ? `${accentText} font-semibold` : 'text-gray-400'}`}>
+            <span className={`mt-1 leading-none text-[9px] font-medium transition-colors whitespace-nowrap ${active ? `${accentText} font-semibold` : 'text-paper-600'}`}>
                 {label}
             </span>
         </button>
@@ -153,7 +153,7 @@ const RailItem = ({ to, Icon, label, active, badge, accentText, accentBgSoft, ac
         <button
             onClick={() => navigate(to)}
             className={`relative w-full flex items-center gap-3 pl-3.5 pr-3 py-2.5 rounded-xl transition-all duration-150 group
-                ${active ? `${accentBgSoft} ${accentText}` : 'text-gray-500 hover:bg-gray-50 hover:text-gray-800'}`}
+                ${active ? `${accentBgSoft} ${accentText}` : 'text-paper-700 hover:bg-paper-100 hover:text-ink-800'}`}
         >
             {active && <span className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-full ${accentBg}`} />}
             <div className="relative flex items-center justify-center w-5 h-5 flex-shrink-0">
@@ -249,7 +249,7 @@ const AppShell = () => {
     if (!user) return <Navigate to="/login" replace />;
 
     return (
-        <div className="flex h-screen bg-gray-50 font-sans overflow-hidden">
+        <div className="flex h-screen bg-paper-100 font-sans overflow-hidden">
             <div className={`fixed top-0 left-0 h-[2px] ${cfg.accentBg} transition-all duration-400 z-[100]`}
                 style={{ width: `${progress}%`, opacity: progress >= 100 ? 0 : 1 }} />
 
@@ -260,7 +260,7 @@ const AppShell = () => {
                 </button>
 
                 <div className="px-4 mb-3">
-                    <p className="text-[10.5px] font-semibold text-gray-400 uppercase tracking-wider">{cfg.hubLabel}</p>
+                    <p className="text-[10.5px] font-semibold text-paper-600 uppercase tracking-wider">{cfg.hubLabel}</p>
                 </div>
 
                 <nav className="flex-1 flex flex-col gap-0.5 w-full overflow-y-auto px-2.5">
@@ -272,7 +272,7 @@ const AppShell = () => {
 
                     <div className="w-full h-px bg-paper-300 my-2.5" />
 
-                    <p className="px-3 mb-1 text-[10.5px] font-semibold text-gray-400 uppercase tracking-wider">More</p>
+                    <p className="px-3 mb-1 text-[10.5px] font-semibold text-paper-600 uppercase tracking-wider">More</p>
                     {cfg.more.map(item => (
                         <RailItem key={item.to} to={item.to} Icon={item.icon} label={item.label}
                             active={isActive(item.to, location.pathname, item.exact)}
@@ -280,36 +280,36 @@ const AppShell = () => {
                     ))}
                 </nav>
 
-                <div className="mt-auto pt-4 border-t border-gray-100 w-full px-3">
+                <div className="mt-auto pt-4 border-t border-paper-300 w-full px-3">
                     <button onClick={() => navigate(cfg.profilePath)}
-                        className="w-full flex items-center gap-3 px-1.5 py-2 rounded-xl hover:bg-gray-50 transition-colors group">
+                        className="w-full flex items-center gap-3 px-1.5 py-2 rounded-xl hover:bg-paper-100 transition-colors group">
                         <div className={`w-9 h-9 rounded-xl overflow-hidden ring-2 ring-transparent ${cfg.avatarGroupRing} transition-all flex-shrink-0`}>
                             <Avatar name={userName} size="sm" src={profilePic || undefined} />
                         </div>
                         <div className="min-w-0 flex-1 text-left">
-                            <p className="text-sm font-semibold text-gray-800 leading-none truncate">{userName}</p>
-                            {subLabel && <p className="text-xs text-gray-400 mt-0.5 truncate">{subLabel}</p>}
+                            <p className="text-sm font-semibold text-ink-800 leading-none truncate">{userName}</p>
+                            {subLabel && <p className="text-xs text-paper-600 mt-0.5 truncate">{subLabel}</p>}
                         </div>
                     </button>
                     <button onClick={handleLogout} title="Sign out"
-                        className="w-full mt-1 py-2 flex items-center gap-3 px-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors text-sm font-medium">
+                        className="w-full mt-1 py-2 flex items-center gap-3 px-2 text-paper-600 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors text-sm font-medium">
                         <LogOut size={16} /> Sign out
                     </button>
                 </div>
             </aside>
 
             {/* ── Mobile Bottom Nav ──────────────────────────────────────── */}
-            <nav className="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-100 h-[62px] flex items-center z-40 shadow-[0_-1px_12px_rgba(0,0,0,0.06)] px-1">
+            <nav className="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-paper-300 h-[62px] flex items-center z-40 shadow-[0_-1px_12px_rgba(0,0,0,0.06)] px-1">
                 {mobileLeft.map(item => (
                     <NavItem key={item.to} to={item.to} Icon={item.icon} label={item.label}
                         active={isActive(item.to, location.pathname, item.exact)}
                         accentText={cfg.accentText} accentBgSoft={cfg.accentBgSoft} />
                 ))}
                 <button onClick={() => setShowMoreMenu(true)} className="flex-1 flex flex-col items-center justify-center -mt-5">
-                    <div className={`w-12 h-12 ${cfg.accentBg} rounded-2xl flex items-center justify-center ${cfg.accentShadow} hover:shadow-soft-md transition-all active:scale-95`}>
+                    <div className={`w-12 h-12 ${cfg.accentBg} rounded-xl flex items-center justify-center ${cfg.accentShadow} hover:shadow-soft-md transition-all active:scale-95`}>
                         <Grid3X3 size={19} className="text-white" />
                     </div>
-                    <span className="text-[9px] font-medium text-gray-400 mt-1">More</span>
+                    <span className="text-[9px] font-medium text-paper-600 mt-1">More</span>
                 </button>
                 {mobileRight.map(item => (
                     <NavItem key={item.to} to={item.to} Icon={item.icon} label={item.label}
@@ -322,13 +322,13 @@ const AppShell = () => {
             {showMoreMenu && (
                 <div className="fixed inset-0 z-[60] flex items-end md:items-center md:justify-center" onClick={() => setShowMoreMenu(false)}>
                     <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-                    <div className="relative w-full md:w-[420px] bg-white rounded-t-3xl md:rounded-3xl pt-3 pb-10 md:pb-6 px-5 shadow-soft-lg animate-in slide-in-from-bottom-3 duration-200"
+                    <div className="relative w-full md:w-[420px] bg-white rounded-t-3xl md:rounded-2xl pt-3 pb-10 md:pb-6 px-5 shadow-soft-lg animate-in slide-in-from-bottom-3 duration-200"
                         onClick={e => e.stopPropagation()}>
-                        <div className="w-8 h-1 bg-gray-200 rounded-full mx-auto mb-5 md:hidden" />
+                        <div className="w-8 h-1 bg-paper-300 rounded-full mx-auto mb-5 md:hidden" />
                         <div className="flex items-center justify-between mb-5">
                             <NileConnectLogo size="xs" showText showTagline={false} animated={false} />
-                            <button onClick={() => setShowMoreMenu(false)} className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors">
-                                <X size={14} className="text-gray-600" />
+                            <button onClick={() => setShowMoreMenu(false)} className="p-2 rounded-xl bg-paper-200 hover:bg-paper-300 transition-colors">
+                                <X size={14} className="text-paper-700" />
                             </button>
                         </div>
                         <div className="grid grid-cols-4 gap-2">
@@ -338,8 +338,8 @@ const AppShell = () => {
                                 const badge = navBadge(item.label);
                                 return (
                                     <button key={item.to} onClick={() => { navigate(item.to); setShowMoreMenu(false); }}
-                                        className={`relative flex flex-col items-center gap-2 p-3 rounded-2xl transition-all
-                                            ${active ? `${cfg.accentBg} text-white` : 'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}>
+                                        className={`relative flex flex-col items-center gap-2 p-3 rounded-xl transition-all
+                                            ${active ? `${cfg.accentBg} text-white` : 'bg-paper-100 text-paper-700 hover:bg-paper-200'}`}>
                                         <Icon size={20} strokeWidth={active ? 2.2 : 1.8} />
                                         <span className="text-[10px] font-medium leading-none">{item.label}</span>
                                         {!!badge && badge > 0 && (
@@ -351,9 +351,9 @@ const AppShell = () => {
                                 );
                             })}
                         </div>
-                        <div className="mt-5 pt-4 border-t border-gray-100">
+                        <div className="mt-5 pt-4 border-t border-paper-300">
                             <button onClick={handleLogout}
-                                className="w-full py-3 flex items-center justify-center gap-2 text-red-500 text-sm font-medium rounded-2xl hover:bg-red-50 transition-colors">
+                                className="w-full py-3 flex items-center justify-center gap-2 text-red-500 text-sm font-medium rounded-xl hover:bg-red-50 transition-colors">
                                 <LogOut size={16} /> Sign out
                             </button>
                         </div>
@@ -368,14 +368,14 @@ const AppShell = () => {
                         <button onClick={() => navigate(cfg.profilePath)} className="md:hidden w-8 h-8 rounded-xl overflow-hidden flex-shrink-0">
                             <Avatar name={userName} size="sm" src={profilePic || undefined} />
                         </button>
-                        <div className="hidden sm:flex items-center gap-1 text-sm text-gray-400">
-                            <button onClick={() => navigate(rootPath)} className="font-medium hover:text-gray-700 transition-colors whitespace-nowrap">
+                        <div className="hidden sm:flex items-center gap-1 text-sm text-paper-600">
+                            <button onClick={() => navigate(rootPath)} className="font-medium hover:text-ink-700 transition-colors whitespace-nowrap">
                                 {cfg.hubLabel}
                             </button>
                             {crumbs.map((c, i) => (
                                 <React.Fragment key={c}>
                                     <ChevronRight size={13} className="opacity-40" />
-                                    <span className={`capitalize ${i === crumbs.length - 1 ? 'text-gray-700 font-semibold' : ''}`}>
+                                    <span className={`capitalize ${i === crumbs.length - 1 ? 'text-ink-700 font-semibold' : ''}`}>
                                         {c.replace(/-/g, ' ')}
                                     </span>
                                 </React.Fragment>
@@ -385,7 +385,7 @@ const AppShell = () => {
 
                     <div className="flex-1 max-w-sm mx-3" ref={searchRef}>
                         <div className="relative">
-                            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-paper-600 pointer-events-none" />
                             <input
                                 type="text"
                                 placeholder={cfg.searchPlaceholder}
@@ -399,15 +399,15 @@ const AppShell = () => {
                                         setSearchQuery('');
                                     }
                                 }}
-                                className={`w-full h-9 bg-gray-50 border border-gray-200 rounded-full pl-9 pr-4 text-sm text-gray-700 placeholder:text-gray-400 outline-none transition-all ${cfg.inputFocusClasses}`}
+                                className={`w-full h-9 bg-paper-100 border border-paper-300 rounded-full pl-9 pr-4 text-sm text-ink-700 placeholder:text-paper-600 outline-none transition-all ${cfg.inputFocusClasses}`}
                             />
                             {showSearchResults && searchQuery.trim() && (
-                                <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-2xl shadow-soft-md overflow-hidden z-50">
+                                <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-paper-300 rounded-xl shadow-soft-md overflow-hidden z-50">
                                     <button
                                         onClick={() => { navigate(`${cfg.primary[1].to}?q=${encodeURIComponent(searchQuery)}`); setShowSearchResults(false); setSearchQuery(''); }}
-                                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left">
+                                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-paper-100 transition-colors text-left">
                                         <Search size={14} className={`${cfg.accentText} opacity-70 flex-shrink-0`} />
-                                        <span className="text-sm text-gray-700">Search "{searchQuery}"</span>
+                                        <span className="text-sm text-ink-700">Search "{searchQuery}"</span>
                                     </button>
                                 </div>
                             )}
@@ -422,7 +422,7 @@ const AppShell = () => {
                     <div className="flex items-center gap-1 flex-shrink-0">
                         <div className="relative">
                             <button onClick={toggleNotifications}
-                                className={`relative p-2 rounded-xl transition-colors ${showNotifications ? cfg.notifActiveClasses : 'text-gray-400 hover:text-gray-700 hover:bg-gray-50'}`}>
+                                className={`relative p-2 rounded-xl transition-colors ${showNotifications ? cfg.notifActiveClasses : 'text-paper-600 hover:text-ink-700 hover:bg-paper-100'}`}>
                                 <Bell size={18} />
                                 {isLive && unreadNotifCount === 0 && (
                                     <span

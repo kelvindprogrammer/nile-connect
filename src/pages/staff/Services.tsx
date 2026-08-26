@@ -119,10 +119,10 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({ request, saving, onClose,
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in"
             onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
         >
-            <div className="bg-white border border-gray-100 rounded-[24px] shadow-card w-full max-w-md animate-in zoom-in-95 slide-in-from-bottom-4">
-                <div className="flex items-center justify-between p-6 border-b border-gray-100">
+            <div className="bg-white border border-paper-300 rounded-[24px] shadow-card w-full max-w-md animate-in zoom-in-95 slide-in-from-bottom-4">
+                <div className="flex items-center justify-between p-6 border-b border-paper-300">
                     <div className="flex items-center gap-3">
-                        <div className={`w-9 h-9 rounded-[12px] flex items-center justify-center border border-gray-100 ${SERVICE_ICON_BG[request.type]}`}>
+                        <div className={`w-9 h-9 rounded-[12px] flex items-center justify-center border border-paper-300 ${SERVICE_ICON_BG[request.type]}`}>
                             {SERVICE_ICONS[request.type]}
                         </div>
                         <div>
@@ -130,7 +130,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({ request, saving, onClose,
                             <p className="text-[8px] font-semibold text-black/40 tracking-wider">{TYPE_LABELS[request.type]}</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-100 hover:bg-black hover:text-white transition-all">
+                    <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg border border-paper-300 hover:bg-black hover:text-white transition-all">
                         <X size={14} />
                     </button>
                 </div>
@@ -151,7 +151,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({ request, saving, onClose,
                             min={minDate}
                             value={date}
                             onChange={(e) => setDate(e.target.value)}
-                            className="w-full border border-gray-100 rounded-xl px-4 py-2.5 font-semibold text-[10px] outline-none focus:shadow-card transition-all bg-white"
+                            className="w-full border border-paper-300 rounded-xl px-4 py-2.5 font-semibold text-[10px] outline-none focus:shadow-card transition-all bg-white"
                         />
                     </div>
                     <div className="space-y-1.5">
@@ -160,7 +160,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({ request, saving, onClose,
                             type="time"
                             value={time}
                             onChange={(e) => setTime(e.target.value)}
-                            className="w-full border border-gray-100 rounded-xl px-4 py-2.5 font-semibold text-[10px] outline-none focus:shadow-card transition-all bg-white"
+                            className="w-full border border-paper-300 rounded-xl px-4 py-2.5 font-semibold text-[10px] outline-none focus:shadow-card transition-all bg-white"
                         />
                     </div>
 
@@ -215,10 +215,10 @@ const CompleteModal: React.FC<CompleteModalProps> = ({ request, saving, onClose,
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in"
             onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
         >
-            <div className="bg-white border border-gray-100 rounded-[24px] shadow-card w-full max-w-md animate-in zoom-in-95 slide-in-from-bottom-4">
-                <div className="flex items-center justify-between p-6 border-b border-gray-100">
+            <div className="bg-white border border-paper-300 rounded-[24px] shadow-card w-full max-w-md animate-in zoom-in-95 slide-in-from-bottom-4">
+                <div className="flex items-center justify-between p-6 border-b border-paper-300">
                     <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-[12px] flex items-center justify-center border border-gray-100 bg-nile-green text-white">
+                        <div className="w-9 h-9 rounded-[12px] flex items-center justify-center border border-paper-300 bg-nile-green text-white">
                             <CheckCircle2 size={16} />
                         </div>
                         <div>
@@ -226,7 +226,7 @@ const CompleteModal: React.FC<CompleteModalProps> = ({ request, saving, onClose,
                             <p className="text-[8px] font-semibold text-black/40 tracking-wider">{request.student_name} · {TYPE_LABELS[request.type]}</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-100 hover:bg-black hover:text-white transition-all">
+                    <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg border border-paper-300 hover:bg-black hover:text-white transition-all">
                         <X size={14} />
                     </button>
                 </div>
@@ -237,7 +237,7 @@ const CompleteModal: React.FC<CompleteModalProps> = ({ request, saving, onClose,
                         value={feedback}
                         onChange={(e) => setFeedback(e.target.value)}
                         placeholder="Share notes, scores or recommendations from this session..."
-                        className="w-full h-28 border border-gray-100 rounded-xl px-4 py-3 font-semibold text-[10px] outline-none focus:shadow-card transition-all bg-white resize-none"
+                        className="w-full h-28 border border-paper-300 rounded-xl px-4 py-3 font-semibold text-[10px] outline-none focus:shadow-card transition-all bg-white resize-none"
                     />
                 </div>
 
@@ -295,11 +295,11 @@ const ServiceOverviewCard: React.FC<ServiceCardProps> = ({ type, count, pending,
             className={`group w-full text-left bg-white border-[2px] rounded-[20px] p-5 transition-all hover:-translate-y-0.5 hover:shadow-card
                 ${active
                     ? `${activeBorder[type]} ${accentShadow[type]}`
-                    : 'border-black shadow-card'
+                    : 'border-paper-400 shadow-card'
                 }`}
         >
             <div className="flex items-start justify-between mb-4">
-                <div className={`w-11 h-11 rounded-[14px] flex items-center justify-center border border-gray-100 text-white ${iconBg[type]}`}>
+                <div className={`w-11 h-11 rounded-[14px] flex items-center justify-center border border-paper-300 text-white ${iconBg[type]}`}>
                     {SERVICE_ICONS[type]}
                 </div>
                 {pending > 0 && (
@@ -359,7 +359,7 @@ const RequestRow: React.FC<RequestRowProps> = ({
         : null;
 
     return (
-        <div className="bg-white border border-gray-100 rounded-[18px] p-4 flex flex-col gap-3 hover:shadow-card transition-all group">
+        <div className="bg-white border border-paper-300 rounded-[18px] p-4 flex flex-col gap-3 hover:shadow-card transition-all group">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                 {/* Avatar + student info */}
                 <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -413,7 +413,7 @@ const RequestRow: React.FC<RequestRowProps> = ({
                             <button
                                 onClick={() => onSchedule(request)}
                                 disabled={actionLoading}
-                                className="flex items-center gap-1.5 px-3 py-2 bg-nile-blue text-white border border-gray-100 rounded-xl font-semibold text-[8px] shadow-card transition-all disabled:opacity-40"
+                                className="flex items-center gap-1.5 px-3 py-2 bg-nile-blue text-white border border-paper-300 rounded-xl font-semibold text-[8px] shadow-card transition-all disabled:opacity-40"
                             >
                                 <Calendar size={11} />
                                 SCHEDULE
@@ -432,7 +432,7 @@ const RequestRow: React.FC<RequestRowProps> = ({
                         <button
                             onClick={() => onComplete(request)}
                             disabled={actionLoading}
-                            className="flex items-center gap-1.5 px-3 py-2 bg-nile-green text-white border border-gray-100 rounded-xl font-semibold text-[8px] shadow-card transition-all disabled:opacity-40"
+                            className="flex items-center gap-1.5 px-3 py-2 bg-nile-green text-white border border-paper-300 rounded-xl font-semibold text-[8px] shadow-card transition-all disabled:opacity-40"
                         >
                             {actionLoading ? <Loader2 size={11} className="animate-spin" /> : <CheckCircle2 size={11} />}
                             COMPLETE
@@ -441,7 +441,7 @@ const RequestRow: React.FC<RequestRowProps> = ({
                     {status === 'scheduled' && room_id && (
                         <button
                             onClick={() => onJoin(room_id)}
-                            className="flex items-center gap-1.5 px-3 py-2 bg-black text-white border border-gray-100 rounded-xl font-semibold text-[8px] shadow-green transition-all"
+                            className="flex items-center gap-1.5 px-3 py-2 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[8px] shadow-green transition-all"
                         >
                             <Zap size={11} />
                             JOIN SESSION
@@ -461,7 +461,7 @@ const RequestRow: React.FC<RequestRowProps> = ({
                     )}
                     <button
                         onClick={() => onViewProfile(request.student_id)}
-                        className="flex items-center gap-1.5 px-3 py-2 bg-white text-black border border-gray-100 rounded-xl font-semibold text-[8px] hover:bg-black hover:text-white transition-all"
+                        className="flex items-center gap-1.5 px-3 py-2 bg-white text-black border border-paper-300 rounded-xl font-semibold text-[8px] hover:bg-black hover:text-white transition-all"
                     >
                         <Users size={11} />
                         PROFILE
@@ -487,7 +487,7 @@ const MetricPill: React.FC<{
     color?: string;
     icon?: React.ReactNode;
 }> = ({ label, value, color = 'bg-white text-black', icon }) => (
-    <div className={`flex items-center gap-2.5 px-4 py-2.5 border border-gray-100 rounded-xl font-semibold ${color}`}>
+    <div className={`flex items-center gap-2.5 px-4 py-2.5 border border-paper-300 rounded-xl font-semibold ${color}`}>
         {icon && <span className="opacity-60">{icon}</span>}
         <span className="text-xl font-semibold leading-none">{value}</span>
         <span className="text-[7px] leading-tight max-w-[60px]">{label}</span>
@@ -497,8 +497,8 @@ const MetricPill: React.FC<{
 // ─── Empty State ──────────────────────────────────────────────────────────────
 
 const EmptyState: React.FC<{ tab: TabFilter }> = ({ tab }) => (
-    <div className="py-20 border-[2px] border-dashed border-black/10 rounded-[24px] flex flex-col items-center justify-center gap-3">
-        <div className="w-14 h-14 rounded-[18px] bg-black/5 border border-gray-100/10 flex items-center justify-center text-black/20">
+    <div className="py-20 border-[2px] border-dashed border-paper-400/10 rounded-[24px] flex flex-col items-center justify-center gap-3">
+        <div className="w-14 h-14 rounded-[18px] bg-black/5 border border-paper-300/10 flex items-center justify-center text-black/20">
             {tab === 'MOCK INTERVIEWS' ? <Mic size={24} />
                 : tab === 'CAREER ADVISORY' ? <MessageSquare size={24} />
                 : tab === 'CV REVIEW' ? <FileText size={24} />
@@ -639,10 +639,10 @@ const StaffServices: React.FC = () => {
     if (loading) {
         return (
             <div className="p-4 md:p-8 space-y-6">
-                <div className="h-12 bg-black/5 rounded-2xl w-72 animate-pulse" />
+                <div className="h-12 bg-black/5 rounded-xl w-72 animate-pulse" />
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                     {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="h-16 bg-black/5 rounded-2xl animate-pulse" />
+                        <div key={i} className="h-16 bg-black/5 rounded-xl animate-pulse" />
                     ))}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -666,7 +666,7 @@ const StaffServices: React.FC = () => {
                 <p className="font-semibold text-lg text-black">Could not load service requests</p>
                 <p className="text-[9px] font-semibold text-black/40 mt-1">Please try again or log out and back in</p>
             </div>
-            <button onClick={load} className="px-6 py-3 bg-black text-white border border-gray-100 rounded-xl font-semibold text-[9px] shadow-green transition-all">
+            <button onClick={load} className="px-6 py-3 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all">
                 TRY AGAIN
             </button>
         </div>
@@ -681,7 +681,7 @@ const StaffServices: React.FC = () => {
             <div className="p-4 md:p-8 space-y-8 font-sans pb-24 text-left min-h-full">
 
                 {/* ── Header ──────────────────────────────────────────────── */}
-                <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-4 border-b border-gray-100 pb-6">
+                <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-4 border-b border-paper-300 pb-6">
                     <div>
                         <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">
                             Career Services .
@@ -723,7 +723,7 @@ const StaffServices: React.FC = () => {
 
                 {/* ── Tabs + Filters ───────────────────────────────────────── */}
                 <div className="flex flex-col gap-4">
-                    <div className="flex bg-white p-1 border border-gray-100 rounded-2xl shadow-sm overflow-x-auto gap-0.5">
+                    <div className="flex bg-white p-1 border border-paper-300 rounded-xl shadow-sm overflow-x-auto gap-0.5">
                         {TABS.map((tab) => {
                             const count = tab === 'ALL REQUESTS' ? requests.length
                                 : tab === 'MOCK INTERVIEWS' ? typeCounts.counts.mock_interview
@@ -757,7 +757,7 @@ const StaffServices: React.FC = () => {
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 placeholder="SEARCH BY NAME, EMAIL, MAJOR, OR SERVICE TYPE..."
-                                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-100 font-semibold text-[9px] outline-none focus:shadow-card bg-white transition-all"
+                                className="w-full pl-10 pr-4 py-3 rounded-xl border border-paper-300 font-semibold text-[9px] outline-none focus:shadow-card bg-white transition-all"
                             />
                             {search && (
                                 <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-black/30 hover:text-black">
@@ -769,7 +769,7 @@ const StaffServices: React.FC = () => {
                         <div className="relative">
                             <button
                                 onClick={() => setShowStatusDropdown((p) => !p)}
-                                className="flex items-center gap-2 px-4 py-3 border border-gray-100 rounded-xl font-semibold text-[9px] bg-white hover:bg-black hover:text-white transition-all whitespace-nowrap"
+                                className="flex items-center gap-2 px-4 py-3 border border-paper-300 rounded-xl font-semibold text-[9px] bg-white hover:bg-black hover:text-white transition-all whitespace-nowrap"
                             >
                                 <span className={`w-2 h-2 rounded-full ${
                                     statusFilter === 'pending' ? 'bg-yellow-400'
@@ -782,7 +782,7 @@ const StaffServices: React.FC = () => {
                                 <ChevronDown size={12} className={`transition-transform ${showStatusDropdown ? 'rotate-180' : ''}`} />
                             </button>
                             {showStatusDropdown && (
-                                <div className="absolute right-0 top-full mt-1 z-20 bg-white border border-gray-100 rounded-xl shadow-card overflow-hidden min-w-[140px]">
+                                <div className="absolute right-0 top-full mt-1 z-20 bg-white border border-paper-300 rounded-xl shadow-card overflow-hidden min-w-[140px]">
                                     {(['All', 'pending', 'scheduled', 'completed', 'declined'] as StatusFilter[]).map((s) => (
                                         <button
                                             key={s}

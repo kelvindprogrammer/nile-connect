@@ -130,7 +130,7 @@ const PrivacySettingsPage: React.FC = () => {
     if (loading) {
         return (
             <div className="flex items-center justify-center py-24">
-                <Loader2 size={24} className="animate-spin text-gray-300" />
+                <Loader2 size={24} className="animate-spin text-paper-500" />
             </div>
         );
     }
@@ -140,7 +140,7 @@ const PrivacySettingsPage: React.FC = () => {
             <div className="max-w-2xl mx-auto p-6">
                 <div className="social-card py-12 text-center space-y-3">
                     <AlertCircle size={26} className="text-red-300 mx-auto" />
-                    <p className="text-sm text-gray-600">{loadError}</p>
+                    <p className="text-sm text-paper-700">{loadError}</p>
                     <Button size="sm" variant="outline" onClick={() => setReloadToken(t => t + 1)}>
                         Try again
                     </Button>
@@ -156,22 +156,22 @@ const PrivacySettingsPage: React.FC = () => {
                     <button
                         onClick={() => navigate(-1)}
                         aria-label="Go back"
-                        className="p-2 -ml-2 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors"
+                        className="p-2 -ml-2 rounded-xl text-paper-600 hover:text-ink-700 hover:bg-paper-100 transition-colors"
                     >
                         <ArrowLeft size={18} />
                     </button>
                     <div className="min-w-0">
-                        <h1 className="text-xl md:text-2xl font-semibold text-gray-900 leading-tight">
+                        <h1 className="text-xl md:text-2xl font-semibold text-ink-800 leading-tight">
                             Privacy & safety
                         </h1>
-                        <p className="text-xs text-gray-400 mt-0.5">
+                        <p className="text-xs text-paper-600 mt-0.5">
                             Changes save automatically
                         </p>
                     </div>
                 </div>
                 <div aria-live="polite" className="text-xs flex-shrink-0">
                     {saveState === 'saving' && (
-                        <span className="flex items-center gap-1.5 text-gray-400">
+                        <span className="flex items-center gap-1.5 text-paper-600">
                             <Loader2 size={12} className="animate-spin" /> Saving
                         </span>
                     )}
@@ -288,10 +288,10 @@ const PrivacySettingsPage: React.FC = () => {
             >
                 <div className="py-3.5 flex items-start justify-between gap-4">
                     <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-800">
+                        <p className="text-sm font-medium text-ink-800">
                             {pushState === 'subscribed' ? 'On for this device' : 'Off for this device'}
                         </p>
-                        <p className="text-[11px] text-gray-500 mt-0.5 leading-snug">
+                        <p className="text-[11px] text-paper-700 mt-0.5 leading-snug">
                             {pushState === 'unsupported' && 'Your browser does not support push notifications.'}
                             {pushState === 'unconfigured' && 'Push is not set up on the server yet. Your in-app notifications still work.'}
                             {pushState === 'denied' && 'You blocked notifications for this site. Re-enable them in your browser settings.'}
@@ -320,19 +320,19 @@ const PrivacySettingsPage: React.FC = () => {
             >
                 {blockedLoading ? (
                     <div className="py-6 flex justify-center">
-                        <Loader2 size={16} className="animate-spin text-gray-300" />
+                        <Loader2 size={16} className="animate-spin text-paper-500" />
                     </div>
                 ) : blocked.length === 0 ? (
-                    <p className="py-6 text-center text-xs text-gray-400">
+                    <p className="py-6 text-center text-xs text-paper-600">
                         You haven't blocked anyone.
                     </p>
                 ) : (
-                    <ul className="divide-y divide-gray-50">
+                    <ul className="divide-y divide-paper-200">
                         {blocked.map(person => (
                             <li key={person.id} className="flex items-center justify-between gap-3 py-3">
                                 <div className="min-w-0">
-                                    <p className="text-sm font-medium text-gray-800 truncate">{person.name}</p>
-                                    <p className="text-xs text-gray-400 truncate">@{person.username}</p>
+                                    <p className="text-sm font-medium text-ink-800 truncate">{person.name}</p>
+                                    <p className="text-xs text-paper-600 truncate">@{person.username}</p>
                                 </div>
                                 <Button size="xs" variant="outline" onClick={() => handleUnblock(person)}>
                                     Unblock
@@ -343,9 +343,9 @@ const PrivacySettingsPage: React.FC = () => {
                 )}
             </Section>
 
-            <div className="flex items-start gap-2.5 p-4 rounded-2xl bg-nile-blue/5 border border-nile-blue/10">
+            <div className="flex items-start gap-2.5 p-4 rounded-xl bg-nile-blue/5 border border-nile-blue/10">
                 <VolumeX size={15} className="text-nile-blue flex-shrink-0 mt-0.5" />
-                <p className="text-xs text-gray-600 leading-relaxed">
+                <p className="text-xs text-paper-700 leading-relaxed">
                     Want to stop seeing someone without blocking them? Use <strong>Mute</strong> from the
                     menu on any of their posts. Muting is completely private — they're never told.
                 </p>
@@ -362,14 +362,14 @@ const Section: React.FC<{
     description?: string;
     children: React.ReactNode;
 }> = ({ icon: Icon, title, description, children }) => (
-    <section className="bg-white border border-gray-100 rounded-2xl shadow-card overflow-hidden">
-        <header className="px-4 py-3.5 border-b border-gray-50">
+    <section className="bg-white border border-paper-300 rounded-xl shadow-card overflow-hidden">
+        <header className="px-4 py-3.5 border-b border-paper-200">
             <div className="flex items-center gap-2">
                 <Icon size={15} className="text-nile-blue" />
-                <h2 className="text-sm font-semibold text-gray-900">{title}</h2>
+                <h2 className="text-sm font-semibold text-ink-800">{title}</h2>
             </div>
             {description && (
-                <p className="text-[11px] text-gray-500 mt-1 leading-relaxed">{description}</p>
+                <p className="text-[11px] text-paper-700 mt-1 leading-relaxed">{description}</p>
             )}
         </header>
         <div className="px-4">{children}</div>
@@ -387,16 +387,16 @@ const ChoiceRow: React.FC<{
 }> = ({ label, help, value, options, labels, onChange }) => {
     const id = `choice-${label.replace(/\s+/g, '-').toLowerCase()}`;
     return (
-        <div className="py-3.5 border-b border-gray-50 last:border-0">
-            <label htmlFor={id} className="block text-sm font-medium text-gray-800">
+        <div className="py-3.5 border-b border-paper-200 last:border-0">
+            <label htmlFor={id} className="block text-sm font-medium text-ink-800">
                 {label}
             </label>
-            {help && <p className="text-[11px] text-gray-500 mt-0.5 leading-snug">{help}</p>}
+            {help && <p className="text-[11px] text-paper-700 mt-0.5 leading-snug">{help}</p>}
             <select
                 id={id}
                 value={value}
                 onChange={e => onChange(e.target.value)}
-                className="mt-2 w-full border border-gray-200 rounded-xl py-2 px-3 text-sm bg-white
+                className="mt-2 w-full border border-paper-300 rounded-xl py-2 px-3 text-sm bg-white
                            outline-none transition-all cursor-pointer
                            focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10"
             >
@@ -414,10 +414,10 @@ const ToggleRow: React.FC<{
     checked: boolean;
     onChange: (value: boolean) => void;
 }> = ({ label, help, checked, onChange }) => (
-    <div className="py-3.5 border-b border-gray-50 last:border-0 flex items-start justify-between gap-4">
+    <div className="py-3.5 border-b border-paper-200 last:border-0 flex items-start justify-between gap-4">
         <div className="min-w-0">
-            <p className="text-sm font-medium text-gray-800">{label}</p>
-            {help && <p className="text-[11px] text-gray-500 mt-0.5 leading-snug">{help}</p>}
+            <p className="text-sm font-medium text-ink-800">{label}</p>
+            {help && <p className="text-[11px] text-paper-700 mt-0.5 leading-snug">{help}</p>}
         </div>
         <button
             type="button"
@@ -426,7 +426,7 @@ const ToggleRow: React.FC<{
             aria-label={label}
             onClick={() => onChange(!checked)}
             className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 mt-0.5
-                        ${checked ? 'bg-nile-blue' : 'bg-gray-200'}`}
+                        ${checked ? 'bg-nile-blue' : 'bg-paper-300'}`}
         >
             <span
                 className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform

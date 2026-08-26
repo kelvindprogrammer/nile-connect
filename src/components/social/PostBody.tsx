@@ -110,7 +110,7 @@ const PostBody: React.FC<PostBodyProps> = ({ content, className }) => {
     if (!content) return null;
 
     return (
-        <p className={className ?? 'text-sm text-gray-800 leading-relaxed whitespace-pre-wrap break-words'}>
+        <p className={className ?? 'text-sm text-ink-800 leading-relaxed whitespace-pre-wrap break-words'}>
             {tokens.map((tok, i) => {
                 switch (tok.type) {
                     case 'mention':

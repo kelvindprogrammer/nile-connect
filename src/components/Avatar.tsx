@@ -78,7 +78,7 @@ const Avatar: React.FC<AvatarProps> = ({
             </div>
             {presence && (
                 <span
-                    className={`absolute bottom-0 right-0 ${dotSizeMap[size]} rounded-full ring-2 ring-white ${presence === 'online' ? 'bg-nile-green' : 'bg-gray-300'}`}
+                    className={`absolute bottom-0 right-0 ${dotSizeMap[size]} rounded-full ring-2 ring-white ${presence === 'online' ? 'bg-nile-green' : 'bg-paper-400'}`}
                 />
             )}
         </div>

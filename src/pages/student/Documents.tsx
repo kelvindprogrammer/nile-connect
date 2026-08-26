@@ -120,7 +120,7 @@ const Documents = () => {
     return (
         <>
             <div className="p-4 md:p-8 space-y-6 md:space-y-8 anime-fade-in font-sans pb-24 text-left">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-100 pb-6">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-paper-300 pb-6">
                     <div>
                         <h2 className="text-2xl md:text-4xl font-semibold text-black leading-none">Document Library .</h2>
                         <p className="text-[8px] md:text-[10px] font-semibold text-nile-blue/50 mt-1">
@@ -133,7 +133,7 @@ const Documents = () => {
                 </div>
 
                 {showForm && (
-                    <form onSubmit={handleSubmit} className="bg-white border border-gray-100 rounded-[20px] shadow-card p-5 md:p-6 space-y-4">
+                    <form onSubmit={handleSubmit} className="bg-white border border-paper-300 rounded-[20px] shadow-card p-5 md:p-6 space-y-4">
                         <div className="flex items-center justify-between">
                             <h3 className="font-semibold text-sm">Upload a document</h3>
                             <button type="button" onClick={() => setShowForm(false)}><X size={16} /></button>
@@ -145,7 +145,7 @@ const Documents = () => {
                                 <select
                                     value={uploadType}
                                     onChange={e => setUploadType(e.target.value)}
-                                    className="w-full border border-gray-100 rounded-xl py-3 px-4 font-semibold text-xs outline-none focus:shadow-blue bg-[#F8F9FB]/60 focus:bg-white transition-all"
+                                    className="w-full border border-paper-300 rounded-xl py-3 px-4 font-semibold text-xs outline-none focus:shadow-blue bg-paper-100 focus:bg-white transition-all"
                                 >
                                     {DOCUMENT_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                                 </select>
@@ -157,7 +157,7 @@ const Documents = () => {
                                     value={uploadTitle}
                                     onChange={e => setUploadTitle(e.target.value)}
                                     placeholder="e.g. Updated Resume 2026"
-                                    className="w-full border border-gray-100 rounded-xl py-3 px-4 font-semibold text-xs outline-none focus:shadow-blue bg-[#F8F9FB]/60 focus:bg-white transition-all"
+                                    className="w-full border border-paper-300 rounded-xl py-3 px-4 font-semibold text-xs outline-none focus:shadow-blue bg-paper-100 focus:bg-white transition-all"
                                 />
                             </div>
                         </div>
@@ -168,7 +168,7 @@ const Documents = () => {
                                 <select
                                     value={refereeType}
                                     onChange={e => setRefereeType(e.target.value as RefereeType | '')}
-                                    className="w-full border border-gray-100 rounded-xl py-3 px-4 font-semibold text-xs outline-none focus:shadow-blue bg-[#F8F9FB]/60 focus:bg-white transition-all"
+                                    className="w-full border border-paper-300 rounded-xl py-3 px-4 font-semibold text-xs outline-none focus:shadow-blue bg-paper-100 focus:bg-white transition-all"
                                 >
                                     <option value="">— Select —</option>
                                     <option value="academic">Academic</option>
@@ -182,7 +182,7 @@ const Documents = () => {
                             <button
                                 type="button"
                                 onClick={() => fileInputRef.current?.click()}
-                                className="w-full p-4 border-[2px] border-dashed border-black/20 rounded-xl text-[10px] font-semibold text-black/40 hover:border-nile-blue hover:text-nile-blue transition-all flex items-center justify-center gap-2"
+                                className="w-full p-4 border-[2px] border-dashed border-paper-400/20 rounded-xl text-[10px] font-semibold text-black/40 hover:border-nile-blue hover:text-nile-blue transition-all flex items-center justify-center gap-2"
                             >
                                 <Upload size={14} /> {pendingFile ? pendingFile.name : 'CHOOSE FILE'}
                             </button>
@@ -206,13 +206,13 @@ const Documents = () => {
                             <div key={group.value} className="space-y-3">
                                 <h3 className="text-[10px] font-semibold text-black/40 tracking-wider">{group.label.toUpperCase()}</h3>
                                 {group.docs.length === 0 ? (
-                                    <div className="py-6 text-center border-[2px] border-dashed border-black/10 rounded-[18px]">
+                                    <div className="py-6 text-center border-[2px] border-dashed border-paper-400/10 rounded-[18px]">
                                         <p className="text-[9px] font-semibold text-black/20">NO {group.label.toUpperCase()} UPLOADED YET</p>
                                     </div>
                                 ) : (
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                         {group.docs.map(doc => (
-                                            <div key={doc.id} className="bg-white border border-gray-100 rounded-[18px] shadow-card p-4 flex items-start gap-3">
+                                            <div key={doc.id} className="bg-white border border-paper-300 rounded-[18px] shadow-card p-4 flex items-start gap-3">
                                                 <div className="w-10 h-10 bg-nile-blue/10 rounded-xl flex items-center justify-center text-nile-blue flex-shrink-0">
                                                     <FileText size={16} />
                                                 </div>

@@ -170,39 +170,39 @@ const Network = () => {
 
                 <div className="border-b border-paper-300 pb-5">
                     <div className="co-eyebrow mb-1">1,842 alumni · 96 open to mentoring</div>
-                    <h1 className="co-display text-3xl md:text-4xl text-gray-900 leading-tight">People who <em>were</em> here</h1>
-                    <p className="text-sm text-gray-500 mt-1">Graduates who agreed to take questions from current students. Introductions run through the institution, not cold messages.</p>
+                    <h1 className="co-display text-3xl md:text-4xl text-ink-800 leading-tight">People who <em>were</em> here</h1>
+                    <p className="text-sm text-paper-700 mt-1">Graduates who agreed to take questions from current students. Introductions run through the institution, not cold messages.</p>
                 </div>
 
                 <div className="grid grid-cols-3 gap-3">
                     <div className="bg-paper-100 border border-paper-300 rounded-xl p-4 text-center">
                         <p className="font-display text-2xl text-app-accent">{connLoading ? '—' : connections.accepted.length}</p>
-                        <p className="text-xs text-gray-500 mt-0.5">Connections</p>
+                        <p className="text-xs text-paper-700 mt-0.5">Connections</p>
                     </div>
                     <div className="bg-paper-100 border border-paper-300 rounded-xl p-4 text-center">
                         <p className="font-display text-2xl text-green-700">{connLoading ? '—' : connections.incoming.length}</p>
-                        <p className="text-xs text-gray-500 mt-0.5">Invitations</p>
+                        <p className="text-xs text-paper-700 mt-0.5">Invitations</p>
                     </div>
                     <div className="bg-paper-100 border border-paper-300 rounded-xl p-4 text-center">
-                        <p className="font-display text-2xl text-gray-700">{connLoading ? '—' : connections.outgoing.length}</p>
-                        <p className="text-xs text-gray-500 mt-0.5">Pending</p>
+                        <p className="font-display text-2xl text-ink-700">{connLoading ? '—' : connections.outgoing.length}</p>
+                        <p className="text-xs text-paper-700 mt-0.5">Pending</p>
                     </div>
                 </div>
 
                 {connections.incoming.length > 0 && (
                     <div className="social-card p-4 space-y-3">
-                        <h2 className="text-sm font-semibold text-gray-900">Invitations</h2>
+                        <h2 className="text-sm font-semibold text-ink-800">Invitations</h2>
                         {connections.incoming.map(inv => (
                             <div key={inv.id} className="flex items-center gap-3">
                                 <Avatar name={inv.full_name} size="sm" />
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium text-gray-900 truncate">{inv.full_name}</p>
-                                    <p className="text-xs text-gray-400">{ROLE_LABELS[inv.role] || inv.role} · wants to connect</p>
+                                    <p className="text-sm font-medium text-ink-800 truncate">{inv.full_name}</p>
+                                    <p className="text-xs text-paper-600">{ROLE_LABELS[inv.role] || inv.role} · wants to connect</p>
                                 </div>
                                 <button
                                     onClick={() => handleRespond(inv.id, 'decline', inv.full_name)}
                                     disabled={respondingId === inv.id}
-                                    className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-gray-200 transition-colors disabled:opacity-60"
+                                    className="w-8 h-8 flex items-center justify-center rounded-full bg-paper-200 text-paper-600 hover:bg-paper-300 transition-colors disabled:opacity-60"
                                 >
                                     <X size={14} />
                                 </button>
@@ -220,14 +220,14 @@ const Network = () => {
 
                 {suggestions.length > 0 && (
                     <div className="social-card p-4 space-y-3">
-                        <h2 className="text-sm font-semibold text-gray-900">People you may know</h2>
+                        <h2 className="text-sm font-semibold text-ink-800">People you may know</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {suggestions.map(s => (
-                                <div key={s.user_id} className="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 transition-colors">
+                                <div key={s.user_id} className="flex items-center gap-3 p-2 rounded-xl hover:bg-paper-100 transition-colors">
                                     <Avatar name={s.full_name} size="sm" />
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-gray-900 truncate">{s.full_name}</p>
-                                        <p className="text-xs text-gray-400">
+                                        <p className="text-sm font-medium text-ink-800 truncate">{s.full_name}</p>
+                                        <p className="text-xs text-paper-600">
                                             {ROLE_LABELS[s.role] || s.role}
                                             {s.mutual_connections > 0 ? ` · ${s.mutual_connections} mutual` : ''}
                                         </p>
@@ -247,13 +247,13 @@ const Network = () => {
 
                 <div className="flex flex-col sm:flex-row gap-3">
                     <div className="flex-1 relative">
-                        <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" />
+                        <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-paper-500" />
                         <input
                             type="text"
                             placeholder="Search by name or major..."
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
-                            className="w-full pl-11 pr-4 py-2.5 bg-white border border-gray-200 rounded-full text-sm text-gray-800 placeholder:text-gray-400 outline-none focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10 transition-all"
+                            className="w-full pl-11 pr-4 py-2.5 bg-white border border-paper-300 rounded-full text-sm text-ink-800 placeholder:text-paper-600 outline-none focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10 transition-all"
                         />
                     </div>
                     <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
@@ -262,7 +262,7 @@ const Network = () => {
                                 key={tab.key}
                                 onClick={() => setFilter(tab.key)}
                                 className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
-                                    filter === tab.key ? 'bg-nile-blue text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                                    filter === tab.key ? 'bg-nile-blue text-white' : 'bg-paper-200 text-paper-700 hover:bg-paper-300'
                                 }`}
                             >
                                 {tab.label}
@@ -273,12 +273,12 @@ const Network = () => {
 
                 {peopleLoading ? (
                     <div className="flex items-center justify-center py-16">
-                        <Loader2 size={24} className="animate-spin text-gray-300" />
+                        <Loader2 size={24} className="animate-spin text-paper-500" />
                     </div>
                 ) : people.length === 0 ? (
                     <div className="social-card py-14 text-center">
-                        <Users size={28} className="text-gray-200 mx-auto mb-3" />
-                        <p className="text-sm text-gray-400">No people found{searchTerm ? ` for "${searchTerm}"` : ''}.</p>
+                        <Users size={28} className="text-paper-400 mx-auto mb-3" />
+                        <p className="text-sm text-paper-600">No people found{searchTerm ? ` for "${searchTerm}"` : ''}.</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -325,12 +325,12 @@ const PersonCard = ({
         <div className="flex items-center gap-3">
             <Avatar name={person.name} size="md" presence={presenceFor(person.lastActiveAt)} />
             <div className="min-w-0 flex-1">
-                <h3 className="text-sm font-semibold text-gray-900 truncate">{person.name}</h3>
-                <p className="text-xs text-gray-400 mt-0.5 truncate">
+                <h3 className="text-sm font-semibold text-ink-800 truncate">{person.name}</h3>
+                <p className="text-xs text-paper-600 mt-0.5 truncate">
                     {person.roleLabel}{person.major ? ` · ${person.major}` : ''}
                 </p>
                 {presenceLabel(person.lastActiveAt) && (
-                    <p className="text-[11px] text-gray-400 mt-0.5">{presenceLabel(person.lastActiveAt)}</p>
+                    <p className="text-[11px] text-paper-600 mt-0.5">{presenceLabel(person.lastActiveAt)}</p>
                 )}
             </div>
         </div>
@@ -342,7 +342,7 @@ const PersonCard = ({
                 </span>
             )}
             {connection.status === 'pending_outgoing' && (
-                <span className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium bg-paper-100 text-gray-500 border border-paper-300">
+                <span className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium bg-paper-100 text-paper-700 border border-paper-300">
                     <Clock size={14} /> Pending
                 </span>
             )}
@@ -351,7 +351,7 @@ const PersonCard = ({
                     <button
                         onClick={() => onRespond(connection.connId!, 'decline', person.name)}
                         disabled={respondingId === connection.connId}
-                        className="flex-1 py-1.5 rounded-md text-xs font-medium bg-paper-100 text-gray-600 hover:bg-paper-200 transition-colors disabled:opacity-60 border border-paper-300"
+                        className="flex-1 py-1.5 rounded-md text-xs font-medium bg-paper-100 text-paper-700 hover:bg-paper-200 transition-colors disabled:opacity-60 border border-paper-300"
                     >
                         Decline
                     </button>
@@ -374,7 +374,7 @@ const PersonCard = ({
             )}
             <button
                 onClick={onMessage}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium bg-paper-100 text-gray-700 hover:bg-paper-200 transition-colors border border-paper-300"
+                className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium bg-paper-100 text-ink-700 hover:bg-paper-200 transition-colors border border-paper-300"
             >
                 <MessageCircle size={14} /> Message
             </button>

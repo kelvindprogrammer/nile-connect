@@ -92,13 +92,13 @@ const StaffMessages = () => {
         <div className="flex h-full bg-white overflow-hidden anime-fade-in font-sans pb-20 md:pb-0">
 
             {/* Conversation list */}
-            <div className={`${selected ? 'hidden md:flex' : 'flex'} w-full md:w-80 lg:w-96 flex-col border-r border-gray-100`}>
-                <div className="p-4 border-b border-gray-100 space-y-3">
+            <div className={`${selected ? 'hidden md:flex' : 'flex'} w-full md:w-80 lg:w-96 flex-col border-r border-paper-300`}>
+                <div className="p-4 border-b border-paper-300 space-y-3">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-xl font-semibold text-gray-900">Messages</h2>
+                        <h2 className="text-xl font-semibold text-ink-800">Messages</h2>
                         <button
                             onClick={() => { setShowSearch(s => !s); setSearchQuery(''); setSearchResults([]); }}
-                            className="w-9 h-9 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-nile-blue transition-colors"
+                            className="w-9 h-9 flex items-center justify-center rounded-full text-paper-600 hover:bg-paper-200 hover:text-nile-blue transition-colors"
                             title={showSearch ? 'Close' : 'New message'}
                         >
                             {showSearch ? <X size={18} /> : <Plus size={18} />}
@@ -108,32 +108,32 @@ const StaffMessages = () => {
                     {showSearch ? (
                         <div className="space-y-1">
                             <div className="relative">
-                                <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-300" />
+                                <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-paper-500" />
                                 <input
                                     autoFocus
                                     value={searchQuery}
                                     onChange={e => handleSearch(e.target.value)}
                                     placeholder="Search people to message..."
-                                    className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-full text-sm text-gray-800 placeholder:text-gray-400 outline-none focus:bg-white focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10 transition-all"
+                                    className="w-full pl-10 pr-4 py-2.5 bg-paper-100 border border-paper-300 rounded-full text-sm text-ink-800 placeholder:text-paper-600 outline-none focus:bg-white focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10 transition-all"
                                 />
                             </div>
                             {searching ? (
                                 <div className="flex justify-center py-3">
-                                    <Loader2 size={16} className="animate-spin text-gray-300" />
+                                    <Loader2 size={16} className="animate-spin text-paper-500" />
                                 </div>
                             ) : searchQuery && searchResults.length === 0 ? (
-                                <p className="text-sm text-gray-400 text-center py-3">No users found</p>
+                                <p className="text-sm text-paper-600 text-center py-3">No users found</p>
                             ) : (
                                 searchResults.map(u => (
                                     <div
                                         key={u.id}
                                         onClick={() => startConversation(u)}
-                                        className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors"
+                                        className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-paper-100 cursor-pointer transition-colors"
                                     >
                                         <Avatar name={u.full_name} size="sm" presence={u.last_active_at ? (isOnline(u.last_active_at) ? 'online' : 'offline') : undefined} />
                                         <div className="min-w-0">
-                                            <p className="text-sm font-medium text-gray-900 truncate">{u.full_name}</p>
-                                            <p className="text-xs text-gray-400 capitalize">{u.role}</p>
+                                            <p className="text-sm font-medium text-ink-800 truncate">{u.full_name}</p>
+                                            <p className="text-xs text-paper-600 capitalize">{u.role}</p>
                                         </div>
                                     </div>
                                 ))
@@ -141,12 +141,12 @@ const StaffMessages = () => {
                         </div>
                     ) : (
                         <div className="relative">
-                            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-300" />
+                            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-paper-500" />
                             <input
                                 value={search}
                                 onChange={e => setSearch(e.target.value)}
                                 placeholder="Search conversations..."
-                                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-full text-sm text-gray-800 placeholder:text-gray-400 outline-none focus:bg-white focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10 transition-all"
+                                className="w-full pl-10 pr-4 py-2.5 bg-paper-100 border border-paper-300 rounded-full text-sm text-ink-800 placeholder:text-paper-600 outline-none focus:bg-white focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10 transition-all"
                             />
                         </div>
                     )}
@@ -155,12 +155,12 @@ const StaffMessages = () => {
                 <div className="flex-1 overflow-y-auto custom-scrollbar">
                     {convLoading ? (
                         <div className="flex justify-center items-center h-24">
-                            <Loader2 size={24} className="animate-spin text-gray-300" />
+                            <Loader2 size={24} className="animate-spin text-paper-500" />
                         </div>
                     ) : filtered.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-16 px-6 text-center gap-2">
-                            <MessageCircle size={28} className="text-gray-200" />
-                            <p className="text-sm text-gray-400">{search ? 'No matches found' : 'No conversations yet'}</p>
+                            <MessageCircle size={28} className="text-paper-400" />
+                            <p className="text-sm text-paper-600">{search ? 'No matches found' : 'No conversations yet'}</p>
                             {!search && (
                                 <button onClick={() => setShowSearch(true)} className="text-sm font-medium text-nile-blue hover:underline">
                                     Start a conversation
@@ -171,8 +171,8 @@ const StaffMessages = () => {
                         <div
                             key={c.user_id}
                             onClick={() => setSelected(c)}
-                            className={`px-4 py-3 flex items-center gap-3 cursor-pointer transition-colors border-b border-gray-50
-                                ${selected?.user_id === c.user_id ? 'bg-nile-blue/5' : 'hover:bg-gray-50'}`}
+                            className={`px-4 py-3 flex items-center gap-3 cursor-pointer transition-colors border-b border-paper-200
+                                ${selected?.user_id === c.user_id ? 'bg-nile-blue/5' : 'hover:bg-paper-100'}`}
                         >
                             <Avatar
                                 name={c.full_name}
@@ -181,10 +181,10 @@ const StaffMessages = () => {
                             />
                             <div className="flex-1 min-w-0">
                                 <div className="flex justify-between items-baseline gap-2">
-                                    <h4 className="font-semibold text-gray-900 text-sm truncate">{c.full_name}</h4>
-                                    {c.last_time && <span className="text-[11px] text-gray-400 flex-shrink-0">{formatClockTime(c.last_time)}</span>}
+                                    <h4 className="font-semibold text-ink-800 text-sm truncate">{c.full_name}</h4>
+                                    {c.last_time && <span className="text-[11px] text-paper-600 flex-shrink-0">{formatClockTime(c.last_time)}</span>}
                                 </div>
-                                <p className={`text-xs truncate mt-0.5 ${c.unread > 0 ? 'text-gray-900 font-medium' : 'text-gray-400'}`}>
+                                <p className={`text-xs truncate mt-0.5 ${c.unread > 0 ? 'text-ink-800 font-medium' : 'text-paper-600'}`}>
                                     {c.last_msg || 'No messages yet'}
                                 </p>
                             </div>
@@ -202,8 +202,8 @@ const StaffMessages = () => {
             <div className={`${selected ? 'flex' : 'hidden md:flex'} flex-1 flex-col bg-white min-w-0`}>
                 {selected ? (
                     <>
-                        <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-3 bg-white flex-shrink-0">
-                            <button onClick={() => setSelected(null)} className="md:hidden p-1.5 -ml-1 text-gray-400 hover:text-gray-700 rounded-lg flex-shrink-0 transition-colors">
+                        <div className="px-4 py-3 border-b border-paper-300 flex items-center gap-3 bg-white flex-shrink-0">
+                            <button onClick={() => setSelected(null)} className="md:hidden p-1.5 -ml-1 text-paper-600 hover:text-ink-700 rounded-lg flex-shrink-0 transition-colors">
                                 <ChevronLeft size={20} />
                             </button>
                             <Avatar
@@ -212,8 +212,8 @@ const StaffMessages = () => {
                                 presence={selected.last_active_at ? (isOnline(selected.last_active_at) ? 'online' : 'offline') : undefined}
                             />
                             <div className="min-w-0">
-                                <h3 className="font-semibold text-gray-900 text-sm truncate">{selected.full_name}</h3>
-                                <p className="text-xs text-gray-400 mt-0.5">{presenceLabel(selected.last_active_at) || 'Offline'}</p>
+                                <h3 className="font-semibold text-ink-800 text-sm truncate">{selected.full_name}</h3>
+                                <p className="text-xs text-paper-600 mt-0.5">{presenceLabel(selected.last_active_at) || 'Offline'}</p>
                             </div>
                         </div>
 
@@ -221,12 +221,12 @@ const StaffMessages = () => {
                     </>
                 ) : (
                     <div className="flex-1 hidden md:flex flex-col items-center justify-center text-center p-12 gap-3">
-                        <div className="w-16 h-16 bg-nile-blue/5 rounded-2xl flex items-center justify-center text-nile-blue/20">
+                        <div className="w-16 h-16 bg-nile-blue/5 rounded-xl flex items-center justify-center text-nile-blue/20">
                             <MessageCircle size={32} />
                         </div>
                         <div>
-                            <h3 className="font-semibold text-gray-900">Your messages</h3>
-                            <p className="text-sm text-gray-400 mt-1 max-w-xs">
+                            <h3 className="font-semibold text-ink-800">Your messages</h3>
+                            <p className="text-sm text-paper-600 mt-1 max-w-xs">
                                 Select a conversation, or start a new one with any student, employer, or staff member
                             </p>
                         </div>
@@ -404,15 +404,15 @@ const ThreadPane: React.FC<ThreadPaneProps> = ({ toUserId, onActivity }) => {
 
     return (
         <>
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50/60 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-paper-100/60 custom-scrollbar">
                 {loading ? (
                     <div className="flex justify-center pt-10">
-                        <Loader2 size={24} className="animate-spin text-gray-300" />
+                        <Loader2 size={24} className="animate-spin text-paper-500" />
                     </div>
                 ) : messages.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-center gap-3 opacity-70">
-                        <MessageCircle size={32} className="text-gray-200" />
-                        <p className="text-sm text-gray-400">Start the conversation</p>
+                        <MessageCircle size={32} className="text-paper-400" />
+                        <p className="text-sm text-paper-600">Start the conversation</p>
                     </div>
                 ) : (
                     <>
@@ -420,7 +420,7 @@ const ThreadPane: React.FC<ThreadPaneProps> = ({ toUserId, onActivity }) => {
                             const isMe = m.sender_id === user?.id;
                             return (
                                 <div key={m.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                                    <div className={`max-w-[75%] px-4 py-2.5 rounded-2xl ${isMe ? 'bg-nile-blue text-white rounded-br-md' : 'bg-white text-gray-800 border border-gray-100 rounded-bl-md'}`}>
+                                    <div className={`max-w-[75%] px-4 py-2.5 rounded-xl ${isMe ? 'bg-nile-blue text-white rounded-br-md' : 'bg-white text-ink-800 border border-paper-300 rounded-bl-md'}`}>
                                         {m.media_url && (
                                             m.media_type === 'image' ? (
                                                 <button
@@ -435,7 +435,7 @@ const ThreadPane: React.FC<ThreadPaneProps> = ({ toUserId, onActivity }) => {
                                                     href={m.media_url}
                                                     target="_blank"
                                                     rel="noreferrer"
-                                                    className={`flex items-center gap-2 px-3 py-2 rounded-xl mb-1.5 text-xs font-medium ${isMe ? 'bg-white/10 text-white' : 'bg-gray-50 border border-gray-100 text-gray-700'}`}
+                                                    className={`flex items-center gap-2 px-3 py-2 rounded-xl mb-1.5 text-xs font-medium ${isMe ? 'bg-white/10 text-white' : 'bg-paper-100 border border-paper-300 text-ink-700'}`}
                                                 >
                                                     <FileText size={16} className="flex-shrink-0" />
                                                     <span className="truncate flex-1">{decodeURIComponent(m.media_url.split('/').pop() || 'Attachment')}</span>
@@ -444,7 +444,7 @@ const ThreadPane: React.FC<ThreadPaneProps> = ({ toUserId, onActivity }) => {
                                             )
                                         )}
                                         {m.content && <p className="text-sm leading-relaxed whitespace-pre-wrap">{m.content}</p>}
-                                        <div className={`flex items-center gap-1 mt-1 justify-end ${isMe ? 'text-white/60' : 'text-gray-300'}`}>
+                                        <div className={`flex items-center gap-1 mt-1 justify-end ${isMe ? 'text-white/60' : 'text-paper-500'}`}>
                                             <span className="text-[10px]">{formatClockTime(m.created_at)}</span>
                                             {isMe && renderReceipt(m)}
                                         </div>
@@ -454,7 +454,7 @@ const ThreadPane: React.FC<ThreadPaneProps> = ({ toUserId, onActivity }) => {
                         })}
                         {partnerTyping && (
                             <div className="flex justify-start">
-                                <div className="bg-white border border-gray-100 rounded-2xl rounded-bl-md px-4 py-3">
+                                <div className="bg-white border border-paper-300 rounded-xl rounded-bl-md px-4 py-3">
                                     <span className="typing-dots"><span /><span /><span /></span>
                                 </div>
                             </div>
@@ -464,15 +464,15 @@ const ThreadPane: React.FC<ThreadPaneProps> = ({ toUserId, onActivity }) => {
                 <div ref={messagesEndRef} />
             </div>
 
-            <form onSubmit={handleSend} className="p-3 md:p-4 border-t border-gray-100 bg-white flex-shrink-0 relative">
+            <form onSubmit={handleSend} className="p-3 md:p-4 border-t border-paper-300 bg-white flex-shrink-0 relative">
                 {showEmoji && <EmojiPicker onSelect={handleEmojiSelect} onClose={() => setShowEmoji(false)} />}
-                <div className="flex items-center gap-1 bg-gray-50 border border-gray-200 rounded-full pl-1.5 pr-1.5 py-1.5 focus-within:border-nile-blue focus-within:ring-2 focus-within:ring-nile-blue/10 transition-all">
+                <div className="flex items-center gap-1 bg-paper-100 border border-paper-300 rounded-full pl-1.5 pr-1.5 py-1.5 focus-within:border-nile-blue focus-within:ring-2 focus-within:ring-nile-blue/10 transition-all">
                     <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileSelect} accept="image/*,.pdf,.doc,.docx,.txt" />
                     <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
                         disabled={uploading}
-                        className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-nile-blue hover:bg-white transition-colors flex-shrink-0 disabled:opacity-50"
+                        className="w-8 h-8 flex items-center justify-center rounded-full text-paper-600 hover:text-nile-blue hover:bg-white transition-colors flex-shrink-0 disabled:opacity-50"
                         title="Attach file"
                     >
                         {uploading ? <Loader2 size={16} className="animate-spin" /> : <Paperclip size={16} />}
@@ -481,14 +481,14 @@ const ThreadPane: React.FC<ThreadPaneProps> = ({ toUserId, onActivity }) => {
                         ref={inputRef}
                         type="text"
                         placeholder="Type a message..."
-                        className="flex-1 bg-transparent border-none outline-none text-sm text-gray-800 placeholder:text-gray-400 min-w-0 px-1"
+                        className="flex-1 bg-transparent border-none outline-none text-sm text-ink-800 placeholder:text-paper-600 min-w-0 px-1"
                         value={msg}
                         onChange={e => handleInputChange(e.target.value)}
                     />
                     <button
                         type="button"
                         onClick={() => setShowEmoji(v => !v)}
-                        className="hidden sm:flex w-8 h-8 items-center justify-center rounded-full text-gray-400 hover:text-gray-600 hover:bg-white transition-colors flex-shrink-0"
+                        className="hidden sm:flex w-8 h-8 items-center justify-center rounded-full text-paper-600 hover:text-paper-700 hover:bg-white transition-colors flex-shrink-0"
                         title="Emoji"
                     >
                         <Smile size={16} />
@@ -514,7 +514,7 @@ const ThreadPane: React.FC<ThreadPaneProps> = ({ toUserId, onActivity }) => {
                     >
                         <X size={20} />
                     </button>
-                    <img src={lightbox} alt="Attachment" className="max-w-full max-h-full rounded-2xl object-contain" onClick={e => e.stopPropagation()} />
+                    <img src={lightbox} alt="Attachment" className="max-w-full max-h-full rounded-xl object-contain" onClick={e => e.stopPropagation()} />
                 </div>
             )}
         </>

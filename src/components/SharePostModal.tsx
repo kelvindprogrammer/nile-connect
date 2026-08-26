@@ -49,37 +49,37 @@ const SharePostModal: React.FC<SharePostModalProps> = ({ isOpen, onClose, post }
             onClick={onClose}
         >
             <div
-                className="bg-white rounded-2xl shadow-soft-lg border border-gray-100 w-full max-w-sm max-h-[80vh] flex flex-col overflow-hidden"
+                className="bg-white rounded-xl shadow-soft-lg border border-paper-300 w-full max-w-sm max-h-[80vh] flex flex-col overflow-hidden"
                 onClick={e => e.stopPropagation()}
             >
-                <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
-                    <h3 className="font-semibold text-sm text-gray-900">Send to</h3>
-                    <button onClick={onClose} className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors">
+                <div className="px-5 py-4 border-b border-paper-300 flex items-center justify-between flex-shrink-0">
+                    <h3 className="font-semibold text-sm text-ink-800">Send to</h3>
+                    <button onClick={onClose} className="p-1.5 rounded-lg text-paper-600 hover:bg-paper-200 hover:text-ink-700 transition-colors">
                         <X size={16} />
                     </button>
                 </div>
                 <div className="overflow-y-auto flex-1">
                     {loading ? (
                         <div className="flex items-center justify-center py-10">
-                            <Loader2 size={20} className="animate-spin text-gray-300" />
+                            <Loader2 size={20} className="animate-spin text-paper-500" />
                         </div>
                     ) : conversations.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-12 px-6 text-center gap-2">
-                            <UsersIcon size={28} className="text-gray-200" />
-                            <p className="text-sm text-gray-400">Start a conversation first to share posts.</p>
+                            <UsersIcon size={28} className="text-paper-400" />
+                            <p className="text-sm text-paper-600">Start a conversation first to share posts.</p>
                         </div>
                     ) : conversations.map(c => (
                         <button
                             key={c.user_id}
                             onClick={() => handleSend(c.user_id)}
                             disabled={sendingTo !== null}
-                            className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors disabled:opacity-50"
+                            className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-paper-100 transition-colors disabled:opacity-50"
                         >
                             <Avatar name={c.full_name} size="sm" />
-                            <span className="flex-1 min-w-0 text-sm font-medium text-gray-800 truncate">{c.full_name}</span>
+                            <span className="flex-1 min-w-0 text-sm font-medium text-ink-800 truncate">{c.full_name}</span>
                             {sendingTo === c.user_id
-                                ? <Loader2 size={16} className="animate-spin text-gray-400" />
-                                : <Send size={16} className="text-gray-300" />}
+                                ? <Loader2 size={16} className="animate-spin text-paper-600" />
+                                : <Send size={16} className="text-paper-500" />}
                         </button>
                     ))}
                 </div>

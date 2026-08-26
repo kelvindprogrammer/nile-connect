@@ -9,8 +9,8 @@ const Loader: React.FC<{ size?: 'sm' | 'md' | 'lg' }> = ({ size = 'md' }) => {
 
     return (
         <div className="flex flex-col items-center justify-center space-y-4">
-            <div className={`${sizeClasses[size]} border-black border-t-nile-green rounded-full animate-spin shadow-brutalist-sm`}></div>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black animate-pulse">Loading...</p>
+            <div className={`${sizeClasses[size]} border-paper-400 border-t-nile-green rounded-full animate-spin shadow-soft-xs`}></div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black animate-pulse">Loading...</p>
         </div>
     );
 };

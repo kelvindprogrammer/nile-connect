@@ -19,8 +19,8 @@ const ProfileStrengthCard: React.FC<{
 }> = ({ completion, isLoading, onComplete, accentText = 'text-nile-blue', accentBg = 'bg-nile-blue' }) => {
     if (isLoading) {
         return (
-            <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-4 flex items-center justify-center h-[92px]">
-                <Loader2 size={16} className="animate-spin text-gray-300" />
+            <div className="bg-white border border-paper-300 rounded-xl shadow-card p-4 flex items-center justify-center h-[92px]">
+                <Loader2 size={16} className="animate-spin text-paper-500" />
             </div>
         );
     }
@@ -28,15 +28,15 @@ const ProfileStrengthCard: React.FC<{
     const done = completion.percent >= 100;
 
     return (
-        <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-4">
+        <div className="bg-white border border-paper-300 rounded-xl shadow-card p-4">
             <div className="flex items-center justify-between mb-2">
-                <p className="text-xs font-semibold text-gray-700">Profile strength</p>
+                <p className="text-xs font-semibold text-ink-700">Profile strength</p>
                 <span className={`text-xs font-semibold ${done ? 'text-nile-green' : accentText}`}>
                     {completion.percent}%
                 </span>
             </div>
 
-            <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mb-3">
+            <div className="w-full h-1.5 bg-paper-200 rounded-full overflow-hidden mb-3">
                 <div
                     className={`h-full rounded-full transition-all duration-700 ${done ? 'bg-nile-green' : accentBg}`}
                     style={{ width: `${completion.percent}%` }}
@@ -49,11 +49,11 @@ const ProfileStrengthCard: React.FC<{
                 </p>
             ) : (
                 <>
-                    <p className="text-[11px] text-gray-500 leading-snug mb-2">
+                    <p className="text-[11px] text-paper-700 leading-snug mb-2">
                         Still to add:{' '}
-                        <span className="text-gray-700">{completion.missing.slice(0, 3).join(', ')}</span>
+                        <span className="text-ink-700">{completion.missing.slice(0, 3).join(', ')}</span>
                         {completion.missing.length > 3 && (
-                            <span className="text-gray-400"> +{completion.missing.length - 3} more</span>
+                            <span className="text-paper-600"> +{completion.missing.length - 3} more</span>
                         )}
                     </p>
                     <button

@@ -71,8 +71,8 @@ const ApplicationTracker = () => {
                 {/* Header */}
                 <div className="border-b border-paper-300 pb-6">
                     {eyebrow && <div className="co-eyebrow mb-1">{eyebrow}</div>}
-                    <h2 className="co-display text-3xl md:text-4xl text-gray-900 leading-tight">Applications</h2>
-                    <p className="text-sm text-gray-500 mt-1">Where each application stands, and what the employer is waiting on.</p>
+                    <h2 className="co-display text-3xl md:text-4xl text-ink-800 leading-tight">Applications</h2>
+                    <p className="text-sm text-paper-700 mt-1">Where each application stands, and what the employer is waiting on.</p>
                 </div>
 
                 {/* Status Summary / Pipeline */}
@@ -81,12 +81,12 @@ const ApplicationTracker = () => {
                         { label: 'Applied', count: applied.length, icon: <FileText size={14} strokeWidth={2} />, bg: 'bg-app-tint text-app-accent border-app-accent' },
                         { label: 'Interviews', count: interviews.length, icon: <CheckCircle size={14} strokeWidth={2} />, bg: 'bg-green-50 text-green-700 border-green-600' },
                         { label: 'Offers', count: offers.length, icon: <Clock size={14} strokeWidth={2} />, bg: 'bg-amber-50 text-amber-700 border-amber-600' },
-                        { label: 'Closed', count: closed.length, icon: <Ban size={14} strokeWidth={2} />, bg: 'bg-paper-100 text-gray-500 border-paper-400' },
+                        { label: 'Closed', count: closed.length, icon: <Ban size={14} strokeWidth={2} />, bg: 'bg-paper-100 text-paper-700 border-paper-400' },
                     ].map(cfg => (
                         <div key={cfg.label} className="p-3 bg-paper-100 border border-paper-300 rounded-lg flex items-center justify-between">
                             <div>
-                                <span className="text-xs font-medium text-gray-500 block">{cfg.label}</span>
-                                <span className="font-display text-2xl text-gray-900 leading-none">{cfg.count}</span>
+                                <span className="text-xs font-medium text-paper-700 block">{cfg.label}</span>
+                                <span className="font-display text-2xl text-ink-800 leading-none">{cfg.count}</span>
                             </div>
                             <div className={`p-2 rounded-md ${cfg.bg}`}>
                                 {cfg.icon}
@@ -132,18 +132,18 @@ const Column = ({ title, color, apps, status, onWithdraw }: {
     const headerColor = status === 'applied' ? 'text-nile-blue' : status === 'interviews' ? 'text-nile-green' : 'text-yellow-600';
 
     return (
-        <div className={`${color} rounded-[28px] md:rounded-[35px] border border-gray-100 shadow-card md:shadow-card p-4 md:p-6 space-y-4 md:space-y-6`}>
+        <div className={`${color} rounded-[28px] md:rounded-[35px] border border-paper-300 shadow-card md:shadow-card p-4 md:p-6 space-y-4 md:space-y-6`}>
             <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                     <div className={`w-3 h-3 rounded-full ${dotColor}`}></div>
                     <h3 className={`font-semibold text-xs md:text-sm ${headerColor}`}>{title}</h3>
                 </div>
-                <span className="text-[9px] md:text-xs font-semibold bg-nile-green text-white px-3 py-1 rounded-full border border-black">{apps.length}</span>
+                <span className="text-[9px] md:text-xs font-semibold bg-nile-green text-white px-3 py-1 rounded-full border border-paper-400">{apps.length}</span>
             </div>
 
             <div className="space-y-3 md:space-y-4">
                 {apps.length === 0 ? (
-                    <div className="py-10 text-center border-[2px] border-dashed border-black/10 rounded-[20px]">
+                    <div className="py-10 text-center border-[2px] border-dashed border-paper-400/10 rounded-[20px]">
                         <p className="text-[9px] font-semibold text-black/20">NONE YET</p>
                     </div>
                 ) : (
@@ -168,10 +168,10 @@ const AppCard = ({ app, onWithdraw }: { app: Application; onWithdraw: (app: Appl
     const canWithdraw = !['accepted', 'rejected', 'withdrawn'].includes(app.stage);
 
     return (
-        <div className="bg-white p-4 md:p-6 rounded-[20px] md:rounded-[25px] border border-gray-100 shadow-card md:shadow-card transition-all group relative">
+        <div className="bg-white p-4 md:p-6 rounded-[20px] md:rounded-[25px] border border-paper-300 shadow-card md:shadow-card transition-all group relative">
             <div className="flex justify-between items-start mb-3 md:mb-5">
                 <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-nile-green text-white flex items-center justify-center text-[10px] md:text-sm font-semibold border border-gray-100 flex-shrink-0">
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-xl bg-nile-green text-white flex items-center justify-center text-[10px] md:text-sm font-semibold border border-paper-300 flex-shrink-0">
                         {initials}
                     </div>
                     <div className="min-w-0">
@@ -184,7 +184,7 @@ const AppCard = ({ app, onWithdraw }: { app: Application; onWithdraw: (app: Appl
                         <MoreHorizontal size={16} strokeWidth={3} />
                     </button>
                     {menuOpen && (
-                        <div className="absolute right-0 top-6 z-10 bg-white border border-gray-100 rounded-xl shadow-card py-1 w-36">
+                        <div className="absolute right-0 top-6 z-10 bg-white border border-paper-300 rounded-xl shadow-card py-1 w-36">
                             <button
                                 onClick={() => navigate(`/student/jobs/${app.job_id}`)}
                                 className="w-full text-left px-3 py-2 text-[9px] font-semibold hover:bg-black/5"

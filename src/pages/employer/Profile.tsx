@@ -96,19 +96,19 @@ const EmployerProfile = () => {
         <div className="p-4 md:p-8 space-y-6 md:space-y-10 anime-fade-in font-sans pb-24 md:pb-20 text-left max-w-4xl mx-auto">
 
             {/* Banner Header */}
-            <div className="bg-white border border-gray-100 rounded-[24px] md:rounded-[32px] shadow-green md:shadow-green overflow-hidden">
-                <div className="h-24 md:h-36 bg-black border-b border-gray-100 relative overflow-hidden">
+            <div className="bg-white border border-paper-300 rounded-[24px] md:rounded-[32px] shadow-green md:shadow-green overflow-hidden">
+                <div className="h-24 md:h-36 bg-black border-b border-paper-300 relative overflow-hidden">
                     <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px]" />
                     <button
                         onClick={() => setEditing(!editing)}
-                        className="absolute top-4 right-4 w-10 h-10 bg-white border border-gray-100 rounded-lg hidden md:flex items-center justify-center shadow-sm hover:bg-nile-green transition-colors"
+                        className="absolute top-4 right-4 w-10 h-10 bg-white border border-paper-300 rounded-lg hidden md:flex items-center justify-center shadow-sm hover:bg-nile-green transition-colors"
                     >
                         {editing ? <X size={16} strokeWidth={2.5} /> : <Settings size={16} strokeWidth={2.5} />}
                     </button>
                 </div>
 
                 <div className="px-4 md:px-8 pb-6 md:pb-8 relative">
-                    <div className="absolute -top-8 md:-top-10 left-4 md:left-8 w-16 h-16 md:w-20 md:h-20 bg-white border border-gray-100 rounded-[12px] md:rounded-[16px] shadow-green flex items-center justify-center overflow-hidden group">
+                    <div className="absolute -top-8 md:-top-10 left-4 md:left-8 w-16 h-16 md:w-20 md:h-20 bg-white border border-paper-300 rounded-[12px] md:rounded-[16px] shadow-green flex items-center justify-center overflow-hidden group">
                         {(editing ? editForm.logo_url : profile?.logo_url) ? (
                             <img src={editing ? editForm.logo_url : profile?.logo_url} alt={companyName} className="w-full h-full object-cover" />
                         ) : (
@@ -132,16 +132,16 @@ const EmployerProfile = () => {
                             <div className="flex items-center gap-2 flex-wrap mb-1">
                                 <h1 className="text-xl md:text-3xl font-semibold text-black leading-none truncate">{companyName} .</h1>
                                 {isApproved ? (
-                                    <span className="flex items-center gap-1 bg-nile-green text-white text-[6px] md:text-[7px] font-semibold px-2 py-0.5 rounded border border-black flex-shrink-0">
+                                    <span className="flex items-center gap-1 bg-nile-green text-white text-[6px] md:text-[7px] font-semibold px-2 py-0.5 rounded border border-paper-400 flex-shrink-0">
                                         <ShieldCheck size={8} strokeWidth={3} /> APPROVED
                                     </span>
                                 ) : (
-                                    <span className="flex items-center gap-1 bg-yellow-100 text-yellow-700 text-[6px] md:text-[7px] font-semibold px-2 py-0.5 rounded border border-black flex-shrink-0">
+                                    <span className="flex items-center gap-1 bg-yellow-100 text-yellow-700 text-[6px] md:text-[7px] font-semibold px-2 py-0.5 rounded border border-paper-400 flex-shrink-0">
                                         <ShieldAlert size={8} strokeWidth={3} /> PENDING
                                     </span>
                                 )}
                                 {isVerifiedBadge && (
-                                    <span className="flex items-center gap-1 bg-nile-blue text-white text-[6px] md:text-[7px] font-semibold px-2 py-0.5 rounded border border-black flex-shrink-0">
+                                    <span className="flex items-center gap-1 bg-nile-blue text-white text-[6px] md:text-[7px] font-semibold px-2 py-0.5 rounded border border-paper-400 flex-shrink-0">
                                         <ShieldCheck size={8} strokeWidth={3} /> VERIFIED
                                     </span>
                                 )}
@@ -184,7 +184,7 @@ const EmployerProfile = () => {
                             <textarea
                                 value={editForm.about ?? ''}
                                 onChange={(e) => setEditForm(p => ({ ...p, about: e.target.value }))}
-                                className="w-full h-28 border border-gray-100 rounded-xl p-4 font-bold text-xs outline-none focus:shadow-blue transition-all bg-nile-white/40 resize-none"
+                                className="w-full h-28 border border-paper-300 rounded-xl p-4 font-bold text-xs outline-none focus:shadow-blue transition-all bg-nile-white/40 resize-none"
                                 placeholder="Describe your company..."
                             />
                         ) : (
@@ -200,27 +200,27 @@ const EmployerProfile = () => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label className="text-[9px] font-semibold text-black/40 block mb-1">COMPANY NAME</label>
-                                        <input value={editForm.company_name ?? ''} onChange={e => setEditForm(p => ({ ...p, company_name: e.target.value }))} className="w-full border border-gray-100 rounded-xl p-3 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40" />
+                                        <input value={editForm.company_name ?? ''} onChange={e => setEditForm(p => ({ ...p, company_name: e.target.value }))} className="w-full border border-paper-300 rounded-xl p-3 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40" />
                                     </div>
                                     <div>
                                         <label className="text-[9px] font-semibold text-black/40 block mb-1">INDUSTRY</label>
-                                        <input value={editForm.industry ?? ''} onChange={e => setEditForm(p => ({ ...p, industry: e.target.value }))} className="w-full border border-gray-100 rounded-xl p-3 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40" />
+                                        <input value={editForm.industry ?? ''} onChange={e => setEditForm(p => ({ ...p, industry: e.target.value }))} className="w-full border border-paper-300 rounded-xl p-3 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40" />
                                     </div>
                                     <div>
                                         <label className="text-[9px] font-semibold text-black/40 block mb-1">LOCATION</label>
-                                        <input value={editForm.location ?? ''} onChange={e => setEditForm(p => ({ ...p, location: e.target.value }))} className="w-full border border-gray-100 rounded-xl p-3 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40" />
+                                        <input value={editForm.location ?? ''} onChange={e => setEditForm(p => ({ ...p, location: e.target.value }))} className="w-full border border-paper-300 rounded-xl p-3 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40" />
                                     </div>
                                     <div>
                                         <label className="text-[9px] font-semibold text-black/40 block mb-1">CONTACT EMAIL</label>
-                                        <input type="email" value={editForm.contact_email ?? ''} onChange={e => setEditForm(p => ({ ...p, contact_email: e.target.value }))} className="w-full border border-gray-100 rounded-xl p-3 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40" />
+                                        <input type="email" value={editForm.contact_email ?? ''} onChange={e => setEditForm(p => ({ ...p, contact_email: e.target.value }))} className="w-full border border-paper-300 rounded-xl p-3 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40" />
                                     </div>
                                     <div>
                                         <label className="text-[9px] font-semibold text-black/40 block mb-1">COMPANY SIZE</label>
-                                        <input value={editForm.company_size ?? ''} onChange={e => setEditForm(p => ({ ...p, company_size: e.target.value }))} placeholder="e.g. 51-200 employees" className="w-full border border-gray-100 rounded-xl p-3 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40" />
+                                        <input value={editForm.company_size ?? ''} onChange={e => setEditForm(p => ({ ...p, company_size: e.target.value }))} placeholder="e.g. 51-200 employees" className="w-full border border-paper-300 rounded-xl p-3 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40" />
                                     </div>
                                     <div>
                                         <label className="text-[9px] font-semibold text-black/40 block mb-1">HEADQUARTERS</label>
-                                        <input value={editForm.headquarters ?? ''} onChange={e => setEditForm(p => ({ ...p, headquarters: e.target.value }))} placeholder="e.g. Abuja, Nigeria" className="w-full border border-gray-100 rounded-xl p-3 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40" />
+                                        <input value={editForm.headquarters ?? ''} onChange={e => setEditForm(p => ({ ...p, headquarters: e.target.value }))} placeholder="e.g. Abuja, Nigeria" className="w-full border border-paper-300 rounded-xl p-3 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40" />
                                     </div>
                                     <div>
                                         <label className="text-[9px] font-semibold text-black/40 block mb-1">FOUNDED YEAR</label>
@@ -229,7 +229,7 @@ const EmployerProfile = () => {
                                             value={editForm.founded_year ?? ''}
                                             onChange={e => setEditForm(p => ({ ...p, founded_year: e.target.value ? Number(e.target.value) : undefined }))}
                                             placeholder="e.g. 2015"
-                                            className="w-full border border-gray-100 rounded-xl p-3 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40"
+                                            className="w-full border border-paper-300 rounded-xl p-3 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40"
                                         />
                                     </div>
                                 </div>
@@ -261,11 +261,11 @@ const EmployerProfile = () => {
                                 <>
                                     <div>
                                         <label className="text-[7px] font-semibold text-black/30 flex items-center gap-1.5 mb-1.5"><Globe size={14} /> WEBSITE</label>
-                                        <input value={editForm.website ?? ''} onChange={e => setEditForm(p => ({ ...p, website: e.target.value }))} placeholder="company.io" className="w-full border border-gray-100 rounded-lg p-2 font-semibold text-xs outline-none" />
+                                        <input value={editForm.website ?? ''} onChange={e => setEditForm(p => ({ ...p, website: e.target.value }))} placeholder="company.io" className="w-full border border-paper-300 rounded-lg p-2 font-semibold text-xs outline-none" />
                                     </div>
                                     <div>
                                         <label className="text-[7px] font-semibold text-black/30 flex items-center gap-1.5 mb-1.5"><Link2 size={14} /> LINKEDIN</label>
-                                        <input value={editForm.linkedin ?? ''} onChange={e => setEditForm(p => ({ ...p, linkedin: e.target.value }))} placeholder="linkedin.com/company/..." className="w-full border border-gray-100 rounded-lg p-2 font-semibold text-xs outline-none" />
+                                        <input value={editForm.linkedin ?? ''} onChange={e => setEditForm(p => ({ ...p, linkedin: e.target.value }))} placeholder="linkedin.com/company/..." className="w-full border border-paper-300 rounded-lg p-2 font-semibold text-xs outline-none" />
                                     </div>
                                 </>
                             ) : (

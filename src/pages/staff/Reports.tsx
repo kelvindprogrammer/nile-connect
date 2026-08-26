@@ -192,7 +192,7 @@ const StaffReports = () => {
         <div className="p-4 md:p-8 space-y-8 anime-fade-in font-sans pb-20 text-left min-h-full">
 
             {/* Header */}
-            <div className="border-b border-gray-100 pb-6">
+            <div className="border-b border-paper-300 pb-6">
                 <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">Reports .</h2>
                 <p className="text-[9px] font-semibold text-black/40 mt-1">REAL DATA · CSV EXPORTS · PLATFORM ANALYTICS</p>
             </div>
@@ -205,7 +205,7 @@ const StaffReports = () => {
             ) : (
                 <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
                     {kpis.map(k => (
-                        <div key={k.label} className={`border border-gray-100 rounded-[16px] p-4 shadow-card ${k.color.includes('bg-') ? k.color : `bg-white ${k.color}`}`}>
+                        <div key={k.label} className={`border border-paper-300 rounded-[16px] p-4 shadow-card ${k.color.includes('bg-') ? k.color : `bg-white ${k.color}`}`}>
                             <div className="flex items-center gap-2 mb-2 opacity-60">{k.icon}</div>
                             <p className="text-2xl font-semibold leading-none">{k.value.toLocaleString()}</p>
                             <p className="text-[7px] font-semibold mt-1 opacity-60">{k.label}</p>
@@ -218,16 +218,16 @@ const StaffReports = () => {
 
                 {/* Left: Report builder */}
                 <div className="xl:col-span-7 space-y-6">
-                    <div className="bg-white border border-gray-100 rounded-[28px] p-6 md:p-8 shadow-card">
+                    <div className="bg-white border border-paper-300 rounded-[28px] p-6 md:p-8 shadow-card">
                         <h3 className="text-[10px] font-semibold text-black/50 mb-5">REPORT BUILDER</h3>
 
                         {/* Report type selection */}
                         <div className="space-y-3 mb-6">
                             {(Object.entries(reportMeta) as [ReportType, typeof reportMeta[ReportType]][]).map(([type, m]) => (
                                 <button key={type} onClick={() => { setReportType(type); setSummary(null); }}
-                                    className={`w-full flex items-center gap-4 p-4 border border-gray-100 rounded-[16px] transition-all text-left
+                                    className={`w-full flex items-center gap-4 p-4 border border-paper-300 rounded-[16px] transition-all text-left
                                         ${reportType === type ? 'shadow-green bg-black text-white' : 'bg-nile-white hover:bg-white hover:shadow-card'}`}>
-                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 border-2 ${reportType === type ? 'bg-white/10 border-white/20' : `${m.color} border-black/10`}`}>
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 border-2 ${reportType === type ? 'bg-white/10 border-white/20' : `${m.color} border-paper-400/10`}`}>
                                         {m.icon}
                                     </div>
                                     <div className="flex-1 min-w-0">
@@ -240,14 +240,14 @@ const StaffReports = () => {
                         </div>
 
                         {/* Action buttons */}
-                        <div className="flex flex-col sm:flex-row gap-3 pt-2 border-t border-gray-100/5">
+                        <div className="flex flex-col sm:flex-row gap-3 pt-2 border-t border-paper-300/5">
                             <button onClick={downloadCSV} disabled={isDownloading}
-                                className="flex-1 py-4 bg-black text-white border border-gray-100 rounded-xl font-semibold text-[9px] shadow-green transition-all disabled:opacity-40 flex items-center justify-center gap-2">
+                                className="flex-1 py-4 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all disabled:opacity-40 flex items-center justify-center gap-2">
                                 {isDownloading ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
                                 {isDownloading ? 'GENERATING...' : 'DOWNLOAD CSV'}
                             </button>
                             <button onClick={generateSummary} disabled={generating || loadingStats}
-                                className="flex-1 py-4 bg-white text-black border border-gray-100 rounded-xl font-semibold text-[9px] shadow-card transition-all disabled:opacity-40 flex items-center justify-center gap-2">
+                                className="flex-1 py-4 bg-white text-black border border-paper-300 rounded-xl font-semibold text-[9px] shadow-card transition-all disabled:opacity-40 flex items-center justify-center gap-2">
                                 {generating ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
                                 {generating ? 'GENERATING...' : 'TEXT SUMMARY'}
                             </button>
@@ -256,12 +256,12 @@ const StaffReports = () => {
 
                     {/* Summary output */}
                     {summary && (
-                        <div className="bg-white border border-gray-100 rounded-[24px] shadow-card p-6 anime-fade-in">
+                        <div className="bg-white border border-paper-300 rounded-[24px] shadow-card p-6 anime-fade-in">
                             <div className="flex items-center gap-2 mb-4">
                                 <BarChart3 size={14} className="text-nile-blue" />
                                 <h4 className="text-[9px] font-semibold text-black/50">GENERATED SUMMARY</h4>
                             </div>
-                            <pre className="font-mono text-[10px] text-black whitespace-pre-wrap leading-relaxed bg-nile-white/60 border border-gray-100/10 rounded-xl p-5">
+                            <pre className="font-mono text-[10px] text-black whitespace-pre-wrap leading-relaxed bg-nile-white/60 border border-paper-300/10 rounded-xl p-5">
                                 {summary}
                             </pre>
                         </div>
@@ -271,8 +271,8 @@ const StaffReports = () => {
                 {/* Right: Export info + stats */}
                 <div className="xl:col-span-5 space-y-5">
                     {/* Export preview */}
-                    <div className="bg-nile-blue text-white border border-gray-100 rounded-[24px] p-6 shadow-card">
-                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 ${meta.color} border border-white/20`}>
+                    <div className="bg-nile-blue text-white border border-paper-300 rounded-[24px] p-6 shadow-card">
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${meta.color} border border-white/20`}>
                             {meta.icon}
                         </div>
                         <h3 className="text-sm font-semibold tracking-tight">{meta.label}</h3>
@@ -287,8 +287,8 @@ const StaffReports = () => {
 
                     {/* Quick stats */}
                     {stats && (
-                        <div className="bg-white border border-gray-100 rounded-[24px] p-5 shadow-card space-y-4">
-                            <h3 className="text-[10px] font-semibold text-black/40 pb-3 border-b border-gray-100/5">PLATFORM SNAPSHOT</h3>
+                        <div className="bg-white border border-paper-300 rounded-[24px] p-5 shadow-card space-y-4">
+                            <h3 className="text-[10px] font-semibold text-black/40 pb-3 border-b border-paper-300/5">PLATFORM SNAPSHOT</h3>
                             {[
                                 { label: 'Placement activity', value: `${stats.active_jobs} active jobs`, bar: Math.min(100, stats.active_jobs * 5) },
                                 { label: 'Employer pipeline', value: `${stats.total_employers - stats.pending_employers}/${stats.total_employers} verified`, bar: stats.total_employers > 0 ? Math.round(((stats.total_employers - stats.pending_employers) / stats.total_employers) * 100) : 0 },
@@ -300,7 +300,7 @@ const StaffReports = () => {
                                         <span>{item.label}</span>
                                         <span className="text-black">{item.value}</span>
                                     </div>
-                                    <div className="h-2 bg-nile-white border border-gray-100 rounded-full overflow-hidden p-0.5">
+                                    <div className="h-2 bg-nile-white border border-paper-300 rounded-full overflow-hidden p-0.5">
                                         <div className="h-full bg-black rounded-full transition-all duration-700" style={{ width: `${item.bar}%` }} />
                                     </div>
                                 </div>

@@ -145,7 +145,7 @@ const Profile = () => {
 
                     <div className="px-4 md:px-8 pb-6 md:pb-8 relative">
                         <div className="absolute -top-8 md:-top-12 left-4 md:left-8 group">
-                            <div className="w-16 h-16 md:w-24 md:h-24 rounded-2xl border border-gray-100 bg-white shadow-card flex items-center justify-center overflow-hidden">
+                            <div className="w-16 h-16 md:w-24 md:h-24 rounded-xl border border-paper-300 bg-white shadow-card flex items-center justify-center overflow-hidden">
                                 <Avatar name={displayName} size="lg" src={profilePic || undefined} />
                             </div>
                             <button
@@ -162,7 +162,7 @@ const Profile = () => {
                         <div className="pt-10 md:pt-16 flex flex-col sm:flex-row justify-between sm:items-end gap-4">
                             <div className="space-y-1 flex-grow min-w-0">
                                 <div className="flex items-center gap-2 flex-wrap">
-                                    <h3 className="text-2xl md:text-3xl font-semibold text-gray-900 leading-tight truncate">{displayName}</h3>
+                                    <h3 className="text-2xl md:text-3xl font-semibold text-ink-800 leading-tight truncate">{displayName}</h3>
                                     {isVerified && (
                                         <span className="flex items-center gap-1 bg-nile-green text-white text-xs font-medium px-2.5 py-1 rounded-full flex-shrink-0">
                                             <ShieldCheck size={9} strokeWidth={3} /> Verified
@@ -173,14 +173,14 @@ const Profile = () => {
                                     {[major, 'Nile University', gradYear].filter(Boolean).join(' • ')}
                                 </p>
                                 {location ? (
-                                    <div className="flex items-center gap-2 text-xs text-gray-400 pt-1">
+                                    <div className="flex items-center gap-2 text-xs text-paper-600 pt-1">
                                         <MapPin size={12} strokeWidth={3} />
                                         <span>{location}</span>
                                     </div>
                                 ) : (
                                     <button
                                         onClick={() => navigate('/student/profile/edit')}
-                                        className="flex items-center gap-2 text-xs text-gray-300 hover:text-nile-blue transition-colors pt-1"
+                                        className="flex items-center gap-2 text-xs text-paper-500 hover:text-nile-blue transition-colors pt-1"
                                     >
                                         <MapPin size={12} strokeWidth={3} />
                                         <span>Add your location</span>
@@ -201,7 +201,7 @@ const Profile = () => {
                             </div>
                         </div>
 
-                        <div className="flex flex-wrap gap-6 md:gap-10 mt-5 pt-5 md:pt-6 border-t border-gray-100">
+                        <div className="flex flex-wrap gap-6 md:gap-10 mt-5 pt-5 md:pt-6 border-t border-paper-300">
                             <StatBadge value={appsCount === null ? '—' : String(appsCount)} label="Apps" onClick={() => navigate('/student/applications')} />
                             <StatBadge value={totalViews === null ? '—' : String(totalViews)} label="Profile views" />
                             <StatBadge value={offersCount === null ? '—' : String(offersCount)} label="Offers" onClick={() => navigate('/student/applications')} />
@@ -212,7 +212,7 @@ const Profile = () => {
 
                 {/* Strength tip banner */}
                 {strength < 80 && (
-                    <div className="bg-nile-blue/5 border border-dashed border-nile-blue/20 rounded-2xl p-4 flex items-center justify-between gap-4">
+                    <div className="bg-nile-blue/5 border border-dashed border-nile-blue/20 rounded-xl p-4 flex items-center justify-between gap-4">
                         <p className="text-sm font-medium text-nile-blue">
                             Profile at {strength}% — still to add: {completion.missing.slice(0, 3).join(', ')}
                             {completion.missing.length > 3 ? ` and ${completion.missing.length - 3} more` : ''}
@@ -228,7 +228,7 @@ const Profile = () => {
                     <div className="xl:col-span-2 space-y-6 md:space-y-8">
                         <SectionCard title="About me">
                             {bio ? (
-                                <p className="text-sm text-gray-800 leading-relaxed">{bio}</p>
+                                <p className="text-sm text-ink-800 leading-relaxed">{bio}</p>
                             ) : (
                                 <button
                                     onClick={() => navigate('/student/profile/edit')}
@@ -243,20 +243,20 @@ const Profile = () => {
                             {profile.experiences.length > 0 ? (
                                 <div className="space-y-4">
                                     {profile.experiences.map(exp => (
-                                        <div key={exp.id} className="flex items-start gap-4 p-4 bg-gray-50 border border-gray-100 rounded-2xl">
+                                        <div key={exp.id} className="flex items-start gap-4 p-4 bg-paper-100 border border-paper-300 rounded-xl">
                                             <div className="w-10 h-10 rounded-xl bg-nile-blue text-white flex items-center justify-center flex-shrink-0">
                                                 <Briefcase size={16} />
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <p className="font-semibold text-sm text-gray-900 leading-none">{exp.title}</p>
+                                                <p className="font-semibold text-sm text-ink-800 leading-none">{exp.title}</p>
                                                 <p className="text-xs text-nile-blue mt-1">{exp.company} • {exp.duration}</p>
-                                                {exp.description && <p className="text-xs text-gray-600 mt-2 leading-relaxed">{exp.description}</p>}
+                                                {exp.description && <p className="text-xs text-paper-700 mt-2 leading-relaxed">{exp.description}</p>}
                                             </div>
                                         </div>
                                     ))}
                                     <button
                                         onClick={() => navigate('/student/profile/edit')}
-                                        className="w-full py-3 border border-dashed border-gray-200 rounded-2xl text-xs font-medium text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-all flex items-center justify-center gap-2"
+                                        className="w-full py-3 border border-dashed border-paper-300 rounded-xl text-xs font-medium text-paper-600 hover:bg-paper-100 hover:text-paper-700 transition-all flex items-center justify-center gap-2"
                                     >
                                         <Plus size={12} strokeWidth={3} /> Add experience
                                     </button>
@@ -264,7 +264,7 @@ const Profile = () => {
                             ) : (
                                 <button
                                     onClick={() => navigate('/student/profile/edit')}
-                                    className="w-full py-6 border border-dashed border-gray-200 rounded-2xl text-xs font-medium text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-all flex items-center justify-center gap-2"
+                                    className="w-full py-6 border border-dashed border-paper-300 rounded-xl text-xs font-medium text-paper-600 hover:bg-paper-100 hover:text-paper-700 transition-all flex items-center justify-center gap-2"
                                 >
                                     <Plus size={14} strokeWidth={4} /> Add experience
                                 </button>
@@ -275,7 +275,7 @@ const Profile = () => {
                             {profile.skills.length === 0 ? (
                                 <button
                                     onClick={() => navigate('/student/profile/edit')}
-                                    className="w-full py-6 border border-dashed border-gray-200 rounded-2xl text-xs font-medium text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-all flex items-center justify-center gap-2"
+                                    className="w-full py-6 border border-dashed border-paper-300 rounded-xl text-xs font-medium text-paper-600 hover:bg-paper-100 hover:text-paper-700 transition-all flex items-center justify-center gap-2"
                                 >
                                     <Plus size={14} strokeWidth={4} /> Add your skills
                                 </button>
@@ -284,7 +284,7 @@ const Profile = () => {
                                     {profile.skills.map(s => {
                                         const count = endorsementCount(s);
                                         return (
-                                            <span key={s} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">
+                                            <span key={s} className="flex items-center gap-1.5 px-3 py-1.5 bg-paper-200 text-paper-700 rounded-full text-xs font-medium">
                                                 {s}
                                                 {count > 0 && (
                                                     <span className="px-1.5 py-0.5 rounded-full bg-nile-blue/10 text-nile-blue text-[10px] font-semibold">
@@ -306,9 +306,9 @@ const Profile = () => {
                                     <GraduationCap size={18} />
                                 </div>
                                 <div className="min-w-0">
-                                    <p className="font-semibold text-gray-900 text-sm leading-none truncate">Nile University</p>
+                                    <p className="font-semibold text-ink-800 text-sm leading-none truncate">Nile University</p>
                                     <p className="text-xs text-nile-blue mt-1">{major ? `B.Sc. ${major}` : 'Course not set'}</p>
-                                    {gradYear && <p className="text-xs text-gray-400 mt-2">Class of {gradYear}</p>}
+                                    {gradYear && <p className="text-xs text-paper-600 mt-2">Class of {gradYear}</p>}
                                 </div>
                             </div>
                         </SectionCard>
@@ -319,14 +319,14 @@ const Profile = () => {
                                 {profile.linkedIn ? (
                                     <ContactRow icon={<Link2 size={14} strokeWidth={3} />} label={profile.linkedIn} href={`https://${profile.linkedIn.replace('https://', '')}`} />
                                 ) : (
-                                    <button onClick={() => navigate('/student/profile/edit')} className="w-full flex items-center gap-3 p-3 border border-dashed border-gray-200 rounded-xl text-xs font-medium text-gray-400 hover:border-nile-blue hover:text-nile-blue transition-all">
+                                    <button onClick={() => navigate('/student/profile/edit')} className="w-full flex items-center gap-3 p-3 border border-dashed border-paper-300 rounded-xl text-xs font-medium text-paper-600 hover:border-nile-blue hover:text-nile-blue transition-all">
                                         <Link2 size={14} strokeWidth={3} /> Add LinkedIn
                                     </button>
                                 )}
                                 {profile.portfolio ? (
                                     <ContactRow icon={<ExternalLink size={14} strokeWidth={3} />} label={profile.portfolio} href={`https://${profile.portfolio.replace('https://', '')}`} />
                                 ) : (
-                                    <button onClick={() => navigate('/student/profile/edit')} className="w-full flex items-center gap-3 p-3 border border-dashed border-gray-200 rounded-xl text-xs font-medium text-gray-400 hover:border-nile-blue hover:text-nile-blue transition-all">
+                                    <button onClick={() => navigate('/student/profile/edit')} className="w-full flex items-center gap-3 p-3 border border-dashed border-paper-300 rounded-xl text-xs font-medium text-paper-600 hover:border-nile-blue hover:text-nile-blue transition-all">
                                         <ExternalLink size={14} strokeWidth={3} /> Add portfolio
                                     </button>
                                 )}
@@ -349,19 +349,19 @@ const Profile = () => {
             {/* CV Modal */}
             {showCvModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setShowCvModal(false)}>
-                    <div className="bg-white border border-gray-100 rounded-[28px] shadow-card max-w-sm w-full p-8 space-y-6" onClick={e => e.stopPropagation()}>
+                    <div className="bg-white border border-paper-300 rounded-[28px] shadow-card max-w-sm w-full p-8 space-y-6" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center justify-between">
                             <h3 className="text-xl font-semibold">Your CV</h3>
-                            <button onClick={() => setShowCvModal(false)} className="p-1.5 border border-gray-100/10 rounded-lg hover:bg-black/5">
+                            <button onClick={() => setShowCvModal(false)} className="p-1.5 border border-paper-300/10 rounded-lg hover:bg-black/5">
                                 <X size={16} strokeWidth={3} />
                             </button>
                         </div>
                         {apiProfile?.resume_url ? (
                             <>
-                                <p className="text-sm text-gray-500 leading-relaxed">
+                                <p className="text-sm text-paper-700 leading-relaxed">
                                     This is the CV employers and staff will see when you apply for jobs or career services.
                                 </p>
-                                <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 space-y-3">
+                                <div className="p-4 bg-paper-100 rounded-xl border border-paper-300 space-y-3">
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 bg-nile-blue text-white rounded-xl flex items-center justify-center">
                                             <FileText size={18} />
@@ -381,7 +381,7 @@ const Profile = () => {
                             </>
                         ) : (
                             <>
-                                <p className="text-sm text-gray-500 leading-relaxed">
+                                <p className="text-sm text-paper-700 leading-relaxed">
                                     You haven't uploaded a CV yet. Upload a PDF so employers and career services can review it when you apply.
                                 </p>
                                 <div className="flex gap-3">
@@ -400,8 +400,8 @@ const Profile = () => {
 };
 
 const SectionCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
-    <div className="bg-white p-5 md:p-6 rounded-[20px] md:rounded-[24px] border border-gray-100 shadow-sm">
-        <h3 className="text-base md:text-lg font-semibold text-black mb-4 md:mb-5 pb-2 border-b border-gray-100">{title}</h3>
+    <div className="bg-white p-5 md:p-6 rounded-[20px] md:rounded-[24px] border border-paper-300 shadow-sm">
+        <h3 className="text-base md:text-lg font-semibold text-black mb-4 md:mb-5 pb-2 border-b border-paper-300">{title}</h3>
         {children}
     </div>
 );
@@ -411,7 +411,7 @@ const StatBadge = ({ value, label, highlight = false, onClick }: { value: string
     return (
         <Tag onClick={onClick} className={`text-left ${onClick ? 'hover:opacity-70 transition-opacity cursor-pointer' : ''}`}>
             <p className={`text-xl md:text-2xl font-semibold leading-none ${highlight ? 'text-nile-green' : 'text-black'}`}>{value}</p>
-            <p className="text-xs font-medium text-gray-400 mt-1">{label}</p>
+            <p className="text-xs font-medium text-paper-600 mt-1">{label}</p>
         </Tag>
     );
 };
@@ -421,7 +421,7 @@ const ContactRow = ({ icon, label, href }: { icon: React.ReactNode; label: strin
         href={href}
         target={href?.startsWith('http') ? '_blank' : undefined}
         rel="noreferrer"
-        className="flex items-center gap-3 p-3 border border-gray-100 rounded-xl hover:translate-y-[-1px] transition-all cursor-pointer shadow-sm group hover:bg-nile-blue hover:text-white"
+        className="flex items-center gap-3 p-3 border border-paper-300 rounded-xl hover:translate-y-[-1px] transition-all cursor-pointer shadow-sm group hover:bg-nile-blue hover:text-white"
         onClick={e => !href && e.preventDefault()}
     >
         <span className="flex-shrink-0">{icon}</span>

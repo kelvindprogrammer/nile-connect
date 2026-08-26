@@ -22,7 +22,7 @@ const stageColor: Record<string, string> = {
     offer_extended:       'bg-nile-green/20 text-nile-green border-nile-green/30',
     accepted:             'bg-nile-green/20 text-nile-green border-nile-green/30',
     rejected:             'bg-red-50 text-red-500 border-red-200',
-    withdrawn:            'bg-black/5 text-black/40 border-black/10',
+    withdrawn:            'bg-black/5 text-black/40 border-paper-400/10',
 };
 
 const stageLabel = (s: string) => APPLICATION_STAGES.find(x => x.value === s)?.label ?? s;
@@ -72,7 +72,7 @@ const EmployerApplications = () => {
 
     if (loading && applications.length === 0) return (
         <div className="p-4 md:p-8 space-y-6 animate-pulse">
-            <div className="h-12 bg-black/5 rounded-2xl w-64" />
+            <div className="h-12 bg-black/5 rounded-xl w-64" />
             <div className="flex gap-2">{[1,2,3,4].map(i => <div key={i} className="h-9 bg-black/5 rounded-xl w-24" />)}</div>
             {[1,2,3,4].map(i => <div key={i} className="h-24 bg-black/5 rounded-[20px]" />)}
         </div>
@@ -80,14 +80,14 @@ const EmployerApplications = () => {
 
     return (
         <div className="p-4 md:p-8 space-y-8 anime-fade-in font-sans pb-20 text-left min-h-full">
-            <div className="border-b border-gray-100 pb-6">
+            <div className="border-b border-paper-300 pb-6">
                 <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">Applications .</h2>
                 <p className="text-[9px] font-semibold text-black/40 mt-1">
                     {applications.length} TOTAL · {applications.filter(a => a.stage === 'submitted').length} NEW · MANAGE YOUR PIPELINE
                 </p>
             </div>
 
-            <div className="flex bg-white p-1 border border-gray-100 rounded-2xl shadow-sm overflow-x-auto">
+            <div className="flex bg-white p-1 border border-paper-300 rounded-xl shadow-sm overflow-x-auto">
                 <button onClick={() => setFilter('all')}
                     className={`flex items-center gap-1.5 px-3 md:px-5 py-2 rounded-xl font-semibold text-[8px] transition-all whitespace-nowrap flex-shrink-0
                         ${filter === 'all' ? 'bg-black text-white shadow-green' : 'text-black/40 hover:text-black'}`}>
@@ -113,14 +113,14 @@ const EmployerApplications = () => {
                     <Search size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-black/30" />
                     <input type="text" value={search} onChange={e => setSearch(e.target.value)}
                         placeholder="SEARCH BY NAME OR MAJOR..."
-                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-100 font-semibold text-[9px] outline-none focus:shadow-card bg-nile-white/60 focus:bg-white transition-all" />
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-paper-300 font-semibold text-[9px] outline-none focus:shadow-card bg-nile-white/60 focus:bg-white transition-all" />
                 </div>
                 <div className="relative">
                     <ArrowUpDown size={12} className="absolute left-4 top-1/2 -translate-y-1/2 text-black/30 pointer-events-none" />
                     <select
                         value={sort}
                         onChange={e => setSort(e.target.value as SortOption)}
-                        className="appearance-none pl-10 pr-8 py-3 rounded-xl border border-gray-100 font-semibold text-[9px] outline-none focus:shadow-card bg-nile-white/60 focus:bg-white transition-all cursor-pointer"
+                        className="appearance-none pl-10 pr-8 py-3 rounded-xl border border-paper-300 font-semibold text-[9px] outline-none focus:shadow-card bg-nile-white/60 focus:bg-white transition-all cursor-pointer"
                     >
                         <option value="">SORT: DEFAULT</option>
                         <option value="gpa">GPA (HIGH TO LOW)</option>
@@ -131,7 +131,7 @@ const EmployerApplications = () => {
             </div>
 
             {applications.length === 0 ? (
-                <div className="py-20 text-center border-[2px] border-dashed border-black/10 rounded-[28px]">
+                <div className="py-20 text-center border-[2px] border-dashed border-paper-400/10 rounded-[28px]">
                     <ClipboardList size={28} className="text-black/15 mx-auto mb-4" />
                     <p className="text-[9px] font-semibold text-black/30">
                         {search ? 'No matches' : filter === 'all' ? 'No applications yet — post jobs to attract talent' : `No ${stageLabel(filter).toLowerCase()} applications`}
@@ -140,7 +140,7 @@ const EmployerApplications = () => {
             ) : (
                 <div className="space-y-3">
                     {applications.map(app => (
-                        <div key={app.id} className="bg-white border border-gray-100 rounded-[20px] p-4 md:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 hover:shadow-card transition-all">
+                        <div key={app.id} className="bg-white border border-paper-300 rounded-[20px] p-4 md:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 hover:shadow-card transition-all">
                             <button onClick={() => navigate(`/employer/candidates/${app.id}`)} className="w-10 h-10 bg-nile-blue text-white rounded-xl flex items-center justify-center font-semibold text-sm flex-shrink-0">
                                 {(app.student_name || '?').charAt(0).toUpperCase()}
                             </button>
@@ -180,7 +180,7 @@ const EmployerApplications = () => {
                             </div>
                             <div className="flex items-center gap-2 w-full sm:w-auto flex-shrink-0">
                                 <button onClick={() => navigate('/employer/messages')}
-                                    className="p-2 border border-gray-100/10 rounded-xl text-black/40 hover:border-black hover:text-nile-blue transition-all">
+                                    className="p-2 border border-paper-300/10 rounded-xl text-black/40 hover:border-paper-400 hover:text-nile-blue transition-all">
                                     <MessageSquare size={14} />
                                 </button>
                                 <StageSelect current={app.stage} loading={!!actionLoading[app.id]} onChange={s => handleStageChange(app, s)} />
@@ -196,7 +196,7 @@ const EmployerApplications = () => {
 const StageSelect = ({ current, loading, onChange }: {
     current: string; loading: boolean; onChange: (s: string) => void;
 }) => {
-    const cfg = stageColor[current] || 'bg-black/5 text-black/40 border-black/10';
+    const cfg = stageColor[current] || 'bg-black/5 text-black/40 border-paper-400/10';
     return loading ? (
         <div className={`flex items-center gap-2 px-3 py-2 border-[2px] rounded-xl font-semibold text-[8px] ${cfg}`}>
             <Loader2 size={11} className="animate-spin" /> ...

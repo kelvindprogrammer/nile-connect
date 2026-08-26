@@ -34,8 +34,8 @@ const NileConnectLogo: React.FC<NileConnectLogoProps> = ({
     className = '',
 }) => {
     const s = sizeMap[size];
-    const textMain = textColor === 'white' ? 'text-white' : 'text-[#1E499D]';
-    const textSub  = textColor === 'white' ? 'text-[#6CBB56]' : 'text-[#6CBB56]';
+    const textMain = textColor === 'white' ? 'text-white' : 'text-app-accent';
+    const textSub  = textColor === 'white' ? 'text-nile-green' : 'text-nile-green';
 
     return (
         <div className={`flex flex-col items-center ${s.gap} ${className}`}>
@@ -47,14 +47,14 @@ const NileConnectLogo: React.FC<NileConnectLogoProps> = ({
                 {/* Outer glow (subtle) */}
                 <div
                     className="absolute inset-0 rounded-full opacity-20 blur-xl"
-                    style={{ background: '#1E499D', transform: 'scale(0.8)' }}
+                    style={{ background: 'var(--app-accent)', transform: 'scale(0.8)' }}
                 />
 
                 {/* Orbit ring (dashed green) */}
                 <div
                     className="absolute inset-0 rounded-full"
                     style={{
-                        border: '2px dashed #6CBB56',
+                        border: '2px dashed var(--status-success)',
                         opacity: 0.85,
                     }}
                 />
@@ -68,7 +68,7 @@ const NileConnectLogo: React.FC<NileConnectLogoProps> = ({
                         className="absolute rounded-full border-[1.5px] border-white shadow-md"
                         style={{
                             width: s.node1, height: s.node1,
-                            background: '#6CBB56',
+                            background: 'var(--status-success)',
                             top: -(s.node1 / 2),
                             left: '50%',
                             marginLeft: -(s.node1 / 2),
@@ -88,7 +88,7 @@ const NileConnectLogo: React.FC<NileConnectLogoProps> = ({
                         className="absolute rounded-full border-[1.5px] border-white shadow-md"
                         style={{
                             width: s.node2, height: s.node2,
-                            background: '#1E499D',
+                            background: 'var(--app-accent)',
                             top: -(s.node2 / 2),
                             left: '50%',
                             marginLeft: -(s.node2 / 2),
@@ -98,7 +98,7 @@ const NileConnectLogo: React.FC<NileConnectLogoProps> = ({
 
                 {/* Center circle */}
                 <div
-                    className="relative z-10 rounded-full bg-[#1E499D] flex items-center justify-center shadow-lg"
+                    className="relative z-10 rounded-full bg-app-accent flex items-center justify-center shadow-lg"
                     style={{ width: s.circle, height: s.circle }}
                 >
                     <Users
@@ -113,14 +113,14 @@ const NileConnectLogo: React.FC<NileConnectLogoProps> = ({
             {showText && (
                 <div className="text-center select-none">
                     <p
-                        className={`font-black leading-none ${s.titleSize} ${textMain}`}
+                        className={`font-semibold leading-none ${s.titleSize} ${textMain}`}
                         style={{ fontFamily: "'Georgia', 'Times New Roman', serif", fontStyle: 'italic' }}
                     >
-                        Connect<span style={{ color: '#6CBB56' }}>.</span>
+                        Connect<span style={{ color: 'var(--status-success)' }}>.</span>
                     </p>
                     {showTagline && (
                         <p
-                            className={`font-black uppercase tracking-[0.35em] mt-1 ${s.taglineSize} ${textSub}`}
+                            className={`font-semibold uppercase tracking-[0.35em] mt-1 ${s.taglineSize} ${textSub}`}
                         >
                             EMPOWERING STUDENTS
                         </p>

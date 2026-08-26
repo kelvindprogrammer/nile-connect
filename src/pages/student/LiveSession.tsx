@@ -211,7 +211,7 @@ const LiveSession = () => {
     // ── ENDED ─────────────────────────────────────────────────────────────────
     if (phase === 'ended') return (
         <div className="min-h-screen bg-black flex items-center justify-center p-6">
-            <div className="bg-white border border-gray-100 rounded-[32px] p-8 md:p-12 text-center max-w-md w-full shadow-green">
+            <div className="bg-white border border-paper-300 rounded-[32px] p-8 md:p-12 text-center max-w-md w-full shadow-green">
                 <NileConnectLogo size="sm" showText showTagline={false} animated={false} className="mb-6 justify-center" />
                 <CheckCircle2 size={48} className="text-nile-green mx-auto mb-4" strokeWidth={1.5} />
                 <h2 className="text-2xl font-semibold tracking-tight mb-2">Session Complete</h2>
@@ -221,11 +221,11 @@ const LiveSession = () => {
                 </p>
                 <div className="flex gap-3">
                     <button onClick={() => navigate(role === 'staff' ? '/staff/services' : '/student/career')}
-                        className="flex-1 py-3 border border-gray-100 rounded-xl font-semibold text-[9px] hover:bg-black hover:text-white transition-all">
+                        className="flex-1 py-3 border border-paper-300 rounded-xl font-semibold text-[9px] hover:bg-black hover:text-white transition-all">
                         {role === 'staff' ? 'SERVICES' : 'CAREER CENTER'}
                     </button>
                     <button onClick={() => navigate(basePath)}
-                        className="flex-1 py-3 bg-nile-blue text-white border border-gray-100 rounded-xl font-semibold text-[9px] shadow-green transition-all">
+                        className="flex-1 py-3 bg-nile-blue text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all">
                         DASHBOARD
                     </button>
                 </div>

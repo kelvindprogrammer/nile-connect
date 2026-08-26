@@ -111,21 +111,21 @@ const CareerCenter = () => {
             <div className="p-4 md:p-10 space-y-6 md:space-y-8 font-sans bg-nile-white min-h-full pb-24">
 
                 {/* Header */}
-                <div className="border-b border-gray-100 pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+                <div className="border-b border-paper-300 pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
                     <div>
                         <h2 className="text-3xl md:text-6xl font-semibold text-black leading-none">Careers .</h2>
                         <p className="text-[10px] md:text-lg font-bold text-nile-blue/70 mt-2">Accelerate your professional readiness .</p>
                     </div>
                     <button
                         onClick={handleStartLiveSession}
-                        className="flex items-center gap-2 px-5 py-3 bg-nile-blue text-white border border-gray-100 rounded-xl font-semibold text-[9px] shadow-green transition-all flex-shrink-0 animate-pulse"
+                        className="flex items-center gap-2 px-5 py-3 bg-nile-blue text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all flex-shrink-0 animate-pulse"
                     >
                         <Zap size={13} strokeWidth={3} /> START LIVE SESSION
                     </button>
                 </div>
 
                 {/* Career Readiness Banner */}
-                <div className="bg-nile-green text-white p-6 md:p-8 rounded-[28px] border border-gray-100 shadow-card flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5">
+                <div className="bg-nile-green text-white p-6 md:p-8 rounded-[28px] border border-paper-300 shadow-card flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5">
                     <div className="space-y-3 flex-1">
                         <p className="text-[9px] font-semibold text-white/60">OVERALL READINESS</p>
                         <h3 className="text-xl md:text-3xl font-semibold text-white">Profile Strength</h3>
@@ -143,7 +143,7 @@ const CareerCenter = () => {
                     </div>
                     <button
                         onClick={() => setShowRequestModal(true)}
-                        className="bg-white text-nile-green font-semibold py-3 px-6 rounded-full border border-gray-100 shadow-card transition-all text-[10px] whitespace-nowrap flex-shrink-0"
+                        className="bg-white text-nile-green font-semibold py-3 px-6 rounded-full border border-paper-300 shadow-card transition-all text-[10px] whitespace-nowrap flex-shrink-0"
                     >
                         REQUEST CAREER SERVICE
                     </button>
@@ -152,16 +152,16 @@ const CareerCenter = () => {
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 md:gap-8">
 
                     {/* AI Architect Card */}
-                    <div className="bg-white p-6 md:p-8 rounded-[28px] border border-gray-100 shadow-card space-y-5 text-left">
+                    <div className="bg-white p-6 md:p-8 rounded-[28px] border border-paper-300 shadow-card space-y-5 text-left">
                         <div className="flex justify-between items-center">
                             <h3 className="text-xl md:text-2xl font-semibold text-black">AI Architect .</h3>
-                            <div className="w-10 h-10 bg-nile-green text-white rounded-xl border border-gray-100 shadow-card flex items-center justify-center">
+                            <div className="w-10 h-10 bg-nile-green text-white rounded-xl border border-paper-300 shadow-card flex items-center justify-center">
                                 <Cpu size={18} strokeWidth={2.5} />
                             </div>
                         </div>
                         <div
                             onClick={() => navigate('/student/career/ai')}
-                            className="aspect-video border-[2px] border-dashed border-black rounded-[20px] flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-nile-green/5 transition-all group"
+                            className="aspect-video border-[2px] border-dashed border-paper-400 rounded-[20px] flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-nile-green/5 transition-all group"
                         >
                             <Sparkles size={36} strokeWidth={2} className="text-nile-blue/30 group-hover:text-nile-green group-hover:scale-110 transition-all" />
                             <div className="text-center">
@@ -171,7 +171,7 @@ const CareerCenter = () => {
                         </div>
                         <button
                             onClick={() => navigate('/student/career/ai')}
-                            className="w-full bg-nile-green text-white font-semibold py-3.5 rounded-full border border-gray-100 shadow-card transition-all text-[10px] flex items-center justify-center gap-2"
+                            className="w-full bg-nile-green text-white font-semibold py-3.5 rounded-full border border-paper-300 shadow-card transition-all text-[10px] flex items-center justify-center gap-2"
                         >
                             <Cpu size={14} /> LAUNCH NEURAL ANALYSIS
                         </button>
@@ -181,10 +181,10 @@ const CareerCenter = () => {
                     <div className="space-y-6">
 
                         {/* Mock Interview */}
-                        <div className="bg-white p-6 md:p-8 rounded-[28px] border border-gray-100 shadow-card text-left">
+                        <div className="bg-white p-6 md:p-8 rounded-[28px] border border-paper-300 shadow-card text-left">
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="text-lg md:text-xl font-semibold text-black">Mock Interview .</h3>
-                                <div className="w-10 h-10 bg-nile-blue text-white rounded-xl border border-gray-100 shadow-card flex items-center justify-center">
+                                <div className="w-10 h-10 bg-nile-blue text-white rounded-xl border border-paper-300 shadow-card flex items-center justify-center">
                                     <Video size={16} strokeWidth={2.5} />
                                 </div>
                             </div>
@@ -193,14 +193,14 @@ const CareerCenter = () => {
                             </p>
                             <div className="grid grid-cols-3 gap-2 mb-5">
                                 {['Behavioral', 'Technical', 'HR Round'].map(t => (
-                                    <div key={t} className="text-center p-2.5 bg-nile-white border border-gray-100/10 rounded-xl">
+                                    <div key={t} className="text-center p-2.5 bg-nile-white border border-paper-300/10 rounded-xl">
                                         <p className="text-[8px] font-semibold text-black/50">{t}</p>
                                     </div>
                                 ))}
                             </div>
                             <button
                                 onClick={() => navigate('/student/career/mock-interview')}
-                                className="w-full bg-nile-blue text-white font-semibold py-3.5 rounded-full border border-gray-100 shadow-card transition-all text-[10px] flex items-center justify-center gap-2"
+                                className="w-full bg-nile-blue text-white font-semibold py-3.5 rounded-full border border-paper-300 shadow-card transition-all text-[10px] flex items-center justify-center gap-2"
                             >
                                 <span>START SESSION</span>
                                 <ArrowUpRight size={16} strokeWidth={3} />
@@ -208,7 +208,7 @@ const CareerCenter = () => {
                         </div>
 
                         {/* Career Services */}
-                        <div className="bg-white p-6 md:p-8 rounded-[28px] border border-gray-100 shadow-card text-left">
+                        <div className="bg-white p-6 md:p-8 rounded-[28px] border border-paper-300 shadow-card text-left">
                             <div className="flex justify-between items-center mb-5">
                                 <h3 className="text-lg md:text-xl font-semibold text-black">Career Services .</h3>
                                 <button
@@ -248,10 +248,10 @@ const CareerCenter = () => {
             {/* Request Service Modal */}
             {showRequestModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setShowRequestModal(false)}>
-                    <div className="bg-white border border-gray-100 rounded-[28px] shadow-card max-w-md w-full p-6 md:p-8 space-y-6" onClick={e => e.stopPropagation()}>
+                    <div className="bg-white border border-paper-300 rounded-[28px] shadow-card max-w-md w-full p-6 md:p-8 space-y-6" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center justify-between">
                             <h3 className="text-xl font-semibold">Request Career Service</h3>
-                            <button onClick={() => setShowRequestModal(false)} className="p-1.5 border border-gray-100/10 rounded-lg hover:bg-black/5">
+                            <button onClick={() => setShowRequestModal(false)} className="p-1.5 border border-paper-300/10 rounded-lg hover:bg-black/5">
                                 <X size={16} strokeWidth={3} />
                             </button>
                         </div>
@@ -268,7 +268,7 @@ const CareerCenter = () => {
                                             className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${
                                                 requestType === t.value
                                                     ? 'border-nile-blue bg-nile-blue/5 shadow-blue'
-                                                    : 'border-gray-100 hover:border-nile-blue/30'
+                                                    : 'border-paper-300 hover:border-nile-blue/30'
                                             }`}
                                         >
                                             <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${requestType === t.value ? 'bg-nile-blue text-white' : 'bg-nile-white text-nile-blue'}`}>
@@ -288,7 +288,7 @@ const CareerCenter = () => {
                                     value={requestNotes}
                                     onChange={e => setRequestNotes(e.target.value)}
                                     placeholder="e.g. My CV needs improvement and I have an interview at Google next month..."
-                                    className="w-full h-24 border border-gray-100 rounded-xl py-3 px-4 font-bold text-sm outline-none focus:shadow-blue transition-all bg-nile-white/40 resize-none"
+                                    className="w-full h-24 border border-paper-300 rounded-xl py-3 px-4 font-bold text-sm outline-none focus:shadow-blue transition-all bg-nile-white/40 resize-none"
                                 />
                             </div>
                             <div className="flex gap-3">
@@ -305,11 +305,11 @@ const CareerCenter = () => {
             {/* Live Session Modal */}
             {showSessionModal && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={() => setShowSessionModal(false)}>
-                    <div className="bg-white border border-gray-100 rounded-[28px] shadow-green max-w-md w-full p-6 space-y-5 anime-fade-in"
+                    <div className="bg-white border border-paper-300 rounded-[28px] shadow-green max-w-md w-full p-6 space-y-5 anime-fade-in"
                         onClick={e => e.stopPropagation()}>
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-nile-blue rounded-xl border border-gray-100 flex items-center justify-center">
+                                <div className="w-10 h-10 bg-nile-blue rounded-xl border border-paper-300 flex items-center justify-center">
                                     <Video size={18} className="text-white" />
                                 </div>
                                 <div>
@@ -317,7 +317,7 @@ const CareerCenter = () => {
                                     <p className="text-[7px] font-semibold text-black/40">REAL-TIME VIDEO CALL</p>
                                 </div>
                             </div>
-                            <button onClick={() => setShowSessionModal(false)} className="p-1.5 rounded-lg border border-gray-100/10 hover:bg-black/5">
+                            <button onClick={() => setShowSessionModal(false)} className="p-1.5 rounded-lg border border-paper-300/10 hover:bg-black/5">
                                 <X size={14} strokeWidth={3} />
                             </button>
                         </div>
@@ -334,13 +334,13 @@ const CareerCenter = () => {
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => { navigator.clipboard.writeText(sessionLink); showToast('Link copied!', 'success'); }}
-                                    className="flex items-center gap-1.5 px-3 py-2 border border-gray-100 rounded-xl font-semibold text-[8px] hover:bg-black hover:text-white transition-all"
+                                    className="flex items-center gap-1.5 px-3 py-2 border border-paper-300 rounded-xl font-semibold text-[8px] hover:bg-black hover:text-white transition-all"
                                 >
                                     <Copy size={12} /> COPY LINK
                                 </button>
                                 <button
                                     onClick={handleJoinSession}
-                                    className="flex-1 py-2 bg-nile-blue text-white border border-gray-100 rounded-xl font-semibold text-[9px] shadow-green transition-all flex items-center justify-center gap-2"
+                                    className="flex-1 py-2 bg-nile-blue text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all flex items-center justify-center gap-2"
                                 >
                                     <Zap size={12} /> JOIN NOW
                                 </button>
@@ -356,10 +356,10 @@ const CareerCenter = () => {
 const ServiceRequestCard = ({ req, onJoin }: { req: ServiceRequestItem; onJoin: (roomId: string) => void }) => {
     const scheduled = formatDate(req.scheduled_at);
     return (
-        <div className="p-4 border border-gray-100 rounded-[18px] shadow-card bg-white space-y-2">
+        <div className="p-4 border border-paper-300 rounded-[18px] shadow-card bg-white space-y-2">
             <div className="flex items-center justify-between gap-2">
                 <p className="font-semibold text-black text-[11px] leading-none">{TYPE_LABELS[req.type] || req.type}</p>
-                <span className={`text-[8px] font-semibold px-2 py-1 rounded-full uppercase ${STATUS_STYLES[req.status] || 'bg-gray-100 text-gray-600'}`}>
+                <span className={`text-[8px] font-semibold px-2 py-1 rounded-full uppercase ${STATUS_STYLES[req.status] || 'bg-paper-200 text-paper-700'}`}>
                     {req.status}
                 </span>
             </div>
@@ -381,7 +381,7 @@ const ServiceRequestCard = ({ req, onJoin }: { req: ServiceRequestItem; onJoin: 
             {req.status === 'scheduled' && req.room_id && (
                 <button
                     onClick={() => onJoin(req.room_id)}
-                    className="w-full mt-1 flex items-center justify-center gap-2 py-2 bg-nile-blue text-white border border-gray-100 rounded-xl font-semibold text-[9px] shadow-green transition-all"
+                    className="w-full mt-1 flex items-center justify-center gap-2 py-2 bg-nile-blue text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all"
                 >
                     <Zap size={12} /> JOIN SESSION
                 </button>

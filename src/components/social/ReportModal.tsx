@@ -78,9 +78,9 @@ const ReportModal: React.FC<ReportModalProps> = ({
                         <div className="w-10 h-10 rounded-full bg-nile-green/15 text-nile-green flex items-center justify-center flex-shrink-0">
                             <Check size={18} strokeWidth={3} />
                         </div>
-                        <p className="text-sm text-gray-700 leading-relaxed">{done}</p>
+                        <p className="text-sm text-ink-700 leading-relaxed">{done}</p>
                     </div>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-paper-700">
                         You will not be told the outcome of the review, to protect everyone's privacy.
                         If you need to stop seeing this person, you can also block them.
                     </p>
@@ -93,17 +93,17 @@ const ReportModal: React.FC<ReportModalProps> = ({
     return (
         <Modal isOpen onClose={onClose} title={`Report ${subjectLabel}`} maxWidth="sm">
             <form onSubmit={handleSubmit} className="space-y-4 text-left">
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-paper-700">
                     Your report is confidential. {subjectLabel.replace(/'s.*/, '')} will not be told who reported them.
                 </p>
 
                 {loadingReasons ? (
                     <div className="flex items-center justify-center py-8">
-                        <Loader2 size={20} className="animate-spin text-gray-300" />
+                        <Loader2 size={20} className="animate-spin text-paper-500" />
                     </div>
                 ) : (
                     <fieldset className="space-y-1.5">
-                        <legend className="text-xs font-medium text-gray-700 mb-1.5">
+                        <legend className="text-xs font-medium text-ink-700 mb-1.5">
                             What's the problem?
                         </legend>
                         {reasons.map(r => (
@@ -112,7 +112,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
                                 className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-colors
                                     ${selected === r.reason
                                         ? 'border-nile-blue bg-nile-blue/5'
-                                        : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50'}`}
+                                        : 'border-paper-300 hover:border-paper-300 hover:bg-paper-100'}`}
                             >
                                 <input
                                     type="radio"
@@ -123,8 +123,8 @@ const ReportModal: React.FC<ReportModalProps> = ({
                                     className="mt-0.5 accent-nile-blue"
                                 />
                                 <span className="min-w-0">
-                                    <span className="block text-sm font-medium text-gray-900">{r.label}</span>
-                                    <span className="block text-[11px] text-gray-500 mt-0.5 leading-snug">{r.help}</span>
+                                    <span className="block text-sm font-medium text-ink-800">{r.label}</span>
+                                    <span className="block text-[11px] text-paper-700 mt-0.5 leading-snug">{r.help}</span>
                                 </span>
                             </label>
                         ))}
@@ -138,7 +138,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
                             <LifeBuoy size={15} />
                             <p className="text-xs font-semibold">If someone is in immediate danger</p>
                         </div>
-                        <p className="text-[11px] text-gray-700 leading-relaxed">
+                        <p className="text-[11px] text-ink-700 leading-relaxed">
                             Please contact emergency services or the university counselling team directly —
                             they can act faster than a content review. Your report will still be sent to
                             Career Services and treated as urgent.
@@ -147,8 +147,8 @@ const ReportModal: React.FC<ReportModalProps> = ({
                 )}
 
                 <div>
-                    <label htmlFor="report-details" className="block text-xs font-medium text-gray-700 mb-1.5">
-                        Anything else we should know? <span className="text-gray-400">(optional)</span>
+                    <label htmlFor="report-details" className="block text-xs font-medium text-ink-700 mb-1.5">
+                        Anything else we should know? <span className="text-paper-600">(optional)</span>
                     </label>
                     <textarea
                         id="report-details"
@@ -157,7 +157,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
                         maxLength={2000}
                         rows={3}
                         placeholder="Add any context that would help our team review this."
-                        className="w-full border border-gray-200 rounded-xl py-2.5 px-3.5 text-sm outline-none
+                        className="w-full border border-paper-300 rounded-xl py-2.5 px-3.5 text-sm outline-none
                                    transition-all bg-white resize-none
                                    focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10"
                     />

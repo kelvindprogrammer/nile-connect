@@ -34,10 +34,10 @@ const JOB_TYPES: { value: string; label: string }[] = [
 ];
 
 const APP_STATUS_GROUPS: { key: AppStatusGroup; label: string; color: string; bg: string; dot: string }[] = [
-    { key: 'applied',   label: 'Applied',   color: 'text-nile-blue',  bg: 'bg-nile-blue/10 border-nile-blue/20',   dot: '#1E499D' },
+    { key: 'applied',   label: 'Applied',   color: 'text-nile-blue',  bg: 'bg-nile-blue/10 border-nile-blue/20',   dot: 'var(--app-accent)' },
     { key: 'screening', label: 'Screening', color: 'text-purple-600', bg: 'bg-purple-50 border-purple-200',        dot: '#9333ea' },
     { key: 'interview', label: 'Interview', color: 'text-yellow-600', bg: 'bg-yellow-50 border-yellow-200',        dot: '#ca8a04' },
-    { key: 'offer',     label: 'Offer',     color: 'text-nile-green', bg: 'bg-nile-green/10 border-nile-green/20', dot: '#6CBB56' },
+    { key: 'offer',     label: 'Offer',     color: 'text-nile-green', bg: 'bg-nile-green/10 border-nile-green/20', dot: 'var(--status-success)' },
     { key: 'rejected',  label: 'Rejected',  color: 'text-red-500',   bg: 'bg-red-50 border-red-200',              dot: '#ef4444' },
 ];
 
@@ -53,7 +53,7 @@ const STATUS_BADGE: Record<string, string> = {
     pending:  'bg-yellow-50 text-yellow-600 border-yellow-200',
     active:   'bg-nile-green/15 text-nile-green border-nile-green/30',
     rejected: 'bg-red-50 text-red-500 border-red-200',
-    archived: 'bg-black/5 text-black/40 border-black/10',
+    archived: 'bg-black/5 text-black/40 border-paper-400/10',
 };
 
 const EMPTY_FORM: PostJobRequest = {
@@ -89,24 +89,24 @@ const Field: React.FC<{ label: string; children: React.ReactNode; required?: boo
 );
 
 const inputCls = [
-    'w-full border border-gray-100 rounded-xl py-3 px-4',
+    'w-full border border-paper-300 rounded-xl py-3 px-4',
     'font-semibold text-xs outline-none',
     'focus:shadow-blue',
-    'bg-[#F8F9FB]/60 focus:bg-white',
+    'bg-paper-100 focus:bg-white',
     'transition-all placeholder:text-black/20 placeholder:font-bold placeholder:normal-case placeholder:tracking-normal',
 ].join(' ');
 
 const EmptyState: React.FC<{ icon: React.ReactNode; headline: string; sub?: string; action?: { label: string; onClick: () => void } }> = ({
     icon, headline, sub, action,
 }) => (
-    <div className="py-20 flex flex-col items-center text-center border-[2px] border-dashed border-black/10 rounded-[28px]">
+    <div className="py-20 flex flex-col items-center text-center border-[2px] border-dashed border-paper-400/10 rounded-[28px]">
         <div className="text-black/20 mb-4">{icon}</div>
         <p className="text-[10px] font-semibold text-black/30">{headline}</p>
         {sub && <p className="text-[8px] font-semibold text-black/20 tracking-wider mt-1">{sub}</p>}
         {action && (
             <button
                 onClick={action.onClick}
-                className="mt-5 px-5 py-2.5 bg-black text-white border border-gray-100 rounded-xl font-semibold text-[9px] shadow-green transition-all">
+                className="mt-5 px-5 py-2.5 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all">
                 {action.label}
             </button>
         )}
@@ -114,9 +114,9 @@ const EmptyState: React.FC<{ icon: React.ReactNode; headline: string; sub?: stri
 );
 
 const SkeletonCard: React.FC = () => (
-    <div className="bg-white border border-gray-100/10 rounded-[24px] p-5 animate-pulse space-y-3">
+    <div className="bg-white border border-paper-300/10 rounded-[24px] p-5 animate-pulse space-y-3">
         <div className="flex gap-4 items-center">
-            <div className="w-12 h-12 bg-black/5 rounded-2xl flex-shrink-0" />
+            <div className="w-12 h-12 bg-black/5 rounded-xl flex-shrink-0" />
             <div className="flex-1 space-y-2">
                 <div className="h-3.5 bg-black/5 rounded-lg w-3/4" />
                 <div className="h-2.5 bg-black/5 rounded-lg w-1/2" />
@@ -146,15 +146,15 @@ const JobCard: React.FC<JobCardProps> = ({
     showApprovalActions = false, showArchiveAction = false,
 }) => {
     const companyName = job.company || 'Nile University';
-    const typeBadge = TYPE_BADGE_COLORS[job.type] ?? 'bg-black/5 text-black/50 border-black/10';
-    const statusBadge = STATUS_BADGE[job.status] ?? 'bg-black/5 text-black/30 border-black/10';
+    const typeBadge = TYPE_BADGE_COLORS[job.type] ?? 'bg-black/5 text-black/50 border-paper-400/10';
+    const statusBadge = STATUS_BADGE[job.status] ?? 'bg-black/5 text-black/30 border-paper-400/10';
     const busy = actionLoading[job.id] ?? false;
 
     return (
-        <div className="group bg-white border border-gray-100 rounded-[24px] p-5 md:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 shadow-card hover:shadow-blue hover:-translate-y-[2px] transition-all duration-200">
+        <div className="group bg-white border border-paper-300 rounded-[24px] p-5 md:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 shadow-card hover:shadow-blue hover:-translate-y-[2px] transition-all duration-200">
 
             {/* Company avatar */}
-            <div className="w-12 h-12 bg-nile-blue text-white rounded-2xl border border-gray-100 flex items-center justify-center font-semibold text-sm flex-shrink-0 shadow-card group-hover:bg-black transition-colors duration-200">
+            <div className="w-12 h-12 bg-nile-blue text-white rounded-xl border border-paper-300 flex items-center justify-center font-semibold text-sm flex-shrink-0 shadow-card group-hover:bg-black transition-colors duration-200">
                 {initials(companyName)}
             </div>
 
@@ -193,14 +193,14 @@ const JobCard: React.FC<JobCardProps> = ({
                         <button
                             onClick={() => onAction(job, 'active')}
                             disabled={busy}
-                            className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 bg-nile-green text-white border border-gray-100 rounded-xl font-semibold text-[9px] shadow-card transition-all disabled:opacity-40">
+                            className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 bg-nile-green text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-card transition-all disabled:opacity-40">
                             {busy ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle2 size={12} strokeWidth={3} />}
                             APPROVE
                         </button>
                         <button
                             onClick={() => onAction(job, 'rejected')}
                             disabled={busy}
-                            className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 bg-white text-red-500 border border-gray-100 rounded-xl font-semibold text-[9px] shadow-card transition-all disabled:opacity-40">
+                            className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 bg-white text-red-500 border border-paper-300 rounded-xl font-semibold text-[9px] shadow-card transition-all disabled:opacity-40">
                             <XCircle size={12} strokeWidth={3} />
                             REJECT
                         </button>
@@ -210,7 +210,7 @@ const JobCard: React.FC<JobCardProps> = ({
                     <button
                         onClick={() => onAction(job, 'archived')}
                         disabled={busy}
-                        className="flex items-center gap-1.5 px-4 py-2.5 bg-white text-black/50 border border-gray-100/30 rounded-xl font-semibold text-[8px] hover:border-black hover:text-black hover:shadow-card transition-all disabled:opacity-40">
+                        className="flex items-center gap-1.5 px-4 py-2.5 bg-white text-black/50 border border-paper-300/30 rounded-xl font-semibold text-[8px] hover:border-paper-400 hover:text-black hover:shadow-card transition-all disabled:opacity-40">
                         {busy ? <Loader2 size={12} className="animate-spin" /> : <Archive size={12} />}
                         ARCHIVE
                     </button>
@@ -226,9 +226,9 @@ const AppCard: React.FC<{ app: StaffApplication; onViewProfile: (studentId: stri
     const group = APP_STATUS_GROUPS.find(g => g.key === app.status) ?? APP_STATUS_GROUPS[0];
 
     return (
-        <div className="bg-white border border-gray-100 rounded-[20px] p-4 md:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-3 hover:shadow-card hover:-translate-y-[1px] transition-all duration-200">
+        <div className="bg-white border border-paper-300 rounded-[20px] p-4 md:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-3 hover:shadow-card hover:-translate-y-[1px] transition-all duration-200">
             {/* Student avatar */}
-            <div className="w-10 h-10 bg-nile-blue text-white rounded-xl border border-gray-100 flex items-center justify-center font-semibold text-sm flex-shrink-0">
+            <div className="w-10 h-10 bg-nile-blue text-white rounded-xl border border-paper-300 flex items-center justify-center font-semibold text-sm flex-shrink-0">
                 {initials(app.student_name || 'S')}
             </div>
 
@@ -253,7 +253,7 @@ const AppCard: React.FC<{ app: StaffApplication; onViewProfile: (studentId: stri
                         href={app.resume_url}
                         target="_blank"
                         rel="noreferrer"
-                        className="flex items-center gap-1.5 px-3 py-2 bg-white text-black/50 border border-gray-100/30 rounded-xl font-semibold text-[8px] hover:border-black hover:text-black hover:shadow-card transition-all"
+                        className="flex items-center gap-1.5 px-3 py-2 bg-white text-black/50 border border-paper-300/30 rounded-xl font-semibold text-[8px] hover:border-paper-400 hover:text-black hover:shadow-card transition-all"
                     >
                         <FileText size={12} /> VIEW CV
                     </a>
@@ -261,7 +261,7 @@ const AppCard: React.FC<{ app: StaffApplication; onViewProfile: (studentId: stri
                 <button
                     onClick={() => onViewProfile(app.student_id)}
                     disabled={!app.student_id}
-                    className="flex items-center gap-1.5 px-3 py-2 bg-white text-black/50 border border-gray-100/30 rounded-xl font-semibold text-[8px] hover:border-black hover:text-black hover:shadow-card transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="flex items-center gap-1.5 px-3 py-2 bg-white text-black/50 border border-paper-300/30 rounded-xl font-semibold text-[8px] hover:border-paper-400 hover:text-black hover:shadow-card transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                     <UserCircle size={12} /> PROFILE
                 </button>
@@ -454,9 +454,9 @@ const StaffJobs: React.FC = () => {
         return (
             <div className="p-4 md:p-8 space-y-8 pb-20">
                 {/* Header skeleton */}
-                <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-4 border-b border-gray-100 pb-6">
+                <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-4 border-b border-paper-300 pb-6">
                     <div className="space-y-2">
-                        <div className="h-10 md:h-14 bg-black/5 rounded-2xl w-72 animate-pulse" />
+                        <div className="h-10 md:h-14 bg-black/5 rounded-xl w-72 animate-pulse" />
                         <div className="h-2.5 bg-black/5 rounded-lg w-48 animate-pulse" />
                     </div>
                     <div className="flex gap-2">
@@ -482,7 +482,7 @@ const StaffJobs: React.FC = () => {
                 <p className="font-semibold text-lg text-black">Could not load jobs data</p>
                 <p className="text-[9px] font-semibold text-black/40 mt-1">Check your connection or try logging out and back in</p>
             </div>
-            <button onClick={loadData} className="px-6 py-3 bg-black text-white border border-gray-100 rounded-xl font-semibold text-[9px] shadow-green transition-all">
+            <button onClick={loadData} className="px-6 py-3 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all">
                 TRY AGAIN
             </button>
         </div>
@@ -493,7 +493,7 @@ const StaffJobs: React.FC = () => {
         <div className="p-4 md:p-8 space-y-8 anime-fade-in font-sans pb-24 text-left min-h-full">
 
             {/* ── Page header ───────────────────────────────────────────── */}
-            <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-6 border-b border-gray-100 pb-6">
+            <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-6 border-b border-paper-300 pb-6">
                 <div>
                     <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">
                         Jobs &amp; Placement<span className="text-nile-green"> .</span>
@@ -504,7 +504,7 @@ const StaffJobs: React.FC = () => {
                 </div>
 
                 {/* Tab bar */}
-                <div className="flex bg-white p-1 border border-gray-100 rounded-2xl shadow-card overflow-x-auto w-full xl:w-auto gap-0.5 flex-shrink-0">
+                <div className="flex bg-white p-1 border border-paper-300 rounded-xl shadow-card overflow-x-auto w-full xl:w-auto gap-0.5 flex-shrink-0">
                     {tabs.map(t => (
                         <button
                             key={t.id}
@@ -537,11 +537,11 @@ const StaffJobs: React.FC = () => {
             ══════════════════════════════════════════════════════════════ */}
             {activeTab === 'POST_JOB' && (
                 <div className="max-w-2xl anime-fade-in">
-                    <div className="bg-white border border-gray-100 rounded-[28px] p-6 md:p-8 shadow-card">
+                    <div className="bg-white border border-paper-300 rounded-[28px] p-6 md:p-8 shadow-card">
 
                         {/* Form header */}
-                        <div className="flex items-center gap-3 mb-6 pb-5 border-b border-gray-100/5">
-                            <div className="w-11 h-11 bg-black rounded-xl border border-gray-100 flex items-center justify-center flex-shrink-0">
+                        <div className="flex items-center gap-3 mb-6 pb-5 border-b border-paper-300/5">
+                            <div className="w-11 h-11 bg-black rounded-xl border border-paper-300 flex items-center justify-center flex-shrink-0">
                                 <FileText size={18} className="text-nile-green" />
                             </div>
                             <div>
@@ -627,13 +627,13 @@ const StaffJobs: React.FC = () => {
                                 <button
                                     type="button"
                                     onClick={() => setForm(EMPTY_FORM)}
-                                    className="px-5 py-3.5 border border-gray-100 rounded-xl font-semibold text-[9px] hover:bg-black hover:text-white transition-all">
+                                    className="px-5 py-3.5 border border-paper-300 rounded-xl font-semibold text-[9px] hover:bg-black hover:text-white transition-all">
                                     CLEAR
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={posting}
-                                    className="flex-1 py-4 bg-black text-white border border-gray-100 rounded-xl font-semibold text-[10px] shadow-green transition-all disabled:opacity-40 flex items-center justify-center gap-2">
+                                    className="flex-1 py-4 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[10px] shadow-green transition-all disabled:opacity-40 flex items-center justify-center gap-2">
                                     {posting
                                         ? <><Loader2 size={14} className="animate-spin" /> POSTING...</>
                                         : <><Send size={14} /> POST JOB LISTING</>
@@ -723,12 +723,12 @@ const StaffJobs: React.FC = () => {
                                 value={activeSearch}
                                 onChange={e => setActiveSearch(e.target.value)}
                                 placeholder="SEARCH ACTIVE JOBS..."
-                                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-100 font-semibold text-[9px] outline-none focus:shadow-card bg-[#F8F9FB]/60 focus:bg-white transition-all"
+                                className="w-full pl-10 pr-4 py-3 rounded-xl border border-paper-300 font-semibold text-[9px] outline-none focus:shadow-card bg-paper-100 focus:bg-white transition-all"
                             />
                         </div>
 
                         {/* Type filter pills */}
-                        <div className="flex bg-white p-1 border border-gray-100 rounded-xl gap-0.5 overflow-x-auto flex-shrink-0">
+                        <div className="flex bg-white p-1 border border-paper-300 rounded-xl gap-0.5 overflow-x-auto flex-shrink-0">
                             <button
                                 onClick={() => setTypeFilter('all')}
                                 className={[
@@ -806,7 +806,7 @@ const StaffJobs: React.FC = () => {
                             value={appSearch}
                             onChange={e => setAppSearch(e.target.value)}
                             placeholder="SEARCH BY STUDENT, JOB, OR COMPANY..."
-                            className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-100 font-semibold text-[9px] outline-none focus:shadow-card bg-[#F8F9FB]/60 focus:bg-white transition-all"
+                            className="w-full pl-10 pr-4 py-3 rounded-xl border border-paper-300 font-semibold text-[9px] outline-none focus:shadow-card bg-paper-100 focus:bg-white transition-all"
                         />
                     </div>
 
@@ -815,7 +815,7 @@ const StaffJobs: React.FC = () => {
                         {APP_STATUS_GROUPS.map(g => {
                             const cnt = groupedApplications[g.key].length;
                             return (
-                                <div key={g.key} className={`border border-gray-100 rounded-[18px] p-4 shadow-card ${g.bg.split(' ')[0]}`}>
+                                <div key={g.key} className={`border border-paper-300 rounded-[18px] p-4 shadow-card ${g.bg.split(' ')[0]}`}>
                                     <div className="flex items-center gap-1.5 mb-1.5">
                                         <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: g.dot }} />
                                         <span className={`text-[7px] font-semibold tracking-wider ${g.color}`}>{g.label}</span>
@@ -849,7 +849,7 @@ const StaffJobs: React.FC = () => {
                                     <section key={g.key}>
                                         {/* Group heading */}
                                         <div className="flex items-center gap-3 mb-4">
-                                            <div className="w-3 h-3 rounded-full flex-shrink-0 border border-gray-100" style={{ background: g.dot }} />
+                                            <div className="w-3 h-3 rounded-full flex-shrink-0 border border-paper-300" style={{ background: g.dot }} />
                                             <h3 className={`text-[10px] font-semibold ${g.color}`}>{g.label}</h3>
                                             <span className="text-[8px] font-semibold text-black/30">
                                                 {group.length} APPLICANT{group.length !== 1 ? 'S' : ''}
@@ -858,7 +858,7 @@ const StaffJobs: React.FC = () => {
                                         </div>
 
                                         {group.length === 0 ? (
-                                            <div className="py-8 text-center border-[1px] border-dashed border-black/10 rounded-[20px]">
+                                            <div className="py-8 text-center border-[1px] border-dashed border-paper-400/10 rounded-[20px]">
                                                 <p className="text-[8px] font-semibold text-black/20 tracking-wider">
                                                     NO {g.label.toUpperCase()} APPLICATIONS
                                                 </p>

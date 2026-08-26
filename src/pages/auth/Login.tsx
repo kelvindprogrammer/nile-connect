@@ -42,7 +42,7 @@ const Login = () => {
                 {['Connect with employers & alumni', 'AI-powered career coaching', 'Real-time messaging & video calls'].map((item, i) => (
                     <div key={i} className="flex items-center gap-3 text-left p-3 bg-white/5 border border-white/10 rounded-xl">
                         <div className="w-1.5 h-1.5 bg-nile-green rounded-full flex-shrink-0" />
-                        <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest">{item}</p>
+                        <p className="text-[10px] font-bold text-white/70 tracking-tight">{item}</p>
                     </div>
                 ))}
             </div>
@@ -63,17 +63,17 @@ const Login = () => {
                 )}
 
                 <div className="space-y-1.5">
-                    <h1 className="text-4xl font-black text-black uppercase tracking-tight leading-none">
+                    <h1 className="text-4xl font-semibold text-black uppercase tracking-tight leading-none">
                         Welcome Back.
                     </h1>
-                    <p className="text-[9px] font-black text-nile-blue/50 uppercase tracking-[0.2em]">
+                    <p className="text-[9px] font-semibold text-nile-blue/50 uppercase tracking-[0.2em]">
                         SIGN IN WITH YOUR NILE UNIVERSITY ACCOUNT
                     </p>
                 </div>
 
                 <div className="space-y-5">
-                    <div className="p-4 bg-nile-white border-[2px] border-black/10 rounded-xl space-y-3">
-                        <p className="text-[9px] font-black text-black/50 uppercase tracking-widest">
+                    <div className="p-4 bg-nile-white border-[2px] border-paper-400/10 rounded-xl space-y-3">
+                        <p className="text-[9px] font-semibold text-black/50 tracking-tight">
                             SINGLE SIGN-ON
                         </p>
                         <p className="text-xs text-black/60 leading-relaxed">
@@ -96,8 +96,8 @@ const Login = () => {
                     </Button>
                 </div>
 
-                <div className="pt-4 border-t-[2px] border-black/5 text-center">
-                    <p className="text-[8px] font-black text-black/30 uppercase tracking-widest leading-relaxed">
+                <div className="pt-4 border-t-[2px] border-paper-400/5 text-center">
+                    <p className="text-[8px] font-semibold text-black/30 tracking-tight leading-relaxed">
                         By signing in you agree to Nile Connect's terms of service.
                         <br />
                         Your identity is verified by Campus One (Nile University SSO).

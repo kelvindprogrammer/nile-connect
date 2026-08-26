@@ -69,8 +69,8 @@ const StaffInsights = () => {
 
     if (isLoading) return (
         <div className="p-4 md:p-6 space-y-6 animate-pulse max-w-5xl mx-auto">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">{[1,2,3,4].map(i => <div key={i} className="h-24 bg-gray-100 rounded-2xl" />)}</div>
-            <div className="h-80 bg-gray-100 rounded-2xl" />
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">{[1,2,3,4].map(i => <div key={i} className="h-24 bg-paper-200 rounded-xl" />)}</div>
+            <div className="h-80 bg-paper-200 rounded-xl" />
         </div>
     );
 
@@ -84,16 +84,16 @@ const StaffInsights = () => {
     return (
         <div className="p-4 md:p-6 pb-24 md:pb-8 space-y-6 anime-fade-in font-sans max-w-5xl mx-auto">
             <div>
-                <h1 className="text-2xl font-semibold text-gray-900">Insights</h1>
-                <p className="text-sm text-gray-400 mt-1">Platform activity and pending approvals</p>
+                <h1 className="text-2xl font-semibold text-ink-800">Insights</h1>
+                <p className="text-sm text-paper-600 mt-1">Platform activity and pending approvals</p>
             </div>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {statCards.map(s => (
-                    <div key={s.label} className="bg-white border border-gray-100 rounded-2xl shadow-card p-4">
-                        <div className="w-8 h-8 rounded-lg bg-gray-50 text-gray-500 flex items-center justify-center mb-2">{s.icon}</div>
-                        <h3 className="text-xl font-semibold text-gray-900 leading-none">{s.value.toLocaleString()}</h3>
-                        <p className="text-xs text-gray-400 mt-1">{s.label}</p>
+                    <div key={s.label} className="bg-white border border-paper-300 rounded-xl shadow-card p-4">
+                        <div className="w-8 h-8 rounded-lg bg-paper-100 text-paper-700 flex items-center justify-center mb-2">{s.icon}</div>
+                        <h3 className="text-xl font-semibold text-ink-800 leading-none">{s.value.toLocaleString()}</h3>
+                        <p className="text-xs text-paper-600 mt-1">{s.label}</p>
                     </div>
                 ))}
             </div>
@@ -103,14 +103,14 @@ const StaffInsights = () => {
                 badgeCount={pendingEmployers.length} emptyLabel="No pending employer verifications"
             >
                 {pendingEmployers.map(emp => (
-                    <div key={emp.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-gray-50 border border-gray-100 rounded-xl gap-3">
+                    <div key={emp.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-paper-100 border border-paper-300 rounded-xl gap-3">
                         <div className="flex items-center gap-3 min-w-0 flex-1">
-                            <div className="w-9 h-9 bg-gray-900 text-white rounded-lg flex items-center justify-center font-semibold text-sm flex-shrink-0">
+                            <div className="w-9 h-9 bg-ink-900 text-white rounded-lg flex items-center justify-center font-semibold text-sm flex-shrink-0">
                                 {emp.company_name.charAt(0).toUpperCase()}
                             </div>
                             <div className="min-w-0">
-                                <p className="font-medium text-sm text-gray-900 truncate">{emp.company_name}</p>
-                                <p className="text-xs text-gray-400 truncate">{emp.industry} · {emp.location}</p>
+                                <p className="font-medium text-sm text-ink-800 truncate">{emp.company_name}</p>
+                                <p className="text-xs text-paper-600 truncate">{emp.industry} · {emp.location}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
@@ -126,14 +126,14 @@ const StaffInsights = () => {
                 badgeCount={pendingJobs.length} emptyLabel="No pending job approvals"
             >
                 {pendingJobs.map(job => (
-                    <div key={job.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-gray-50 border border-gray-100 rounded-xl gap-3">
+                    <div key={job.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-paper-100 border border-paper-300 rounded-xl gap-3">
                         <div className="flex items-center gap-3 min-w-0 flex-1">
                             <div className="w-9 h-9 bg-nile-blue/10 text-nile-blue rounded-lg flex items-center justify-center flex-shrink-0">
                                 <Briefcase size={15} />
                             </div>
                             <div className="min-w-0">
-                                <p className="font-medium text-sm text-gray-900 truncate">{job.title}</p>
-                                <p className="text-xs text-gray-400 truncate">{job.company} · {job.type} · {job.location}</p>
+                                <p className="font-medium text-sm text-ink-800 truncate">{job.title}</p>
+                                <p className="text-xs text-paper-600 truncate">{job.company} · {job.type} · {job.location}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
@@ -153,9 +153,9 @@ const StaffInsights = () => {
                         { label: 'Network', icon: <MessageSquare size={18} />, path: '/staff/crm' },
                     ].map(qa => (
                         <button key={qa.label} onClick={() => navigate(qa.path)}
-                            className="flex flex-col items-start gap-3 p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-white hover:shadow-card transition-all text-left">
-                            <div className="w-9 h-9 rounded-lg bg-white border border-gray-100 flex items-center justify-center text-gray-700">{qa.icon}</div>
-                            <span className="text-xs font-medium text-gray-800 leading-tight">{qa.label}</span>
+                            className="flex flex-col items-start gap-3 p-4 bg-paper-100 border border-paper-300 rounded-xl hover:bg-white hover:shadow-card transition-all text-left">
+                            <div className="w-9 h-9 rounded-lg bg-white border border-paper-300 flex items-center justify-center text-ink-700">{qa.icon}</div>
+                            <span className="text-xs font-medium text-ink-800 leading-tight">{qa.label}</span>
                         </button>
                     ))}
                 </div>
@@ -174,24 +174,24 @@ const StaffInsights = () => {
                         return (
                             <div key={bar.label} className="space-y-1.5">
                                 <div className="flex justify-between text-xs">
-                                    <span className="text-gray-500">{bar.label}</span>
-                                    <span className="font-medium text-gray-900">{bar.value.toLocaleString()}</span>
+                                    <span className="text-paper-700">{bar.label}</span>
+                                    <span className="font-medium text-ink-800">{bar.value.toLocaleString()}</span>
                                 </div>
-                                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                                    <div className="h-full bg-gray-900 rounded-full transition-all duration-700" style={{ width: `${Math.max(pct, 2)}%` }} />
+                                <div className="h-2 bg-paper-200 rounded-full overflow-hidden">
+                                    <div className="h-full bg-ink-900 rounded-full transition-all duration-700" style={{ width: `${Math.max(pct, 2)}%` }} />
                                 </div>
                             </div>
                         );
                     })}
                     {stats && (
                         <div className="pt-2 grid grid-cols-2 gap-3">
-                            <div className="bg-gray-50 border border-gray-100 rounded-xl p-3 text-center">
-                                <p className="text-lg font-semibold text-gray-900 leading-none">{stats.pending_employers}</p>
-                                <p className="text-[11px] text-gray-400 mt-1">Pending employers</p>
+                            <div className="bg-paper-100 border border-paper-300 rounded-xl p-3 text-center">
+                                <p className="text-lg font-semibold text-ink-800 leading-none">{stats.pending_employers}</p>
+                                <p className="text-[11px] text-paper-600 mt-1">Pending employers</p>
                             </div>
-                            <div className="bg-gray-50 border border-gray-100 rounded-xl p-3 text-center">
-                                <p className="text-lg font-semibold text-gray-900 leading-none">{stats.upcoming_events}</p>
-                                <p className="text-[11px] text-gray-400 mt-1">Upcoming events</p>
+                            <div className="bg-paper-100 border border-paper-300 rounded-xl p-3 text-center">
+                                <p className="text-lg font-semibold text-ink-800 leading-none">{stats.upcoming_events}</p>
+                                <p className="text-[11px] text-paper-600 mt-1">Upcoming events</p>
                             </div>
                         </div>
                     )}
@@ -204,11 +204,11 @@ const StaffInsights = () => {
 const QueueSection = ({ title, icon, badgeCount, emptyLabel, children }: {
     title: string; icon: React.ReactNode; badgeCount: number; emptyLabel: string; children: React.ReactNode;
 }) => (
-    <div className="bg-white border border-gray-100 rounded-2xl shadow-card overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-50">
+    <div className="bg-white border border-paper-300 rounded-xl shadow-card overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-paper-200">
             <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 bg-gray-900 text-white rounded-lg flex items-center justify-center flex-shrink-0">{icon}</div>
-                <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
+                <div className="w-7 h-7 bg-ink-900 text-white rounded-lg flex items-center justify-center flex-shrink-0">{icon}</div>
+                <h3 className="text-sm font-semibold text-ink-800">{title}</h3>
             </div>
             {badgeCount > 0 ? (
                 <span className="text-xs font-medium bg-red-500 text-white px-2.5 py-1 rounded-full">{badgeCount} pending</span>
@@ -218,9 +218,9 @@ const QueueSection = ({ title, icon, badgeCount, emptyLabel, children }: {
         </div>
         <div className="p-4 space-y-3">
             {badgeCount === 0 ? (
-                <div className="py-10 text-center border-2 border-dashed border-gray-100 rounded-xl">
+                <div className="py-10 text-center border-2 border-dashed border-paper-300 rounded-xl">
                     <CheckCircle2 size={24} className="text-nile-green/40 mx-auto mb-2" />
-                    <p className="text-sm text-gray-400">{emptyLabel}</p>
+                    <p className="text-sm text-paper-600">{emptyLabel}</p>
                 </div>
             ) : children}
         </div>
@@ -232,7 +232,7 @@ const ActionButton = ({ label, isLoading, onClick, variant }: {
 }) => (
     <button onClick={onClick} disabled={isLoading}
         className={`flex items-center gap-1.5 px-3 py-2 rounded-lg font-medium text-xs transition-all disabled:opacity-50
-            ${variant === 'approve' ? 'bg-nile-green text-white' : 'bg-white border border-gray-200 text-red-500 hover:bg-red-50'}`}>
+            ${variant === 'approve' ? 'bg-nile-green text-white' : 'bg-white border border-paper-300 text-red-500 hover:bg-red-50'}`}>
         {isLoading ? <Loader2 size={13} className="animate-spin" /> : variant === 'approve' ? <CheckCircle2 size={13} /> : <XCircle size={13} />}
         <span className="hidden sm:inline">{label}</span>
     </button>

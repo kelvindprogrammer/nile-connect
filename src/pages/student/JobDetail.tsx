@@ -21,7 +21,7 @@ const typeStyles: Record<string, string> = {
     'remote': 'bg-nile-blue/10 text-nile-blue',
     'hybrid': 'bg-purple-50 text-purple-600',
     'internship': 'bg-amber-50 text-amber-600',
-    'part-time': 'bg-gray-100 text-gray-600',
+    'part-time': 'bg-paper-200 text-paper-700',
 };
 
 const typeLabel: Record<string, string> = {
@@ -94,8 +94,8 @@ const JobDetail = () => {
 
     if (error || !job) return (
         <div className="p-8 flex flex-col items-center justify-center h-[60vh] gap-4">
-            <AlertCircle size={36} className="text-gray-300" />
-            <p className="text-sm font-medium text-gray-400">Job not found</p>
+            <AlertCircle size={36} className="text-paper-500" />
+            <p className="text-sm font-medium text-paper-600">Job not found</p>
             <Button variant="outline" size="sm" onClick={() => navigate('/student/jobs')}>
                 <ArrowLeft size={14} className="mr-2" /> Back to job board
             </Button>
@@ -103,7 +103,7 @@ const JobDetail = () => {
     );
 
     const typeKey = (job.type || '').toLowerCase();
-    const typeClass = typeStyles[typeKey] || 'bg-gray-100 text-gray-600';
+    const typeClass = typeStyles[typeKey] || 'bg-paper-200 text-paper-700';
     const typeName = typeLabel[typeKey] || job.type || 'Role';
     const skills = job.skills ? job.skills.split(',').map(s => s.trim()).filter(Boolean) : [];
     const requirements = job.requirements
@@ -121,26 +121,26 @@ const JobDetail = () => {
                 {/* Back */}
                 <button
                     onClick={() => navigate('/student/jobs')}
-                    className="flex items-center gap-2 text-gray-400 text-sm font-medium hover:text-gray-700 transition-colors group"
+                    className="flex items-center gap-2 text-paper-600 text-sm font-medium hover:text-ink-700 transition-colors group"
                 >
                     <ArrowLeft size={15} className="group-hover:-translate-x-1 transition-transform" />
                     Back to job board
                 </button>
 
                 {/* Header Card */}
-                <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-6 md:p-8">
+                <div className="bg-white border border-paper-300 rounded-xl shadow-card p-6 md:p-8">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                         <div className="flex items-center gap-4">
                             {job.employer?.logo_url ? (
-                                <img src={job.employer.logo_url} alt={companyName} className="w-16 h-16 md:w-20 md:h-20 rounded-2xl object-cover border border-gray-100 flex-shrink-0" />
+                                <img src={job.employer.logo_url} alt={companyName} className="w-16 h-16 md:w-20 md:h-20 rounded-xl object-cover border border-paper-300 flex-shrink-0" />
                             ) : (
-                                <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-nile-blue to-nile-blue-600 text-white flex items-center justify-center text-xl font-semibold flex-shrink-0">
+                                <div className="w-16 h-16 md:w-20 md:h-20 rounded-xl bg-gradient-to-br from-nile-blue to-nile-blue-600 text-white flex items-center justify-center text-xl font-semibold flex-shrink-0">
                                     {initials}
                                 </div>
                             )}
                             <div className="space-y-1.5">
                                 <div className="flex items-center flex-wrap gap-2">
-                                    <h1 className="text-xl md:text-2xl font-semibold text-gray-900 leading-tight">{job.title}</h1>
+                                    <h1 className="text-xl md:text-2xl font-semibold text-ink-800 leading-tight">{job.title}</h1>
                                     <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${typeClass}`}>{typeName}</span>
                                     {job.is_remote && (
                                         <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-nile-green/10 text-nile-green flex items-center gap-1">
@@ -148,22 +148,22 @@ const JobDetail = () => {
                                         </span>
                                     )}
                                 </div>
-                                <div className="flex items-center gap-1.5 text-sm text-gray-500">
-                                    <Building size={13} className="text-gray-400" />
+                                <div className="flex items-center gap-1.5 text-sm text-paper-700">
+                                    <Building size={13} className="text-paper-600" />
                                     <span>{companyName}</span>
                                     {job.employer?.is_verified && (
                                         <BadgeCheck size={14} className="text-nile-blue" />
                                     )}
                                 </div>
-                                <div className="flex items-center gap-4 pt-0.5 flex-wrap text-xs text-gray-400">
+                                <div className="flex items-center gap-4 pt-0.5 flex-wrap text-xs text-paper-600">
                                     {job.location && (
                                         <span className="flex items-center gap-1">
-                                            <MapPin size={12} className="text-gray-400" /> {job.location}
+                                            <MapPin size={12} className="text-paper-600" /> {job.location}
                                         </span>
                                     )}
                                     {job.salary && (
                                         <span className="flex items-center gap-1">
-                                            <Wallet size={12} className="text-gray-400" /> {job.salary}
+                                            <Wallet size={12} className="text-paper-600" /> {job.salary}
                                         </span>
                                     )}
                                     <span className="flex items-center gap-1">
@@ -178,13 +178,13 @@ const JobDetail = () => {
                         <div className="flex gap-2 w-full md:w-auto">
                             <button
                                 onClick={handleSave}
-                                className={`p-3 rounded-xl transition-all ${isSaved ? 'bg-nile-green/10 text-nile-green' : 'bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600'}`}
+                                className={`p-3 rounded-xl transition-all ${isSaved ? 'bg-nile-green/10 text-nile-green' : 'bg-paper-100 text-paper-600 hover:bg-paper-200 hover:text-paper-700'}`}
                             >
                                 <Bookmark size={16} fill={isSaved ? 'currentColor' : 'none'} />
                             </button>
                             <button
                                 onClick={() => setShowShareModal(true)}
-                                className="p-3 rounded-xl transition-all bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                                className="p-3 rounded-xl transition-all bg-paper-100 text-paper-600 hover:bg-paper-200 hover:text-paper-700"
                                 title="Share to feed"
                             >
                                 <Share2 size={16} />
@@ -206,7 +206,7 @@ const JobDetail = () => {
                     <div className="xl:col-span-2 space-y-6">
                         {job.description && (
                             <Card title="Role description">
-                                <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+                                <p className="text-sm text-ink-700 leading-relaxed whitespace-pre-line">
                                     {job.description}
                                 </p>
                             </Card>
@@ -218,7 +218,7 @@ const JobDetail = () => {
                                     {requirements.map((req, i) => (
                                         <li key={i} className="flex items-start gap-3">
                                             <ShieldCheck size={16} className="text-nile-green flex-shrink-0 mt-0.5" />
-                                            <span className="text-sm text-gray-700 leading-snug">{req}</span>
+                                            <span className="text-sm text-ink-700 leading-snug">{req}</span>
                                         </li>
                                     ))}
                                 </ul>
@@ -231,15 +231,15 @@ const JobDetail = () => {
                                     {job.required_docs?.map(type => (
                                         <div key={type} className="flex items-center gap-3">
                                             <FileCheck2 size={15} className="text-nile-blue flex-shrink-0" />
-                                            <span className="text-sm text-gray-800">{docLabel(type)}</span>
+                                            <span className="text-sm text-ink-800">{docLabel(type)}</span>
                                             <span className="text-xs font-medium text-red-500 ml-auto">Required</span>
                                         </div>
                                     ))}
                                     {job.optional_docs?.map(type => (
                                         <div key={type} className="flex items-center gap-3">
-                                            <FileCheck2 size={15} className="text-gray-300 flex-shrink-0" />
-                                            <span className="text-sm text-gray-600">{docLabel(type)}</span>
-                                            <span className="text-xs font-medium text-gray-400 ml-auto">Optional</span>
+                                            <FileCheck2 size={15} className="text-paper-500 flex-shrink-0" />
+                                            <span className="text-sm text-paper-700">{docLabel(type)}</span>
+                                            <span className="text-xs font-medium text-paper-600 ml-auto">Optional</span>
                                         </div>
                                     ))}
                                 </div>
@@ -248,22 +248,22 @@ const JobDetail = () => {
 
                         {job.employer?.about && (
                             <Card title={`About ${companyName}`}>
-                                <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+                                <p className="text-sm text-ink-700 leading-relaxed whitespace-pre-line">
                                     {job.employer.about}
                                 </p>
-                                <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-gray-50">
+                                <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-paper-200">
                                     {job.employer.industry && (
-                                        <span className="text-xs text-gray-500 flex items-center gap-1">
+                                        <span className="text-xs text-paper-700 flex items-center gap-1">
                                             <Briefcase size={13} /> {job.employer.industry}
                                         </span>
                                     )}
                                     {job.employer.company_size && (
-                                        <span className="text-xs text-gray-500 flex items-center gap-1">
+                                        <span className="text-xs text-paper-700 flex items-center gap-1">
                                             <Users2 size={13} /> {job.employer.company_size}
                                         </span>
                                     )}
                                     {job.employer.headquarters && (
-                                        <span className="text-xs text-gray-500 flex items-center gap-1">
+                                        <span className="text-xs text-paper-700 flex items-center gap-1">
                                             <MapPin size={13} /> {job.employer.headquarters}
                                         </span>
                                     )}
@@ -283,13 +283,13 @@ const JobDetail = () => {
                                         <Link
                                             key={pos.id}
                                             to={`/student/jobs/${pos.id}`}
-                                            className="flex items-center justify-between gap-3 p-3 rounded-xl border border-gray-100 hover:border-gray-200 hover:bg-gray-50 transition-all"
+                                            className="flex items-center justify-between gap-3 p-3 rounded-xl border border-paper-300 hover:border-paper-300 hover:bg-paper-100 transition-all"
                                         >
                                             <div className="min-w-0">
-                                                <p className="text-sm font-medium text-gray-900 truncate">{pos.title}</p>
-                                                <p className="text-xs text-gray-400">{pos.location}{pos.is_remote ? ' · Remote' : ''}</p>
+                                                <p className="text-sm font-medium text-ink-800 truncate">{pos.title}</p>
+                                                <p className="text-xs text-paper-600">{pos.location}{pos.is_remote ? ' · Remote' : ''}</p>
                                             </div>
-                                            <ChevronRight size={15} className="text-gray-300 flex-shrink-0" />
+                                            <ChevronRight size={15} className="text-paper-500 flex-shrink-0" />
                                         </Link>
                                     ))}
                                 </div>
@@ -314,11 +314,11 @@ const JobDetail = () => {
                             </div>
 
                             {skills.length > 0 && (
-                                <div className="mt-6 pt-5 border-t border-gray-50">
-                                    <p className="text-xs font-medium text-gray-400 mb-3">Skills</p>
+                                <div className="mt-6 pt-5 border-t border-paper-200">
+                                    <p className="text-xs font-medium text-paper-600 mb-3">Skills</p>
                                     <div className="flex flex-wrap gap-2">
                                         {skills.map(tag => (
-                                            <span key={tag} className="text-xs font-medium text-gray-700 px-2.5 py-1 bg-gray-50 border border-gray-100 rounded-full">
+                                            <span key={tag} className="text-xs font-medium text-ink-700 px-2.5 py-1 bg-paper-100 border border-paper-300 rounded-full">
                                                 {tag}
                                             </span>
                                         ))}
@@ -327,13 +327,13 @@ const JobDetail = () => {
                             )}
                         </Card>
 
-                        <div className="bg-nile-blue text-white rounded-2xl p-5">
+                        <div className="bg-nile-blue text-white rounded-xl p-5">
                             <p className="text-xs text-white/60 mb-3">Ready to apply?</p>
                             <Button
                                 fullWidth
                                 size="md"
                                 onClick={() => setShowApplyModal(true)}
-                                className="!bg-white !text-nile-blue hover:!bg-gray-50"
+                                className="!bg-white !text-nile-blue hover:!bg-paper-100"
                             >
                                 Submit application
                             </Button>
@@ -365,12 +365,12 @@ const DetailItem = ({ icon, label, value, color }: {
     icon: React.ReactNode; label: string; value: string; color: string;
 }) => (
     <div className="flex items-start gap-3">
-        <div className={`w-9 h-9 bg-gray-50 rounded-xl flex items-center justify-center ${color} flex-shrink-0`}>
+        <div className={`w-9 h-9 bg-paper-100 rounded-xl flex items-center justify-center ${color} flex-shrink-0`}>
             {icon}
         </div>
         <div className="text-left min-w-0">
-            <p className="text-xs text-gray-400">{label}</p>
-            <p className="text-sm font-medium text-gray-900 capitalize truncate">{value}</p>
+            <p className="text-xs text-paper-600">{label}</p>
+            <p className="text-sm font-medium text-ink-800 capitalize truncate">{value}</p>
         </div>
     </div>
 );

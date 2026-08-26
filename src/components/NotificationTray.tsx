@@ -45,9 +45,9 @@ const NotificationTray: React.FC<NotificationTrayProps> = ({ notifications, load
     };
 
     return (
-        <div className="w-full max-w-sm bg-white border border-gray-100 rounded-2xl shadow-soft-lg overflow-hidden">
-            <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-                <h3 className="font-semibold text-sm text-gray-900">Notifications</h3>
+        <div className="w-full max-w-sm bg-white border border-paper-300 rounded-xl shadow-soft-lg overflow-hidden">
+            <div className="px-4 py-3 border-b border-paper-300 flex items-center justify-between">
+                <h3 className="font-semibold text-sm text-ink-800">Notifications</h3>
                 {unreadCount > 0 && (
                     <span className="text-xs font-medium text-nile-blue bg-nile-blue-50 px-2 py-0.5 rounded-full">
                         {unreadCount} new
@@ -58,29 +58,29 @@ const NotificationTray: React.FC<NotificationTrayProps> = ({ notifications, load
             <div className="max-h-[420px] overflow-y-auto">
                 {!loaded ? (
                     <div className="flex items-center justify-center py-10">
-                        <Loader2 size={20} className="animate-spin text-gray-300" />
+                        <Loader2 size={20} className="animate-spin text-paper-500" />
                     </div>
                 ) : notifications.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-12 px-6 text-center gap-2">
-                        <Bell size={28} className="text-gray-200" />
-                        <p className="text-sm text-gray-400">You're all caught up</p>
+                        <Bell size={28} className="text-paper-400" />
+                        <p className="text-sm text-paper-600">You're all caught up</p>
                     </div>
                 ) : notifications.map(n => {
                     const Icon = ICONS[n.type] || Bell;
-                    const iconStyle = ICON_STYLES[n.type] || 'text-gray-500 bg-gray-100';
+                    const iconStyle = ICON_STYLES[n.type] || 'text-paper-700 bg-paper-200';
                     return (
                         <button
                             key={n.id}
                             onClick={() => handleClick(n)}
-                            className={`w-full flex items-start gap-3 px-4 py-3 text-left border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors ${!n.is_read ? 'bg-nile-blue-50/40' : ''}`}
+                            className={`w-full flex items-start gap-3 px-4 py-3 text-left border-b border-paper-200 last:border-0 hover:bg-paper-100 transition-colors ${!n.is_read ? 'bg-nile-blue-50/40' : ''}`}
                         >
                             <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${iconStyle}`}>
                                 <Icon size={16} />
                             </div>
                             <div className="min-w-0 flex-1">
-                                <p className="text-sm font-medium text-gray-900 truncate">{n.title}</p>
-                                {n.body && <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{n.body}</p>}
-                                <p className="text-xs text-gray-400 mt-1">{timeAgo(n.created_at)}</p>
+                                <p className="text-sm font-medium text-ink-800 truncate">{n.title}</p>
+                                {n.body && <p className="text-xs text-paper-700 mt-0.5 line-clamp-2">{n.body}</p>}
+                                <p className="text-xs text-paper-600 mt-1">{timeAgo(n.created_at)}</p>
                             </div>
                             {!n.is_read && <span className="w-2 h-2 rounded-full bg-nile-blue mt-1.5 flex-shrink-0" />}
                         </button>
@@ -91,7 +91,7 @@ const NotificationTray: React.FC<NotificationTrayProps> = ({ notifications, load
             {notifications.length > 0 && (
                 <button
                     onClick={onMarkAllRead}
-                    className="w-full py-3 border-t border-gray-100 flex items-center justify-center gap-1.5 text-sm font-medium text-gray-500 hover:text-nile-blue hover:bg-gray-50 transition-colors"
+                    className="w-full py-3 border-t border-paper-300 flex items-center justify-center gap-1.5 text-sm font-medium text-paper-700 hover:text-nile-blue hover:bg-paper-100 transition-colors"
                 >
                     <CheckCheck size={14} /> Mark all as read
                 </button>

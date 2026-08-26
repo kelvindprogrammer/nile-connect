@@ -43,7 +43,7 @@ const EmployerSettings = () => {
         <div className="p-4 md:p-8 space-y-8 font-sans bg-nile-white min-h-full anime-fade-in text-left pb-24 md:pb-8">
 
             {/* Header */}
-            <div className="bg-white border border-gray-100 rounded-[24px] shadow-green p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+            <div className="bg-white border border-paper-300 rounded-[24px] shadow-green p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-1/3 h-full bg-nile-green/5 -skew-x-12 translate-x-1/4 pointer-events-none" />
                 <div className="space-y-2 z-10">
                     <span className="px-3 py-1 bg-nile-green text-white text-[8px] font-semibold rounded-full">RECRUITER SETTINGS</span>
@@ -51,7 +51,7 @@ const EmployerSettings = () => {
                     <p className="text-[10px] font-bold text-black/40">Manage your account, notifications & privacy.</p>
                 </div>
                 <div className="hidden md:flex items-center gap-4 z-10">
-                    <div className="w-14 h-14 bg-nile-blue text-white rounded-[18px] border border-gray-100 flex items-center justify-center font-semibold text-2xl shadow-card">
+                    <div className="w-14 h-14 bg-nile-blue text-white rounded-[18px] border border-paper-300 flex items-center justify-center font-semibold text-2xl shadow-card">
                         {recruiterName.charAt(0).toUpperCase()}
                     </div>
                     <div>
@@ -79,7 +79,7 @@ const EmployerSettings = () => {
                         </div>
                         <button
                             onClick={() => navigate('/employer/profile')}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-nile-blue text-white border border-gray-100 rounded-lg font-semibold text-[8px] shadow-card transition-all"
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-nile-blue text-white border border-paper-300 rounded-lg font-semibold text-[8px] shadow-card transition-all"
                         >
                             <Building2 size={11} /> EDIT
                         </button>
@@ -141,7 +141,7 @@ const EmployerSettings = () => {
                         </div>
                         <button
                             onClick={() => navigate('/employer/jobs')}
-                            className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-100 rounded-lg font-semibold text-[8px] hover:bg-black hover:text-white transition-all"
+                            className="flex items-center gap-1.5 px-3 py-1.5 border border-paper-300 rounded-lg font-semibold text-[8px] hover:bg-black hover:text-white transition-all"
                         >
                             <Briefcase size={10} /> MANAGE
                         </button>
@@ -153,7 +153,7 @@ const EmployerSettings = () => {
                     <button
                         onClick={handleSave}
                         disabled={saving}
-                        className="flex items-center gap-2 px-8 py-3 bg-black text-white border border-gray-100 rounded-xl font-semibold text-[10px] shadow-green transition-all disabled:opacity-50 disabled:pointer-events-none"
+                        className="flex items-center gap-2 px-8 py-3 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[10px] shadow-green transition-all disabled:opacity-50 disabled:pointer-events-none"
                     >
                         {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                         {saving ? 'SAVING...' : 'SAVE CHANGES'}
@@ -169,7 +169,7 @@ const EmployerSettings = () => {
                         </div>
                         <button
                             onClick={() => logout()}
-                            className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-100 rounded-lg font-semibold text-[8px] text-black hover:bg-black hover:text-white transition-all"
+                            className="flex items-center gap-1.5 px-3 py-1.5 border border-paper-300 rounded-lg font-semibold text-[8px] text-black hover:bg-black hover:text-white transition-all"
                         >
                             <LogOut size={10} /> SIGN OUT
                         </button>
@@ -189,13 +189,13 @@ const Section = ({ icon, label, children, danger = false }: {
         <h3 className={`text-[9px] font-semibold flex items-center gap-2 ${danger ? 'text-red-500' : 'text-black/40'}`}>
             {icon} {label}
         </h3>
-        <div className={`bg-white border border-gray-100 rounded-[20px] p-5 shadow-card space-y-3 ${danger ? 'border-red-200' : ''}`}>
+        <div className={`bg-white border border-paper-300 rounded-[20px] p-5 shadow-card space-y-3 ${danger ? 'border-red-200' : ''}`}>
             {children}
         </div>
     </section>
 );
 
-const Divider = () => <div className="border-t border-dashed border-black/5" />;
+const Divider = () => <div className="border-t border-dashed border-paper-400/5" />;
 
 const Row = ({ label, value, onClick }: { label: string; value: string; onClick?: () => void }) => (
     <div

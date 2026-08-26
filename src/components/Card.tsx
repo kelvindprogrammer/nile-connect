@@ -32,10 +32,10 @@ const Card: React.FC<CardProps> = ({
     return (
         <div className={cn('rounded-xl overflow-hidden', variants[variant], className)}>
             {(title || action) && (
-                <div className="px-5 py-4 flex items-center justify-between border-b border-gray-50">
+                <div className="px-5 py-4 flex items-center justify-between border-b border-paper-200">
                     <div>
-                        <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
-                        {subtitle && <p className="text-xs text-gray-400 mt-0.5">{subtitle}</p>}
+                        <h3 className="text-sm font-semibold text-ink-800">{title}</h3>
+                        {subtitle && <p className="text-xs text-paper-600 mt-0.5">{subtitle}</p>}
                     </div>
                     {action && <div className="flex-shrink-0">{action}</div>}
                 </div>

@@ -17,21 +17,21 @@ const StaffStatsCard: React.FC<StaffStatsCardProps> = ({ stats }) => {
     ];
 
     return (
-        <div className="bg-white border border-gray-100 rounded-2xl shadow-card overflow-hidden">
-            <div className="px-4 py-3 border-b border-gray-50">
-                <h3 className="text-sm font-semibold text-gray-900">At a glance</h3>
+        <div className="bg-white border border-paper-300 rounded-xl shadow-card overflow-hidden">
+            <div className="px-4 py-3 border-b border-paper-200">
+                <h3 className="text-sm font-semibold text-ink-800">At a glance</h3>
             </div>
             <div className="grid grid-cols-2 gap-2 p-3">
                 {tiles.map(t => (
                     <button
                         key={t.label}
                         onClick={() => navigate(t.to)}
-                        className={`text-left p-3 rounded-xl transition-colors ${t.urgent && !!t.value ? 'bg-red-50 hover:bg-red-100' : 'bg-gray-50 hover:bg-gray-100'}`}
+                        className={`text-left p-3 rounded-xl transition-colors ${t.urgent && !!t.value ? 'bg-red-50 hover:bg-red-100' : 'bg-paper-100 hover:bg-paper-200'}`}
                     >
-                        <p className={`text-lg font-semibold leading-none ${t.urgent && !!t.value ? 'text-red-600' : 'text-gray-900'}`}>
+                        <p className={`text-lg font-semibold leading-none ${t.urgent && !!t.value ? 'text-red-600' : 'text-ink-800'}`}>
                             {t.value ?? '—'}
                         </p>
-                        <p className="text-[11px] text-gray-400 mt-1 leading-tight">{t.label}</p>
+                        <p className="text-[11px] text-paper-600 mt-1 leading-tight">{t.label}</p>
                     </button>
                 ))}
             </div>

@@ -34,18 +34,18 @@ const PeopleSuggestionsCard: React.FC<{ seeAllTo: string }> = ({ seeAllTo }) => 
             {people?.map(p => {
                 const sent = sentTo.has(p.user_id);
                 return (
-                    <div key={p.user_id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors">
+                    <div key={p.user_id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-paper-100 transition-colors">
                         <Avatar name={p.full_name} size="sm" />
                         <div className="min-w-0 flex-1">
-                            <p className="text-xs font-medium text-gray-800 truncate">{p.full_name}</p>
-                            <p className="text-[11px] text-gray-400 truncate">
+                            <p className="text-xs font-medium text-ink-800 truncate">{p.full_name}</p>
+                            <p className="text-[11px] text-paper-600 truncate">
                                 {ROLE_LABELS[p.role] || p.role}{p.mutual_connections > 0 ? ` · ${p.mutual_connections} mutual` : ''}
                             </p>
                         </div>
                         <button
                             onClick={() => handleConnect(p.user_id)}
                             disabled={sent}
-                            className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${sent ? 'text-nile-green' : 'text-gray-400 hover:text-nile-blue hover:bg-nile-blue/10'}`}
+                            className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${sent ? 'text-nile-green' : 'text-paper-600 hover:text-nile-blue hover:bg-nile-blue/10'}`}
                             title={sent ? 'Request sent' : 'Connect'}
                         >
                             {sent ? <Check size={14} /> : <UserPlus size={14} />}
