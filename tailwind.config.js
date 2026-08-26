@@ -4,46 +4,71 @@ export default {
     theme: {
         extend: {
             colors: {
+                // Every token is stored as an "R G B" triplet so Tailwind's
+                // `/opacity` modifier keeps working. A bare `var(--x)` colour
+                // silently drops utilities like `bg-nile-blue/10` — Tailwind v3
+                // cannot compose alpha into an opaque custom property, so the
+                // rule is never emitted and the element renders untinted.
                 'harbour': {
-                    50: 'var(--harbour-050)',
-                    500: 'var(--harbour-500)',
-                    600: 'var(--harbour-600)',
+                    DEFAULT: 'rgb(var(--harbour-500-rgb) / <alpha-value>)',
+                    50:  'rgb(var(--harbour-050-rgb) / <alpha-value>)',
+                    500: 'rgb(var(--harbour-500-rgb) / <alpha-value>)',
+                    600: 'rgb(var(--harbour-600-rgb) / <alpha-value>)',
                 },
                 'app': {
-                    accent: 'var(--app-accent)',
-                    tint: 'var(--app-tint)',
-                    ink: 'var(--app-ink)',
+                    accent: 'rgb(var(--app-accent-rgb) / <alpha-value>)',
+                    tint:   'rgb(var(--app-tint-rgb) / <alpha-value>)',
+                    ink:    'rgb(var(--app-ink-rgb) / <alpha-value>)',
                 },
                 'paper': {
-                    0: 'var(--paper-000)',
-                    50: 'var(--paper-050)',
-                    100: 'var(--paper-100)',
-                    200: 'var(--paper-200)',
-                    300: 'var(--paper-300)',
-                    400: 'var(--paper-400)',
-                    500: 'var(--paper-500)',
-                    600: 'var(--paper-600)',
-                    700: 'var(--paper-700)',
+                    0:   'rgb(var(--paper-000-rgb) / <alpha-value>)',
+                    50:  'rgb(var(--paper-050-rgb) / <alpha-value>)',
+                    100: 'rgb(var(--paper-100-rgb) / <alpha-value>)',
+                    200: 'rgb(var(--paper-200-rgb) / <alpha-value>)',
+                    300: 'rgb(var(--paper-300-rgb) / <alpha-value>)',
+                    400: 'rgb(var(--paper-400-rgb) / <alpha-value>)',
+                    500: 'rgb(var(--paper-500-rgb) / <alpha-value>)',
+                    600: 'rgb(var(--paper-600-rgb) / <alpha-value>)',
+                    700: 'rgb(var(--paper-700-rgb) / <alpha-value>)',
                 },
                 'ink': {
-                    500: 'var(--ink-500)',
-                    600: 'var(--ink-600)',
-                    700: 'var(--ink-700)',
-                    800: 'var(--ink-800)',
-                    900: 'var(--ink-900)',
+                    500: 'rgb(var(--ink-500-rgb) / <alpha-value>)',
+                    600: 'rgb(var(--ink-600-rgb) / <alpha-value>)',
+                    700: 'rgb(var(--ink-700-rgb) / <alpha-value>)',
+                    800: 'rgb(var(--ink-800-rgb) / <alpha-value>)',
+                    900: 'rgb(var(--ink-900-rgb) / <alpha-value>)',
                 },
+                // `nile-*` is the legacy vocabulary the pages are written in.
+                // It is retained as a full scale — re-pointed at Harbour — so
+                // the ~380 existing `nile-blue-700` / `nile-green/10` usages
+                // keep resolving while pages are migrated to `app-*`.
                 'nile-blue': {
-                    DEFAULT: 'var(--harbour-500)',
-                    50:  'var(--harbour-050)',
-                    500: 'var(--harbour-500)',
-                    600: 'var(--harbour-600)',
+                    DEFAULT: 'rgb(var(--harbour-500-rgb) / <alpha-value>)',
+                    50:  'rgb(var(--harbour-050-rgb) / <alpha-value>)',
+                    100: 'rgb(var(--nile-blue-100-rgb) / <alpha-value>)',
+                    200: 'rgb(var(--nile-blue-200-rgb) / <alpha-value>)',
+                    300: 'rgb(var(--nile-blue-300-rgb) / <alpha-value>)',
+                    400: 'rgb(var(--nile-blue-400-rgb) / <alpha-value>)',
+                    500: 'rgb(var(--harbour-500-rgb) / <alpha-value>)',
+                    600: 'rgb(var(--harbour-600-rgb) / <alpha-value>)',
+                    700: 'rgb(var(--nile-blue-700-rgb) / <alpha-value>)',
+                    800: 'rgb(var(--nile-blue-800-rgb) / <alpha-value>)',
+                    900: 'rgb(var(--nile-blue-900-rgb) / <alpha-value>)',
                 },
                 'nile-green': {
-                    DEFAULT: 'var(--status-success)',
-                    50:  'var(--green-050)',
-                    600: 'var(--green-600)',
+                    DEFAULT: 'rgb(var(--green-600-rgb) / <alpha-value>)',
+                    50:  'rgb(var(--green-050-rgb) / <alpha-value>)',
+                    100: 'rgb(var(--nile-green-100-rgb) / <alpha-value>)',
+                    200: 'rgb(var(--nile-green-200-rgb) / <alpha-value>)',
+                    300: 'rgb(var(--nile-green-300-rgb) / <alpha-value>)',
+                    400: 'rgb(var(--nile-green-400-rgb) / <alpha-value>)',
+                    500: 'rgb(var(--nile-green-500-rgb) / <alpha-value>)',
+                    600: 'rgb(var(--green-600-rgb) / <alpha-value>)',
+                    700: 'rgb(var(--nile-green-700-rgb) / <alpha-value>)',
+                    800: 'rgb(var(--nile-green-800-rgb) / <alpha-value>)',
+                    900: 'rgb(var(--nile-green-900-rgb) / <alpha-value>)',
                 },
-                'nile-white': 'var(--paper-000)',
+                'nile-white': 'rgb(var(--paper-000-rgb) / <alpha-value>)',
             },
             boxShadow: {
                 'soft-xs': 'var(--shadow-xs)',
@@ -58,6 +83,9 @@ export default {
                 'nav':     '0 0 0 1px var(--border), var(--shadow-xs)',
                 'brutalist':    '6px 6px 0px 0px rgba(0,0,0,1)',
                 'brutalist-sm': '3px 3px 0px 0px rgba(0,0,0,1)',
+            },
+            spacing: {
+                '4.5': '1.125rem',
             },
             borderRadius: {
                 '4xl': '2rem',
