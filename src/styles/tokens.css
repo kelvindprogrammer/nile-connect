@@ -252,3 +252,55 @@
   --shadow-lg: 0 16px 40px rgba(13, 18, 32, 0.08), 0 4px 12px rgba(13, 18, 32, 0.05);
   --shadow-overlay: 0 32px 64px -16px rgba(13, 18, 32, 0.24), 0 8px 20px -8px rgba(13, 18, 32, 0.12);
 }
+
+/* ── 10. Component Helpers & Micro-Interactions ───────── */
+.co-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  border-radius: var(--radius-full);
+  line-height: 1.2;
+}
+
+.co-badge-accent {
+  background-color: var(--app-tint);
+  color: var(--app-accent);
+}
+
+.co-badge-outline {
+  background-color: var(--paper-000);
+  border: 1px solid var(--paper-300);
+  color: var(--text-muted);
+}
+
+.co-card {
+  background-color: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xs);
+  transition: transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
+}
+
+.co-card:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+.co-focus-ring:focus-visible {
+  outline: none;
+  border-color: var(--app-accent);
+  box-shadow: 0 0 0 3px rgba(38, 101, 140, 0.18);
+}
+
+/* Mobile responsive padding and touch target pass */
+@media (max-width: 640px) {
+  :root {
+    --card-pad: 16px;
+    --control-h: 40px;
+    --page-gutter: 16px;
+  }
+}
+

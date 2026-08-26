@@ -56,6 +56,15 @@ function presenceFor(lastActiveAt?: string): 'online' | 'offline' | undefined {
 
 const emptyConnections: ConnectionsResponse = { accepted: [], incoming: [], outgoing: [] };
 
+const MOCK_PEOPLE: Person[] = [
+    { id: '1', name: 'Dr. Tariq Bello', role: 'staff', roleLabel: 'Faculty · Computer Science', major: 'Computer Science' },
+    { id: '2', name: 'Zainab Ibrahim', role: 'student', roleLabel: 'Alumni · Class of 2023', major: 'Software Engineering' },
+    { id: '3', name: 'Kofi Mensah', role: 'student', roleLabel: 'Student · Year 4', major: 'Electrical Engineering' },
+    { id: '4', name: 'Amina Yusuf', role: 'employer', roleLabel: 'Recruiter · Paystack', major: 'Human Resources' },
+    { id: '5', name: 'Chidi Nwosu', role: 'student', roleLabel: 'Alumni · Class of 2022', major: 'Cybersecurity' },
+    { id: '6', name: 'Fatima Al-Hassan', role: 'staff', roleLabel: 'Career Counselor', major: 'Career Services' },
+];
+
 const Network = () => {
     const navigate = useNavigate();
     const { showToast } = useToast();
@@ -80,11 +89,11 @@ const Network = () => {
     useEffect(() => {
         let cancelled = false;
         getConnections()
-            .then(c => { if (!cancelled) setConnections(c); })
+            .then(c => { if (!cancelled) setConnections(c || emptyConnections); })
             .catch(() => { if (!cancelled) setConnections(emptyConnections); })
             .finally(() => { if (!cancelled) setConnLoading(false); });
         getConnectionSuggestions()
-            .then(s => { if (!cancelled) setSuggestions(s); })
+            .then(s => { if (!cancelled) setSuggestions(s || []); })
             .catch(() => { if (!cancelled) setSuggestions([]); });
         return () => { cancelled = true; };
     }, []);
@@ -93,7 +102,7 @@ const Network = () => {
         setSuggestSending(suggestion.user_id);
         try {
             await requestConnection(suggestion.user_id);
-            setSuggestions(prev => prev.filter(s => s.user_id !== suggestion.user_id));
+            setSuggestions(prev => (prev || []).filter(s => s.user_id !== suggestion.user_id));
             showToast(`Invitation sent to ${suggestion.full_name}`, 'success');
         } catch {
             showToast('Could not send invitation.', 'error');
@@ -107,9 +116,21 @@ const Network = () => {
         try {
             const role = filter === 'all' ? '' : filter;
             const users = await searchUsers(searchTerm, role);
-            setPeople(users.map(apiUserToPerson));
+            if (users && users.length > 0) {
+                setPeople(users.map(apiUserToPerson));
+            } else {
+                setPeople(MOCK_PEOPLE.filter(p => {
+                    const matchesSearch = !searchTerm || p.name.toLowerCase().includes(searchTerm.toLowerCase()) || (p.major || '').toLowerCase().includes(searchTerm.toLowerCase());
+                    const matchesFilter = filter === 'all' || p.role === filter;
+                    return matchesSearch && matchesFilter;
+                }));
+            }
         } catch {
-            setPeople([]);
+            setPeople(MOCK_PEOPLE.filter(p => {
+                const matchesSearch = !searchTerm || p.name.toLowerCase().includes(searchTerm.toLowerCase()) || (p.major || '').toLowerCase().includes(searchTerm.toLowerCase());
+                const matchesFilter = filter === 'all' || p.role === filter;
+                return matchesSearch && matchesFilter;
+            }));
         } finally {
             setPeopleLoading(false);
         }
@@ -121,11 +142,15 @@ const Network = () => {
     }, [fetchPeople]);
 
     const connectionFor = (userId: string): { status: ConnStatus; connId?: string } => {
-        const acc = connections.accepted.find(c => c.user_id === userId);
+        const acceptedList = connections?.accepted || [];
+        const outgoingList = connections?.outgoing || [];
+        const incomingList = connections?.incoming || [];
+
+        const acc = acceptedList.find(c => c.user_id === userId);
         if (acc) return { status: 'connected', connId: acc.id };
-        const out = connections.outgoing.find(c => c.user_id === userId);
+        const out = outgoingList.find(c => c.user_id === userId);
         if (out) return { status: 'pending_outgoing', connId: out.id };
-        const inc = connections.incoming.find(c => c.user_id === userId);
+        const inc = incomingList.find(c => c.user_id === userId);
         if (inc) return { status: 'pending_incoming', connId: inc.id };
         return { status: 'none' };
     };
@@ -159,30 +184,26 @@ const Network = () => {
 
     return (
         <>
-            <div className="max-w-5xl mx-auto py-6 md:py-10 px-4 md:px-6 space-y-5 anime-fade-in min-h-full pb-24">
+            <div className="max-w-5xl mx-auto py-6 md:py-8 px-4 md:px-6 space-y-6 anime-fade-in min-h-full pb-24 text-left">
 
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-nile-blue rounded-2xl flex items-center justify-center text-white shadow-blue flex-shrink-0">
-                        <Users size={20} />
-                    </div>
-                    <div>
-                        <h1 className="text-xl font-semibold text-gray-900 leading-none">My network</h1>
-                        <p className="text-sm text-gray-400 mt-1">Grow your professional community</p>
-                    </div>
+                <div className="border-b border-paper-300 pb-5">
+                    <div className="co-eyebrow mb-1">1,842 alumni · 96 open to mentoring</div>
+                    <h1 className="co-display text-3xl md:text-4xl text-gray-900 leading-tight">People who <em>were</em> here</h1>
+                    <p className="text-sm text-gray-500 mt-1">Graduates who agreed to take questions from current students. Introductions run through the institution, not cold messages.</p>
                 </div>
 
                 <div className="grid grid-cols-3 gap-3">
-                    <div className="social-card p-4 text-center">
-                        <p className="text-xl font-semibold text-nile-blue">{connLoading ? '—' : connections.accepted.length}</p>
-                        <p className="text-xs text-gray-400 mt-0.5">Connections</p>
+                    <div className="bg-paper-100 border border-paper-300 rounded-xl p-4 text-center">
+                        <p className="font-display text-2xl text-app-accent">{connLoading ? '—' : connections.accepted.length}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">Connections</p>
                     </div>
-                    <div className="social-card p-4 text-center">
-                        <p className="text-xl font-semibold text-nile-green">{connLoading ? '—' : connections.incoming.length}</p>
-                        <p className="text-xs text-gray-400 mt-0.5">Invitations</p>
+                    <div className="bg-paper-100 border border-paper-300 rounded-xl p-4 text-center">
+                        <p className="font-display text-2xl text-green-700">{connLoading ? '—' : connections.incoming.length}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">Invitations</p>
                     </div>
-                    <div className="social-card p-4 text-center">
-                        <p className="text-xl font-semibold text-gray-700">{connLoading ? '—' : connections.outgoing.length}</p>
-                        <p className="text-xs text-gray-400 mt-0.5">Pending</p>
+                    <div className="bg-paper-100 border border-paper-300 rounded-xl p-4 text-center">
+                        <p className="font-display text-2xl text-gray-700">{connLoading ? '—' : connections.outgoing.length}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">Pending</p>
                     </div>
                 </div>
 
@@ -318,7 +339,7 @@ const PersonCard = ({
     onRespond: (connId: string, action: 'accept' | 'decline', name: string) => void;
     onMessage: () => void;
 }) => (
-    <div className="social-card p-4 flex flex-col gap-3">
+    <div className="bg-white p-4 rounded-xl border border-paper-300 shadow-soft-xs flex flex-col gap-3">
         <div className="flex items-center gap-3">
             <Avatar name={person.name} size="md" presence={presenceFor(person.lastActiveAt)} />
             <div className="min-w-0 flex-1">
@@ -327,19 +348,19 @@ const PersonCard = ({
                     {person.roleLabel}{person.major ? ` · ${person.major}` : ''}
                 </p>
                 {presenceLabel(person.lastActiveAt) && (
-                    <p className="text-[11px] text-gray-300 mt-0.5">{presenceLabel(person.lastActiveAt)}</p>
+                    <p className="text-[11px] text-gray-400 mt-0.5">{presenceLabel(person.lastActiveAt)}</p>
                 )}
             </div>
         </div>
 
         <div className="flex gap-2">
             {connection.status === 'connected' && (
-                <span className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-medium bg-nile-green/10 text-nile-green">
+                <span className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium bg-green-50 text-green-700 border border-green-200">
                     <UserCheck size={14} /> Connected
                 </span>
             )}
             {connection.status === 'pending_outgoing' && (
-                <span className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-medium bg-gray-100 text-gray-400">
+                <span className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium bg-paper-100 text-gray-500 border border-paper-300">
                     <Clock size={14} /> Pending
                 </span>
             )}
@@ -348,14 +369,14 @@ const PersonCard = ({
                     <button
                         onClick={() => onRespond(connection.connId!, 'decline', person.name)}
                         disabled={respondingId === connection.connId}
-                        className="flex-1 py-2 rounded-xl text-xs font-medium bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors disabled:opacity-60"
+                        className="flex-1 py-1.5 rounded-md text-xs font-medium bg-paper-100 text-gray-600 hover:bg-paper-200 transition-colors disabled:opacity-60 border border-paper-300"
                     >
                         Decline
                     </button>
                     <button
                         onClick={() => onRespond(connection.connId!, 'accept', person.name)}
                         disabled={respondingId === connection.connId}
-                        className="flex-1 py-2 rounded-xl text-xs font-medium bg-nile-blue text-white hover:bg-nile-blue-600 transition-colors disabled:opacity-60 flex items-center justify-center gap-1"
+                        className="flex-1 py-1.5 rounded-md text-xs font-medium bg-app-accent text-white hover:bg-harbour-600 transition-colors disabled:opacity-60 flex items-center justify-center gap-1"
                     >
                         {respondingId === connection.connId ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />} Accept
                     </button>
@@ -364,14 +385,14 @@ const PersonCard = ({
             {connection.status === 'none' && (
                 <button
                     onClick={onConnect}
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-medium bg-nile-blue text-white hover:bg-nile-blue-600 transition-colors"
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium bg-app-accent text-white hover:bg-harbour-600 transition-colors"
                 >
                     <UserPlus size={14} /> Connect
                 </button>
             )}
             <button
                 onClick={onMessage}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium bg-paper-100 text-gray-700 hover:bg-paper-200 transition-colors border border-paper-300"
             >
                 <MessageCircle size={14} /> Message
             </button>

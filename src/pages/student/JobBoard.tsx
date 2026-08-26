@@ -106,38 +106,38 @@ const JobBoard = () => {
             <div className="p-4 md:p-8 space-y-6 anime-fade-in font-sans pb-24 text-left max-w-6xl mx-auto">
 
                 {/* Header */}
-                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 border-b border-paper-300 pb-5">
                     <div>
-                        <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 leading-tight">Opportunities</h1>
-                        <p className="text-sm text-gray-400 mt-1">
-                            {isLoading ? 'Loading roles…' : `${filtered.length} open ${filtered.length === 1 ? 'role' : 'roles'} matched to your profile`}
-                        </p>
+                        <div className="co-eyebrow mb-1">
+                            {isLoading ? 'Loading roles…' : `${filtered.length} open ${filtered.length === 1 ? 'role' : 'roles'} matched to your record`}
+                        </div>
+                        <h1 className="co-display text-3xl md:text-4xl text-gray-900 leading-tight">Opportunities</h1>
                     </div>
 
                     <div className="flex items-center gap-2 w-full lg:w-auto">
                         <div className="relative group flex-1 lg:w-72">
-                            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-nile-blue transition-colors" />
+                            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-app-accent transition-colors" />
                             <input
                                 type="text"
                                 value={search}
                                 onChange={e => setSearch(e.target.value)}
-                                placeholder="Search by title or company"
-                                className="w-full bg-white border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-sm text-gray-800 placeholder:text-gray-400 outline-none focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10 transition-all"
+                                placeholder="Search roles, employers, cities…"
+                                className="w-full bg-white border border-paper-400 rounded-md py-2 pl-10 pr-4 text-sm text-gray-800 placeholder:text-gray-400 outline-none focus:border-app-accent focus:ring-2 focus:ring-app-accent/20 transition-all"
                             />
                         </div>
 
                         <div className="relative" ref={filterRef}>
                             <button
                                 onClick={() => setShowFilters(v => !v)}
-                                className={`flex items-center gap-2 px-4 py-2.5 border rounded-xl text-sm font-medium transition-all
+                                className={`flex items-center gap-2 px-3.5 py-2 border rounded-md text-xs font-medium transition-all
                                     ${showFilters || hasFilters
-                                        ? 'bg-nile-blue text-white border-nile-blue shadow-blue'
-                                        : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'}`}
+                                        ? 'bg-app-accent text-white border-app-accent shadow-soft-xs'
+                                        : 'bg-white text-gray-700 border-paper-400 hover:bg-paper-100'}`}
                             >
-                                <SlidersHorizontal size={15} />
+                                <SlidersHorizontal size={14} />
                                 Filters
                                 {hasFilters && (
-                                    <span className="w-5 h-5 bg-nile-green text-white rounded-full text-[10px] flex items-center justify-center font-semibold">
+                                    <span className="w-4 h-4 bg-green-600 text-white rounded-full text-[10px] flex items-center justify-center font-semibold">
                                         {(typeFilter !== 'All' ? 1 : 0) + (locationFilter !== 'All' ? 1 : 0) + (categoryFilter !== 'All' ? 1 : 0) + (remoteOnly ? 1 : 0)}
                                     </span>
                                 )}
@@ -317,18 +317,18 @@ const JobCard = ({ job, onNavigate, onApply }: { job: Job; onNavigate: () => voi
     return (
         <div
             onClick={onNavigate}
-            className="group bg-white p-5 rounded-2xl border border-gray-100 shadow-card hover:shadow-soft-md hover:-translate-y-0.5 transition-all cursor-pointer flex flex-col text-left"
+            className="group bg-white p-5 rounded-xl border border-paper-300 shadow-soft-xs hover:shadow-soft hover:-translate-y-0.5 transition-all cursor-pointer flex flex-col text-left"
         >
             <div className="flex justify-between items-start gap-3 mb-3">
                 <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-nile-blue to-nile-blue-600 text-white flex items-center justify-center text-sm font-semibold flex-shrink-0">
+                    <div className="w-11 h-11 rounded-lg bg-app-tint text-app-accent font-display text-sm font-semibold flex items-center justify-center flex-shrink-0">
                         {initials}
                     </div>
                     <div className="min-w-0">
                         <div className="flex items-center gap-1.5">
-                            <h3 className="text-base font-semibold text-gray-900 leading-snug truncate group-hover:text-nile-blue transition-colors">{job.title}</h3>
+                            <h3 className="text-base font-semibold text-gray-900 leading-snug truncate group-hover:text-app-accent transition-colors">{job.title}</h3>
                             {isNew && (
-                                <span className="flex-shrink-0 text-[10px] font-semibold text-nile-green bg-nile-green/10 px-1.5 py-0.5 rounded-full">New</span>
+                                <span className="flex-shrink-0 text-[10px] font-semibold text-green-700 bg-green-50 border border-green-200 px-1.5 py-0.5 rounded-full">New</span>
                             )}
                         </div>
                         <div className="flex items-center gap-1 mt-0.5">
@@ -338,7 +338,7 @@ const JobCard = ({ job, onNavigate, onApply }: { job: Job; onNavigate: () => voi
                 </div>
                 <button
                     onClick={handleSave}
-                    className={`p-2 rounded-lg transition-all flex-shrink-0 ${isSaved ? 'bg-nile-green/10 text-nile-green' : 'bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600'}`}
+                    className={`p-2 rounded-md transition-all flex-shrink-0 ${isSaved ? 'bg-app-tint text-app-accent' : 'bg-paper-100 text-gray-400 hover:text-gray-600'}`}
                 >
                     <Bookmark size={15} fill={isSaved ? 'currentColor' : 'none'} />
                 </button>
@@ -351,8 +351,8 @@ const JobCard = ({ job, onNavigate, onApply }: { job: Job; onNavigate: () => voi
                     </span>
                 )}
                 {job.salary && (
-                    <span className="flex items-center gap-1">
-                        <Wallet size={12} className="text-gray-400" /> {job.salary}
+                    <span className="flex items-center gap-1 font-mono">
+                        <Wallet size={12} className="text-gray-400" /> {job.salary.replace('₦', '')}
                     </span>
                 )}
                 {typeof job.applicant_count === 'number' && (
@@ -363,19 +363,19 @@ const JobCard = ({ job, onNavigate, onApply }: { job: Job; onNavigate: () => voi
             </div>
 
             <div className="flex flex-wrap items-center gap-1.5 mb-4">
-                <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${typeClass}`}>{typeName}</span>
+                <span className="co-badge co-badge-accent">{typeName}</span>
                 {tags.map(tag => (
-                    <span key={tag} className="text-xs font-medium px-2.5 py-1 bg-gray-50 border border-gray-100 rounded-full text-gray-600">{tag}</span>
+                    <span key={tag} className="co-badge co-badge-outline">{tag}</span>
                 ))}
             </div>
 
-            <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-50">
+            <div className="flex items-center justify-between mt-auto pt-3 border-t border-paper-200">
                 <div className="flex items-center gap-3 text-[11px] text-gray-400">
                     <span className="flex items-center gap-1">
                         <Clock size={11} /> {timeAgo(job.posted_at)}
                     </span>
                     {deadline && (
-                        <span className={`flex items-center gap-1 font-medium ${deadline.urgent ? 'text-red-500' : 'text-gray-400'}`}>
+                        <span className={`flex items-center gap-1 font-medium ${deadline.urgent ? 'text-red-600' : 'text-gray-400'}`}>
                             <Sparkles size={11} /> {deadline.label}
                         </span>
                     )}

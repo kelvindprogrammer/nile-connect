@@ -60,25 +60,30 @@ const ApplicationTracker = () => {
 
     return (
         <>
-            <div className="p-4 md:p-10 space-y-6 md:space-y-10 font-sans bg-nile-white min-h-full pb-20">
+            <div className="p-4 md:p-8 space-y-6 md:space-y-8 font-sans bg-white min-h-full pb-20 max-w-6xl mx-auto text-left">
                 {/* Header */}
-                <div className="border-b border-gray-100 pb-6 md:pb-8">
-                    <h2 className="text-3xl md:text-5xl font-semibold text-gray-900 leading-tight">Applications</h2>
-                    <p className="text-sm text-gray-600 mt-2">Track your job journey</p>
+                <div className="border-b border-paper-300 pb-6">
+                    <div className="co-eyebrow mb-1">Adaeze Okonkwo · Engineering, Year 3</div>
+                    <h2 className="co-display text-3xl md:text-4xl text-gray-900 leading-tight">Applications</h2>
+                    <p className="text-sm text-gray-500 mt-1">Where each application stands, and what the employer is waiting on.</p>
                 </div>
 
-                {/* Status Summary — stacks on mobile */}
-                <div className="flex flex-wrap gap-3">
+                {/* Status Summary / Pipeline */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {[
-                        { label: 'Applied', count: applied.length, icon: <FileText size={14} strokeWidth={2} />, bg: 'bg-nile-blue/10 text-nile-blue' },
-                        { label: 'Interviews', count: interviews.length, icon: <CheckCircle size={14} strokeWidth={2} />, bg: 'bg-nile-green/10 text-nile-green' },
-                        { label: 'Offers', count: offers.length, icon: <Clock size={14} strokeWidth={2} />, bg: 'bg-yellow-50 text-yellow-600' },
-                        { label: 'Closed', count: closed.length, icon: <Ban size={14} strokeWidth={2} />, bg: 'bg-black/5 text-black/40' },
+                        { label: 'Applied', count: applied.length, icon: <FileText size={14} strokeWidth={2} />, bg: 'bg-app-tint text-app-accent border-app-accent' },
+                        { label: 'Interviews', count: interviews.length, icon: <CheckCircle size={14} strokeWidth={2} />, bg: 'bg-green-50 text-green-700 border-green-600' },
+                        { label: 'Offers', count: offers.length, icon: <Clock size={14} strokeWidth={2} />, bg: 'bg-amber-50 text-amber-700 border-amber-600' },
+                        { label: 'Closed', count: closed.length, icon: <Ban size={14} strokeWidth={2} />, bg: 'bg-paper-100 text-gray-500 border-paper-400' },
                     ].map(cfg => (
-                        <div key={cfg.label} className={`flex items-center space-x-2 px-4 py-2 rounded-full ${cfg.bg}`}>
-                            {cfg.icon}
-                            <span className="font-medium text-xs">{cfg.label}</span>
-                            <span className="font-semibold text-xs bg-white/70 rounded-full px-2 py-0.5">{cfg.count}</span>
+                        <div key={cfg.label} className="p-3 bg-paper-100 border border-paper-300 rounded-lg flex items-center justify-between">
+                            <div>
+                                <span className="text-xs font-medium text-gray-500 block">{cfg.label}</span>
+                                <span className="font-display text-2xl text-gray-900 leading-none">{cfg.count}</span>
+                            </div>
+                            <div className={`p-2 rounded-md ${cfg.bg}`}>
+                                {cfg.icon}
+                            </div>
                         </div>
                     ))}
                 </div>
