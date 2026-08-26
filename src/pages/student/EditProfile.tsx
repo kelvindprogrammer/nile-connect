@@ -188,7 +188,7 @@ const EditProfile = () => {
                 <form onSubmit={handleSave} className="space-y-6 md:space-y-8">
 
                     {/* Avatar */}
-                    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 p-6 bg-nile-blue/5 border-[2px] border-dashed border-paper-400/10 rounded-[24px]">
+                    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 p-6 bg-nile-blue/5 border border-dashed border-paper-400/10 rounded-[24px]">
                         <div className="relative group flex-shrink-0">
                             <div className="w-20 h-20 rounded-[16px] border border-paper-300 overflow-hidden shadow-card">
                                 {picture ? (
@@ -231,7 +231,7 @@ const EditProfile = () => {
                     </div>
 
                     {/* CV / Resume */}
-                    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 p-6 bg-nile-green/5 border-[2px] border-dashed border-paper-400/10 rounded-[24px]">
+                    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 p-6 bg-nile-green/5 border border-dashed border-paper-400/10 rounded-[24px]">
                         <div className="w-14 h-14 rounded-[16px] bg-nile-blue text-white flex items-center justify-center flex-shrink-0 border border-paper-300">
                             <FileText size={22} />
                         </div>
@@ -364,7 +364,7 @@ const EditProfile = () => {
                         ))}
 
                         {showAddExp && (
-                            <div className="p-5 bg-nile-white/50 border-[2px] border-dashed border-paper-400 rounded-[20px] space-y-3">
+                            <div className="p-5 bg-nile-white/50 border border-dashed border-paper-400 rounded-[20px] space-y-3">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     <input
                                         placeholder="JOB TITLE *"
@@ -402,7 +402,7 @@ const EditProfile = () => {
                             <button
                                 type="button"
                                 onClick={() => setShowAddExp(true)}
-                                className="w-full py-6 border-[2px] border-dashed border-paper-400/20 rounded-[16px] text-[10px] font-semibold text-paper-600 hover:bg-paper-100 hover:text-ink-800 hover:border-paper-400 transition-all flex items-center justify-center gap-2"
+                                className="w-full py-6 border border-dashed border-paper-400/20 rounded-[16px] text-[10px] font-semibold text-paper-600 hover:bg-paper-100 hover:text-ink-800 hover:border-paper-400 transition-all flex items-center justify-center gap-2"
                             >
                                 <Plus size={14} strokeWidth={3} /> ADD FIRST EXPERIENCE
                             </button>

@@ -103,7 +103,7 @@ const CandidateDetail = () => {
                 className="flex items-center gap-2 text-paper-700 font-semibold text-[9px] hover:text-ink-800 transition-colors">
                 <ArrowLeft size={14} strokeWidth={3} /> BACK TO TALENT POOL
             </button>
-            <div className="py-24 text-center border-[2px] border-dashed border-paper-400/10 rounded-[32px]">
+            <div className="py-24 text-center border border-dashed border-paper-400/10 rounded-[32px]">
                 <AlertCircle size={32} className="text-paper-600 mx-auto mb-4" />
                 <p className="text-[9px] font-semibold text-paper-600">Candidate not found or no applications</p>
             </div>
@@ -160,7 +160,7 @@ const CandidateDetail = () => {
                                 value={app.stage}
                                 disabled={savingStage}
                                 onChange={e => handleStageChange(e.target.value)}
-                                className={`w-full appearance-none pl-4 pr-9 py-3 border-[2px] rounded-xl font-semibold text-[9px] tracking-wider cursor-pointer outline-none ${badge} border-current`}
+                                className={`w-full appearance-none pl-4 pr-9 py-3 border rounded-xl font-semibold text-[9px] tracking-wider cursor-pointer outline-none ${badge} border-current`}
                             >
                                 {APPLICATION_STAGES.map(s => (
                                     <option key={s.value} value={s.value}>{s.label.toUpperCase()}</option>

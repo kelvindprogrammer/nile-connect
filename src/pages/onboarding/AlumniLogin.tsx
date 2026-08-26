@@ -20,7 +20,7 @@ const AlumniLogin = () => {
                 {/* Back Button */}
                 <button
                     onClick={() => navigate('/onboarding')}
-                    className="absolute top-6 left-6 z-30 w-11 h-11 bg-white border-3 border-paper-400 rounded-xl shadow-soft-xs flex items-center justify-center hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all"
+                    className="absolute top-6 left-6 z-30 w-11 h-11 bg-white border-3 border-paper-400 rounded-xl shadow-soft-xs flex items-center justify-center hover:-translate-y-0.5 hover:shadow-soft-sm transition-all"
                 >
                     <ArrowLeft size={18} strokeWidth={3} />
                 </button>
@@ -85,7 +85,7 @@ const AlumniLogin = () => {
                         {/* Submit Button */}
                         <button
                             type="submit"
-                            className="w-full bg-nile-green text-nile-white font-semibold py-5 rounded-[16px] border-3 border-paper-400 shadow-soft-sm hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none active:scale-95 transition-all text-sm tracking-tight mt-4"
+                            className="w-full bg-nile-green text-nile-white font-semibold py-5 rounded-[16px] border-3 border-paper-400 shadow-soft-sm hover:-translate-y-0.5 hover:shadow-soft-sm active:scale-95 transition-all text-sm tracking-tight mt-4"
                         >
                             LOGIN
                         </button>

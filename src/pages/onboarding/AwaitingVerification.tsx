@@ -8,12 +8,12 @@ const AwaitingVerification = () => {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-nile-white p-4 md:p-8 font-sans">
-            <div className="w-full max-w-4xl flex flex-col md:flex-row bg-white border-[2px] border-paper-400 shadow-soft-md rounded-[40px] overflow-hidden min-h-[500px] anime-fade-in relative text-left">
+            <div className="w-full max-w-4xl flex flex-col md:flex-row bg-white border border-paper-400 shadow-soft-md rounded-[40px] overflow-hidden min-h-[500px] anime-fade-in relative text-left">
 
                 {/* Back Button */}
                 <button
                     onClick={() => navigate(-1)}
-                    className="absolute top-6 left-6 z-30 w-11 h-11 bg-white border-[2px] border-paper-400 rounded-lg shadow-sm flex items-center justify-center hover:translate-x-[0.5px] hover:translate-y-[0.5px] hover:shadow-none transition-all"
+                    className="absolute top-6 left-6 z-30 w-11 h-11 bg-white border border-paper-400 rounded-lg shadow-sm flex items-center justify-center hover:-translate-y-0.5 hover:shadow-soft-sm transition-all"
                 >
                     <ArrowLeft size={16} strokeWidth={3} />
                 </button>
@@ -24,7 +24,7 @@ const AwaitingVerification = () => {
                     <div className="absolute bottom-8 left-4 w-52 h-52 bg-nile-white/20 rounded-full border-2 border-nile-white/10"></div>
 
                     {/* Shield Icon Box */}
-                    <div className="relative z-10 w-[100px] h-[100px] bg-white border-[2px] border-paper-400 rounded-xl shadow-soft-sm flex items-center justify-center mb-8">
+                    <div className="relative z-10 w-[100px] h-[100px] bg-white border border-paper-400 rounded-xl shadow-soft-sm flex items-center justify-center mb-8">
                         <ShieldCheck size={48} strokeWidth={2} className="text-ink-800" />
                     </div>
 
@@ -33,7 +33,7 @@ const AwaitingVerification = () => {
 
                 {/* Right Panel */}
                 <div className="flex-1 flex flex-col justify-center items-center text-center p-10 md:p-14 space-y-8 bg-[radial-gradient(#000_0.5px,transparent_0.5px)] [background-size:20px_20px] [background-position:center] !bg-opacity-5">
-                    <div className="w-16 h-16 bg-white border-[2px] border-paper-400 rounded-full flex items-center justify-center mb-2 shadow-sm">
+                    <div className="w-16 h-16 bg-white border border-paper-400 rounded-full flex items-center justify-center mb-2 shadow-sm">
                         <Mail size={24} strokeWidth={3} />
                     </div>
 

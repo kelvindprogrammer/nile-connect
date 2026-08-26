@@ -143,7 +143,7 @@ const Column = ({ title, color, apps, status, onWithdraw }: {
 
             <div className="space-y-3 md:space-y-4">
                 {apps.length === 0 ? (
-                    <div className="py-10 text-center border-[2px] border-dashed border-paper-400/10 rounded-[20px]">
+                    <div className="py-10 text-center border border-dashed border-paper-400/10 rounded-[20px]">
                         <p className="text-[9px] font-semibold text-paper-600">NONE YET</p>
                     </div>
                 ) : (

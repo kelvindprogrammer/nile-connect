@@ -131,7 +131,7 @@ const EmployerApplications = () => {
             </div>
 
             {applications.length === 0 ? (
-                <div className="py-20 text-center border-[2px] border-dashed border-paper-400/10 rounded-[28px]">
+                <div className="py-20 text-center border border-dashed border-paper-400/10 rounded-[28px]">
                     <ClipboardList size={28} className="text-paper-500 mx-auto mb-4" />
                     <p className="text-[9px] font-semibold text-paper-600">
                         {search ? 'No matches' : filter === 'all' ? 'No applications yet — post jobs to attract talent' : `No ${stageLabel(filter).toLowerCase()} applications`}
@@ -198,13 +198,13 @@ const StageSelect = ({ current, loading, onChange }: {
 }) => {
     const cfg = stageColor[current] || 'bg-paper-100 text-paper-700 border-paper-400/10';
     return loading ? (
-        <div className={`flex items-center gap-2 px-3 py-2 border-[2px] rounded-xl font-semibold text-[8px] ${cfg}`}>
+        <div className={`flex items-center gap-2 px-3 py-2 border rounded-xl font-semibold text-[8px] ${cfg}`}>
             <Loader2 size={11} className="animate-spin" /> ...
         </div>
     ) : (
         <div className="relative">
             <select value={current} onChange={e => onChange(e.target.value)}
-                className={`appearance-none pl-3 pr-8 py-2 border-[2px] rounded-xl font-semibold text-[8px] tracking-wider cursor-pointer outline-none ${cfg} border-current`}>
+                className={`appearance-none pl-3 pr-8 py-2 border rounded-xl font-semibold text-[8px] tracking-wider cursor-pointer outline-none ${cfg} border-current`}>
                 {APPLICATION_STAGES.map(o => (
                     <option key={o.value} value={o.value}>{o.label.toUpperCase()}</option>
                 ))}

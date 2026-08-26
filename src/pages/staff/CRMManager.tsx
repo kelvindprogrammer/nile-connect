@@ -155,7 +155,7 @@ const CRMManager = () => {
 
             {/* Alerts */}
             {todayReminders.length > 0 && (
-                <div className="bg-yellow-50 border-[2px] border-yellow-400 rounded-[20px] p-4 flex items-start gap-4 anime-fade-in">
+                <div className="bg-yellow-50 border border-yellow-400 rounded-[20px] p-4 flex items-start gap-4 anime-fade-in">
                     <Bell size={18} className="text-yellow-600 flex-shrink-0 mt-0.5" strokeWidth={3} />
                     <div className="flex-1">
                         <p className="font-semibold text-sm text-yellow-800">{todayReminders.length} REMINDER{todayReminders.length > 1 ? 'S' : ''} DUE TODAY</p>
@@ -165,7 +165,7 @@ const CRMManager = () => {
                 </div>
             )}
             {!loadingEmployers && coldEmployers.length > 0 && (
-                <div className="bg-blue-50 border-[2px] border-blue-200 rounded-[20px] p-4 flex items-start gap-4 anime-fade-in">
+                <div className="bg-blue-50 border border-blue-200 rounded-[20px] p-4 flex items-start gap-4 anime-fade-in">
                     <RefreshCw size={18} className="text-blue-500 flex-shrink-0 mt-0.5" strokeWidth={3} />
                     <div className="flex-1">
                         <p className="font-semibold text-sm text-blue-800">{coldEmployers.length} EMPLOYERS NEED RE-ENGAGEMENT</p>
@@ -184,7 +184,7 @@ const CRMManager = () => {
                 <div className="xl:col-span-8 space-y-4">
                     <h3 className="text-[10px] font-semibold text-paper-700">SCHEDULED REMINDERS ({reminders.length})</h3>
                     {reminders.length === 0 ? (
-                        <div className="py-16 text-center border-[2px] border-dashed border-paper-400/10 rounded-[24px]">
+                        <div className="py-16 text-center border border-dashed border-paper-400/10 rounded-[24px]">
                             <Bell size={24} className="text-paper-500 mx-auto mb-3" />
                             <p className="text-[9px] font-semibold text-paper-600">No reminders yet — create one above</p>
                         </div>
@@ -192,7 +192,7 @@ const CRMManager = () => {
                         const t = templateMessages[r.type];
                         return (
                             <div key={r.id} className={`bg-white border border-paper-300 rounded-[20px] p-5 shadow-card transition-all
-                                ${r.sent ? 'opacity-50' : 'hover:translate-y-[-1px] hover:shadow-green'}`}>
+                                ${r.sent ? 'opacity-50' : 'hover:-translate-y-0.5-1px] hover:shadow-green'}`}>
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="flex items-start gap-3 flex-1 min-w-0">
                                         <div className={`w-9 h-9 rounded-xl border border-paper-300 flex items-center justify-center flex-shrink-0 ${t.color}`}>

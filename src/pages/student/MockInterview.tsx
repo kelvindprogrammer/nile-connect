@@ -170,7 +170,7 @@ const MockInterview = () => {
                                         className={`p-4 md:p-5 border border-paper-300 rounded-[20px] text-left transition-all
                                             ${interviewType === t.id
                                                 ? 'shadow-green translate-x-[-2px] translate-y-[-2px]'
-                                                : 'shadow-card hover:translate-x-[-1px] hover:translate-y-[-1px]'}
+                                                : 'shadow-card -1px] hover:-translate-y-0.5-1px]'}
                                             bg-white`}
                                     >
                                         <div className={`w-10 h-10 rounded-xl border border-paper-300 flex items-center justify-center mb-3 ${t.color}`}>
@@ -194,7 +194,7 @@ const MockInterview = () => {
                             />
                         </div>
 
-                        <div className="bg-nile-blue/5 border-[2px] border-dashed border-nile-blue/20 rounded-[20px] p-5 space-y-2">
+                        <div className="bg-nile-blue/5 border border-dashed border-nile-blue/20 rounded-[20px] p-5 space-y-2">
                             <p className="text-[9px] font-semibold text-nile-blue">WHAT TO EXPECT</p>
                             <ul className="space-y-1.5">
                                 {['5 curated questions based on your type', 'AI evaluates each answer in real time', 'Detailed feedback with score and tips', 'Overall performance report at the end'].map((item, i) => (

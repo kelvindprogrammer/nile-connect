@@ -58,7 +58,7 @@ const ProfileCompletion = () => {
                     <div className="pt-6">
                         <button
                             type="submit"
-                            className="w-full bg-nile-green text-white font-semibold py-5 px-8 rounded-full border-3 border-paper-400 shadow-soft-sm hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none active:scale-95 transition-all text-xl"
+                            className="w-full bg-nile-green text-white font-semibold py-5 px-8 rounded-full border-3 border-paper-400 shadow-soft-sm hover:-translate-y-0.5 hover:shadow-soft-sm active:scale-95 transition-all text-xl"
                         >
                             FINISH
                         </button>

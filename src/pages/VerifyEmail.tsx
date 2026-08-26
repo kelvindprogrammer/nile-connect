@@ -43,11 +43,11 @@ const VerifyEmail = () => {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-nile-white p-4 font-sans">
-            <div className="max-w-md w-full bg-white border-[2px] border-paper-400 rounded-[28px] shadow-soft-sm p-8 text-center space-y-6">
+            <div className="max-w-md w-full bg-white border border-paper-400 rounded-[28px] shadow-soft-sm p-8 text-center space-y-6">
                 <div className="flex justify-center">
                     <NileConnectLogo />
                 </div>
-                <div className={`w-20 h-20 mx-auto rounded-full border-[2px] flex items-center justify-center ${cfg.tone}`}>
+                <div className={`w-20 h-20 mx-auto rounded-full border flex items-center justify-center ${cfg.tone}`}>
                     {cfg.icon}
                 </div>
                 <div className="space-y-2">
@@ -57,13 +57,13 @@ const VerifyEmail = () => {
                 <div className="flex flex-col gap-3 pt-2">
                     <Link
                         to="/employer"
-                        className="w-full py-3 bg-ink-900 text-white border-[2px] border-paper-400 rounded-xl font-semibold text-xs tracking-tight hover:bg-nile-blue transition-colors"
+                        className="w-full py-3 bg-ink-900 text-white border border-paper-400 rounded-xl font-semibold text-xs tracking-tight hover:bg-nile-blue transition-colors"
                     >
                         Go to employer dashboard
                     </Link>
                     <Link
                         to="/login"
-                        className="w-full py-3 bg-white text-ink-800 border-[2px] border-paper-400 rounded-xl font-semibold text-xs tracking-tight hover:bg-nile-white transition-colors"
+                        className="w-full py-3 bg-white text-ink-800 border border-paper-400 rounded-xl font-semibold text-xs tracking-tight hover:bg-nile-white transition-colors"
                     >
                         Back to login
                     </Link>

@@ -63,19 +63,19 @@ const EmployerRegistration = () => {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-nile-white p-4 md:p-8 font-sans">
-            <div className="w-full max-w-4xl flex flex-col md:flex-row bg-white border-[2px] border-paper-400 shadow-soft-md rounded-[40px] overflow-hidden min-h-[500px] relative text-left anime-fade-in">
+            <div className="w-full max-w-4xl flex flex-col md:flex-row bg-white border border-paper-400 shadow-soft-md rounded-[40px] overflow-hidden min-h-[500px] relative text-left anime-fade-in">
 
                 {/* Left Panel */}
                 <div className="w-full md:w-[40%] bg-nile-blue text-white border-r-[2px] border-paper-400 flex flex-col p-10 relative overflow-hidden">
                     <button
                         onClick={() => navigate('/register?role=employer')}
-                        className="mb-8 w-10 h-10 bg-white text-ink-800 border-[2px] border-paper-400 rounded-xl flex items-center justify-center shadow-sm hover:translate-x-0.5 hover:translate-y-0.5 transition-all z-10"
+                        className="mb-8 w-10 h-10 bg-white text-ink-800 border border-paper-400 rounded-xl flex items-center justify-center shadow-sm hover:-translate-y-0.5 transition-all z-10"
                     >
                         <ArrowLeft size={16} strokeWidth={3} />
                     </button>
 
                     <div className="relative z-10 space-y-6 flex-1 flex flex-col justify-center">
-                        <div className="w-16 h-16 bg-white border-[2px] border-paper-400 rounded-xl flex items-center justify-center shadow-soft-sm flex-shrink-0">
+                        <div className="w-16 h-16 bg-white border border-paper-400 rounded-xl flex items-center justify-center shadow-soft-sm flex-shrink-0">
                             <Building2 size={32} strokeWidth={2.5} className="text-ink-800" />
                         </div>
                         
@@ -198,7 +198,7 @@ const EmployerRegistration = () => {
                                             name="about"
                                             value={form.about}
                                             onChange={handleChange}
-                                            className="w-full h-24 bg-nile-white/40 border-[2px] border-paper-400 rounded-xl p-4 text-sm outline-none focus:bg-white focus:border-app-accent focus:ring-2 focus:ring-app-accent/20 transition-all"
+                                            className="w-full h-24 bg-nile-white/40 border border-paper-400 rounded-xl p-4 text-sm outline-none focus:bg-white focus:border-app-accent focus:ring-2 focus:ring-app-accent/20 transition-all"
                                             placeholder="DESCRIBE YOUR RECRUITING NEEDS..."
                                         />
                                     </div>

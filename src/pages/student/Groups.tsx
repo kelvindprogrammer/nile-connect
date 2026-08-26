@@ -143,8 +143,7 @@ const GroupsPage: React.FC = () => {
                         onChange={e => setQuery(e.target.value)}
                         placeholder="Search groups…"
                         aria-label="Search groups"
-                        className="w-full h-10 pl-10 pr-4 rounded-xl border border-paper-300 text-sm outline-none
-                                   focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10"
+                        className="w-full h-10 pl-10 pr-4 rounded-xl border border-paper-300 text-sm outline-none focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10"
                     />
                 </div>
             )}

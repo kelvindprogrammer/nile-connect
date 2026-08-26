@@ -214,7 +214,7 @@ const LiveSession = () => {
             <div className="bg-white border border-paper-300 rounded-[32px] p-8 md:p-12 text-center max-w-md w-full shadow-green">
                 <NileConnectLogo size="sm" showText showTagline={false} animated={false} className="mb-6 justify-center" />
                 <CheckCircle2 size={48} className="text-nile-green mx-auto mb-4" strokeWidth={1.5} />
-                <h2 className="co-display text-2xl  mb-2">Session complete</h2>
+                <h2 className="co-display text-2xl mb-2">Session complete</h2>
                 <p className="text-[9px] font-semibold text-paper-700 mb-2">Duration: {formatTime(duration)}</p>
                 <p className="text-sm font-bold text-paper-700 leading-relaxed mb-8">
                     Your live career advisory session has ended. Check your messages for any follow-up notes.
@@ -368,7 +368,7 @@ const LiveSession = () => {
                                     </button>
                                 </div>
                                 <button onClick={endCall}
-                                    className="w-full py-3.5 bg-red-600 border-[2px] border-red-500 rounded-[14px] font-semibold text-[10px] text-white hover:bg-red-700 transition-all flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(239,68,68,0.3)]">
+                                    className="w-full py-3.5 bg-red-600 border border-red-500 rounded-[14px] font-semibold text-[10px] text-white hover:bg-red-700 transition-all flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(239,68,68,0.3)]">
                                     <PhoneOff size={16} /> END SESSION
                                 </button>
                             </div>

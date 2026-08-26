@@ -182,7 +182,7 @@ const Documents = () => {
                             <button
                                 type="button"
                                 onClick={() => fileInputRef.current?.click()}
-                                className="w-full p-4 border-[2px] border-dashed border-paper-400/20 rounded-xl text-[10px] font-semibold text-paper-700 hover:border-nile-blue hover:text-nile-blue transition-all flex items-center justify-center gap-2"
+                                className="w-full p-4 border border-dashed border-paper-400/20 rounded-xl text-[10px] font-semibold text-paper-700 hover:border-nile-blue hover:text-nile-blue transition-all flex items-center justify-center gap-2"
                             >
                                 <Upload size={14} /> {pendingFile ? pendingFile.name : 'CHOOSE FILE'}
                             </button>
@@ -206,7 +206,7 @@ const Documents = () => {
                             <div key={group.value} className="space-y-3">
                                 <h3 className="text-[10px] font-semibold text-paper-700 tracking-wider">{group.label.toUpperCase()}</h3>
                                 {group.docs.length === 0 ? (
-                                    <div className="py-6 text-center border-[2px] border-dashed border-paper-400/10 rounded-[18px]">
+                                    <div className="py-6 text-center border border-dashed border-paper-400/10 rounded-[18px]">
                                         <p className="text-[9px] font-semibold text-paper-600">NO {group.label.toUpperCase()} UPLOADED YET</p>
                                     </div>
                                 ) : (

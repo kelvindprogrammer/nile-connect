@@ -16,12 +16,12 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children, leftContent }) => {
             <div className="absolute top-0 right-0 w-[40%] h-full bg-nile-blue/5 -skew-x-12 translate-x-1/2" />
             
             {/* Main Container - Shared with Login Hub design */}
-            <div className="w-full max-w-4xl flex flex-col md:flex-row bg-white border-[2px] border-paper-400 shadow-[8px_8px_0px_0px_rgba(30,73,157,1)] rounded-[40px] overflow-hidden min-h-[500px] anime-fade-in relative z-10">
+            <div className="w-full max-w-4xl flex flex-col md:flex-row bg-white border border-paper-400 shadow-soft-md rounded-[40px] overflow-hidden min-h-[500px] anime-fade-in relative z-10">
                 
                 {/* Back Button */}
                 <button
                     onClick={() => navigate(-1)}
-                    className="absolute top-6 left-6 z-30 w-11 h-11 bg-white border-[2px] border-paper-400 rounded-lg shadow-sm flex items-center justify-center hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all"
+                    className="absolute top-6 left-6 z-30 w-11 h-11 bg-white border border-paper-400 rounded-lg shadow-sm flex items-center justify-center hover:-translate-y-0.5 hover:shadow-soft-sm transition-all"
                 >
                     <ArrowLeft size={16} strokeWidth={3} />
                 </button>

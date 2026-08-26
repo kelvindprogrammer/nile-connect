@@ -180,9 +180,7 @@ const ReactionBar: React.FC<ReactionBarProps> = ({
                 <div
                     role="menu"
                     aria-label="Choose a reaction"
-                    className="absolute bottom-full left-0 mb-2 z-30 flex items-center gap-0.5 bg-white
-                               border border-paper-300 rounded-full shadow-soft-md px-1.5 py-1
-                               animate-in fade-in slide-in-from-bottom-1 duration-150"
+                    className="absolute bottom-full left-0 mb-2 z-30 flex items-center gap-0.5 bg-white border border-paper-300 rounded-full shadow-soft-md px-1.5 py-1 animate-in fade-in slide-in-from-bottom-1 duration-150"
                 >
                     {catalog.map(meta => (
                         <button
@@ -226,8 +224,7 @@ export const ReactionCount: React.FC<{
             onClick={onClick}
             disabled={!onClick}
             aria-label={`${safe.total} ${safe.total === 1 ? 'reaction' : 'reactions'}`}
-            className="flex items-center gap-1 text-[11px] text-paper-700 hover:text-ink-700
-                       transition-colors disabled:hover:text-paper-700 disabled:cursor-default"
+            className="flex items-center gap-1 text-[11px] text-paper-700 hover:text-ink-700 transition-colors disabled:hover:text-paper-700 disabled:cursor-default"
         >
             <span className="flex -space-x-1" aria-hidden>
                 {top.map(kind => {

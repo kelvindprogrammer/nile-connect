@@ -105,7 +105,7 @@ const EmployerEvents = () => {
             {tab !== 'CREATE' && (
                 <div className="space-y-8 anime-fade-in">
                     {tab === 'MY EVENTS' && myEvents.length === 0 && (
-                        <div className="py-20 text-center border-[2px] border-dashed border-paper-400/10 rounded-[28px]">
+                        <div className="py-20 text-center border border-dashed border-paper-400/10 rounded-[28px]">
                             <Calendar size={28} className="text-paper-500 mx-auto mb-4" />
                             <p className="text-[9px] font-semibold text-paper-600">You haven't created any events yet</p>
                             <button onClick={() => setTab('CREATE')}
@@ -134,7 +134,7 @@ const EmployerEvents = () => {
                     )}
 
                     {displayed.length === 0 && tab === 'ALL EVENTS' && (
-                        <div className="py-20 text-center border-[2px] border-dashed border-paper-400/10 rounded-[28px]">
+                        <div className="py-20 text-center border border-dashed border-paper-400/10 rounded-[28px]">
                             <Calendar size={28} className="text-paper-500 mx-auto mb-4" />
                             <p className="text-[9px] font-semibold text-paper-600">No events on the platform yet</p>
                         </div>
@@ -212,7 +212,7 @@ const EventCard = ({ event }: { event: StaffEvent }) => {
     const catColor = categoryColors[event.category] || categoryColors.other;
     const regPct = event.capacity > 0 ? Math.min(100, Math.round((event.registrations_count / event.capacity) * 100)) : 0;
     return (
-        <div className="bg-white border border-paper-300 rounded-[24px] p-5 flex flex-col gap-4 hover:translate-y-[-1px] shadow-card hover:shadow-blue transition-all">
+        <div className="bg-white border border-paper-300 rounded-[24px] p-5 flex flex-col gap-4 hover:-translate-y-0.5-1px] shadow-card hover:shadow-blue transition-all">
             <div className="flex flex-wrap gap-2">
                 <span className={`text-[7px] font-semibold px-2 py-0.5 rounded-full border ${catColor}`}>{categoryLabel(event.category)}</span>
                 <span className={`text-[7px] font-semibold px-2 py-0.5 rounded-full border ${event.status === 'published' ? 'bg-nile-green/20 text-nile-green border-nile-green/30' : 'bg-yellow-50 text-yellow-600 border-yellow-200'}`}>

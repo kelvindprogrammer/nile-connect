@@ -118,14 +118,14 @@ const EmployerJobs = () => {
                         <Loader2 size={32} className="animate-spin text-nile-blue/40" />
                     </div>
                 ) : activeJobs.length === 0 ? (
-                    <div className="py-20 text-center border-[2px] border-dashed border-paper-400/10 rounded-[24px]">
+                    <div className="py-20 text-center border border-dashed border-paper-400/10 rounded-[24px]">
                         <p className="text-[10px] font-semibold text-paper-600 mb-4">NO ACTIVE JOBS</p>
                         <Button size="sm" onClick={() => setTab('post')}>POST A JOB</Button>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 md:gap-10">
                         {activeJobs.map(job => (
-                            <Card key={job.id} variant="flat" className="border border-paper-300 p-6 md:p-8 hover:translate-y-[-4px] transition-all shadow-card md:shadow-card hover:shadow-none flex flex-col justify-between min-h-[180px] md:min-h-[220px]">
+                            <Card key={job.id} variant="flat" className="border border-paper-300 p-6 md:p-8 hover:-translate-y-0.5-4px] transition-all shadow-card md:shadow-card hover:shadow-soft-sm flex flex-col justify-between min-h-[180px] md:min-h-[220px]">
                                 <div className="flex justify-between items-start">
                                     <div className="space-y-3 md:space-y-4 min-w-0">
                                         <div className="space-y-1 min-w-0">

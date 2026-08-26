@@ -36,7 +36,7 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ onClose }) => {
     return (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={onClose}>
             <div
-                className="bg-white border-[3px] border-paper-400 rounded-[28px] shadow-soft-md max-w-md w-full p-6 md:p-8 space-y-6"
+                className="bg-white border border-paper-400 rounded-[28px] shadow-soft-md max-w-md w-full p-6 md:p-8 space-y-6"
                 onClick={e => e.stopPropagation()}
             >
                 {/* Header */}
@@ -56,7 +56,7 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ onClose }) => {
                 </div>
 
                 {/* Warning */}
-                <div className="p-4 bg-red-50 border-[2px] border-red-200 rounded-[16px] space-y-2">
+                <div className="p-4 bg-red-50 border border-red-200 rounded-[16px] space-y-2">
                     <p className="text-[10px] font-semibold text-red-700 tracking-tight">This will permanently:</p>
                     <ul className="space-y-1">
                         {[
@@ -82,7 +82,7 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ onClose }) => {
                         value={confirmText}
                         onChange={e => setConfirmText(e.target.value.toUpperCase())}
                         placeholder="DELETE"
-                        className="w-full border-[2px] border-paper-400 rounded-xl py-3 px-4 font-semibold text-sm uppercase outline-none focus:border-red-500 focus:shadow-[3px_3px_0px_0px_rgba(239,68,68,0.3)] transition-all"
+                        className="w-full border border-paper-400 rounded-xl py-3 px-4 font-semibold text-sm uppercase outline-none focus:border-red-500 focus:shadow-soft-xs transition-all"
                     />
                 </div>
 
@@ -90,14 +90,14 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ onClose }) => {
                 <div className="flex gap-3">
                     <button
                         onClick={onClose}
-                        className="flex-1 py-3 border-[2px] border-paper-400 rounded-xl font-semibold text-[10px] tracking-tight hover:bg-ink-900 hover:text-white transition-all"
+                        className="flex-1 py-3 border border-paper-400 rounded-xl font-semibold text-[10px] tracking-tight hover:bg-ink-900 hover:text-white transition-all"
                     >
                         CANCEL
                     </button>
                     <button
                         onClick={handleDelete}
                         disabled={!confirmed || isDeleting}
-                        className="flex-1 py-3 bg-red-500 text-white border-[2px] border-paper-400 rounded-xl font-semibold text-[10px] tracking-tight shadow-soft-xs hover:translate-x-px hover:translate-y-px hover:shadow-none transition-all disabled:opacity-30 disabled:translate-x-0 disabled:translate-y-0 flex items-center justify-center gap-2"
+                        className="flex-1 py-3 bg-red-500 text-white border border-paper-400 rounded-xl font-semibold text-[10px] tracking-tight shadow-soft-xs hover:-translate-y-0.5 hover:shadow-soft-sm transition-all disabled:opacity-30 disabled:translate-y-0 flex items-center justify-center gap-2"
                     >
                         {isDeleting ? <Loader2 size={14} className="animate-spin" /> : null}
                         {isDeleting ? 'DELETING...' : 'DELETE ACCOUNT'}

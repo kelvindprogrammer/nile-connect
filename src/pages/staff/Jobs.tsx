@@ -99,7 +99,7 @@ const inputCls = [
 const EmptyState: React.FC<{ icon: React.ReactNode; headline: string; sub?: string; action?: { label: string; onClick: () => void } }> = ({
     icon, headline, sub, action,
 }) => (
-    <div className="py-20 flex flex-col items-center text-center border-[2px] border-dashed border-paper-400/10 rounded-[28px]">
+    <div className="py-20 flex flex-col items-center text-center border border-dashed border-paper-400/10 rounded-[28px]">
         <div className="text-paper-600 mb-4">{icon}</div>
         <p className="text-[10px] font-semibold text-paper-600">{headline}</p>
         {sub && <p className="text-[8px] font-semibold text-paper-600 tracking-wider mt-1">{sub}</p>}
@@ -475,7 +475,7 @@ const StaffJobs: React.FC = () => {
 
     if (loadError) return (
         <div className="p-8 flex flex-col items-center justify-center min-h-[60vh] gap-4 text-center">
-            <div className="w-16 h-16 bg-red-50 border-[2px] border-red-200 rounded-[20px] flex items-center justify-center">
+            <div className="w-16 h-16 bg-red-50 border border-red-200 rounded-[20px] flex items-center justify-center">
                 <AlertCircle size={28} className="text-red-400" />
             </div>
             <div>
@@ -644,7 +644,7 @@ const StaffJobs: React.FC = () => {
                     </div>
 
                     {/* Info panel */}
-                    <div className="mt-4 bg-nile-blue/5 border-[2px] border-nile-blue/20 rounded-[20px] p-5 flex items-start gap-3">
+                    <div className="mt-4 bg-nile-blue/5 border border-nile-blue/20 rounded-[20px] p-5 flex items-start gap-3">
                         <AlertCircle size={16} className="text-nile-blue flex-shrink-0 mt-0.5" />
                         <div>
                             <p className="text-[9px] font-semibold tracking-wider text-nile-blue">DIRECT PLACEMENT</p>
@@ -698,7 +698,7 @@ const StaffJobs: React.FC = () => {
 
                     {/* Tip */}
                     {pendingJobs.length > 0 && (
-                        <div className="bg-yellow-50 border-[2px] border-yellow-200 rounded-[18px] p-4 flex items-start gap-2.5">
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-[18px] p-4 flex items-start gap-2.5">
                             <AlertCircle size={14} className="text-yellow-600 flex-shrink-0 mt-0.5" />
                             <p className="text-[8px] font-semibold text-yellow-700 tracking-wider leading-relaxed">
                                 REVIEW EACH EMPLOYER JOB CAREFULLY BEFORE APPROVING. APPROVED JOBS BECOME VISIBLE TO ALL STUDENTS IMMEDIATELY.

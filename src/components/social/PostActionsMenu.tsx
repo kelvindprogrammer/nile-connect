@@ -148,9 +148,7 @@ const PostActionsMenu: React.FC<PostActionsMenuProps> = ({
                 {open && (
                     <div
                         role="menu"
-                        className="absolute right-0 top-full mt-1 z-40 w-60 bg-white border border-paper-300
-                                   rounded-xl shadow-soft-md overflow-hidden py-1
-                                   animate-in fade-in slide-in-from-top-1 duration-150"
+                        className="absolute right-0 top-full mt-1 z-40 w-60 bg-white border border-paper-300 rounded-xl shadow-soft-md overflow-hidden py-1 animate-in fade-in slide-in-from-top-1 duration-150"
                     >
                         <button role="menuitem" className={itemClass} onClick={handleBookmark} disabled={busy === 'bookmark'}>
                             {busy === 'bookmark'

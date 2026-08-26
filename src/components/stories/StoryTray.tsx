@@ -106,8 +106,7 @@ const StoryTrayRail: React.FC = () => {
                         <div className="w-16 h-16 rounded-full overflow-hidden ring-2 ring-paper-300">
                             <Avatar name={user?.name || 'You'} size="lg" isSelf />
                         </div>
-                        <span className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-nile-blue text-white
-                                         flex items-center justify-center ring-2 ring-white group-hover:scale-110 transition-transform">
+                        <span className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-nile-blue text-white flex items-center justify-center ring-2 ring-white group-hover:scale-110 transition-transform">
                             <Plus size={12} strokeWidth={3} />
                         </span>
                     </div>

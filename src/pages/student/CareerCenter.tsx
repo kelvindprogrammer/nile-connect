@@ -161,7 +161,7 @@ const CareerCenter = () => {
                         </div>
                         <div
                             onClick={() => navigate('/student/career/ai')}
-                            className="aspect-video border-[2px] border-dashed border-paper-400 rounded-[20px] flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-nile-green/5 transition-all group"
+                            className="aspect-video border border-dashed border-paper-400 rounded-[20px] flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-nile-green/5 transition-all group"
                         >
                             <Sparkles size={36} strokeWidth={2} className="text-nile-blue/30 group-hover:text-nile-green group-hover:scale-110 transition-all" />
                             <div className="text-center">
@@ -322,7 +322,7 @@ const CareerCenter = () => {
                             </button>
                         </div>
 
-                        <div className="p-4 bg-nile-blue/5 border-[2px] border-nile-blue/20 rounded-[16px] space-y-2">
+                        <div className="p-4 bg-nile-blue/5 border border-nile-blue/20 rounded-[16px] space-y-2">
                             <p className="text-[8px] font-semibold text-paper-700">YOUR SESSION LINK</p>
                             <p className="text-[9px] font-bold text-nile-blue break-all leading-relaxed">{sessionLink}</p>
                         </div>

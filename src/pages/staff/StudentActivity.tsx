@@ -161,7 +161,7 @@ const StudentActivity = () => {
                 <button
                     onClick={handleExport}
                     disabled={isLoading || filtered.length === 0}
-                    className="flex items-center gap-2 px-4 py-2.5 border border-paper-300 rounded-xl font-semibold text-[9px] hover:bg-ink-900 hover:text-white transition-all shadow-card hover:shadow-none disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 px-4 py-2.5 border border-paper-300 rounded-xl font-semibold text-[9px] hover:bg-ink-900 hover:text-white transition-all shadow-card hover:shadow-soft-sm disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                     <Download size={13} /> EXPORT REPORT
                 </button>

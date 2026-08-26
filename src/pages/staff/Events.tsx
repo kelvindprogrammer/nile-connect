@@ -412,7 +412,7 @@ const StaffEvents: React.FC = () => {
 
                     {/* Empty state */}
                     {filteredEvents.length === 0 ? (
-                        <div className="py-24 border-[2px] border-dashed border-paper-400/10 rounded-[32px] flex flex-col items-center justify-center text-center gap-4 anime-fade-in">
+                        <div className="py-24 border border-dashed border-paper-400/10 rounded-[32px] flex flex-col items-center justify-center text-center gap-4 anime-fade-in">
                             <Calendar size={36} className="text-paper-500" />
                             <div>
                                 <p className="text-[9px] font-semibold text-paper-600">
@@ -495,7 +495,7 @@ const StaffEvents: React.FC = () => {
                         onClick={e => e.stopPropagation()}
                     >
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-red-50 border-[2px] border-red-400 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <div className="w-10 h-10 bg-red-50 border border-red-400 rounded-xl flex items-center justify-center flex-shrink-0">
                                 <Trash2 size={16} className="text-red-500" />
                             </div>
                             <div>
@@ -741,10 +741,7 @@ const EventCard: React.FC<EventCardProps> = ({
     return (
         <div
             style={style}
-            className="relative bg-white border border-paper-300 rounded-[24px] p-5 flex flex-col gap-4
-                       shadow-card
-                       hover:shadow-blue
-                       hover:-translate-y-[2px] transition-all duration-200 anime-fade-in"
+            className="relative bg-white border border-paper-300 rounded-[24px] p-5 flex flex-col gap-4 shadow-card hover:shadow-blue hover:-translate-y-[2px] transition-all duration-200 anime-fade-in"
         >
             {/* Featured badge */}
             {event.is_featured && (

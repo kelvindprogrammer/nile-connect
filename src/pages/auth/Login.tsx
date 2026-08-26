@@ -54,7 +54,7 @@ const Login = () => {
             <div className="max-w-sm mx-auto w-full space-y-8 anime-fade-in text-left">
 
                 {sessionExpired && (
-                    <div className="p-3 bg-yellow-50 border-[2px] border-yellow-300 rounded-xl flex items-start gap-2">
+                    <div className="p-3 bg-yellow-50 border border-yellow-300 rounded-xl flex items-start gap-2">
                         <span className="text-yellow-500 text-sm flex-shrink-0">⚠</span>
                         <p className="text-[11px] font-bold text-yellow-700 leading-snug">
                             Your session expired. Please sign in again to continue.
@@ -72,7 +72,7 @@ const Login = () => {
                 </div>
 
                 <div className="space-y-5">
-                    <div className="p-4 bg-nile-white border-[2px] border-paper-400/10 rounded-xl space-y-3">
+                    <div className="p-4 bg-nile-white border border-paper-400/10 rounded-xl space-y-3">
                         <p className="text-[11px] font-semibold text-paper-700 tracking-tight">
                             SINGLE SIGN-ON
                         </p>

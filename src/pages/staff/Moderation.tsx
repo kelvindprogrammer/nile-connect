@@ -339,8 +339,7 @@ const ReviewModal: React.FC<{
                         onChange={e => setNote(e.target.value)}
                         rows={2}
                         placeholder="Why you're taking this action."
-                        className="w-full border border-paper-300 rounded-xl py-2.5 px-3.5 text-sm outline-none
-                                   resize-none focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10"
+                        className="w-full border border-paper-300 rounded-xl py-2.5 px-3.5 text-sm outline-none resize-none focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10"
                     />
                 </div>
 

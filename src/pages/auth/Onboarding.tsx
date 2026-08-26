@@ -71,7 +71,7 @@ const Onboarding = () => {
             <div className="absolute top-0 right-0 w-[40%] h-full bg-nile-blue/5 -skew-x-12 translate-x-1/2" />
 
             {/* Main Card */}
-            <div className="w-full max-w-4xl flex flex-col md:flex-row bg-white border-[2px] border-paper-400 shadow-[8px_8px_0px_0px_rgba(30,73,157,1)] rounded-[40px] overflow-hidden min-h-[500px] anime-fade-in relative z-10">
+            <div className="w-full max-w-4xl flex flex-col md:flex-row bg-white border border-paper-400 shadow-soft-md rounded-[40px] overflow-hidden min-h-[500px] anime-fade-in relative z-10">
 
                 {/* Brand Side Panel */}
                 <div className="w-full md:w-[42%] bg-nile-blue text-white border-r-[2px] border-paper-400 flex flex-col items-center justify-center p-12 relative overflow-hidden">
@@ -115,7 +115,7 @@ const Onboarding = () => {
                         {/* CTA */}
                         <button
                             onClick={handleNext}
-                            className="w-full bg-nile-blue text-white font-semibold py-4 px-6 rounded-xl border-[2px] border-paper-400 shadow-[4px_4px_0px_0px_rgba(108,187,86,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all uppercase tracking-[0.14em] text-xs flex items-center justify-center space-x-3"
+                            className="w-full bg-nile-blue text-white font-semibold py-4 px-6 rounded-xl border border-paper-400 shadow-soft-sm hover:-translate-y-0.5 hover:shadow-soft-sm transition-all uppercase tracking-[0.14em] text-xs flex items-center justify-center space-x-3"
                         >
                             <span>{slide.cta}</span>
                             <ArrowRight size={16} strokeWidth={3} />
@@ -127,7 +127,7 @@ const Onboarding = () => {
                                 <button
                                     key={i}
                                     onClick={() => setStep(i)}
-                                    className={`rounded-full transition-all duration-300 border-[2px] border-paper-400 ${
+                                    className={`rounded-full transition-all duration-300 border border-paper-400 ${
                                         i === step
                                             ? 'w-8 h-2.5 bg-nile-blue'
                                             : 'w-2.5 h-2.5 bg-transparent hover:bg-nile-blue/20'

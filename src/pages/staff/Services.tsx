@@ -165,7 +165,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({ request, saving, onClose,
                     </div>
 
                     {date && time && (
-                        <div className="flex items-center gap-2 p-3 bg-nile-blue/5 border-[2px] border-nile-blue/20 rounded-xl">
+                        <div className="flex items-center gap-2 p-3 bg-nile-blue/5 border border-nile-blue/20 rounded-xl">
                             <Calendar size={13} className="text-nile-blue flex-shrink-0" />
                             <p className="text-[8px] font-semibold text-nile-blue">
                                 {new Date(`${date}T${time}`).toLocaleString('en-GB', {
@@ -292,7 +292,7 @@ const ServiceOverviewCard: React.FC<ServiceCardProps> = ({ type, count, pending,
     return (
         <button
             onClick={onClick}
-            className={`group w-full text-left bg-white border-[2px] rounded-[20px] p-5 transition-all hover:-translate-y-0.5 hover:shadow-card
+            className={`group w-full text-left bg-white border rounded-[20px] p-5 transition-all hover:-translate-y-0.5 hover:shadow-card
                 ${active
                     ? `${activeBorder[type]} ${accentShadow[type]}`
                     : 'border-paper-400 shadow-card'
@@ -448,13 +448,13 @@ const RequestRow: React.FC<RequestRowProps> = ({
                         </button>
                     )}
                     {status === 'completed' && (
-                        <span className="flex items-center gap-1.5 px-3 py-2 bg-nile-green/10 text-nile-green border-[2px] border-nile-green/30 rounded-xl font-semibold text-[8px]">
+                        <span className="flex items-center gap-1.5 px-3 py-2 bg-nile-green/10 text-nile-green border border-nile-green/30 rounded-xl font-semibold text-[8px]">
                             <CheckCircle2 size={11} />
                             DONE
                         </span>
                     )}
                     {status === 'declined' && (
-                        <span className="flex items-center gap-1.5 px-3 py-2 bg-red-50 text-red-400 border-[2px] border-red-200 rounded-xl font-semibold text-[8px]">
+                        <span className="flex items-center gap-1.5 px-3 py-2 bg-red-50 text-red-400 border border-red-200 rounded-xl font-semibold text-[8px]">
                             <XCircle size={11} />
                             DECLINED
                         </span>
@@ -497,7 +497,7 @@ const MetricPill: React.FC<{
 // ─── Empty State ──────────────────────────────────────────────────────────────
 
 const EmptyState: React.FC<{ tab: TabFilter }> = ({ tab }) => (
-    <div className="py-20 border-[2px] border-dashed border-paper-400/10 rounded-[24px] flex flex-col items-center justify-center gap-3">
+    <div className="py-20 border border-dashed border-paper-400/10 rounded-[24px] flex flex-col items-center justify-center gap-3">
         <div className="w-14 h-14 rounded-[18px] bg-paper-100 border border-paper-300/10 flex items-center justify-center text-paper-600">
             {tab === 'MOCK INTERVIEWS' ? <Mic size={24} />
                 : tab === 'CAREER ADVISORY' ? <MessageSquare size={24} />
@@ -659,7 +659,7 @@ const StaffServices: React.FC = () => {
 
     if (loadError) return (
         <div className="p-8 flex flex-col items-center justify-center min-h-[60vh] gap-4 text-center">
-            <div className="w-16 h-16 bg-red-50 border-[2px] border-red-200 rounded-[20px] flex items-center justify-center">
+            <div className="w-16 h-16 bg-red-50 border border-red-200 rounded-[20px] flex items-center justify-center">
                 <span className="text-3xl">⚠️</span>
             </div>
             <div>

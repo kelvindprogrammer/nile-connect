@@ -120,7 +120,7 @@ const EmployerCandidates = () => {
 
             {/* Candidates grid */}
             {filtered.length === 0 ? (
-                <div className="py-24 text-center border-[2px] border-dashed border-paper-400/10 rounded-[32px]">
+                <div className="py-24 text-center border border-dashed border-paper-400/10 rounded-[32px]">
                     <Users size={32} className="text-paper-500 mx-auto mb-4" />
                     <p className="text-[9px] font-semibold text-paper-600">
                         {search ? 'No candidates match your search' : applications.length === 0 ? 'No candidates yet — post jobs to attract talent' : `No ${stageLabel(filterStatus).toLowerCase()} candidates`}
@@ -151,7 +151,7 @@ const CandidateCard = ({ candidate, onMessage, onView }: {
     const initials = (candidate.student_name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
 
     return (
-        <div className="bg-white border border-paper-300 rounded-[24px] p-5 flex flex-col gap-4 hover:translate-y-[-2px] shadow-card hover:shadow-blue transition-all">
+        <div className="bg-white border border-paper-300 rounded-[24px] p-5 flex flex-col gap-4 hover:-translate-y-0.5-2px] shadow-card hover:shadow-blue transition-all">
             <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-nile-blue text-white rounded-xl flex items-center justify-center font-semibold text-base flex-shrink-0">

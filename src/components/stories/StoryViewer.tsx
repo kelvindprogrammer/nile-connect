@@ -355,17 +355,14 @@ const StoryViewer: React.FC<StoryViewerProps> = ({
                     onClick={goPrev}
                     disabled={index === 0}
                     aria-label="Previous"
-                    className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full
-                               bg-white/10 hover:bg-white/20 text-white items-center justify-center
-                               disabled:opacity-0 transition-opacity"
+                    className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white items-center justify-center disabled:opacity-0 transition-opacity"
                 >
                     <ChevronLeft size={18} />
                 </button>
                 <button
                     onClick={goNext}
                     aria-label="Next"
-                    className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full
-                               bg-white/10 hover:bg-white/20 text-white items-center justify-center"
+                    className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white items-center justify-center"
                 >
                     <ChevronRight size={18} />
                 </button>
@@ -387,16 +384,13 @@ const StoryViewer: React.FC<StoryViewerProps> = ({
                                 placeholder="Reply privately…"
                                 aria-label="Reply to this story"
                                 maxLength={1000}
-                                className="flex-1 h-10 rounded-full bg-white/15 border border-white/25 px-4
-                                           text-sm text-white placeholder:text-white/60 outline-none
-                                           focus:bg-white/25 transition-colors"
+                                className="flex-1 h-10 rounded-full bg-white/15 border border-white/25 px-4 text-sm text-white placeholder:text-white/60 outline-none focus:bg-white/25 transition-colors"
                             />
                             <button
                                 type="submit"
                                 disabled={!reply.trim() || sending}
                                 aria-label="Send reply"
-                                className="w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white
-                                           flex items-center justify-center disabled:opacity-40 transition-colors"
+                                className="w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center disabled:opacity-40 transition-colors"
                             >
                                 {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
                             </button>

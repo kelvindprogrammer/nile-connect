@@ -396,9 +396,7 @@ const ChoiceRow: React.FC<{
                 id={id}
                 value={value}
                 onChange={e => onChange(e.target.value)}
-                className="mt-2 w-full border border-paper-300 rounded-xl py-2 px-3 text-sm bg-white
-                           outline-none transition-all cursor-pointer
-                           focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10"
+                className="mt-2 w-full border border-paper-300 rounded-xl py-2 px-3 text-sm bg-white outline-none transition-all cursor-pointer focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10"
             >
                 {options.map(opt => (
                     <option key={opt} value={opt}>{labels[opt] ?? opt}</option>

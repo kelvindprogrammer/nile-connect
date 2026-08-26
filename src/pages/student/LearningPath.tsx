@@ -62,7 +62,7 @@ const LearningPath = () => {
                         </div>
 
                         {tasks.length === 0 ? (
-                            <div className="py-20 text-center border-[3px] border-dashed border-paper-400/10 rounded-[32px] bg-white space-y-4">
+                            <div className="py-20 text-center border border-dashed border-paper-400/10 rounded-[32px] bg-white space-y-4">
                                 <BookOpen size={48} className="mx-auto text-paper-500" strokeWidth={1.5} />
                                 <div className="space-y-1">
                                     <p className="font-semibold text-sm text-ink-800">Your learning path is empty</p>

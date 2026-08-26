@@ -242,8 +242,7 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ onClose, onPosted }) => {
                                     rows={3}
                                     placeholder="What's happening?"
                                     aria-label="Story text"
-                                    className="w-full border border-paper-300 rounded-xl p-3 text-sm resize-none outline-none
-                                               focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10"
+                                    className="w-full border border-paper-300 rounded-xl p-3 text-sm resize-none outline-none focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10"
                                 />
                                 <p className="text-[11px] text-paper-600 text-right mt-1">
                                     {text.length}/{MAX_TEXT}
@@ -278,9 +277,7 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ onClose, onPosted }) => {
                             <button
                                 onClick={() => fileRef.current?.click()}
                                 disabled={uploading}
-                                className="w-full py-3 border-2 border-dashed border-paper-300 rounded-xl text-xs
-                                           font-medium text-paper-700 hover:border-nile-blue hover:text-nile-blue
-                                           transition-colors disabled:opacity-50"
+                                className="w-full py-3 border-2 border-dashed border-paper-300 rounded-xl text-xs font-medium text-paper-700 hover:border-nile-blue hover:text-nile-blue transition-colors disabled:opacity-50"
                             >
                                 {mediaUrl ? 'Choose a different file' : 'Choose a photo or video'}
                             </button>
@@ -289,8 +286,7 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ onClose, onPosted }) => {
                                 onChange={e => setText(e.target.value.slice(0, MAX_TEXT))}
                                 placeholder="Add a caption (optional)"
                                 aria-label="Caption"
-                                className="w-full border border-paper-300 rounded-xl py-2.5 px-3 text-sm outline-none
-                                           focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10"
+                                className="w-full border border-paper-300 rounded-xl py-2.5 px-3 text-sm outline-none focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10"
                             />
                         </>
                     )}
@@ -302,8 +298,7 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ onClose, onPosted }) => {
                                 onChange={e => setPollQuestion(e.target.value.slice(0, POLL_LIMITS.maxQuestionLength))}
                                 placeholder="Ask a question"
                                 aria-label="Poll question"
-                                className="w-full border border-paper-300 rounded-xl py-2.5 px-3 text-sm outline-none
-                                           focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10"
+                                className="w-full border border-paper-300 rounded-xl py-2.5 px-3 text-sm outline-none focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10"
                             />
                             {pollOptions.map((option, i) => (
                                 <div key={i} className="flex gap-2">
@@ -316,8 +311,7 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ onClose, onPosted }) => {
                                         }}
                                         placeholder={`Option ${i + 1}`}
                                         aria-label={`Poll option ${i + 1}`}
-                                        className="flex-1 border border-paper-300 rounded-xl py-2 px-3 text-sm outline-none
-                                                   focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10"
+                                        className="flex-1 border border-paper-300 rounded-xl py-2 px-3 text-sm outline-none focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10"
                                     />
                                     {pollOptions.length > POLL_LIMITS.minOptions && (
                                         <button
@@ -382,8 +376,7 @@ const StoryComposer: React.FC<StoryComposerProps> = ({ onClose, onPosted }) => {
                     <button
                         onClick={handlePost}
                         disabled={posting || uploading}
-                        className="w-full py-3 rounded-xl bg-nile-blue text-white text-sm font-semibold
-                                   flex items-center justify-center gap-2 disabled:opacity-50 hover:bg-nile-blue-600 transition-colors"
+                        className="w-full py-3 rounded-xl bg-nile-blue text-white text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-50 hover:bg-nile-blue-600 transition-colors"
                     >
                         {posting ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
                         {posting ? 'Sharing…' : 'Share to your story'}

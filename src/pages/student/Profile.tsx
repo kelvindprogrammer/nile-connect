@@ -421,7 +421,7 @@ const ContactRow = ({ icon, label, href }: { icon: React.ReactNode; label: strin
         href={href}
         target={href?.startsWith('http') ? '_blank' : undefined}
         rel="noreferrer"
-        className="flex items-center gap-3 p-3 border border-paper-300 rounded-xl hover:translate-y-[-1px] transition-all cursor-pointer shadow-sm group hover:bg-nile-blue hover:text-white"
+        className="flex items-center gap-3 p-3 border border-paper-300 rounded-xl hover:-translate-y-0.5-1px] transition-all cursor-pointer shadow-sm group hover:bg-nile-blue hover:text-white"
         onClick={e => !href && e.preventDefault()}
     >
         <span className="flex-shrink-0">{icon}</span>

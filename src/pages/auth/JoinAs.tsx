@@ -8,7 +8,7 @@ const JoinAs = () => {
 
     const leftPanelContent = (
         <div className="flex flex-col items-center text-center">
-            <div className="relative z-10 w-24 h-24 bg-white border-[2px] border-paper-400 rounded-xl shadow-[4px_4px_0px_0px_#000] flex items-center justify-center mb-10 transition-transform hover:-rotate-6">
+            <div className="relative z-10 w-24 h-24 bg-white border border-paper-400 rounded-xl shadow-soft-sm flex items-center justify-center mb-10 transition-transform hover:-rotate-6">
                 <UserRound size={48} strokeWidth={2.5} className="text-ink-800" />
             </div>
             
@@ -35,9 +35,9 @@ const JoinAs = () => {
                     {/* Student */}
                     <div 
                         onClick={() => navigate('/student-status')}
-                        className="w-full border-[2px] border-paper-400 rounded-xl p-4 shadow-[3px_3px_0px_0px_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none bg-white hover:bg-nile-white/50 transition-all cursor-pointer flex items-center space-x-4 group"
+                        className="w-full border border-paper-400 rounded-xl p-4 shadow-soft-xs hover:-translate-y-0.5 hover:shadow-soft-sm bg-white hover:bg-nile-white/50 transition-all cursor-pointer flex items-center space-x-4 group"
                     >
-                        <div className="w-11 h-11 border-[2px] border-paper-400 rounded-xl flex items-center justify-center bg-white shadow-sm group-hover:bg-nile-blue group-hover:text-white transition-colors">
+                        <div className="w-11 h-11 border border-paper-400 rounded-xl flex items-center justify-center bg-white shadow-sm group-hover:bg-nile-blue group-hover:text-white transition-colors">
                             <GraduationCap size={18} strokeWidth={2.5} />
                         </div>
                         <div className="text-left">
@@ -49,9 +49,9 @@ const JoinAs = () => {
                     {/* Staff */}
                     <div 
                         onClick={() => navigate('/register?role=staff')}
-                        className="w-full border-[2px] border-paper-400 rounded-xl p-4 shadow-[3px_3px_0px_0px_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none bg-white hover:bg-nile-green/10 transition-all cursor-pointer flex items-center space-x-4 group"
+                        className="w-full border border-paper-400 rounded-xl p-4 shadow-soft-xs hover:-translate-y-0.5 hover:shadow-soft-sm bg-white hover:bg-nile-green/10 transition-all cursor-pointer flex items-center space-x-4 group"
                     >
-                        <div className="w-11 h-11 border-[2px] border-paper-400 rounded-xl flex items-center justify-center bg-white shadow-sm group-hover:bg-nile-green transition-colors">
+                        <div className="w-11 h-11 border border-paper-400 rounded-xl flex items-center justify-center bg-white shadow-sm group-hover:bg-nile-green transition-colors">
                             <Briefcase size={18} strokeWidth={2.5} />
                         </div>
                         <div className="text-left">
@@ -63,9 +63,9 @@ const JoinAs = () => {
                     {/* Employer */}
                     <div 
                         onClick={() => navigate('/register?role=employer')}
-                        className="w-full border-[2px] border-paper-400 rounded-xl p-4 shadow-[3px_3px_0px_0px_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none bg-white hover:bg-nile-blue/10 transition-all cursor-pointer flex items-center space-x-4 group"
+                        className="w-full border border-paper-400 rounded-xl p-4 shadow-soft-xs hover:-translate-y-0.5 hover:shadow-soft-sm bg-white hover:bg-nile-blue/10 transition-all cursor-pointer flex items-center space-x-4 group"
                     >
-                        <div className="w-11 h-11 border-[2px] border-paper-400 rounded-xl flex items-center justify-center bg-white shadow-sm group-hover:bg-nile-blue transition-colors group-hover:text-white">
+                        <div className="w-11 h-11 border border-paper-400 rounded-xl flex items-center justify-center bg-white shadow-sm group-hover:bg-nile-blue transition-colors group-hover:text-white">
                             <Building size={18} strokeWidth={2.5} />
                         </div>
                         <div className="text-left">

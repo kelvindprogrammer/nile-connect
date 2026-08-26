@@ -157,9 +157,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
                         maxLength={2000}
                         rows={3}
                         placeholder="Add any context that would help our team review this."
-                        className="w-full border border-paper-300 rounded-xl py-2.5 px-3.5 text-sm outline-none
-                                   transition-all bg-white resize-none
-                                   focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10"
+                        className="w-full border border-paper-300 rounded-xl py-2.5 px-3.5 text-sm outline-none transition-all bg-white resize-none focus:border-nile-blue focus:ring-2 focus:ring-nile-blue/10"
                     />
                 </div>
 
