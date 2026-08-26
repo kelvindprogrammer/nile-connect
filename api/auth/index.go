@@ -136,13 +136,16 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if os.Getenv("CAMPUS_ONE_CLIENT_ID") == "" {
+	path := r.URL.Query().Get("path")
+
+	// CAMPUS_ONE_CLIENT_ID is only mandatory for the actual live OIDC redirect/callback flow
+	if (path == "login" || path == "callback") && os.Getenv("CAMPUS_ONE_CLIENT_ID") == "" {
 		respond.Error(w, http.StatusServiceUnavailable,
 			"CAMPUS_ONE_CLIENT_ID is not set — add it to your environment variables")
 		return
 	}
 
-	switch r.URL.Query().Get("path") {
+	switch path {
 	case "login":
 		login(w, r)
 	case "callback":
@@ -157,6 +160,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		webhook(w, r)
 	case "verify-email":
 		verifyEmail(w, r)
+	case "dev-login":
+		devLogin(w, r)
 	case "dev-set-role":
 		devSetRole(w, r)
 	case "dev-list-users":
@@ -482,6 +487,87 @@ func logout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.Redirect(w, r, "/login", http.StatusFound)
+}
+
+// ── dev mock login (local testing) ───────────────────────────────────────────
+
+// devLogin instantly signs in a test student, employer, or staff account.
+// Useful for local testing on localhost without needing live Campus One credentials.
+func devLogin(w http.ResponseWriter, r *http.Request) {
+	role := r.URL.Query().Get("role")
+	if role == "" {
+		role = "student"
+	}
+	allowedRoles := map[string]bool{"student": true, "employer": true, "staff": true}
+	if !allowedRoles[role] {
+		respond.Error(w, http.StatusBadRequest, "role must be student, employer, or staff")
+		return
+	}
+
+	database, err := db.Get()
+	if err != nil {
+		respond.Error(w, http.StatusInternalServerError, "database unavailable: "+err.Error())
+		return
+	}
+
+	email := fmt.Sprintf("dev.%s@nileuniversity.edu.ng", role)
+	name := "Dev Student"
+	if role == "employer" {
+		email = "dev.employer@company.com"
+		name = "Dev Employer"
+	} else if role == "staff" {
+		name = "Dev Career Staff"
+	}
+
+	var user models.User
+	err = database.Where("email = ? AND deleted_at IS NULL", email).First(&user).Error
+	if err != nil {
+		user = models.User{
+			CampusOneSub:   "dev-sub-" + role,
+			FullName:       name,
+			Username:       "dev_" + role,
+			Email:          email,
+			Role:           role,
+			StudentSubtype: "current",
+			IsVerified:     true,
+			StudentID:      "NU/DEV/001",
+			StudyLevel:     "Undergraduate",
+			Level:          400,
+			FacultyID:      "Engineering",
+			DepartmentID:   "Computer Science",
+		}
+		if err := database.Create(&user).Error; err != nil {
+			respond.Error(w, http.StatusInternalServerError, "could not create dev user: "+err.Error())
+			return
+		}
+	}
+
+	if user.Role == "employer" {
+		var empProfile models.EmployerProfile
+		if database.Where("user_id = ? AND deleted_at IS NULL", user.ID).First(&empProfile).Error != nil {
+			database.Create(&models.EmployerProfile{
+				UserID:      user.ID,
+				CompanyName: "Acme Nile Partners Ltd",
+				Status:      "approved",
+				Website:     "https://example.com",
+				Industry:    "Technology",
+				About:       "Leading partner company for local dev testing.",
+			})
+		}
+	}
+
+	if err := setSessionCookie(w, r, &user); err != nil {
+		respond.Error(w, http.StatusInternalServerError, "could not create session: "+err.Error())
+		return
+	}
+
+	if r.Header.Get("Accept") == "application/json" {
+		respond.OK(w, userToResponse(&user))
+		return
+	}
+
+	next := roleDashboard(user.Role)
+	http.Redirect(w, r, appBaseURL(r)+next, http.StatusFound)
 }
 
 // ── dev role override (testing only) ─────────────────────────────────────────

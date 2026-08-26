@@ -58,36 +58,14 @@ export const mapBackendUser = (bu: BackendUser): User => ({
     resumeUrl: bu.resume_url ?? undefined,
 });
 
-const DEV_MOCK_USER: User = {
-    id: 'student-dev-1',
-    name: 'Adaeze Okonkwo',
-    username: 'adaeze',
-    email: 'adaeze.okonkwo@student.nile.edu.ng',
-    role: 'student',
-    type: 'current',
-    studentId: 'STU-2024-091',
-    major: 'Engineering',
-    department: 'Engineering',
-    level: 300,
-    isVerified: true,
-};
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     // On mount, resolve the current user from the session cookie via /api/auth/me.
-    // If no backend SSO session is active (e.g. local dev preview), fall back to mock user.
     useEffect(() => {
         getCurrentUser()
-            .then((bu) => {
-                if (bu) {
-                    setUser(mapBackendUser(bu));
-                } else {
-                    setUser(DEV_MOCK_USER);
-                }
-            })
-            .catch(() => setUser(DEV_MOCK_USER))
+            .then((bu) => { if (bu) setUser(mapBackendUser(bu)); })
             .finally(() => setIsLoading(false));
     }, []);
 

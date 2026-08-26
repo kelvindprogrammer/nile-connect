@@ -94,6 +94,43 @@ const Login = () => {
                             SIGN IN WITH CAMPUS ONE
                         </span>
                     </Button>
+
+                    {(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && (
+                        <div className="p-4 bg-amber-50/80 border-[2px] border-amber-300 rounded-xl space-y-3">
+                            <div className="flex items-center justify-between">
+                                <p className="text-[10px] font-black text-amber-900 uppercase tracking-widest flex items-center gap-1.5">
+                                    <span>🛠️</span> Local Dev Fast Sign-In
+                                </p>
+                                <span className="text-[8px] font-bold bg-amber-200 text-amber-800 px-1.5 py-0.5 rounded">DEV ONLY</span>
+                            </div>
+                            <p className="text-[11px] text-amber-800/80 leading-snug">
+                                Instant mock login for local testing without Campus One credentials:
+                            </p>
+                            <div className="grid grid-cols-3 gap-2 pt-1">
+                                <a
+                                    href="/api/auth/dev-login?role=student"
+                                    className="px-2 py-2 text-center text-xs font-black bg-white border-[2px] border-amber-300 hover:border-amber-500 rounded-lg text-amber-900 shadow-sm transition-all hover:scale-105 active:scale-95 flex flex-col items-center gap-0.5"
+                                >
+                                    <span className="text-base">🎓</span>
+                                    <span>Student</span>
+                                </a>
+                                <a
+                                    href="/api/auth/dev-login?role=employer"
+                                    className="px-2 py-2 text-center text-xs font-black bg-white border-[2px] border-amber-300 hover:border-amber-500 rounded-lg text-amber-900 shadow-sm transition-all hover:scale-105 active:scale-95 flex flex-col items-center gap-0.5"
+                                >
+                                    <span className="text-base">🏢</span>
+                                    <span>Employer</span>
+                                </a>
+                                <a
+                                    href="/api/auth/dev-login?role=staff"
+                                    className="px-2 py-2 text-center text-xs font-black bg-white border-[2px] border-amber-300 hover:border-amber-500 rounded-lg text-amber-900 shadow-sm transition-all hover:scale-105 active:scale-95 flex flex-col items-center gap-0.5"
+                                >
+                                    <span className="text-base">🛡️</span>
+                                    <span>Staff</span>
+                                </a>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 <div className="pt-4 border-t-[2px] border-black/5 text-center">
