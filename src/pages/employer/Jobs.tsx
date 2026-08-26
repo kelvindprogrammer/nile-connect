@@ -82,7 +82,7 @@ const EmployerJobs = () => {
             {/* Header */}
             <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 md:gap-8 border-b-[2px] md:border-b border-paper-300 pb-6 md:pb-10">
                 <div className="space-y-1 md:space-y-2">
-                    <h2 className="text-3xl md:text-6xl font-semibold text-black leading-none">Job Console .</h2>
+                    <h2 className="co-display text-3xl md:text-4xl text-ink-800 leading-none">Job console</h2>
                     <p className="text-[10px] md:text-lg font-bold text-nile-blue/50 flex items-center">
                         Manage your recruitment pipeline <ShieldCheck size={18} className="ml-2 md:ml-3 text-nile-green" />
                     </p>
@@ -98,7 +98,7 @@ const EmployerJobs = () => {
                             key={t.id}
                             onClick={() => setTab(t.id)}
                             className={`flex-1 md:flex-none px-4 md:px-6 py-2 md:py-3 rounded-lg md:rounded-xl font-semibold text-[8px] md:text-[10px] transition-all flex items-center justify-center space-x-2 md:space-x-3 whitespace-nowrap
-                                ${tab === t.id ? 'bg-nile-blue text-white shadow-green md:shadow-green' : 'text-black/40 hover:text-black'}
+                                ${tab === t.id ? 'bg-nile-blue text-white shadow-green md:shadow-green' : 'text-paper-700 hover:text-ink-800'}
                             `}
                         >
                             {t.icon}
@@ -119,7 +119,7 @@ const EmployerJobs = () => {
                     </div>
                 ) : activeJobs.length === 0 ? (
                     <div className="py-20 text-center border-[2px] border-dashed border-paper-400/10 rounded-[24px]">
-                        <p className="text-[10px] font-semibold text-black/20 mb-4">NO ACTIVE JOBS</p>
+                        <p className="text-[10px] font-semibold text-paper-600 mb-4">NO ACTIVE JOBS</p>
                         <Button size="sm" onClick={() => setTab('post')}>POST A JOB</Button>
                     </div>
                 ) : (
@@ -129,7 +129,7 @@ const EmployerJobs = () => {
                                 <div className="flex justify-between items-start">
                                     <div className="space-y-3 md:space-y-4 min-w-0">
                                         <div className="space-y-1 min-w-0">
-                                            <h3 className="text-lg md:text-2xl font-semibold text-black tracking-tight leading-none truncate">{job.title}</h3>
+                                            <h3 className="text-lg md:text-2xl font-semibold text-ink-800 tracking-tight leading-none truncate">{job.title}</h3>
                                             <p className="text-[8px] md:text-[10px] font-semibold text-nile-blue/40 flex items-center">
                                                 <MapPin size={10} className="mr-1 flex-shrink-0" />
                                                 <span className="truncate">{job.location} • {job.type?.toUpperCase()}</span>
@@ -139,7 +139,7 @@ const EmployerJobs = () => {
                                             {job.applicant_count} APPLICANT{job.applicant_count !== 1 ? 'S' : ''}
                                         </div>
                                     </div>
-                                    <button className="p-2 md:p-3 bg-nile-white border border-paper-300 rounded-lg md:rounded-xl hover:bg-black hover:text-white transition-all text-nile-blue flex-shrink-0 ml-4">
+                                    <button className="p-2 md:p-3 bg-nile-white border border-paper-300 rounded-lg md:rounded-xl hover:bg-ink-900 hover:text-white transition-all text-nile-blue flex-shrink-0 ml-4">
                                         <ArrowUpRight size={18} strokeWidth={3} />
                                     </button>
                                 </div>
@@ -162,7 +162,7 @@ const EmployerJobs = () => {
                                 <Plus size={28} strokeWidth={3} />
                             </div>
                             <div className="min-w-0">
-                                <h2 className="text-xl md:text-4xl font-semibold text-black truncate">Post Job .</h2>
+                                <h2 className="co-display text-xl md:text-4xl text-ink-800 truncate">Post job</h2>
                                 <p className="text-[7px] md:text-[10px] font-semibold text-nile-blue md: truncate">NEW PROFESSIONAL LISTING</p>
                             </div>
                         </div>
@@ -180,7 +180,7 @@ const EmployerJobs = () => {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 items-end">
                                 <div className="space-y-3">
-                                    <label className="text-[8px] md:text-[10px] font-semibold text-black ml-1">EMPLOYMENT CATEGORY</label>
+                                    <label className="text-[8px] md:text-[10px] font-semibold text-ink-800 ml-1">EMPLOYMENT CATEGORY</label>
                                     <select
                                         value={form.employment_category}
                                         onChange={e => setForm(f => ({ ...f, employment_category: e.target.value }))}
@@ -198,7 +198,7 @@ const EmployerJobs = () => {
                                         onChange={e => setForm(f => ({ ...f, is_remote: e.target.checked }))}
                                         className="accent-nile-blue w-4 h-4"
                                     />
-                                    <span className="text-[9px] md:text-[10px] font-semibold text-black">THIS ROLE IS REMOTE</span>
+                                    <span className="text-[9px] md:text-[10px] font-semibold text-ink-800">THIS ROLE IS REMOTE</span>
                                 </label>
                             </div>
 
@@ -206,10 +206,10 @@ const EmployerJobs = () => {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
                                 <div className="space-y-3">
-                                    <label className="text-[8px] md:text-[10px] font-semibold text-black ml-1">REQUIRED DOCUMENTS</label>
+                                    <label className="text-[8px] md:text-[10px] font-semibold text-ink-800 ml-1">REQUIRED DOCUMENTS</label>
                                     <div className="grid grid-cols-1 gap-1.5">
                                         {DOCUMENT_TYPES.map(t => (
-                                            <label key={t.value} className="flex items-center gap-2 text-[9px] font-semibold text-black/60 cursor-pointer">
+                                            <label key={t.value} className="flex items-center gap-2 text-[9px] font-semibold text-paper-700 cursor-pointer">
                                                 <input
                                                     type="checkbox"
                                                     checked={requiredDocs.includes(t.value)}
@@ -222,10 +222,10 @@ const EmployerJobs = () => {
                                     </div>
                                 </div>
                                 <div className="space-y-3">
-                                    <label className="text-[8px] md:text-[10px] font-semibold text-black ml-1">OPTIONAL DOCUMENTS</label>
+                                    <label className="text-[8px] md:text-[10px] font-semibold text-ink-800 ml-1">OPTIONAL DOCUMENTS</label>
                                     <div className="grid grid-cols-1 gap-1.5">
                                         {DOCUMENT_TYPES.filter(t => !requiredDocs.includes(t.value)).map(t => (
-                                            <label key={t.value} className="flex items-center gap-2 text-[9px] font-semibold text-black/60 cursor-pointer">
+                                            <label key={t.value} className="flex items-center gap-2 text-[9px] font-semibold text-paper-700 cursor-pointer">
                                                 <input
                                                     type="checkbox"
                                                     checked={optionalDocs.includes(t.value)}
@@ -240,7 +240,7 @@ const EmployerJobs = () => {
                             </div>
 
                             <div className="space-y-3">
-                                <label className="text-[8px] md:text-[10px] font-semibold text-black md: ml-1">JOB DESCRIPTION</label>
+                                <label className="text-[8px] md:text-[10px] font-semibold text-ink-800 md: ml-1">JOB DESCRIPTION</label>
                                 <textarea
                                     className="w-full h-32 md:h-48 border border-paper-300 rounded-xl md:rounded-xl p-4 md:p-6 font-bold text-xs md:text-sm outline-none focus:shadow-green transition-all bg-nile-white/40"
                                     placeholder="Responsibilities & role overview..."
@@ -251,7 +251,7 @@ const EmployerJobs = () => {
                             </div>
 
                             <div className="space-y-3">
-                                <label className="text-[8px] md:text-[10px] font-semibold text-black md: ml-1">REQUIREMENTS</label>
+                                <label className="text-[8px] md:text-[10px] font-semibold text-ink-800 md: ml-1">REQUIREMENTS</label>
                                 <textarea
                                     className="w-full h-24 md:h-36 border border-paper-300 rounded-xl md:rounded-xl p-4 md:p-6 font-bold text-xs md:text-sm outline-none focus:shadow-green transition-all bg-nile-white/40"
                                     placeholder="Minimum qualifications & experience..."
@@ -277,7 +277,7 @@ const EmployerJobs = () => {
                             {pendingJobs.map(job => (
                                 <div key={job.id} className="bg-white border border-paper-300 rounded-[20px] p-5 md:p-6 flex items-center justify-between shadow-card">
                                     <div className="min-w-0">
-                                        <h4 className="font-semibold text-sm md:text-base text-black truncate">{job.title}</h4>
+                                        <h4 className="font-semibold text-sm md:text-base text-ink-800 truncate">{job.title}</h4>
                                         <p className="text-[8px] md:text-[9px] font-semibold text-nile-blue/50 mt-1">{job.location} • PENDING REVIEW</p>
                                     </div>
                                     <div className="flex items-center space-x-2 ml-4 flex-shrink-0">
@@ -293,7 +293,7 @@ const EmployerJobs = () => {
                                 <FileBadge size={40} className="text-nile-blue" />
                             </div>
                             <div className="space-y-2 md:space-y-3">
-                                <h3 className="text-xl md:text-3xl font-semibold text-black">No Pending Jobs</h3>
+                                <h3 className="text-xl md:text-3xl font-semibold text-ink-800">No Pending Jobs</h3>
                                 <p className="text-[10px] md:text-sm font-bold text-nile-blue/60 leading-relaxed">Post a job listing to get started.</p>
                             </div>
                             <Button variant="outline" size="sm" onClick={() => setTab('post')}>POST A JOB</Button>

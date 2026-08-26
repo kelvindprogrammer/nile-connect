@@ -126,11 +126,11 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({ request, saving, onClose,
                             {SERVICE_ICONS[request.type]}
                         </div>
                         <div>
-                            <p className="font-semibold text-[10px] text-black">Schedule Session</p>
-                            <p className="text-[8px] font-semibold text-black/40 tracking-wider">{TYPE_LABELS[request.type]}</p>
+                            <p className="font-semibold text-[10px] text-ink-800">Schedule Session</p>
+                            <p className="text-[8px] font-semibold text-paper-700 tracking-wider">{TYPE_LABELS[request.type]}</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg border border-paper-300 hover:bg-black hover:text-white transition-all">
+                    <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg border border-paper-300 hover:bg-ink-900 hover:text-white transition-all">
                         <X size={14} />
                     </button>
                 </div>
@@ -138,14 +138,14 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({ request, saving, onClose,
                 <div className="px-6 pt-4 pb-2 flex items-center gap-3 bg-black/[0.02]">
                     <Avatar name={request.student_name} size="sm" />
                     <div>
-                        <p className="font-semibold text-xs text-black">{request.student_name}</p>
-                        <p className="text-[8px] font-semibold text-black/40">{request.major || 'No major'} · Class of {request.graduation_year}</p>
+                        <p className="font-semibold text-xs text-ink-800">{request.student_name}</p>
+                        <p className="text-[8px] font-semibold text-paper-700">{request.major || 'No major'} · Class of {request.graduation_year}</p>
                     </div>
                 </div>
 
                 <div className="p-6 space-y-4">
                     <div className="space-y-1.5">
-                        <label className="text-[8px] font-semibold text-black/50">Date</label>
+                        <label className="text-[8px] font-semibold text-paper-700">Date</label>
                         <input
                             type="date"
                             min={minDate}
@@ -155,7 +155,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({ request, saving, onClose,
                         />
                     </div>
                     <div className="space-y-1.5">
-                        <label className="text-[8px] font-semibold text-black/50">Time</label>
+                        <label className="text-[8px] font-semibold text-paper-700">Time</label>
                         <input
                             type="time"
                             value={time}
@@ -222,17 +222,17 @@ const CompleteModal: React.FC<CompleteModalProps> = ({ request, saving, onClose,
                             <CheckCircle2 size={16} />
                         </div>
                         <div>
-                            <p className="font-semibold text-[10px] text-black">Mark Session Complete</p>
-                            <p className="text-[8px] font-semibold text-black/40 tracking-wider">{request.student_name} · {TYPE_LABELS[request.type]}</p>
+                            <p className="font-semibold text-[10px] text-ink-800">Mark Session Complete</p>
+                            <p className="text-[8px] font-semibold text-paper-700 tracking-wider">{request.student_name} · {TYPE_LABELS[request.type]}</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg border border-paper-300 hover:bg-black hover:text-white transition-all">
+                    <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg border border-paper-300 hover:bg-ink-900 hover:text-white transition-all">
                         <X size={14} />
                     </button>
                 </div>
 
                 <div className="p-6 space-y-2">
-                    <label className="text-[8px] font-semibold text-black/50">FEEDBACK FOR STUDENT (OPTIONAL)</label>
+                    <label className="text-[8px] font-semibold text-paper-700">FEEDBACK FOR STUDENT (OPTIONAL)</label>
                     <textarea
                         value={feedback}
                         onChange={(e) => setFeedback(e.target.value)}
@@ -309,16 +309,16 @@ const ServiceOverviewCard: React.FC<ServiceCardProps> = ({ type, count, pending,
                 )}
             </div>
             <div>
-                <p className="text-2xl font-semibold text-black leading-none">{count}</p>
-                <p className="text-[8px] font-semibold text-black/40 mt-1">{TYPE_LABELS[type]} Requests</p>
+                <p className="font-display text-2xl text-ink-800 leading-none">{count}</p>
+                <p className="text-[8px] font-semibold text-paper-700 mt-1">{TYPE_LABELS[type]} Requests</p>
             </div>
-            <div className="mt-3 h-1 rounded-full bg-black/5 overflow-hidden">
+            <div className="mt-3 h-1 rounded-full bg-paper-100 overflow-hidden">
                 <div
                     className={`h-full rounded-full transition-all duration-700 ${iconBg[type]}`}
                     style={{ width: count > 0 ? `${Math.min(100, ((count - pending) / count) * 100)}%` : '0%' }}
                 />
             </div>
-            <p className="text-[7px] font-semibold text-black/30 mt-1 tracking-wider">
+            <p className="text-[7px] font-semibold text-paper-600 mt-1 tracking-wider">
                 {count > 0 ? `${Math.round(((count - pending) / count) * 100)}% resolved` : 'No requests yet'}
             </p>
         </button>
@@ -366,7 +366,7 @@ const RequestRow: React.FC<RequestRowProps> = ({
                     <Avatar name={student_name} size="sm" />
                     <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2 mb-0.5">
-                            <p className="font-semibold text-[11px] text-black truncate leading-none">
+                            <p className="font-semibold text-[11px] text-ink-800 truncate leading-none">
                                 {student_name || 'Unknown student'}
                             </p>
                             <span className={`inline-flex items-center gap-1 text-[7px] font-semibold px-2 py-0.5 rounded-full border ${SERVICE_COLORS[type]}`}>
@@ -379,9 +379,9 @@ const RequestRow: React.FC<RequestRowProps> = ({
                             </span>
                         </div>
                         <div className="flex flex-wrap gap-3 mt-1">
-                            <span className="text-[7px] font-semibold text-black/40">{major || 'No Major'}</span>
-                            <span className="text-[7px] font-semibold text-black/30">Class of {graduation_year || '—'}</span>
-                            <span className="text-[7px] font-semibold text-black/25 flex items-center gap-1">
+                            <span className="text-[7px] font-semibold text-paper-700">{major || 'No Major'}</span>
+                            <span className="text-[7px] font-semibold text-paper-600">Class of {graduation_year || '—'}</span>
+                            <span className="text-[7px] font-semibold text-paper-600 flex items-center gap-1">
                                 <Clock size={8} /> Requested {formattedDate}
                             </span>
                             {formattedScheduled && (
@@ -390,7 +390,7 @@ const RequestRow: React.FC<RequestRowProps> = ({
                                 </span>
                             )}
                             {staff_name && (
-                                <span className="text-[7px] font-semibold text-black/25">Assigned: {staff_name}</span>
+                                <span className="text-[7px] font-semibold text-paper-600">Assigned: {staff_name}</span>
                             )}
                             {resume_url && (
                                 <a
@@ -441,7 +441,7 @@ const RequestRow: React.FC<RequestRowProps> = ({
                     {status === 'scheduled' && room_id && (
                         <button
                             onClick={() => onJoin(room_id)}
-                            className="flex items-center gap-1.5 px-3 py-2 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[8px] shadow-green transition-all"
+                            className="flex items-center gap-1.5 px-3 py-2 bg-ink-900 text-white border border-paper-300 rounded-xl font-semibold text-[8px] shadow-green transition-all"
                         >
                             <Zap size={11} />
                             JOIN SESSION
@@ -461,7 +461,7 @@ const RequestRow: React.FC<RequestRowProps> = ({
                     )}
                     <button
                         onClick={() => onViewProfile(request.student_id)}
-                        className="flex items-center gap-1.5 px-3 py-2 bg-white text-black border border-paper-300 rounded-xl font-semibold text-[8px] hover:bg-black hover:text-white transition-all"
+                        className="flex items-center gap-1.5 px-3 py-2 bg-white text-ink-800 border border-paper-300 rounded-xl font-semibold text-[8px] hover:bg-ink-900 hover:text-white transition-all"
                     >
                         <Users size={11} />
                         PROFILE
@@ -472,7 +472,7 @@ const RequestRow: React.FC<RequestRowProps> = ({
             {status === 'completed' && feedback && (
                 <div className="p-3 bg-nile-green/5 border border-nile-green/20 rounded-xl">
                     <p className="text-[7px] font-semibold text-nile-green/70 mb-1">FEEDBACK GIVEN</p>
-                    <p className="text-[9px] font-semibold text-black/60 leading-relaxed">{feedback}</p>
+                    <p className="text-[9px] font-semibold text-paper-700 leading-relaxed">{feedback}</p>
                 </div>
             )}
         </div>
@@ -486,7 +486,7 @@ const MetricPill: React.FC<{
     value: string | number;
     color?: string;
     icon?: React.ReactNode;
-}> = ({ label, value, color = 'bg-white text-black', icon }) => (
+}> = ({ label, value, color = 'bg-white text-ink-800', icon }) => (
     <div className={`flex items-center gap-2.5 px-4 py-2.5 border border-paper-300 rounded-xl font-semibold ${color}`}>
         {icon && <span className="opacity-60">{icon}</span>}
         <span className="text-xl font-semibold leading-none">{value}</span>
@@ -498,13 +498,13 @@ const MetricPill: React.FC<{
 
 const EmptyState: React.FC<{ tab: TabFilter }> = ({ tab }) => (
     <div className="py-20 border-[2px] border-dashed border-paper-400/10 rounded-[24px] flex flex-col items-center justify-center gap-3">
-        <div className="w-14 h-14 rounded-[18px] bg-black/5 border border-paper-300/10 flex items-center justify-center text-black/20">
+        <div className="w-14 h-14 rounded-[18px] bg-paper-100 border border-paper-300/10 flex items-center justify-center text-paper-600">
             {tab === 'MOCK INTERVIEWS' ? <Mic size={24} />
                 : tab === 'CAREER ADVISORY' ? <MessageSquare size={24} />
                 : tab === 'CV REVIEW' ? <FileText size={24} />
                 : <Users size={24} />}
         </div>
-        <p className="text-[9px] font-semibold text-black/30 text-center px-4">
+        <p className="text-[9px] font-semibold text-paper-600 text-center px-4">
             No service requests match your current filters.
         </p>
     </div>
@@ -639,19 +639,19 @@ const StaffServices: React.FC = () => {
     if (loading) {
         return (
             <div className="p-4 md:p-8 space-y-6">
-                <div className="h-12 bg-black/5 rounded-xl w-72 animate-pulse" />
+                <div className="h-12 bg-paper-100 rounded-xl w-72 animate-pulse" />
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                     {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="h-16 bg-black/5 rounded-xl animate-pulse" />
+                        <div key={i} className="h-16 bg-paper-100 rounded-xl animate-pulse" />
                     ))}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                     {[1, 2, 3].map((i) => (
-                        <div key={i} className="h-36 bg-black/5 rounded-[20px] animate-pulse" />
+                        <div key={i} className="h-36 bg-paper-100 rounded-[20px] animate-pulse" />
                     ))}
                 </div>
                 {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="h-20 bg-black/5 rounded-[18px] animate-pulse" />
+                    <div key={i} className="h-20 bg-paper-100 rounded-[18px] animate-pulse" />
                 ))}
             </div>
         );
@@ -663,10 +663,10 @@ const StaffServices: React.FC = () => {
                 <span className="text-3xl">⚠️</span>
             </div>
             <div>
-                <p className="font-semibold text-lg text-black">Could not load service requests</p>
-                <p className="text-[9px] font-semibold text-black/40 mt-1">Please try again or log out and back in</p>
+                <p className="font-semibold text-lg text-ink-800">Could not load service requests</p>
+                <p className="text-[9px] font-semibold text-paper-700 mt-1">Please try again or log out and back in</p>
             </div>
-            <button onClick={load} className="px-6 py-3 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all">
+            <button onClick={load} className="px-6 py-3 bg-ink-900 text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all">
                 TRY AGAIN
             </button>
         </div>
@@ -683,10 +683,10 @@ const StaffServices: React.FC = () => {
                 {/* ── Header ──────────────────────────────────────────────── */}
                 <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-4 border-b border-paper-300 pb-6">
                     <div>
-                        <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">
-                            Career Services .
+                        <h2 className="co-display text-3xl md:text-4xl text-ink-800 leading-none">
+                            Career Services
                         </h2>
-                        <p className="text-[9px] font-semibold text-black/40 mt-1">
+                        <p className="text-[9px] font-semibold text-paper-700 mt-1">
                             MOCK INTERVIEWS · CAREER ADVISORY · CV REVIEWS
                         </p>
                     </div>
@@ -698,7 +698,7 @@ const StaffServices: React.FC = () => {
 
                 {/* ── Metrics Bar ──────────────────────────────────────────── */}
                 <div className="flex flex-wrap gap-3">
-                    <MetricPill label="TOTAL REQUESTS" value={metrics.total} color="bg-black text-white" icon={<Users size={14} />} />
+                    <MetricPill label="TOTAL REQUESTS" value={metrics.total} color="bg-ink-900 text-white" icon={<Users size={14} />} />
                     <MetricPill label="PENDING" value={metrics.pending} color="bg-yellow-50 text-yellow-700" icon={<Clock size={14} />} />
                     <MetricPill label="SCHEDULED" value={metrics.scheduled} color="bg-nile-blue/10 text-nile-blue" icon={<Calendar size={14} />} />
                     <MetricPill label="COMPLETION RATE" value={`${metrics.completionRate}%`} color="bg-nile-green/10 text-nile-green" icon={<CheckCircle2 size={14} />} />
@@ -734,14 +734,14 @@ const StaffServices: React.FC = () => {
                                     key={tab}
                                     onClick={() => { setActiveTab(tab); setStatusFilter('All'); setSearch(''); }}
                                     className={`flex items-center gap-1.5 px-3 md:px-5 py-2 rounded-xl font-semibold text-[8px] transition-all whitespace-nowrap
-                                        ${activeTab === tab ? 'bg-black text-white shadow-green' : 'text-black/40 hover:text-black'}`}
+                                        ${activeTab === tab ? 'bg-ink-900 text-white shadow-green' : 'text-paper-700 hover:text-ink-800'}`}
                                 >
                                     {tab === 'ALL REQUESTS' && <Users size={10} />}
                                     {tab === 'MOCK INTERVIEWS' && <Mic size={10} />}
                                     {tab === 'CAREER ADVISORY' && <MessageSquare size={10} />}
                                     {tab === 'CV REVIEW' && <FileText size={10} />}
                                     {tab}
-                                    <span className={`text-[7px] px-1.5 py-0.5 rounded-full font-semibold ${activeTab === tab ? 'bg-white/20 text-white' : 'bg-black/5 text-black/50'}`}>
+                                    <span className={`text-[7px] px-1.5 py-0.5 rounded-full font-semibold ${activeTab === tab ? 'bg-white/20 text-white' : 'bg-paper-100 text-paper-700'}`}>
                                         {count}
                                     </span>
                                 </button>
@@ -751,7 +751,7 @@ const StaffServices: React.FC = () => {
 
                     <div className="flex flex-col sm:flex-row gap-3">
                         <div className="relative flex-1">
-                            <Search size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-black/30" />
+                            <Search size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-paper-600" />
                             <input
                                 type="text"
                                 value={search}
@@ -760,7 +760,7 @@ const StaffServices: React.FC = () => {
                                 className="w-full pl-10 pr-4 py-3 rounded-xl border border-paper-300 font-semibold text-[9px] outline-none focus:shadow-card bg-white transition-all"
                             />
                             {search && (
-                                <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-black/30 hover:text-black">
+                                <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-paper-600 hover:text-ink-800">
                                     <X size={13} />
                                 </button>
                             )}
@@ -769,14 +769,14 @@ const StaffServices: React.FC = () => {
                         <div className="relative">
                             <button
                                 onClick={() => setShowStatusDropdown((p) => !p)}
-                                className="flex items-center gap-2 px-4 py-3 border border-paper-300 rounded-xl font-semibold text-[9px] bg-white hover:bg-black hover:text-white transition-all whitespace-nowrap"
+                                className="flex items-center gap-2 px-4 py-3 border border-paper-300 rounded-xl font-semibold text-[9px] bg-white hover:bg-ink-900 hover:text-white transition-all whitespace-nowrap"
                             >
                                 <span className={`w-2 h-2 rounded-full ${
                                     statusFilter === 'pending' ? 'bg-yellow-400'
                                         : statusFilter === 'scheduled' ? 'bg-nile-blue'
                                         : statusFilter === 'completed' ? 'bg-nile-green'
                                         : statusFilter === 'declined' ? 'bg-red-400'
-                                        : 'bg-black'
+                                        : 'bg-ink-900'
                                 }`} />
                                 {statusFilter === 'All' ? 'ALL STATUS' : STATUS_LABELS[statusFilter]}
                                 <ChevronDown size={12} className={`transition-transform ${showStatusDropdown ? 'rotate-180' : ''}`} />
@@ -787,8 +787,8 @@ const StaffServices: React.FC = () => {
                                         <button
                                             key={s}
                                             onClick={() => { setStatusFilter(s); setShowStatusDropdown(false); }}
-                                            className={`w-full text-left px-4 py-2.5 font-semibold text-[8px] hover:bg-black/5 transition-colors flex items-center gap-2
-                                                ${statusFilter === s ? 'bg-black/5 text-black' : 'text-black/60'}`}
+                                            className={`w-full text-left px-4 py-2.5 font-semibold text-[8px] hover:bg-paper-100 transition-colors flex items-center gap-2
+                                                ${statusFilter === s ? 'bg-paper-100 text-ink-800' : 'text-paper-700'}`}
                                         >
                                             <span className={`w-1.5 h-1.5 rounded-full ${
                                                 s === 'pending' ? 'bg-yellow-400'
@@ -805,7 +805,7 @@ const StaffServices: React.FC = () => {
                         </div>
                     </div>
 
-                    <p className="text-[8px] font-semibold text-black/30">
+                    <p className="text-[8px] font-semibold text-paper-600">
                         SHOWING {filtered.length} OF {requests.length} REQUESTS
                         {search && ` · SEARCH: "${search}"`}
                         {statusFilter !== 'All' && ` · STATUS: ${STATUS_LABELS[statusFilter]}`}

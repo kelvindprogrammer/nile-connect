@@ -20,7 +20,7 @@ const Stepper: React.FC<StepperProps> = ({ steps, currentStep }) => {
                         </div>
                         <span 
                             className={`mt-3 text-[9px] font-semibold tracking-tight text-center
-                                ${index <= currentStep ? 'text-black' : 'text-nile-blue/30'}
+                                ${index <= currentStep ? 'text-ink-800' : 'text-nile-blue/30'}
                             `}
                         >
                             {step}

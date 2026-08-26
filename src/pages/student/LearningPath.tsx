@@ -25,7 +25,7 @@ const LearningPath = () => {
             <div className="p-4 md:p-8 space-y-8 anime-fade-in text-left max-w-6xl mx-auto pb-24 md:pb-8">
                 <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-paper-300 pb-6">
                     <div className="space-y-1">
-                        <h2 className="text-3xl md:text-5xl font-semibold text-black">Learning Path .</h2>
+                        <h2 className="co-display text-3xl md:text-4xl text-ink-800">Learning path</h2>
                         <p className="text-[10px] font-semibold text-nile-blue/50">AI-DRIVEN SKILL DEVELOPMENT & TRACKING</p>
                     </div>
                     <div className="flex gap-2">
@@ -39,7 +39,7 @@ const LearningPath = () => {
                     <StatCard label="GOALS SET" value={tasks.length} icon={<Target size={18} />} />
                     <StatCard label="IN PROGRESS" value={stats.inProgress} icon={<Clock size={18} />} color="text-nile-blue" />
                     <StatCard label="COMPLETED" value={stats.completed} icon={<Trophy size={18} />} color="text-nile-green" />
-                    <div className="bg-black text-white border border-paper-300 rounded-[24px] p-6 shadow-green flex flex-col justify-between">
+                    <div className="bg-ink-900 text-white border border-paper-300 rounded-[24px] p-6 shadow-green flex flex-col justify-between">
                         <p className="text-[9px] font-semibold opacity-50">COMPLETION RATE</p>
                         <div className="flex items-end justify-between mt-4">
                             <h4 className="text-4xl font-semibold">{completionRate}%</h4>
@@ -54,19 +54,19 @@ const LearningPath = () => {
                     {/* Main List */}
                     <div className="lg:col-span-8 space-y-6">
                         <div className="flex items-center justify-between">
-                            <h3 className="text-xs font-semibold text-black/40">YOUR CURRICULUM</h3>
+                            <h3 className="text-xs font-semibold text-paper-700">YOUR CURRICULUM</h3>
                             <div className="flex gap-2">
                                 <button className="text-[8px] font-semibold text-nile-blue underline underline-offset-4">ACTIVE</button>
-                                <button className="text-[8px] font-semibold text-black/30 hover:text-black">COMPLETED</button>
+                                <button className="text-[8px] font-semibold text-paper-600 hover:text-ink-800">COMPLETED</button>
                             </div>
                         </div>
 
                         {tasks.length === 0 ? (
                             <div className="py-20 text-center border-[3px] border-dashed border-paper-400/10 rounded-[32px] bg-white space-y-4">
-                                <BookOpen size={48} className="mx-auto text-black/10" strokeWidth={1.5} />
+                                <BookOpen size={48} className="mx-auto text-paper-500" strokeWidth={1.5} />
                                 <div className="space-y-1">
-                                    <p className="font-semibold text-sm text-black">Your learning path is empty</p>
-                                    <p className="text-[10px] font-bold text-black/40">Upload your CV to the AI Architect to get recommendations</p>
+                                    <p className="font-semibold text-sm text-ink-800">Your learning path is empty</p>
+                                    <p className="text-[10px] font-bold text-paper-700">Upload your CV to the AI Architect to get recommendations</p>
                                 </div>
                                 <Button variant="outline" size="sm" onClick={() => window.location.href = '/student/career/ai'}>
                                     GO TO AI ARCHITECT
@@ -96,13 +96,13 @@ const LearningPath = () => {
                             <p className="text-xs font-bold text-white/70 leading-relaxed italic">
                                 "Based on your interest in Software Engineering, I recommend taking the 'Advanced System Design' course on Udemy to improve your architectural skills."
                             </p>
-                            <Button variant="outline" size="sm" fullWidth className="mt-6 border-white/20 text-white hover:bg-white hover:text-black">
+                            <Button variant="outline" size="sm" fullWidth className="mt-6 border-white/20 text-white hover:bg-white hover:text-ink-800">
                                 <ExternalLink size={14} className="mr-2" /> BROWSE UDEMY
                             </Button>
                         </div>
 
                         <div className="bg-white border border-paper-300 rounded-[28px] p-6 shadow-blue">
-                            <h4 className="text-[10px] font-semibold text-black/40 mb-4">QUICK TIPS</h4>
+                            <h4 className="text-[10px] font-semibold text-paper-700 mb-4">QUICK TIPS</h4>
                             <div className="space-y-4">
                                 <TipItem icon={<Star size={14} />} text="Complete 2 tasks this week to earn the 'Active Learner' badge." />
                                 <TipItem icon={<AlertCircle size={14} />} text="Your 'React Testing' course is 80% complete. Finish it today!" />
@@ -130,7 +130,7 @@ const TaskItem = ({ task, onStatusUpdate, onDelete }: {
         `}>
             <div className={`
                 w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 border border-paper-300
-                ${task.category === 'course' ? 'bg-nile-blue text-white' : 'bg-yellow-400 text-black'}
+                ${task.category === 'course' ? 'bg-nile-blue text-white' : 'bg-yellow-400 text-ink-800'}
             `}>
                 {task.category === 'course' ? <Play size={20} /> : <Zap size={20} />}
             </div>
@@ -138,11 +138,11 @@ const TaskItem = ({ task, onStatusUpdate, onDelete }: {
             <div className="flex-1 min-w-0 text-left">
                 <div className="flex items-center gap-2 flex-wrap">
                     <p className="font-semibold text-sm truncate leading-none">{task.title}</p>
-                    <span className="text-[7px] font-semibold px-2 py-0.5 bg-black/5 rounded-full border border-paper-400/10">
+                    <span className="text-[7px] font-semibold px-2 py-0.5 bg-paper-100 rounded-full border border-paper-400/10">
                         {task.source}
                     </span>
                 </div>
-                <p className="text-[9px] font-semibold text-black/30 mt-1.5">
+                <p className="text-[9px] font-semibold text-paper-600 mt-1.5">
                     RECOMMENDED ON {new Date(task.recommendedDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }).toUpperCase()}
                 </p>
                 
@@ -170,7 +170,7 @@ const TaskItem = ({ task, onStatusUpdate, onDelete }: {
 
             <button 
                 onClick={() => onDelete(task.id)}
-                className="p-2 text-black/10 hover:text-red-500 transition-colors"
+                className="p-2 text-paper-500 hover:text-red-500 transition-colors"
             >
                 <Trash2 size={16} />
             </button>
@@ -178,22 +178,22 @@ const TaskItem = ({ task, onStatusUpdate, onDelete }: {
     );
 };
 
-const StatCard = ({ label, value, icon, color = 'text-black' }: { label: string, value: number, icon: React.ReactNode, color?: string }) => (
+const StatCard = ({ label, value, icon, color = 'text-ink-800' }: { label: string, value: number, icon: React.ReactNode, color?: string }) => (
     <div className="bg-white border border-paper-300 rounded-[24px] p-6 shadow-card">
         <div className="flex items-center gap-2 mb-4">
             <div className={`p-2 rounded-lg bg-nile-white border border-paper-400/10 ${color}`}>{icon}</div>
-            <p className="text-[9px] font-semibold text-black/30">{label}</p>
+            <p className="text-[9px] font-semibold text-paper-600">{label}</p>
         </div>
-        <h4 className="text-4xl font-semibold text-black">{value}</h4>
+        <h4 className="text-4xl font-semibold text-ink-800">{value}</h4>
     </div>
 );
 
 const TipItem = ({ icon, text }: { icon: React.ReactNode, text: string }) => (
     <div className="flex gap-3 items-start">
-        <div className="p-1.5 bg-black text-white rounded-lg border border-paper-400 flex-shrink-0">
+        <div className="p-1.5 bg-ink-900 text-white rounded-lg border border-paper-400 flex-shrink-0">
             {icon}
         </div>
-        <p className="text-[9px] font-bold text-black/60 leading-relaxed tracking-wider">{text}</p>
+        <p className="text-[9px] font-bold text-paper-700 leading-relaxed tracking-wider">{text}</p>
     </div>
 );
 

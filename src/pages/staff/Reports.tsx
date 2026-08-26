@@ -193,21 +193,21 @@ const StaffReports = () => {
 
             {/* Header */}
             <div className="border-b border-paper-300 pb-6">
-                <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">Reports .</h2>
-                <p className="text-[9px] font-semibold text-black/40 mt-1">REAL DATA · CSV EXPORTS · PLATFORM ANALYTICS</p>
+                <h2 className="co-display text-3xl md:text-4xl text-ink-800 leading-none">Reports</h2>
+                <p className="text-[9px] font-semibold text-paper-700 mt-1">REAL DATA · CSV EXPORTS · PLATFORM ANALYTICS</p>
             </div>
 
             {/* KPI Strip */}
             {loadingStats ? (
                 <div className="grid grid-cols-2 md:grid-cols-6 gap-3 animate-pulse">
-                    {[1,2,3,4,5,6].map(i => <div key={i} className="h-20 bg-black/5 rounded-[16px]" />)}
+                    {[1,2,3,4,5,6].map(i => <div key={i} className="h-20 bg-paper-100 rounded-[16px]" />)}
                 </div>
             ) : (
                 <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
                     {kpis.map(k => (
                         <div key={k.label} className={`border border-paper-300 rounded-[16px] p-4 shadow-card ${k.color.includes('bg-') ? k.color : `bg-white ${k.color}`}`}>
                             <div className="flex items-center gap-2 mb-2 opacity-60">{k.icon}</div>
-                            <p className="text-2xl font-semibold leading-none">{k.value.toLocaleString()}</p>
+                            <p className="font-display text-2xl leading-none">{k.value.toLocaleString()}</p>
                             <p className="text-[7px] font-semibold mt-1 opacity-60">{k.label}</p>
                         </div>
                     ))}
@@ -219,20 +219,20 @@ const StaffReports = () => {
                 {/* Left: Report builder */}
                 <div className="xl:col-span-7 space-y-6">
                     <div className="bg-white border border-paper-300 rounded-[28px] p-6 md:p-8 shadow-card">
-                        <h3 className="text-[10px] font-semibold text-black/50 mb-5">REPORT BUILDER</h3>
+                        <h3 className="text-[10px] font-semibold text-paper-700 mb-5">REPORT BUILDER</h3>
 
                         {/* Report type selection */}
                         <div className="space-y-3 mb-6">
                             {(Object.entries(reportMeta) as [ReportType, typeof reportMeta[ReportType]][]).map(([type, m]) => (
                                 <button key={type} onClick={() => { setReportType(type); setSummary(null); }}
                                     className={`w-full flex items-center gap-4 p-4 border border-paper-300 rounded-[16px] transition-all text-left
-                                        ${reportType === type ? 'shadow-green bg-black text-white' : 'bg-nile-white hover:bg-white hover:shadow-card'}`}>
+                                        ${reportType === type ? 'shadow-green bg-ink-900 text-white' : 'bg-nile-white hover:bg-white hover:shadow-card'}`}>
                                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 border-2 ${reportType === type ? 'bg-white/10 border-white/20' : `${m.color} border-paper-400/10`}`}>
                                         {m.icon}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className={`font-semibold text-xs tracking-wider ${reportType === type ? 'text-white' : 'text-black'}`}>{m.label}</p>
-                                        <p className={`text-[8px] font-bold mt-0.5 truncate ${reportType === type ? 'text-white/50' : 'text-black/40'}`}>{m.desc}</p>
+                                        <p className={`font-semibold text-xs tracking-wider ${reportType === type ? 'text-white' : 'text-ink-800'}`}>{m.label}</p>
+                                        <p className={`text-[8px] font-bold mt-0.5 truncate ${reportType === type ? 'text-white/50' : 'text-paper-700'}`}>{m.desc}</p>
                                     </div>
                                     {reportType === type && <FileText size={14} className="text-nile-green flex-shrink-0" />}
                                 </button>
@@ -242,12 +242,12 @@ const StaffReports = () => {
                         {/* Action buttons */}
                         <div className="flex flex-col sm:flex-row gap-3 pt-2 border-t border-paper-300/5">
                             <button onClick={downloadCSV} disabled={isDownloading}
-                                className="flex-1 py-4 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all disabled:opacity-40 flex items-center justify-center gap-2">
+                                className="flex-1 py-4 bg-ink-900 text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all disabled:opacity-40 flex items-center justify-center gap-2">
                                 {isDownloading ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
                                 {isDownloading ? 'GENERATING...' : 'DOWNLOAD CSV'}
                             </button>
                             <button onClick={generateSummary} disabled={generating || loadingStats}
-                                className="flex-1 py-4 bg-white text-black border border-paper-300 rounded-xl font-semibold text-[9px] shadow-card transition-all disabled:opacity-40 flex items-center justify-center gap-2">
+                                className="flex-1 py-4 bg-white text-ink-800 border border-paper-300 rounded-xl font-semibold text-[9px] shadow-card transition-all disabled:opacity-40 flex items-center justify-center gap-2">
                                 {generating ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
                                 {generating ? 'GENERATING...' : 'TEXT SUMMARY'}
                             </button>
@@ -259,9 +259,9 @@ const StaffReports = () => {
                         <div className="bg-white border border-paper-300 rounded-[24px] shadow-card p-6 anime-fade-in">
                             <div className="flex items-center gap-2 mb-4">
                                 <BarChart3 size={14} className="text-nile-blue" />
-                                <h4 className="text-[9px] font-semibold text-black/50">GENERATED SUMMARY</h4>
+                                <h4 className="text-[9px] font-semibold text-paper-700">GENERATED SUMMARY</h4>
                             </div>
-                            <pre className="font-mono text-[10px] text-black whitespace-pre-wrap leading-relaxed bg-nile-white/60 border border-paper-300/10 rounded-xl p-5">
+                            <pre className="font-mono text-[10px] text-ink-800 whitespace-pre-wrap leading-relaxed bg-nile-white/60 border border-paper-300/10 rounded-xl p-5">
                                 {summary}
                             </pre>
                         </div>
@@ -288,7 +288,7 @@ const StaffReports = () => {
                     {/* Quick stats */}
                     {stats && (
                         <div className="bg-white border border-paper-300 rounded-[24px] p-5 shadow-card space-y-4">
-                            <h3 className="text-[10px] font-semibold text-black/40 pb-3 border-b border-paper-300/5">PLATFORM SNAPSHOT</h3>
+                            <h3 className="text-[10px] font-semibold text-paper-700 pb-3 border-b border-paper-300/5">PLATFORM SNAPSHOT</h3>
                             {[
                                 { label: 'Placement activity', value: `${stats.active_jobs} active jobs`, bar: Math.min(100, stats.active_jobs * 5) },
                                 { label: 'Employer pipeline', value: `${stats.total_employers - stats.pending_employers}/${stats.total_employers} verified`, bar: stats.total_employers > 0 ? Math.round(((stats.total_employers - stats.pending_employers) / stats.total_employers) * 100) : 0 },
@@ -296,12 +296,12 @@ const StaffReports = () => {
                                 { label: 'Upcoming events', value: `${stats.upcoming_events} events`, bar: Math.min(100, stats.upcoming_events * 10) },
                             ].map(item => (
                                 <div key={item.label}>
-                                    <div className="flex justify-between text-[8px] font-semibold text-black/50 mb-1.5">
+                                    <div className="flex justify-between text-[8px] font-semibold text-paper-700 mb-1.5">
                                         <span>{item.label}</span>
-                                        <span className="text-black">{item.value}</span>
+                                        <span className="text-ink-800">{item.value}</span>
                                     </div>
                                     <div className="h-2 bg-nile-white border border-paper-300 rounded-full overflow-hidden p-0.5">
-                                        <div className="h-full bg-black rounded-full transition-all duration-700" style={{ width: `${item.bar}%` }} />
+                                        <div className="h-full bg-ink-900 rounded-full transition-all duration-700" style={{ width: `${item.bar}%` }} />
                                     </div>
                                 </div>
                             ))}

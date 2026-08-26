@@ -84,7 +84,7 @@ const StaffInsights = () => {
     return (
         <div className="p-4 md:p-6 pb-24 md:pb-8 space-y-6 anime-fade-in font-sans max-w-5xl mx-auto">
             <div>
-                <h1 className="text-2xl font-semibold text-ink-800">Insights</h1>
+                <h1 className="co-display text-2xl text-ink-800">Insights</h1>
                 <p className="text-sm text-paper-600 mt-1">Platform activity and pending approvals</p>
             </div>
 

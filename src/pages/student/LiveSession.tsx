@@ -210,18 +210,18 @@ const LiveSession = () => {
 
     // ── ENDED ─────────────────────────────────────────────────────────────────
     if (phase === 'ended') return (
-        <div className="min-h-screen bg-black flex items-center justify-center p-6">
+        <div className="min-h-screen bg-ink-900 flex items-center justify-center p-6">
             <div className="bg-white border border-paper-300 rounded-[32px] p-8 md:p-12 text-center max-w-md w-full shadow-green">
                 <NileConnectLogo size="sm" showText showTagline={false} animated={false} className="mb-6 justify-center" />
                 <CheckCircle2 size={48} className="text-nile-green mx-auto mb-4" strokeWidth={1.5} />
-                <h2 className="text-2xl font-semibold tracking-tight mb-2">Session Complete</h2>
-                <p className="text-[9px] font-semibold text-black/40 mb-2">Duration: {formatTime(duration)}</p>
-                <p className="text-sm font-bold text-black/60 leading-relaxed mb-8">
+                <h2 className="co-display text-2xl  mb-2">Session complete</h2>
+                <p className="text-[9px] font-semibold text-paper-700 mb-2">Duration: {formatTime(duration)}</p>
+                <p className="text-sm font-bold text-paper-700 leading-relaxed mb-8">
                     Your live career advisory session has ended. Check your messages for any follow-up notes.
                 </p>
                 <div className="flex gap-3">
                     <button onClick={() => navigate(role === 'staff' ? '/staff/services' : '/student/career')}
-                        className="flex-1 py-3 border border-paper-300 rounded-xl font-semibold text-[9px] hover:bg-black hover:text-white transition-all">
+                        className="flex-1 py-3 border border-paper-300 rounded-xl font-semibold text-[9px] hover:bg-ink-900 hover:text-white transition-all">
                         {role === 'staff' ? 'SERVICES' : 'CAREER CENTER'}
                     </button>
                     <button onClick={() => navigate(basePath)}

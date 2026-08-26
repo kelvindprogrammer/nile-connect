@@ -211,7 +211,7 @@ const StoryViewer: React.FC<StoryViewerProps> = ({
             role="dialog"
             aria-modal="true"
             aria-label={`Stories from ${author?.name ?? 'this person'}`}
-            className="fixed inset-0 z-[100] bg-black flex items-center justify-center select-none"
+            className="fixed inset-0 z-[100] bg-ink-900 flex items-center justify-center select-none"
             onTouchStart={e => { touchStartY.current = e.touches[0]?.clientY ?? null; }}
             onTouchEnd={e => {
                 // A downward swipe closes, matching every story UI people know.
@@ -221,7 +221,7 @@ const StoryViewer: React.FC<StoryViewerProps> = ({
                 touchStartY.current = null;
             }}
         >
-            <div className="relative w-full h-full max-w-[480px] max-h-screen bg-black overflow-hidden">
+            <div className="relative w-full h-full max-w-[480px] max-h-screen bg-ink-900 overflow-hidden">
                 {/* Progress bars — one segment per story */}
                 <div className={`absolute top-0 inset-x-0 z-30 flex gap-1 p-2 transition-opacity ${paused ? 'opacity-0' : 'opacity-100'}`}>
                     {stories.map((s, i) => (

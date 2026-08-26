@@ -352,7 +352,7 @@ const Profile = () => {
                     <div className="bg-white border border-paper-300 rounded-[28px] shadow-card max-w-sm w-full p-8 space-y-6" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center justify-between">
                             <h3 className="text-xl font-semibold">Your CV</h3>
-                            <button onClick={() => setShowCvModal(false)} className="p-1.5 border border-paper-300/10 rounded-lg hover:bg-black/5">
+                            <button onClick={() => setShowCvModal(false)} className="p-1.5 border border-paper-300/10 rounded-lg hover:bg-paper-100">
                                 <X size={16} strokeWidth={3} />
                             </button>
                         </div>
@@ -401,7 +401,7 @@ const Profile = () => {
 
 const SectionCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
     <div className="bg-white p-5 md:p-6 rounded-[20px] md:rounded-[24px] border border-paper-300 shadow-sm">
-        <h3 className="text-base md:text-lg font-semibold text-black mb-4 md:mb-5 pb-2 border-b border-paper-300">{title}</h3>
+        <h3 className="text-base md:text-lg font-semibold text-ink-800 mb-4 md:mb-5 pb-2 border-b border-paper-300">{title}</h3>
         {children}
     </div>
 );
@@ -410,7 +410,7 @@ const StatBadge = ({ value, label, highlight = false, onClick }: { value: string
     const Tag = onClick ? 'button' : 'div';
     return (
         <Tag onClick={onClick} className={`text-left ${onClick ? 'hover:opacity-70 transition-opacity cursor-pointer' : ''}`}>
-            <p className={`text-xl md:text-2xl font-semibold leading-none ${highlight ? 'text-nile-green' : 'text-black'}`}>{value}</p>
+            <p className={`text-xl md:text-2xl font-semibold leading-none ${highlight ? 'text-nile-green' : 'text-ink-800'}`}>{value}</p>
             <p className="text-xs font-medium text-paper-600 mt-1">{label}</p>
         </Tag>
     );

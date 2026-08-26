@@ -51,19 +51,19 @@ const VerifyEmail = () => {
                     {cfg.icon}
                 </div>
                 <div className="space-y-2">
-                    <h1 className="text-xl font-semibold uppercase tracking-wide text-black">{cfg.title}</h1>
-                    <p className="text-sm font-semibold text-black/60 leading-relaxed">{cfg.message}</p>
+                    <h1 className="co-display text-2xl text-ink-800">{cfg.title}</h1>
+                    <p className="text-sm font-semibold text-paper-700 leading-relaxed">{cfg.message}</p>
                 </div>
                 <div className="flex flex-col gap-3 pt-2">
                     <Link
                         to="/employer"
-                        className="w-full py-3 bg-black text-white border-[2px] border-paper-400 rounded-xl font-semibold text-xs tracking-tight hover:bg-nile-blue transition-colors"
+                        className="w-full py-3 bg-ink-900 text-white border-[2px] border-paper-400 rounded-xl font-semibold text-xs tracking-tight hover:bg-nile-blue transition-colors"
                     >
                         Go to employer dashboard
                     </Link>
                     <Link
                         to="/login"
-                        className="w-full py-3 bg-white text-black border-[2px] border-paper-400 rounded-xl font-semibold text-xs tracking-tight hover:bg-nile-white transition-colors"
+                        className="w-full py-3 bg-white text-ink-800 border-[2px] border-paper-400 rounded-xl font-semibold text-xs tracking-tight hover:bg-nile-white transition-colors"
                     >
                         Back to login
                     </Link>

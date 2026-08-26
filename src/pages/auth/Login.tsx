@@ -42,7 +42,7 @@ const Login = () => {
                 {['Connect with employers & alumni', 'AI-powered career coaching', 'Real-time messaging & video calls'].map((item, i) => (
                     <div key={i} className="flex items-center gap-3 text-left p-3 bg-white/5 border border-white/10 rounded-xl">
                         <div className="w-1.5 h-1.5 bg-nile-green rounded-full flex-shrink-0" />
-                        <p className="text-[10px] font-bold text-white/70 tracking-tight">{item}</p>
+                        <p className="text-[11px] font-bold text-white/70 tracking-tight">{item}</p>
                     </div>
                 ))}
             </div>
@@ -56,27 +56,27 @@ const Login = () => {
                 {sessionExpired && (
                     <div className="p-3 bg-yellow-50 border-[2px] border-yellow-300 rounded-xl flex items-start gap-2">
                         <span className="text-yellow-500 text-sm flex-shrink-0">⚠</span>
-                        <p className="text-[9px] font-bold text-yellow-700 leading-snug">
+                        <p className="text-[11px] font-bold text-yellow-700 leading-snug">
                             Your session expired. Please sign in again to continue.
                         </p>
                     </div>
                 )}
 
                 <div className="space-y-1.5">
-                    <h1 className="text-4xl font-semibold text-black uppercase tracking-tight leading-none">
-                        Welcome Back.
+                    <h1 className="co-display text-4xl text-ink-800 leading-none">
+                        Welcome back
                     </h1>
-                    <p className="text-[9px] font-semibold text-nile-blue/50 uppercase tracking-[0.2em]">
+                    <p className="text-[11px] font-semibold text-nile-blue/50 uppercase tracking-[0.14em]">
                         SIGN IN WITH YOUR NILE UNIVERSITY ACCOUNT
                     </p>
                 </div>
 
                 <div className="space-y-5">
                     <div className="p-4 bg-nile-white border-[2px] border-paper-400/10 rounded-xl space-y-3">
-                        <p className="text-[9px] font-semibold text-black/50 tracking-tight">
+                        <p className="text-[11px] font-semibold text-paper-700 tracking-tight">
                             SINGLE SIGN-ON
                         </p>
-                        <p className="text-xs text-black/60 leading-relaxed">
+                        <p className="text-xs text-paper-700 leading-relaxed">
                             Use your Nile University Campus One account. No separate
                             password needed — just sign in with your university credentials.
                         </p>
@@ -97,7 +97,7 @@ const Login = () => {
                 </div>
 
                 <div className="pt-4 border-t-[2px] border-paper-400/5 text-center">
-                    <p className="text-[8px] font-semibold text-black/30 tracking-tight leading-relaxed">
+                    <p className="text-[8px] font-semibold text-paper-600 tracking-tight leading-relaxed">
                         By signing in you agree to Nile Connect's terms of service.
                         <br />
                         Your identity is verified by Campus One (Nile University SSO).

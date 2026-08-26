@@ -177,7 +177,7 @@ const EditProfile = () => {
 
                 <div className="flex items-center justify-between border-b border-paper-300 pb-6">
                     <div className="space-y-1">
-                        <h2 className="text-2xl md:text-4xl font-semibold text-black leading-none">Edit Profile .</h2>
+                        <h2 className="co-display text-2xl md:text-4xl text-ink-800 leading-none">Edit profile</h2>
                         <p className="text-[9px] font-semibold text-nile-blue/50">UPDATE YOUR PUBLIC PORTFOLIO</p>
                     </div>
                     <Button variant="ghost" size="sm" onClick={() => navigate('/student/profile')}>
@@ -220,7 +220,7 @@ const EditProfile = () => {
                             />
                         </div>
                         <div className="space-y-1 text-center sm:text-left">
-                            <h4 className="text-sm font-semibold text-black">PROFILE IMAGE</h4>
+                            <h4 className="text-sm font-semibold text-ink-800">PROFILE IMAGE</h4>
                             <p className="text-[9px] font-semibold text-nile-blue/40">JPG, PNG, WEBP — max 4MB</p>
                             {picture && <p className="text-[8px] font-semibold text-nile-green">✓ PHOTO UPLOADED</p>}
                             <div className="flex gap-2 pt-1 justify-center sm:justify-start">
@@ -236,7 +236,7 @@ const EditProfile = () => {
                             <FileText size={22} />
                         </div>
                         <div className="flex-1 space-y-1 text-center sm:text-left">
-                            <h4 className="text-sm font-semibold text-black">CV / RESUME</h4>
+                            <h4 className="text-sm font-semibold text-ink-800">CV / RESUME</h4>
                             <p className="text-[9px] font-semibold text-nile-blue/40">PDF — max 10MB. Used when you apply to jobs.</p>
                             {resumeUrl && (
                                 <p className="text-[9px] font-semibold text-nile-green">
@@ -262,7 +262,7 @@ const EditProfile = () => {
 
                     {/* Basic Info */}
                     <div className="space-y-4">
-                        <h3 className="text-xs font-semibold text-black/50 border-b border-paper-400/10 pb-2">BASIC INFORMATION</h3>
+                        <h3 className="text-xs font-semibold text-paper-700 border-b border-paper-400/10 pb-2">BASIC INFORMATION</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <InputField label="FULL NAME" value={name} onChange={e => setName(e.target.value)} icon={<User size={14} />} />
                             <InputField
@@ -292,7 +292,7 @@ const EditProfile = () => {
 
                     {/* Bio */}
                     <div className="space-y-2">
-                        <h3 className="text-xs font-semibold text-black/50 border-b border-paper-400/10 pb-2">PROFESSIONAL BIO</h3>
+                        <h3 className="text-xs font-semibold text-paper-700 border-b border-paper-400/10 pb-2">PROFESSIONAL BIO</h3>
                         <textarea
                             className="w-full h-28 bg-nile-white/40 border border-paper-300 rounded-xl p-4 font-bold text-xs outline-none focus:bg-white focus:shadow-blue transition-all resize-none"
                             placeholder="Tell people about yourself, your goals, and what makes you unique..."
@@ -303,7 +303,7 @@ const EditProfile = () => {
 
                     {/* Skills */}
                     <div className="space-y-3">
-                        <h3 className="text-xs font-semibold text-black/50 border-b border-paper-400/10 pb-2">SKILLS</h3>
+                        <h3 className="text-xs font-semibold text-paper-700 border-b border-paper-400/10 pb-2">SKILLS</h3>
                         <div className="flex gap-2">
                             <input
                                 type="text"
@@ -337,7 +337,7 @@ const EditProfile = () => {
                     {/* Experiences */}
                     <div className="space-y-4">
                         <div className="flex items-center justify-between border-b border-paper-400/10 pb-2">
-                            <h3 className="text-xs font-semibold text-black/50">EXPERIENCE</h3>
+                            <h3 className="text-xs font-semibold text-paper-700">EXPERIENCE</h3>
                             <button type="button" onClick={() => setShowAddExp(true)} className="flex items-center gap-1 text-[9px] font-semibold text-nile-blue hover:text-nile-green transition-colors">
                                 <Plus size={12} strokeWidth={3} /> ADD
                             </button>
@@ -351,7 +351,7 @@ const EditProfile = () => {
                                 <div className="flex-1 min-w-0">
                                     <p className="font-semibold text-sm leading-none">{exp.title}</p>
                                     <p className="text-[9px] font-semibold text-nile-blue/60 mt-1">{exp.company} • {exp.duration}</p>
-                                    {exp.description && <p className="text-[10px] font-bold text-black/60 mt-2 leading-relaxed">{exp.description}</p>}
+                                    {exp.description && <p className="text-[10px] font-bold text-paper-700 mt-2 leading-relaxed">{exp.description}</p>}
                                 </div>
                                 <button
                                     type="button"
@@ -402,7 +402,7 @@ const EditProfile = () => {
                             <button
                                 type="button"
                                 onClick={() => setShowAddExp(true)}
-                                className="w-full py-6 border-[2px] border-dashed border-paper-400/20 rounded-[16px] text-[10px] font-semibold text-black/30 hover:bg-black/5 hover:text-black hover:border-paper-400 transition-all flex items-center justify-center gap-2"
+                                className="w-full py-6 border-[2px] border-dashed border-paper-400/20 rounded-[16px] text-[10px] font-semibold text-paper-600 hover:bg-paper-100 hover:text-ink-800 hover:border-paper-400 transition-all flex items-center justify-center gap-2"
                             >
                                 <Plus size={14} strokeWidth={3} /> ADD FIRST EXPERIENCE
                             </button>

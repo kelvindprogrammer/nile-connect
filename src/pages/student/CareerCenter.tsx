@@ -113,8 +113,8 @@ const CareerCenter = () => {
                 {/* Header */}
                 <div className="border-b border-paper-300 pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
                     <div>
-                        <h2 className="text-3xl md:text-6xl font-semibold text-black leading-none">Careers .</h2>
-                        <p className="text-[10px] md:text-lg font-bold text-nile-blue/70 mt-2">Accelerate your professional readiness .</p>
+                        <h2 className="co-display text-3xl md:text-4xl text-ink-800 leading-none">Careers</h2>
+                        <p className="text-[10px] md:text-lg font-bold text-nile-blue/70 mt-2">Accelerate your professional readiness</p>
                     </div>
                     <button
                         onClick={handleStartLiveSession}
@@ -154,7 +154,7 @@ const CareerCenter = () => {
                     {/* AI Architect Card */}
                     <div className="bg-white p-6 md:p-8 rounded-[28px] border border-paper-300 shadow-card space-y-5 text-left">
                         <div className="flex justify-between items-center">
-                            <h3 className="text-xl md:text-2xl font-semibold text-black">AI Architect .</h3>
+                            <h3 className="co-display text-2xl text-ink-800">AI architect</h3>
                             <div className="w-10 h-10 bg-nile-green text-white rounded-xl border border-paper-300 shadow-card flex items-center justify-center">
                                 <Cpu size={18} strokeWidth={2.5} />
                             </div>
@@ -165,7 +165,7 @@ const CareerCenter = () => {
                         >
                             <Sparkles size={36} strokeWidth={2} className="text-nile-blue/30 group-hover:text-nile-green group-hover:scale-110 transition-all" />
                             <div className="text-center">
-                                <p className="font-semibold text-black text-sm">Scan &amp; Evolve</p>
+                                <p className="font-semibold text-ink-800 text-sm">Scan &amp; Evolve</p>
                                 <p className="text-[9px] font-semibold text-nile-blue/30 mt-1">AI-Powered CV Analysis</p>
                             </div>
                         </div>
@@ -183,7 +183,7 @@ const CareerCenter = () => {
                         {/* Mock Interview */}
                         <div className="bg-white p-6 md:p-8 rounded-[28px] border border-paper-300 shadow-card text-left">
                             <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-lg md:text-xl font-semibold text-black">Mock Interview .</h3>
+                                <h3 className="co-display text-xl text-ink-800">Mock interview</h3>
                                 <div className="w-10 h-10 bg-nile-blue text-white rounded-xl border border-paper-300 shadow-card flex items-center justify-center">
                                     <Video size={16} strokeWidth={2.5} />
                                 </div>
@@ -194,7 +194,7 @@ const CareerCenter = () => {
                             <div className="grid grid-cols-3 gap-2 mb-5">
                                 {['Behavioral', 'Technical', 'HR Round'].map(t => (
                                     <div key={t} className="text-center p-2.5 bg-nile-white border border-paper-300/10 rounded-xl">
-                                        <p className="text-[8px] font-semibold text-black/50">{t}</p>
+                                        <p className="text-[8px] font-semibold text-paper-700">{t}</p>
                                     </div>
                                 ))}
                             </div>
@@ -210,7 +210,7 @@ const CareerCenter = () => {
                         {/* Career Services */}
                         <div className="bg-white p-6 md:p-8 rounded-[28px] border border-paper-300 shadow-card text-left">
                             <div className="flex justify-between items-center mb-5">
-                                <h3 className="text-lg md:text-xl font-semibold text-black">Career Services .</h3>
+                                <h3 className="co-display text-xl text-ink-800">Career services</h3>
                                 <button
                                     onClick={() => setShowRequestModal(true)}
                                     className="flex items-center gap-1 text-[9px] font-semibold text-nile-blue hover:text-nile-green transition-colors"
@@ -226,7 +226,7 @@ const CareerCenter = () => {
                             ) : requests.length === 0 ? (
                                 <div className="text-center py-8 space-y-3">
                                     <MessageSquareText size={28} className="mx-auto text-nile-blue/20" />
-                                    <p className="text-[10px] font-semibold text-black/40">No requests yet. Book a mock interview, career advisory or CV review with our staff.</p>
+                                    <p className="text-[10px] font-semibold text-paper-700">No requests yet. Book a mock interview, career advisory or CV review with our staff.</p>
                                     <Button size="xs" onClick={() => setShowRequestModal(true)}>REQUEST A SERVICE</Button>
                                 </div>
                             ) : (
@@ -251,14 +251,14 @@ const CareerCenter = () => {
                     <div className="bg-white border border-paper-300 rounded-[28px] shadow-card max-w-md w-full p-6 md:p-8 space-y-6" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center justify-between">
                             <h3 className="text-xl font-semibold">Request Career Service</h3>
-                            <button onClick={() => setShowRequestModal(false)} className="p-1.5 border border-paper-300/10 rounded-lg hover:bg-black/5">
+                            <button onClick={() => setShowRequestModal(false)} className="p-1.5 border border-paper-300/10 rounded-lg hover:bg-paper-100">
                                 <X size={16} strokeWidth={3} />
                             </button>
                         </div>
 
                         <form onSubmit={handleSubmitRequest} className="space-y-4">
                             <div className="space-y-2">
-                                <label className="text-[9px] font-semibold text-black/50">SERVICE TYPE</label>
+                                <label className="text-[9px] font-semibold text-paper-700">SERVICE TYPE</label>
                                 <div className="grid grid-cols-1 gap-2">
                                     {SERVICE_TYPES.map(t => (
                                         <button
@@ -276,14 +276,14 @@ const CareerCenter = () => {
                                             </div>
                                             <div className="min-w-0">
                                                 <p className="font-semibold text-sm leading-none">{t.label}</p>
-                                                <p className="text-[9px] font-semibold text-black/40 mt-1">{t.description}</p>
+                                                <p className="text-[9px] font-semibold text-paper-700 mt-1">{t.description}</p>
                                             </div>
                                         </button>
                                     ))}
                                 </div>
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-[9px] font-semibold text-black/50">WHAT DO YOU NEED HELP WITH?</label>
+                                <label className="text-[9px] font-semibold text-paper-700">WHAT DO YOU NEED HELP WITH?</label>
                                 <textarea
                                     value={requestNotes}
                                     onChange={e => setRequestNotes(e.target.value)}
@@ -314,27 +314,27 @@ const CareerCenter = () => {
                                 </div>
                                 <div>
                                     <h3 className="font-semibold text-base tracking-tight">Live Session</h3>
-                                    <p className="text-[7px] font-semibold text-black/40">REAL-TIME VIDEO CALL</p>
+                                    <p className="text-[7px] font-semibold text-paper-700">REAL-TIME VIDEO CALL</p>
                                 </div>
                             </div>
-                            <button onClick={() => setShowSessionModal(false)} className="p-1.5 rounded-lg border border-paper-300/10 hover:bg-black/5">
+                            <button onClick={() => setShowSessionModal(false)} className="p-1.5 rounded-lg border border-paper-300/10 hover:bg-paper-100">
                                 <X size={14} strokeWidth={3} />
                             </button>
                         </div>
 
                         <div className="p-4 bg-nile-blue/5 border-[2px] border-nile-blue/20 rounded-[16px] space-y-2">
-                            <p className="text-[8px] font-semibold text-black/50">YOUR SESSION LINK</p>
+                            <p className="text-[8px] font-semibold text-paper-700">YOUR SESSION LINK</p>
                             <p className="text-[9px] font-bold text-nile-blue break-all leading-relaxed">{sessionLink}</p>
                         </div>
 
                         <div className="space-y-2">
-                            <p className="text-[9px] font-semibold text-black/60 leading-relaxed">
+                            <p className="text-[9px] font-semibold text-paper-700 leading-relaxed">
                                 Share this link with your career advisor. When they join, you'll be connected in a live video call — right here in NileConnect.
                             </p>
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => { navigator.clipboard.writeText(sessionLink); showToast('Link copied!', 'success'); }}
-                                    className="flex items-center gap-1.5 px-3 py-2 border border-paper-300 rounded-xl font-semibold text-[8px] hover:bg-black hover:text-white transition-all"
+                                    className="flex items-center gap-1.5 px-3 py-2 border border-paper-300 rounded-xl font-semibold text-[8px] hover:bg-ink-900 hover:text-white transition-all"
                                 >
                                     <Copy size={12} /> COPY LINK
                                 </button>
@@ -358,12 +358,12 @@ const ServiceRequestCard = ({ req, onJoin }: { req: ServiceRequestItem; onJoin: 
     return (
         <div className="p-4 border border-paper-300 rounded-[18px] shadow-card bg-white space-y-2">
             <div className="flex items-center justify-between gap-2">
-                <p className="font-semibold text-black text-[11px] leading-none">{TYPE_LABELS[req.type] || req.type}</p>
+                <p className="font-semibold text-ink-800 text-[11px] leading-none">{TYPE_LABELS[req.type] || req.type}</p>
                 <span className={`text-[8px] font-semibold px-2 py-1 rounded-full uppercase ${STATUS_STYLES[req.status] || 'bg-paper-200 text-paper-700'}`}>
                     {req.status}
                 </span>
             </div>
-            {req.notes && <p className="text-[9px] font-semibold text-black/50 leading-relaxed">{req.notes}</p>}
+            {req.notes && <p className="text-[9px] font-semibold text-paper-700 leading-relaxed">{req.notes}</p>}
             <div className="flex items-center gap-3 flex-wrap text-[8px] font-semibold text-nile-blue/50">
                 {req.staff_name && (
                     <span className="flex items-center gap-1"><User size={10} strokeWidth={3} /> {req.staff_name}</span>
@@ -375,7 +375,7 @@ const ServiceRequestCard = ({ req, onJoin }: { req: ServiceRequestItem; onJoin: 
             {req.status === 'completed' && req.feedback && (
                 <div className="p-2.5 bg-nile-green/5 border border-nile-green/20 rounded-xl">
                     <p className="text-[8px] font-semibold text-nile-green/70 mb-1">FEEDBACK</p>
-                    <p className="text-[9px] font-semibold text-black/60 leading-relaxed">{req.feedback}</p>
+                    <p className="text-[9px] font-semibold text-paper-700 leading-relaxed">{req.feedback}</p>
                 </div>
             )}
             {req.status === 'scheduled' && req.room_id && (

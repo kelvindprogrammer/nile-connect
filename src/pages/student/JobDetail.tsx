@@ -140,7 +140,7 @@ const JobDetail = () => {
                             )}
                             <div className="space-y-1.5">
                                 <div className="flex items-center flex-wrap gap-2">
-                                    <h1 className="text-xl md:text-2xl font-semibold text-ink-800 leading-tight">{job.title}</h1>
+                                    <h1 className="co-display text-xl md:text-2xl text-ink-800 leading-tight">{job.title}</h1>
                                     <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${typeClass}`}>{typeName}</span>
                                     {job.is_remote && (
                                         <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-nile-green/10 text-nile-green flex items-center gap-1">

@@ -19,7 +19,7 @@ const statusBadge: Record<string, string> = {
     offer_extended:       'bg-nile-green/20 text-nile-green border-nile-green/30',
     accepted:             'bg-nile-green/20 text-nile-green border-nile-green/30',
     rejected:             'bg-red-50 text-red-500 border-red-200',
-    withdrawn:            'bg-black/5 text-black/40 border-paper-400/10',
+    withdrawn:            'bg-paper-100 text-paper-700 border-paper-400/10',
 };
 
 const stageLabel = (s: string) => APPLICATION_STAGES.find(x => x.value === s)?.label ?? s;
@@ -76,9 +76,9 @@ const EmployerCandidates = () => {
 
     if (loading) return (
         <div className="p-4 md:p-8 space-y-6 animate-pulse">
-            <div className="h-12 bg-black/5 rounded-xl w-64" />
+            <div className="h-12 bg-paper-100 rounded-xl w-64" />
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                {[1,2,3,4,5,6].map(i => <div key={i} className="h-48 bg-black/5 rounded-[24px]" />)}
+                {[1,2,3,4,5,6].map(i => <div key={i} className="h-48 bg-paper-100 rounded-[24px]" />)}
             </div>
         </div>
     );
@@ -88,8 +88,8 @@ const EmployerCandidates = () => {
 
             {/* Header */}
             <div className="border-b border-paper-300 pb-6">
-                <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">Talent Pool .</h2>
-                <p className="text-[9px] font-semibold text-black/40 mt-1">
+                <h2 className="co-display text-3xl md:text-4xl text-ink-800 leading-none">Talent pool</h2>
+                <p className="text-[9px] font-semibold text-paper-700 mt-1">
                     {candidates.length} UNIQUE CANDIDATES · ALL APPLIED TO YOUR LISTINGS
                 </p>
             </div>
@@ -97,7 +97,7 @@ const EmployerCandidates = () => {
             {/* Filters */}
             <div className="flex flex-col md:flex-row gap-3">
                 <div className="relative flex-1">
-                    <Search size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-black/30" />
+                    <Search size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-paper-600" />
                     <input type="text" value={search} onChange={e => setSearch(e.target.value)}
                         placeholder="SEARCH BY NAME, MAJOR OR ROLE..."
                         className="w-full pl-10 pr-4 py-3 rounded-xl border border-paper-300 font-semibold text-[9px] outline-none focus:shadow-card bg-nile-white/60 focus:bg-white transition-all" />
@@ -105,13 +105,13 @@ const EmployerCandidates = () => {
                 <div className="flex bg-white p-1 border border-paper-300 rounded-xl gap-0.5 overflow-x-auto">
                     <button onClick={() => setFilterStatus('all')}
                         className={`px-2.5 py-1.5 rounded-lg font-semibold text-[7px] tracking-wider transition-all whitespace-nowrap
-                            ${filterStatus === 'all' ? 'bg-black text-white' : 'text-black/40 hover:text-black'}`}>
+                            ${filterStatus === 'all' ? 'bg-ink-900 text-white' : 'text-paper-700 hover:text-ink-800'}`}>
                         ALL
                     </button>
                     {APPLICATION_STAGES.map(f => (
                         <button key={f.value} onClick={() => setFilterStatus(f.value)}
                             className={`px-2.5 py-1.5 rounded-lg font-semibold text-[7px] tracking-wider transition-all whitespace-nowrap
-                                ${filterStatus === f.value ? 'bg-black text-white' : 'text-black/40 hover:text-black'}`}>
+                                ${filterStatus === f.value ? 'bg-ink-900 text-white' : 'text-paper-700 hover:text-ink-800'}`}>
                             {f.label}
                         </button>
                     ))}
@@ -121,8 +121,8 @@ const EmployerCandidates = () => {
             {/* Candidates grid */}
             {filtered.length === 0 ? (
                 <div className="py-24 text-center border-[2px] border-dashed border-paper-400/10 rounded-[32px]">
-                    <Users size={32} className="text-black/15 mx-auto mb-4" />
-                    <p className="text-[9px] font-semibold text-black/30">
+                    <Users size={32} className="text-paper-500 mx-auto mb-4" />
+                    <p className="text-[9px] font-semibold text-paper-600">
                         {search ? 'No candidates match your search' : applications.length === 0 ? 'No candidates yet — post jobs to attract talent' : `No ${stageLabel(filterStatus).toLowerCase()} candidates`}
                     </p>
                 </div>
@@ -147,7 +147,7 @@ const CandidateCard = ({ candidate, onMessage, onView }: {
     onMessage: () => void;
     onView: () => void;
 }) => {
-    const badge = statusBadge[candidate.stage] || 'bg-black/5 text-black/40 border-paper-400/10';
+    const badge = statusBadge[candidate.stage] || 'bg-paper-100 text-paper-700 border-paper-400/10';
     const initials = (candidate.student_name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
 
     return (
@@ -159,7 +159,7 @@ const CandidateCard = ({ candidate, onMessage, onView }: {
                     </div>
                     <div className="min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
-                            <p className="font-semibold text-sm text-black truncate leading-none">{candidate.student_name}</p>
+                            <p className="font-semibold text-sm text-ink-800 truncate leading-none">{candidate.student_name}</p>
                             {candidate.is_verified && <CheckCircle2 size={11} className="text-nile-green flex-shrink-0" strokeWidth={3} />}
                         </div>
                         <span className={`text-[7px] font-semibold px-2 py-0.5 rounded-full border ${badge}`}>
@@ -169,13 +169,13 @@ const CandidateCard = ({ candidate, onMessage, onView }: {
                 </div>
             </div>
 
-            <div className="space-y-2 text-[8px] font-semibold text-black/50">
+            <div className="space-y-2 text-[8px] font-semibold text-paper-700">
                 {candidate.major && (
                     <div className="flex items-center gap-2">
                         <GraduationCap size={11} className="text-nile-blue flex-shrink-0" />
                         <span className="truncate">{candidate.major}</span>
-                        {candidate.graduation_year > 0 && <span className="text-black/30">· {candidate.graduation_year}</span>}
-                        {candidate.gpa > 0 && <span className="text-black/30">· GPA {candidate.gpa.toFixed(2)}</span>}
+                        {candidate.graduation_year > 0 && <span className="text-paper-600">· {candidate.graduation_year}</span>}
+                        {candidate.gpa > 0 && <span className="text-paper-600">· GPA {candidate.gpa.toFixed(2)}</span>}
                     </div>
                 )}
                 {candidate.rating > 0 && (
@@ -192,11 +192,11 @@ const CandidateCard = ({ candidate, onMessage, onView }: {
 
             <div className="flex gap-2 mt-auto">
                 <button onClick={onMessage}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 border border-paper-300 rounded-xl font-semibold text-[8px] hover:bg-black hover:text-white transition-all">
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 border border-paper-300 rounded-xl font-semibold text-[8px] hover:bg-ink-900 hover:text-white transition-all">
                     <MessageSquare size={12} /> MESSAGE
                 </button>
                 <button onClick={onView} title="View candidate"
-                    className="p-2.5 border border-paper-300 rounded-xl text-black/40 hover:border-nile-blue hover:text-nile-blue transition-all">
+                    className="p-2.5 border border-paper-300 rounded-xl text-paper-700 hover:border-nile-blue hover:text-nile-blue transition-all">
                     <ArrowUpRight size={14} />
                 </button>
             </div>

@@ -53,7 +53,7 @@ const STATUS_BADGE: Record<string, string> = {
     pending:  'bg-yellow-50 text-yellow-600 border-yellow-200',
     active:   'bg-nile-green/15 text-nile-green border-nile-green/30',
     rejected: 'bg-red-50 text-red-500 border-red-200',
-    archived: 'bg-black/5 text-black/40 border-paper-400/10',
+    archived: 'bg-paper-100 text-paper-700 border-paper-400/10',
 };
 
 const EMPTY_FORM: PostJobRequest = {
@@ -81,7 +81,7 @@ function fmtDate(iso: string | null | undefined): string {
 
 const Field: React.FC<{ label: string; children: React.ReactNode; required?: boolean }> = ({ label, children, required }) => (
     <div className="space-y-1.5">
-        <label className="text-[8px] font-semibold text-black/50">
+        <label className="text-[8px] font-semibold text-paper-700">
             {label}{required && <span className="text-red-500 ml-0.5">*</span>}
         </label>
         {children}
@@ -93,20 +93,20 @@ const inputCls = [
     'font-semibold text-xs outline-none',
     'focus:shadow-blue',
     'bg-paper-100 focus:bg-white',
-    'transition-all placeholder:text-black/20 placeholder:font-bold placeholder:normal-case placeholder:tracking-normal',
+    'transition-all placeholder:text-paper-600 placeholder:font-bold placeholder:normal-case placeholder:tracking-normal',
 ].join(' ');
 
 const EmptyState: React.FC<{ icon: React.ReactNode; headline: string; sub?: string; action?: { label: string; onClick: () => void } }> = ({
     icon, headline, sub, action,
 }) => (
     <div className="py-20 flex flex-col items-center text-center border-[2px] border-dashed border-paper-400/10 rounded-[28px]">
-        <div className="text-black/20 mb-4">{icon}</div>
-        <p className="text-[10px] font-semibold text-black/30">{headline}</p>
-        {sub && <p className="text-[8px] font-semibold text-black/20 tracking-wider mt-1">{sub}</p>}
+        <div className="text-paper-600 mb-4">{icon}</div>
+        <p className="text-[10px] font-semibold text-paper-600">{headline}</p>
+        {sub && <p className="text-[8px] font-semibold text-paper-600 tracking-wider mt-1">{sub}</p>}
         {action && (
             <button
                 onClick={action.onClick}
-                className="mt-5 px-5 py-2.5 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all">
+                className="mt-5 px-5 py-2.5 bg-ink-900 text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all">
                 {action.label}
             </button>
         )}
@@ -116,16 +116,16 @@ const EmptyState: React.FC<{ icon: React.ReactNode; headline: string; sub?: stri
 const SkeletonCard: React.FC = () => (
     <div className="bg-white border border-paper-300/10 rounded-[24px] p-5 animate-pulse space-y-3">
         <div className="flex gap-4 items-center">
-            <div className="w-12 h-12 bg-black/5 rounded-xl flex-shrink-0" />
+            <div className="w-12 h-12 bg-paper-100 rounded-xl flex-shrink-0" />
             <div className="flex-1 space-y-2">
-                <div className="h-3.5 bg-black/5 rounded-lg w-3/4" />
-                <div className="h-2.5 bg-black/5 rounded-lg w-1/2" />
-                <div className="h-2 bg-black/5 rounded-lg w-1/3" />
+                <div className="h-3.5 bg-paper-100 rounded-lg w-3/4" />
+                <div className="h-2.5 bg-paper-100 rounded-lg w-1/2" />
+                <div className="h-2 bg-paper-100 rounded-lg w-1/3" />
             </div>
         </div>
         <div className="flex gap-2 pt-1">
-            <div className="h-8 bg-black/5 rounded-xl flex-1" />
-            <div className="h-8 bg-black/5 rounded-xl w-20" />
+            <div className="h-8 bg-paper-100 rounded-xl flex-1" />
+            <div className="h-8 bg-paper-100 rounded-xl w-20" />
         </div>
     </div>
 );
@@ -146,27 +146,27 @@ const JobCard: React.FC<JobCardProps> = ({
     showApprovalActions = false, showArchiveAction = false,
 }) => {
     const companyName = job.company || 'Nile University';
-    const typeBadge = TYPE_BADGE_COLORS[job.type] ?? 'bg-black/5 text-black/50 border-paper-400/10';
-    const statusBadge = STATUS_BADGE[job.status] ?? 'bg-black/5 text-black/30 border-paper-400/10';
+    const typeBadge = TYPE_BADGE_COLORS[job.type] ?? 'bg-paper-100 text-paper-700 border-paper-400/10';
+    const statusBadge = STATUS_BADGE[job.status] ?? 'bg-paper-100 text-paper-600 border-paper-400/10';
     const busy = actionLoading[job.id] ?? false;
 
     return (
         <div className="group bg-white border border-paper-300 rounded-[24px] p-5 md:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 shadow-card hover:shadow-blue hover:-translate-y-[2px] transition-all duration-200">
 
             {/* Company avatar */}
-            <div className="w-12 h-12 bg-nile-blue text-white rounded-xl border border-paper-300 flex items-center justify-center font-semibold text-sm flex-shrink-0 shadow-card group-hover:bg-black transition-colors duration-200">
+            <div className="w-12 h-12 bg-nile-blue text-white rounded-xl border border-paper-300 flex items-center justify-center font-semibold text-sm flex-shrink-0 shadow-card group-hover:bg-ink-900 transition-colors duration-200">
                 {initials(companyName)}
             </div>
 
             {/* Info block */}
             <div className="flex-1 min-w-0 space-y-1.5">
                 <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="font-semibold text-sm text-black truncate leading-none">{job.title}</h3>
+                    <h3 className="font-semibold text-sm text-ink-800 truncate leading-none">{job.title}</h3>
                     <span className={`text-[7px] font-semibold px-2 py-0.5 rounded-full border ${typeBadge}`}>{job.type}</span>
                     <span className={`text-[7px] font-semibold px-2 py-0.5 rounded-full border ${statusBadge}`}>{job.status}</span>
                 </div>
                 <p className="text-[9px] font-semibold text-nile-blue tracking-wider truncate">{companyName}</p>
-                <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-[8px] font-semibold text-black/30">
+                <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-[8px] font-semibold text-paper-600">
                     {job.location && (
                         <span className="flex items-center gap-1">
                             <MapPin size={9} />{job.location}
@@ -210,7 +210,7 @@ const JobCard: React.FC<JobCardProps> = ({
                     <button
                         onClick={() => onAction(job, 'archived')}
                         disabled={busy}
-                        className="flex items-center gap-1.5 px-4 py-2.5 bg-white text-black/50 border border-paper-300/30 rounded-xl font-semibold text-[8px] hover:border-paper-400 hover:text-black hover:shadow-card transition-all disabled:opacity-40">
+                        className="flex items-center gap-1.5 px-4 py-2.5 bg-white text-paper-700 border border-paper-300/30 rounded-xl font-semibold text-[8px] hover:border-paper-400 hover:text-ink-800 hover:shadow-card transition-all disabled:opacity-40">
                         {busy ? <Loader2 size={12} className="animate-spin" /> : <Archive size={12} />}
                         ARCHIVE
                     </button>
@@ -234,7 +234,7 @@ const AppCard: React.FC<{ app: StaffApplication; onViewProfile: (studentId: stri
 
             <div className="flex-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-2 mb-0.5">
-                    <p className="font-semibold text-sm text-black truncate leading-none">{app.student_name || 'STUDENT'}</p>
+                    <p className="font-semibold text-sm text-ink-800 truncate leading-none">{app.student_name || 'STUDENT'}</p>
                     <span className={`text-[7px] font-semibold px-2 py-0.5 rounded-full border ${group.bg} ${group.color}`}>
                         {group.label}
                     </span>
@@ -242,7 +242,7 @@ const AppCard: React.FC<{ app: StaffApplication; onViewProfile: (studentId: stri
                 <p className="text-[9px] font-semibold text-nile-blue truncate">
                     {app.job_title || 'POSITION'} · {app.company || '—'}
                 </p>
-                <p className="text-[7px] font-semibold text-black/30 mt-0.5">
+                <p className="text-[7px] font-semibold text-paper-600 mt-0.5">
                     APPLIED {fmtDate(app.applied_at)}
                 </p>
             </div>
@@ -253,7 +253,7 @@ const AppCard: React.FC<{ app: StaffApplication; onViewProfile: (studentId: stri
                         href={app.resume_url}
                         target="_blank"
                         rel="noreferrer"
-                        className="flex items-center gap-1.5 px-3 py-2 bg-white text-black/50 border border-paper-300/30 rounded-xl font-semibold text-[8px] hover:border-paper-400 hover:text-black hover:shadow-card transition-all"
+                        className="flex items-center gap-1.5 px-3 py-2 bg-white text-paper-700 border border-paper-300/30 rounded-xl font-semibold text-[8px] hover:border-paper-400 hover:text-ink-800 hover:shadow-card transition-all"
                     >
                         <FileText size={12} /> VIEW CV
                     </a>
@@ -261,7 +261,7 @@ const AppCard: React.FC<{ app: StaffApplication; onViewProfile: (studentId: stri
                 <button
                     onClick={() => onViewProfile(app.student_id)}
                     disabled={!app.student_id}
-                    className="flex items-center gap-1.5 px-3 py-2 bg-white text-black/50 border border-paper-300/30 rounded-xl font-semibold text-[8px] hover:border-paper-400 hover:text-black hover:shadow-card transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="flex items-center gap-1.5 px-3 py-2 bg-white text-paper-700 border border-paper-300/30 rounded-xl font-semibold text-[8px] hover:border-paper-400 hover:text-ink-800 hover:shadow-card transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                     <UserCircle size={12} /> PROFILE
                 </button>
@@ -456,12 +456,12 @@ const StaffJobs: React.FC = () => {
                 {/* Header skeleton */}
                 <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-4 border-b border-paper-300 pb-6">
                     <div className="space-y-2">
-                        <div className="h-10 md:h-14 bg-black/5 rounded-xl w-72 animate-pulse" />
-                        <div className="h-2.5 bg-black/5 rounded-lg w-48 animate-pulse" />
+                        <div className="h-10 md:h-14 bg-paper-100 rounded-xl w-72 animate-pulse" />
+                        <div className="h-2.5 bg-paper-100 rounded-lg w-48 animate-pulse" />
                     </div>
                     <div className="flex gap-2">
                         {[1, 2, 3, 4].map(i => (
-                            <div key={i} className="h-10 bg-black/5 rounded-xl w-28 animate-pulse" />
+                            <div key={i} className="h-10 bg-paper-100 rounded-xl w-28 animate-pulse" />
                         ))}
                     </div>
                 </div>
@@ -479,10 +479,10 @@ const StaffJobs: React.FC = () => {
                 <AlertCircle size={28} className="text-red-400" />
             </div>
             <div>
-                <p className="font-semibold text-lg text-black">Could not load jobs data</p>
-                <p className="text-[9px] font-semibold text-black/40 mt-1">Check your connection or try logging out and back in</p>
+                <p className="font-semibold text-lg text-ink-800">Could not load jobs data</p>
+                <p className="text-[9px] font-semibold text-paper-700 mt-1">Check your connection or try logging out and back in</p>
             </div>
-            <button onClick={loadData} className="px-6 py-3 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all">
+            <button onClick={loadData} className="px-6 py-3 bg-ink-900 text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all">
                 TRY AGAIN
             </button>
         </div>
@@ -495,10 +495,10 @@ const StaffJobs: React.FC = () => {
             {/* ── Page header ───────────────────────────────────────────── */}
             <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-6 border-b border-paper-300 pb-6">
                 <div>
-                    <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">
-                        Jobs &amp; Placement<span className="text-nile-green"> .</span>
+                    <h2 className="co-display text-3xl md:text-4xl text-ink-800 leading-none">
+                        Jobs and placement
                     </h2>
-                    <p className="text-[9px] font-semibold text-black/40 mt-1.5">
+                    <p className="text-[9px] font-semibold text-paper-700 mt-1.5">
                         {pendingJobs.length} PENDING REVIEW · {activeJobs.length} ACTIVE · {applications.length} APPLICATIONS
                     </p>
                 </div>
@@ -514,8 +514,8 @@ const StaffJobs: React.FC = () => {
                                 'font-semibold text-[8px]',
                                 'transition-all duration-150 whitespace-nowrap flex-shrink-0',
                                 activeTab === t.id
-                                    ? 'bg-black text-white shadow-green'
-                                    : 'text-black/40 hover:text-black hover:bg-black/5',
+                                    ? 'bg-ink-900 text-white shadow-green'
+                                    : 'text-paper-700 hover:text-ink-800 hover:bg-paper-100',
                             ].join(' ')}>
                             {t.icon}
                             {t.label}
@@ -541,12 +541,12 @@ const StaffJobs: React.FC = () => {
 
                         {/* Form header */}
                         <div className="flex items-center gap-3 mb-6 pb-5 border-b border-paper-300/5">
-                            <div className="w-11 h-11 bg-black rounded-xl border border-paper-300 flex items-center justify-center flex-shrink-0">
+                            <div className="w-11 h-11 bg-ink-900 rounded-xl border border-paper-300 flex items-center justify-center flex-shrink-0">
                                 <FileText size={18} className="text-nile-green" />
                             </div>
                             <div>
                                 <h3 className="font-semibold text-sm tracking-tight">Post a New Job</h3>
-                                <p className="text-[8px] font-semibold text-black/40 mt-0.5">
+                                <p className="text-[8px] font-semibold text-paper-700 mt-0.5">
                                     POSTED DIRECTLY BY NILE UNIVERSITY · GOES LIVE IMMEDIATELY
                                 </p>
                             </div>
@@ -627,13 +627,13 @@ const StaffJobs: React.FC = () => {
                                 <button
                                     type="button"
                                     onClick={() => setForm(EMPTY_FORM)}
-                                    className="px-5 py-3.5 border border-paper-300 rounded-xl font-semibold text-[9px] hover:bg-black hover:text-white transition-all">
+                                    className="px-5 py-3.5 border border-paper-300 rounded-xl font-semibold text-[9px] hover:bg-ink-900 hover:text-white transition-all">
                                     CLEAR
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={posting}
-                                    className="flex-1 py-4 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[10px] shadow-green transition-all disabled:opacity-40 flex items-center justify-center gap-2">
+                                    className="flex-1 py-4 bg-ink-900 text-white border border-paper-300 rounded-xl font-semibold text-[10px] shadow-green transition-all disabled:opacity-40 flex items-center justify-center gap-2">
                                     {posting
                                         ? <><Loader2 size={14} className="animate-spin" /> POSTING...</>
                                         : <><Send size={14} /> POST JOB LISTING</>
@@ -648,7 +648,7 @@ const StaffJobs: React.FC = () => {
                         <AlertCircle size={16} className="text-nile-blue flex-shrink-0 mt-0.5" />
                         <div>
                             <p className="text-[9px] font-semibold tracking-wider text-nile-blue">DIRECT PLACEMENT</p>
-                            <p className="text-[8px] font-semibold text-black/50 mt-1 leading-relaxed">
+                            <p className="text-[8px] font-semibold text-paper-700 mt-1 leading-relaxed">
                                 Jobs posted directly by staff go live immediately without employer review. Employer-submitted jobs require your approval and appear in the Pending Approval tab.
                             </p>
                         </div>
@@ -666,7 +666,7 @@ const StaffJobs: React.FC = () => {
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <Hourglass size={14} className="text-yellow-600" />
-                            <span className="text-[9px] font-semibold text-black/50">
+                            <span className="text-[9px] font-semibold text-paper-700">
                                 {pendingJobs.length} JOB{pendingJobs.length !== 1 ? 'S' : ''} AWAITING REVIEW
                             </span>
                             {pendingJobs.length > 0 && (
@@ -717,7 +717,7 @@ const StaffJobs: React.FC = () => {
                     {/* Search & type filter */}
                     <div className="flex flex-col md:flex-row gap-3">
                         <div className="relative flex-1">
-                            <Search size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-black/30" />
+                            <Search size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-paper-600" />
                             <input
                                 type="text"
                                 value={activeSearch}
@@ -733,9 +733,9 @@ const StaffJobs: React.FC = () => {
                                 onClick={() => setTypeFilter('all')}
                                 className={[
                                     'px-3 py-1.5 rounded-lg font-semibold text-[8px] tracking-wider whitespace-nowrap transition-all',
-                                    typeFilter === 'all' ? 'bg-black text-white' : 'text-black/40 hover:text-black',
+                                    typeFilter === 'all' ? 'bg-ink-900 text-white' : 'text-paper-700 hover:text-ink-800',
                                 ].join(' ')}>
-                                ALL <span className={typeFilter === 'all' ? 'text-white/60' : 'text-black/20'}>{activeJobs.length}</span>
+                                ALL <span className={typeFilter === 'all' ? 'text-white/60' : 'text-paper-600'}>{activeJobs.length}</span>
                             </button>
                             {JOB_TYPES.map(t => {
                                 const cnt = activeJobs.filter(j => j.type === t.value).length;
@@ -745,9 +745,9 @@ const StaffJobs: React.FC = () => {
                                         onClick={() => setTypeFilter(t.value as JobTypeFilter)}
                                         className={[
                                             'px-3 py-1.5 rounded-lg font-semibold text-[8px] tracking-wider whitespace-nowrap transition-all',
-                                            typeFilter === t.value ? 'bg-black text-white' : 'text-black/40 hover:text-black',
+                                            typeFilter === t.value ? 'bg-ink-900 text-white' : 'text-paper-700 hover:text-ink-800',
                                         ].join(' ')}>
-                                        {t.label} <span className={typeFilter === t.value ? 'text-white/60' : 'text-black/20'}>{cnt}</span>
+                                        {t.label} <span className={typeFilter === t.value ? 'text-white/60' : 'text-paper-600'}>{cnt}</span>
                                     </button>
                                 );
                             })}
@@ -757,12 +757,12 @@ const StaffJobs: React.FC = () => {
                     {/* Results info */}
                     {(activeSearch || typeFilter !== 'all') && (
                         <div className="flex items-center justify-between">
-                            <p className="text-[8px] font-semibold text-black/30 tracking-wider">
+                            <p className="text-[8px] font-semibold text-paper-600 tracking-wider">
                                 {filteredActiveJobs.length} RESULT{filteredActiveJobs.length !== 1 ? 'S' : ''} FOUND
                             </p>
                             <button
                                 onClick={() => { setActiveSearch(''); setTypeFilter('all'); }}
-                                className="text-[8px] font-semibold text-nile-blue tracking-wider hover:text-black transition-colors">
+                                className="text-[8px] font-semibold text-nile-blue tracking-wider hover:text-ink-800 transition-colors">
                                 CLEAR FILTERS
                             </button>
                         </div>
@@ -800,7 +800,7 @@ const StaffJobs: React.FC = () => {
 
                     {/* Search */}
                     <div className="relative max-w-xl">
-                        <Search size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-black/30" />
+                        <Search size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-paper-600" />
                         <input
                             type="text"
                             value={appSearch}
@@ -820,7 +820,7 @@ const StaffJobs: React.FC = () => {
                                         <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: g.dot }} />
                                         <span className={`text-[7px] font-semibold tracking-wider ${g.color}`}>{g.label}</span>
                                     </div>
-                                    <p className="text-2xl font-semibold text-black leading-none">{cnt}</p>
+                                    <p className="font-display text-2xl text-ink-800 leading-none">{cnt}</p>
                                 </div>
                             );
                         })}
@@ -851,15 +851,15 @@ const StaffJobs: React.FC = () => {
                                         <div className="flex items-center gap-3 mb-4">
                                             <div className="w-3 h-3 rounded-full flex-shrink-0 border border-paper-300" style={{ background: g.dot }} />
                                             <h3 className={`text-[10px] font-semibold ${g.color}`}>{g.label}</h3>
-                                            <span className="text-[8px] font-semibold text-black/30">
+                                            <span className="text-[8px] font-semibold text-paper-600">
                                                 {group.length} APPLICANT{group.length !== 1 ? 'S' : ''}
                                             </span>
-                                            <div className="flex-1 h-[1px] bg-black/5" />
+                                            <div className="flex-1 h-[1px] bg-paper-100" />
                                         </div>
 
                                         {group.length === 0 ? (
                                             <div className="py-8 text-center border-[1px] border-dashed border-paper-400/10 rounded-[20px]">
-                                                <p className="text-[8px] font-semibold text-black/20 tracking-wider">
+                                                <p className="text-[8px] font-semibold text-paper-600 tracking-wider">
                                                     NO {g.label.toUpperCase()} APPLICATIONS
                                                 </p>
                                             </div>

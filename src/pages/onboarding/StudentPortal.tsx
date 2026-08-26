@@ -34,19 +34,19 @@ const StudentPortal = () => {
 
                     {/* Icon Box */}
                     <div className="relative z-10 w-[140px] h-[140px] bg-white border-3 border-paper-400 rounded-[28px] shadow-soft-sm flex items-center justify-center mb-10">
-                        <UserRound size={64} strokeWidth={2} className="text-black" />
+                        <UserRound size={64} strokeWidth={2} className="text-ink-800" />
                     </div>
 
-                    <p className="relative z-10 text-2xl font-semibold text-nile-white uppercase tracking-[0.25em]">STUDENT PORTAL</p>
+                    <p className="relative z-10 text-2xl font-semibold text-nile-white uppercase tracking-[0.14em]">STUDENT PORTAL</p>
                 </div>
 
                 {/* Right Panel — Form */}
                 <div className="flex-1 flex flex-col justify-center p-12 md:p-16 space-y-10">
                     {/* Heading */}
                     <div className="space-y-3">
-                        <h1 className="text-5xl font-semibold text-black uppercase tracking-tight">STUDENT EMAIL</h1>
-                        <p className="text-sm font-semibold text-nile-blue uppercase tracking-[0.15em]">
-                            USE YOUR .EDU ADDRESS
+                        <h1 className="co-display text-4xl md:text-5xl text-ink-800">Student email</h1>
+                        <p className="text-sm font-semibold text-nile-blue uppercase tracking-[0.14em]">
+                            Use your .edu address
                         </p>
                     </div>
 
@@ -54,7 +54,7 @@ const StudentPortal = () => {
                     <form onSubmit={handleSubmit} className="space-y-8 pt-4">
                         
                         <div className="space-y-3">
-                            <label className="block text-xs font-semibold text-black uppercase tracking-[0.2em]">
+                            <label className="block text-xs font-semibold text-ink-800 uppercase tracking-[0.14em]">
                                 SCHOOL EMAIL
                             </label>
                             <input

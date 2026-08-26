@@ -27,7 +27,7 @@ const templateMessages: Record<ReminderType, { title: string; message: string; i
         title: 'Happy Holiday Greeting',
         message: 'Warm greetings from the Nile University Career Services team! Wishing you and your team a wonderful holiday season. We look forward to our continued partnership.',
         icon: <PartyPopper size={16} />,
-        color: 'bg-yellow-400 text-black',
+        color: 'bg-yellow-400 text-ink-800',
     },
     weekly: {
         title: 'Happy New Week',
@@ -51,7 +51,7 @@ const templateMessages: Record<ReminderType, { title: string; message: string; i
         title: 'Custom Message',
         message: '',
         icon: <Sparkles size={16} />,
-        color: 'bg-black text-white',
+        color: 'bg-ink-900 text-white',
     },
 };
 
@@ -142,13 +142,13 @@ const CRMManager = () => {
             {/* Header */}
             <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 border-b border-paper-300 pb-6">
                 <div>
-                    <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">CRM Manager .</h2>
-                    <p className="text-[9px] font-semibold text-black/40 mt-1">
+                    <h2 className="co-display text-3xl md:text-4xl text-ink-800 leading-none">CRM Manager</h2>
+                    <p className="text-[9px] font-semibold text-paper-700 mt-1">
                         EMPLOYER RELATIONSHIPS · OUTREACH · REMINDERS
                     </p>
                 </div>
                 <button onClick={() => setShowCompose(true)}
-                    className="flex items-center gap-2 px-5 py-3 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all">
+                    className="flex items-center gap-2 px-5 py-3 bg-ink-900 text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all">
                     <Plus size={14} strokeWidth={3} /> NEW REMINDER
                 </button>
             </div>
@@ -182,11 +182,11 @@ const CRMManager = () => {
 
                 {/* Left: Reminders */}
                 <div className="xl:col-span-8 space-y-4">
-                    <h3 className="text-[10px] font-semibold text-black/40">SCHEDULED REMINDERS ({reminders.length})</h3>
+                    <h3 className="text-[10px] font-semibold text-paper-700">SCHEDULED REMINDERS ({reminders.length})</h3>
                     {reminders.length === 0 ? (
                         <div className="py-16 text-center border-[2px] border-dashed border-paper-400/10 rounded-[24px]">
-                            <Bell size={24} className="text-black/15 mx-auto mb-3" />
-                            <p className="text-[9px] font-semibold text-black/20">No reminders yet — create one above</p>
+                            <Bell size={24} className="text-paper-500 mx-auto mb-3" />
+                            <p className="text-[9px] font-semibold text-paper-600">No reminders yet — create one above</p>
                         </div>
                     ) : reminders.map(r => {
                         const t = templateMessages[r.type];
@@ -207,9 +207,9 @@ const CRMManager = () => {
                                                     </span>
                                                 )}
                                             </div>
-                                            <p className="text-[9px] font-bold text-black/50 mt-1 truncate">{getEmpNames(r.employerIds)}</p>
+                                            <p className="text-[9px] font-bold text-paper-700 mt-1 truncate">{getEmpNames(r.employerIds)}</p>
                                             <div className="flex items-center gap-3 mt-2">
-                                                <span className="flex items-center gap-1 text-[8px] font-semibold text-black/30"><Calendar size={10} />{r.dueDate}</span>
+                                                <span className="flex items-center gap-1 text-[8px] font-semibold text-paper-600"><Calendar size={10} />{r.dueDate}</span>
                                                 <span className="text-[8px] font-semibold text-nile-blue">{r.channel.toUpperCase()}</span>
                                             </div>
                                         </div>
@@ -222,13 +222,13 @@ const CRMManager = () => {
                                                 SEND
                                             </button>
                                         )}
-                                        <button onClick={() => setReminders(p => p.filter(x => x.id !== r.id))} className="p-1.5 text-black/20 hover:text-red-500 transition-colors">
+                                        <button onClick={() => setReminders(p => p.filter(x => x.id !== r.id))} className="p-1.5 text-paper-600 hover:text-red-500 transition-colors">
                                             <X size={14} strokeWidth={3} />
                                         </button>
                                     </div>
                                 </div>
                                 {r.message && (
-                                    <div className="mt-3 p-3 bg-nile-white rounded-xl text-[10px] font-bold text-black/50 leading-relaxed italic border border-paper-400/5">
+                                    <div className="mt-3 p-3 bg-nile-white rounded-xl text-[10px] font-bold text-paper-700 leading-relaxed italic border border-paper-400/5">
                                         "{r.message.slice(0, 140)}{r.message.length > 140 ? '…' : ''}"
                                     </div>
                                 )}
@@ -244,9 +244,9 @@ const CRMManager = () => {
                             EMPLOYER HEALTH ({employers.length})
                         </h3>
                         {loadingEmployers ? (
-                            <div className="space-y-3 animate-pulse">{[1,2,3].map(i => <div key={i} className="h-14 bg-black/5 rounded-xl" />)}</div>
+                            <div className="space-y-3 animate-pulse">{[1,2,3].map(i => <div key={i} className="h-14 bg-paper-100 rounded-xl" />)}</div>
                         ) : employers.length === 0 ? (
-                            <p className="text-[9px] font-semibold text-black/20 py-6 text-center">NO EMPLOYERS YET</p>
+                            <p className="text-[9px] font-semibold text-paper-600 py-6 text-center">NO EMPLOYERS YET</p>
                         ) : employers.slice(0, 6).map(emp => {
                             const eng = engagementLabel(emp);
                             return (
@@ -257,11 +257,11 @@ const CRMManager = () => {
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="font-semibold text-[10px] truncate leading-none">{emp.company_name}</p>
-                                        <p className="text-[8px] font-semibold text-black/30 mt-0.5 truncate">{emp.industry}</p>
+                                        <p className="text-[8px] font-semibold text-paper-600 mt-0.5 truncate">{emp.industry}</p>
                                     </div>
                                     <div className="flex items-center gap-1 flex-shrink-0">
                                         <span className={`text-[7px] font-semibold px-2 py-0.5 rounded-full border ${eng.color}`}>{eng.label}</span>
-                                        <ChevronRight size={11} className="text-black/20 group-hover:text-nile-blue transition-colors" />
+                                        <ChevronRight size={11} className="text-paper-600 group-hover:text-nile-blue transition-colors" />
                                     </div>
                                 </div>
                             );
@@ -293,14 +293,14 @@ const CRMManager = () => {
                     <div className="bg-white border border-paper-300 rounded-[28px] shadow-card max-w-lg w-full p-6 md:p-8 space-y-5 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center justify-between">
                             <h3 className="text-xl font-semibold tracking-tight">New CRM Reminder</h3>
-                            <button onClick={() => setShowCompose(false)} className="p-1.5 border border-paper-300/10 rounded-lg hover:bg-black/5">
+                            <button onClick={() => setShowCompose(false)} className="p-1.5 border border-paper-300/10 rounded-lg hover:bg-paper-100">
                                 <X size={16} strokeWidth={3} />
                             </button>
                         </div>
 
                         {/* Message type */}
                         <div className="space-y-2">
-                            <label className="text-[9px] font-semibold text-black/50">MESSAGE TYPE</label>
+                            <label className="text-[9px] font-semibold text-paper-700">MESSAGE TYPE</label>
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                                 {(Object.entries(templateMessages) as [ReminderType, typeof templateMessages[ReminderType]][]).map(([key, t]) => (
                                     <button key={key} onClick={() => setSelectedType(key)}
@@ -314,7 +314,7 @@ const CRMManager = () => {
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="text-[9px] font-semibold text-black/50">MESSAGE</label>
+                            <label className="text-[9px] font-semibold text-paper-700">MESSAGE</label>
                             <textarea rows={4}
                                 className="w-full h-24 border border-paper-300 rounded-xl p-4 font-bold text-xs outline-none focus:shadow-blue bg-nile-white/40 resize-none transition-all"
                                 value={selectedType === 'custom' ? customMsg : template.message}
@@ -326,11 +326,11 @@ const CRMManager = () => {
 
                         {/* Employers */}
                         <div className="space-y-2">
-                            <label className="text-[9px] font-semibold text-black/50">SEND TO ({selectedEmployerIds.length} selected)</label>
+                            <label className="text-[9px] font-semibold text-paper-700">SEND TO ({selectedEmployerIds.length} selected)</label>
                             {loadingEmployers ? (
-                                <div className="h-24 bg-black/5 rounded-xl animate-pulse" />
+                                <div className="h-24 bg-paper-100 rounded-xl animate-pulse" />
                             ) : employers.length === 0 ? (
-                                <p className="text-[9px] font-semibold text-black/30 py-4 text-center">NO EMPLOYERS ON PLATFORM YET</p>
+                                <p className="text-[9px] font-semibold text-paper-600 py-4 text-center">NO EMPLOYERS ON PLATFORM YET</p>
                             ) : (
                                 <div className="space-y-2 max-h-40 overflow-y-auto">
                                     {employers.map(emp => (
@@ -338,9 +338,9 @@ const CRMManager = () => {
                                             <input type="checkbox" checked={selectedEmployerIds.includes(emp.id)} onChange={() => toggleEmployer(emp.id)} className="w-4 h-4 accent-nile-blue" />
                                             <div className="flex-1 min-w-0">
                                                 <p className="font-semibold text-[10px] truncate">{emp.company_name}</p>
-                                                <p className="text-[8px] text-black/40 font-semibold">{emp.industry} · {emp.status}</p>
+                                                <p className="text-[8px] text-paper-700 font-semibold">{emp.industry} · {emp.status}</p>
                                             </div>
-                                            <span className={`text-[7px] font-semibold px-1.5 py-0.5 rounded-full border ${statusColor[emp.status] || 'bg-black/5 text-black/40'}`}>
+                                            <span className={`text-[7px] font-semibold px-1.5 py-0.5 rounded-full border ${statusColor[emp.status] || 'bg-paper-100 text-paper-700'}`}>
                                                 {emp.status.toUpperCase()}
                                             </span>
                                         </label>
@@ -351,7 +351,7 @@ const CRMManager = () => {
 
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1.5">
-                                <label className="text-[9px] font-semibold text-black/50">CHANNEL</label>
+                                <label className="text-[9px] font-semibold text-paper-700">CHANNEL</label>
                                 <select value={selectedChannel} onChange={e => setSelectedChannel(e.target.value as Channel)}
                                     className="w-full border border-paper-300 rounded-xl py-2.5 px-3 font-semibold text-xs outline-none bg-nile-white/40">
                                     <option value="email">Email</option>
@@ -360,15 +360,15 @@ const CRMManager = () => {
                                 </select>
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-[9px] font-semibold text-black/50">DUE DATE</label>
+                                <label className="text-[9px] font-semibold text-paper-700">DUE DATE</label>
                                 <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)}
                                     className="w-full border border-paper-300 rounded-xl py-2.5 px-3 font-semibold text-xs outline-none bg-nile-white/40" />
                             </div>
                         </div>
 
                         <div className="flex gap-3 pt-2">
-                            <button onClick={() => setShowCompose(false)} className="flex-1 py-3 border border-paper-300 rounded-xl font-semibold text-[9px] hover:bg-black hover:text-white transition-all">CANCEL</button>
-                            <button onClick={handleSave} className="flex-1 py-3 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all flex items-center justify-center gap-2">
+                            <button onClick={() => setShowCompose(false)} className="flex-1 py-3 border border-paper-300 rounded-xl font-semibold text-[9px] hover:bg-ink-900 hover:text-white transition-all">CANCEL</button>
+                            <button onClick={handleSave} className="flex-1 py-3 bg-ink-900 text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all flex items-center justify-center gap-2">
                                 <Bell size={13} /> SAVE REMINDER
                             </button>
                         </div>

@@ -104,7 +104,7 @@ const GroupsPage: React.FC = () => {
         <div className="max-w-3xl mx-auto p-4 md:p-6 pb-24 space-y-5 font-sans">
             <header className="flex items-start justify-between gap-3 flex-wrap">
                 <div>
-                    <h1 className="text-xl md:text-3xl font-semibold text-ink-800 flex items-center gap-2">
+                    <h1 className="co-display text-xl md:text-3xl text-ink-800 flex items-center gap-2">
                         <Users size={22} className="text-nile-blue" />
                         Groups
                     </h1>

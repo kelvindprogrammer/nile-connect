@@ -161,7 +161,7 @@ const PrivacySettingsPage: React.FC = () => {
                         <ArrowLeft size={18} />
                     </button>
                     <div className="min-w-0">
-                        <h1 className="text-xl md:text-2xl font-semibold text-ink-800 leading-tight">
+                        <h1 className="co-display text-xl md:text-2xl text-ink-800 leading-tight">
                             Privacy & safety
                         </h1>
                         <p className="text-xs text-paper-600 mt-0.5">

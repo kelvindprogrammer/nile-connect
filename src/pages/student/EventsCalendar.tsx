@@ -133,7 +133,7 @@ const EventsCalendar = () => {
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-paper-300 pb-6 md:pb-10">
                     <div className="space-y-1 md:space-y-2">
-                        <h2 className="text-3xl md:text-5xl font-semibold text-ink-800 leading-tight">Events</h2>
+                        <h2 className="co-display text-3xl md:text-4xl text-ink-800 leading-tight">Events</h2>
                         <p className="text-sm text-paper-700">Stay connected with your campus</p>
                     </div>
                     <Button variant="nile" size="sm" onClick={() => setShowSuggest(true)}>

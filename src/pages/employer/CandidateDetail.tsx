@@ -23,7 +23,7 @@ const stageBadge: Record<string, string> = {
     offer_extended:       'bg-nile-green/20 text-nile-green border-nile-green/30',
     accepted:             'bg-nile-green/20 text-nile-green border-nile-green/30',
     rejected:             'bg-red-50 text-red-500 border-red-200',
-    withdrawn:            'bg-black/5 text-black/40 border-paper-400/10',
+    withdrawn:            'bg-paper-100 text-paper-700 border-paper-400/10',
 };
 
 const stageLabel = (s: string) => APPLICATION_STAGES.find(x => x.value === s)?.label ?? s;
@@ -100,24 +100,24 @@ const CandidateDetail = () => {
     if (error || !app) return (
         <div className="p-8 anime-fade-in text-left space-y-6">
             <button onClick={() => navigate('/employer/candidates')}
-                className="flex items-center gap-2 text-black/40 font-semibold text-[9px] hover:text-black transition-colors">
+                className="flex items-center gap-2 text-paper-700 font-semibold text-[9px] hover:text-ink-800 transition-colors">
                 <ArrowLeft size={14} strokeWidth={3} /> BACK TO TALENT POOL
             </button>
             <div className="py-24 text-center border-[2px] border-dashed border-paper-400/10 rounded-[32px]">
-                <AlertCircle size={32} className="text-black/20 mx-auto mb-4" />
-                <p className="text-[9px] font-semibold text-black/30">Candidate not found or no applications</p>
+                <AlertCircle size={32} className="text-paper-600 mx-auto mb-4" />
+                <p className="text-[9px] font-semibold text-paper-600">Candidate not found or no applications</p>
             </div>
         </div>
     );
 
-    const badge = stageBadge[app.stage] || 'bg-black/5 text-black/40 border-paper-400/10';
+    const badge = stageBadge[app.stage] || 'bg-paper-100 text-paper-700 border-paper-400/10';
 
     return (
         <div className="p-4 md:p-8 space-y-6 anime-fade-in font-sans pb-20 text-left min-h-full">
 
             {/* Nav */}
             <button onClick={() => navigate('/employer/candidates')}
-                className="flex items-center gap-2 text-black/40 font-semibold text-[9px] hover:text-black transition-colors">
+                className="flex items-center gap-2 text-paper-700 font-semibold text-[9px] hover:text-ink-800 transition-colors">
                 <ArrowLeft size={14} strokeWidth={3} /> BACK TO TALENT POOL
             </button>
 
@@ -130,7 +130,7 @@ const CandidateDetail = () => {
                         </div>
                         <div className="space-y-1.5">
                             <div className="flex items-center gap-2 flex-wrap">
-                                <h1 className="text-2xl md:text-3xl font-semibold text-black leading-none">
+                                <h1 className="co-display text-2xl md:text-3xl text-ink-800 leading-none">
                                     {app.student_name || 'Unknown Candidate'}
                                 </h1>
                             </div>
@@ -139,7 +139,7 @@ const CandidateDetail = () => {
                             </p>
                             <div className="flex flex-wrap items-center gap-2 pt-1">
                                 {app.student_email && (
-                                    <span className="flex items-center gap-1 text-[8px] font-semibold text-black/40">
+                                    <span className="flex items-center gap-1 text-[8px] font-semibold text-paper-700">
                                         <Mail size={10} className="text-nile-blue" /> {app.student_email}
                                     </span>
                                 )}
@@ -183,30 +183,30 @@ const CandidateDetail = () => {
                             <h4 className="font-semibold text-sm tracking-tight">{app.job_title}</h4>
                         </div>
                         {app.applied_at && (
-                            <p className="text-[8px] font-semibold text-black/30">
+                            <p className="text-[8px] font-semibold text-paper-600">
                                 Applied {new Date(app.applied_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                             </p>
                         )}
                         {app.cover_letter && (
                             <div className="pt-3 border-t border-paper-400/5">
-                                <p className="text-[8px] font-semibold text-black/30 mb-1.5">COVER LETTER</p>
-                                <p className="text-[10px] font-medium text-black/70 whitespace-pre-line leading-relaxed">{app.cover_letter}</p>
+                                <p className="text-[8px] font-semibold text-paper-600 mb-1.5">COVER LETTER</p>
+                                <p className="text-[10px] font-medium text-paper-700 whitespace-pre-line leading-relaxed">{app.cover_letter}</p>
                             </div>
                         )}
                     </Card>
 
                     {/* Documents */}
                     <Card className="!p-5 space-y-3">
-                        <h3 className="text-[10px] font-semibold text-black/40">DOCUMENTS</h3>
+                        <h3 className="text-[10px] font-semibold text-paper-700">DOCUMENTS</h3>
                         {(app.documents?.length || 0) === 0 && !app.resume_url ? (
-                            <p className="text-[9px] font-semibold text-black/30">No documents submitted.</p>
+                            <p className="text-[9px] font-semibold text-paper-600">No documents submitted.</p>
                         ) : (
                             <div className="space-y-2">
                                 {app.resume_url && (!app.documents || !app.documents.some(d => d.type === 'resume')) && (
                                     <a href={app.resume_url} target="_blank" rel="noreferrer"
                                         className="flex items-center gap-3 p-3 border border-paper-300 rounded-xl hover:shadow-card transition-all">
                                         <FileText size={14} className="text-nile-blue flex-shrink-0" />
-                                        <span className="text-[9px] font-semibold text-black truncate">Resume / CV</span>
+                                        <span className="text-[9px] font-semibold text-ink-800 truncate">Resume / CV</span>
                                     </a>
                                 )}
                                 {app.documents?.map(doc => (
@@ -214,8 +214,8 @@ const CandidateDetail = () => {
                                         className="flex items-center gap-3 p-3 border border-paper-300 rounded-xl hover:shadow-card transition-all">
                                         <FileText size={14} className="text-nile-blue flex-shrink-0" />
                                         <div className="min-w-0">
-                                            <p className="text-[9px] font-semibold text-black truncate">{doc.title}</p>
-                                            <p className="text-[7px] font-semibold text-black/30 uppercase">{doc.type.replace(/_/g, ' ')}</p>
+                                            <p className="text-[9px] font-semibold text-ink-800 truncate">{doc.title}</p>
+                                            <p className="text-[7px] font-semibold text-paper-600 uppercase">{doc.type.replace(/_/g, ' ')}</p>
                                         </div>
                                     </a>
                                 ))}
@@ -225,20 +225,20 @@ const CandidateDetail = () => {
 
                     {/* Stage history */}
                     <Card className="!p-5 space-y-3">
-                        <h3 className="text-[10px] font-semibold text-black/40">STAGE HISTORY</h3>
+                        <h3 className="text-[10px] font-semibold text-paper-700">STAGE HISTORY</h3>
                         {(app.history?.length || 0) === 0 ? (
-                            <p className="text-[9px] font-semibold text-black/30">No stage changes yet.</p>
+                            <p className="text-[9px] font-semibold text-paper-600">No stage changes yet.</p>
                         ) : (
                             <div className="space-y-3">
                                 {app.history.map((h, i) => (
                                     <div key={i} className="flex items-start gap-3">
-                                        <Clock size={12} className="text-black/20 flex-shrink-0 mt-0.5" />
+                                        <Clock size={12} className="text-paper-600 flex-shrink-0 mt-0.5" />
                                         <div className="min-w-0">
-                                            <p className="text-[9px] font-semibold text-black">
+                                            <p className="text-[9px] font-semibold text-ink-800">
                                                 {h.from_stage ? `${stageLabel(h.from_stage)} → ${stageLabel(h.to_stage)}` : `Applied (${stageLabel(h.to_stage)})`}
                                             </p>
-                                            {h.note && <p className="text-[8px] font-semibold text-black/40 mt-0.5">{h.note}</p>}
-                                            <p className="text-[7px] font-semibold text-black/20 mt-0.5">
+                                            {h.note && <p className="text-[8px] font-semibold text-paper-700 mt-0.5">{h.note}</p>}
+                                            <p className="text-[7px] font-semibold text-paper-600 mt-0.5">
                                                 {new Date(h.created_at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                                             </p>
                                         </div>
@@ -252,23 +252,23 @@ const CandidateDetail = () => {
                 <div className="space-y-6">
                     {/* Academic info */}
                     <Card className="!p-5 space-y-3">
-                        <h3 className="text-[10px] font-semibold text-black/40">ACADEMIC PROFILE</h3>
+                        <h3 className="text-[10px] font-semibold text-paper-700">ACADEMIC PROFILE</h3>
                         <div className="grid grid-cols-2 gap-4">
                             {app.major && (
                                 <div>
-                                    <p className="text-[8px] font-semibold text-black/30 mb-0.5">Major</p>
+                                    <p className="text-[8px] font-semibold text-paper-600 mb-0.5">Major</p>
                                     <p className="font-semibold text-sm">{app.major}</p>
                                 </div>
                             )}
                             {app.graduation_year > 0 && (
                                 <div>
-                                    <p className="text-[8px] font-semibold text-black/30 mb-0.5">Graduation</p>
+                                    <p className="text-[8px] font-semibold text-paper-600 mb-0.5">Graduation</p>
                                     <p className="font-semibold text-sm">{app.graduation_year}</p>
                                 </div>
                             )}
                             {app.gpa > 0 && (
                                 <div>
-                                    <p className="text-[8px] font-semibold text-black/30 mb-0.5">GPA</p>
+                                    <p className="text-[8px] font-semibold text-paper-600 mb-0.5">GPA</p>
                                     <p className="font-semibold text-sm">{app.gpa.toFixed(2)}</p>
                                 </div>
                             )}
@@ -277,19 +277,19 @@ const CandidateDetail = () => {
 
                     {/* Notes + rating */}
                     <Card className="!p-5 space-y-4">
-                        <h3 className="text-[10px] font-semibold text-black/40">PRIVATE NOTES &amp; RATING</h3>
+                        <h3 className="text-[10px] font-semibold text-paper-700">PRIVATE NOTES &amp; RATING</h3>
                         <div className="flex items-center gap-1">
                             {[1, 2, 3, 4, 5].map(n => (
                                 <button key={n} type="button" onClick={() => setNoteRating(n)}>
                                     <Star
                                         size={20}
-                                        className={n <= noteRating ? 'text-yellow-500' : 'text-black/15'}
+                                        className={n <= noteRating ? 'text-yellow-500' : 'text-paper-500'}
                                         fill={n <= noteRating ? 'currentColor' : 'none'}
                                     />
                                 </button>
                             ))}
                             {noteRating > 0 && (
-                                <button type="button" onClick={() => setNoteRating(0)} className="text-[8px] font-semibold text-black/30 ml-2 hover:text-red-400">
+                                <button type="button" onClick={() => setNoteRating(0)} className="text-[8px] font-semibold text-paper-600 ml-2 hover:text-red-400">
                                     CLEAR
                                 </button>
                             )}

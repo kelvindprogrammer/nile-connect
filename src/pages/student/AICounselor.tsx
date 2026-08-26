@@ -35,7 +35,7 @@ const buildProfile = (user: ReturnType<typeof useAuth>['user']): StudentProfile 
 // ---------------------------------------------------------------------------
 
 const Badge = ({ label }: { label: string }) => (
-    <span className="px-3 py-1 bg-nile-white border border-paper-300 rounded-lg text-[8px] md:text-[9px] font-semibold text-black shadow-sm">
+    <span className="px-3 py-1 bg-nile-white border border-paper-300 rounded-lg text-[8px] md:text-[9px] font-semibold text-ink-800 shadow-sm">
         {label}
     </span>
 );
@@ -50,13 +50,13 @@ const AnalysisCard = ({
     >
         <div className="flex items-center space-x-3 mb-6">
             <div className="p-2.5 bg-nile-white border border-paper-300 rounded-xl">{icon}</div>
-            <h4 className="text-[11px] md:text-sm font-semibold text-black">{title}</h4>
+            <h4 className="text-[11px] md:text-sm font-semibold text-ink-800">{title}</h4>
         </div>
         <ul className="space-y-3 flex-1">
             {items.map((it, i) => (
                 <li key={i} className="flex items-start space-x-2 text-[9px] md:text-[10px] font-semibold text-nile-blue/60 group">
-                    <ChevronDown size={14} className="-rotate-90 text-black/20 group-hover:text-black transition-colors" />
-                    <span className="group-hover:text-black transition-colors">{it}</span>
+                    <ChevronDown size={14} className="-rotate-90 text-paper-600 group-hover:text-ink-800 transition-colors" />
+                    <span className="group-hover:text-ink-800 transition-colors">{it}</span>
                 </li>
             ))}
         </ul>
@@ -65,7 +65,7 @@ const AnalysisCard = ({
 
 const OptimizationStep = ({ num, task, desc }: { num: string; task: string; desc: string }) => (
     <div className="flex gap-6 group text-left">
-        <div className="flex-shrink-0 w-10 md:w-12 h-10 md:h-12 bg-white text-black border border-paper-300 rounded-xl flex items-center justify-center font-semibold text-sm group-hover:bg-nile-green transition-colors">
+        <div className="flex-shrink-0 w-10 md:w-12 h-10 md:h-12 bg-white text-ink-800 border border-paper-300 rounded-xl flex items-center justify-center font-semibold text-sm group-hover:bg-nile-green transition-colors">
             {num}
         </div>
         <div className="space-y-1">
@@ -244,7 +244,7 @@ const AICounselor = () => {
                             <Cpu size={18} strokeWidth={2.5} />
                             <span className="text-[9px] font-semibold">NEURAL ENGINE V2.0</span>
                         </div>
-                        <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">Career Architect .</h2>
+                        <h2 className="co-display text-3xl md:text-4xl text-ink-800 leading-none">Career architect</h2>
                         <p className="text-xs font-bold text-nile-blue/70 max-w-xl">
                             AI-driven CV analysis, skill mapping, and the Career Architect chat — always on.
                         </p>
@@ -256,7 +256,7 @@ const AICounselor = () => {
                                 onClick={handleRequestConsultation}
                                 variant="primary"
                                 size="sm"
-                                className="bg-black text-white hover:bg-nile-blue"
+                                className="bg-ink-900 text-white hover:bg-nile-blue"
                             >
                                 <Send size={18} className="mr-2" /> REQUEST CONSULTATION
                             </Button>
@@ -285,11 +285,11 @@ const AICounselor = () => {
                                 ) : cvFile ? (
                                     <CheckCircle2 size={40} className="text-nile-green" />
                                 ) : (
-                                    <Upload size={40} className="text-black group-hover:text-nile-green transition-colors" />
+                                    <Upload size={40} className="text-ink-800 group-hover:text-nile-green transition-colors" />
                                 )}
                             </div>
                             <div>
-                                <p className="font-semibold text-black text-lg">
+                                <p className="font-semibold text-ink-800 text-lg">
                                     {cvFile ? cvFile.name : 'Upload Your CV (PDF)'}
                                 </p>
                                 <p className="text-[10px] font-semibold text-nile-blue/30 mt-1">
@@ -306,7 +306,7 @@ const AICounselor = () => {
                         />
 
                         <div className="space-y-4">
-                            <h3 className="text-2xl md:text-4xl font-semibold text-black tracking-tight leading-none">
+                            <h3 className="text-2xl md:text-4xl font-semibold text-ink-800 tracking-tight leading-none">
                                 {cvFile ? 'Ready to Analyse.' : 'Upload to Begin.'}
                             </h3>
                             <p className="text-[10px] md:text-xs font-semibold text-nile-blue/40 leading-relaxed max-w-md mx-auto italic">
@@ -340,7 +340,7 @@ const AICounselor = () => {
                             <div className="bg-white border border-paper-300 rounded-[32px] md:rounded-[48px] p-6 md:p-12 shadow-card flex flex-col md:flex-row gap-8 items-start">
                                 <div className="space-y-6 flex-1">
                                     <h4 className="text-xs font-semibold text-nile-blue/40">EXECUTIVE SUMMARY</h4>
-                                    <p className="text-base md:text-xl font-semibold text-black leading-snug">
+                                    <p className="text-base md:text-xl font-semibold text-ink-800 leading-snug">
                                         {parsed?.tip || 'AI ANALYSIS COMPLETE. REVIEW YOUR RESULTS BELOW.'}
                                     </p>
                                     <div className="flex flex-wrap gap-3">
@@ -350,7 +350,7 @@ const AICounselor = () => {
                                     </div>
                                 </div>
                                 {parsed?.grade && (
-                                    <div className="w-full md:w-32 flex flex-col items-center justify-center p-6 bg-black text-white rounded-[24px] border border-paper-300 border-dashed">
+                                    <div className="w-full md:w-32 flex flex-col items-center justify-center p-6 bg-ink-900 text-white rounded-[24px] border border-paper-300 border-dashed">
                                         <span className="text-4xl font-semibold">{parsed.grade}</span>
                                         <span className="text-[8px] font-semibold mt-2">CV GRADE</span>
                                     </div>
@@ -395,7 +395,7 @@ const AICounselor = () => {
                             </div>
 
                             {/* Full Review Text */}
-                            <div className="bg-black text-white border border-paper-300 rounded-[32px] md:rounded-[40px] p-8 md:p-12 shadow-green">
+                            <div className="bg-ink-900 text-white border border-paper-300 rounded-[32px] md:rounded-[40px] p-8 md:p-12 shadow-green">
                                 <div className="flex items-center space-x-4 mb-8">
                                     <Sparkles className="text-nile-green" size={28} />
                                     <h3 className="text-2xl md:text-3xl font-semibold">FULL AI REVIEW</h3>
@@ -420,7 +420,7 @@ const AICounselor = () => {
                                 <div className="flex items-center space-x-3 pb-4 border-b-2 border-dashed border-paper-400/10">
                                     <Avatar name="Career AI" size="sm" />
                                     <div className="text-left">
-                                        <p className="text-[10px] font-semibold text-black">AI ARCHITECT</p>
+                                        <p className="text-[10px] font-semibold text-ink-800">AI ARCHITECT</p>
                                         <p className="text-[8px] font-semibold text-nile-blue/40">PERSONALIZED INSIGHTS</p>
                                     </div>
                                 </div>
@@ -430,7 +430,7 @@ const AICounselor = () => {
                                     </p>
                                     <button
                                         onClick={() => setShowChat(true)}
-                                        className="w-full py-4 bg-nile-blue text-white border border-paper-300 rounded-xl font-semibold text-[10px] hover:bg-black transition-all flex items-center justify-center space-x-2 shadow-card"
+                                        className="w-full py-4 bg-nile-blue text-white border border-paper-300 rounded-xl font-semibold text-[10px] hover:bg-ink-900 transition-all flex items-center justify-center space-x-2 shadow-card"
                                     >
                                         <MessageSquare size={14} />
                                         <span>CHAT WITH ARCHITECT</span>
@@ -443,7 +443,7 @@ const AICounselor = () => {
                                     <Zap size={28} className="text-nile-green" />
                                 </div>
                                 <div className="space-y-2">
-                                    <h5 className="text-sm font-semibold text-black tracking-tight">Expert Consultation</h5>
+                                    <h5 className="text-sm font-semibold text-ink-800 tracking-tight">Expert Consultation</h5>
                                     <p className="text-[10px] font-bold text-nile-blue/40 leading-relaxed">
                                         Get customized feedback from a professional advisor.
                                     </p>
@@ -468,7 +468,7 @@ const AICounselor = () => {
                 <div className="xl:col-span-4">
                     <div className="sticky top-20 flex flex-col bg-white border border-paper-300 rounded-[28px] shadow-card overflow-hidden h-[calc(100vh-180px)] min-h-[480px]">
                         {/* Chat header */}
-                        <div className="p-4 border-b border-paper-300 flex items-center gap-3 bg-black text-white flex-shrink-0">
+                        <div className="p-4 border-b border-paper-300 flex items-center gap-3 bg-ink-900 text-white flex-shrink-0">
                             <div className="w-9 h-9 bg-nile-green rounded-xl flex items-center justify-center border-2 border-white flex-shrink-0">
                                 <Cpu size={16} />
                             </div>
@@ -489,14 +489,14 @@ const AICounselor = () => {
                             {messages.map((m) => (
                                 <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                                     {m.role === 'bot' && (
-                                        <div className="w-6 h-6 rounded-full bg-black flex items-center justify-center flex-shrink-0 mr-2 mt-auto mb-1">
+                                        <div className="w-6 h-6 rounded-full bg-ink-900 flex items-center justify-center flex-shrink-0 mr-2 mt-auto mb-1">
                                             <Cpu size={10} className="text-nile-green" />
                                         </div>
                                     )}
                                     <div className={`max-w-[82%] px-3.5 py-3 border border-paper-300 rounded-xl text-[10px] leading-relaxed
                                         ${m.role === 'user'
                                             ? 'bg-nile-blue text-white rounded-tr-sm shadow-green font-semibold'
-                                            : 'bg-white text-black rounded-tl-sm shadow-card font-bold'}`}
+                                            : 'bg-white text-ink-800 rounded-tl-sm shadow-card font-bold'}`}
                                     >
                                         {m.role === 'bot' ? formatMarkdown(m.text, 'text-[10px]') : m.text}
                                     </div>
@@ -504,12 +504,12 @@ const AICounselor = () => {
                             ))}
                             {chatLoading && (
                                 <div className="flex justify-start">
-                                    <div className="w-6 h-6 rounded-full bg-black flex items-center justify-center flex-shrink-0 mr-2">
+                                    <div className="w-6 h-6 rounded-full bg-ink-900 flex items-center justify-center flex-shrink-0 mr-2">
                                         <Cpu size={10} className="text-nile-green" />
                                     </div>
                                     <div className="px-4 py-3 border border-paper-300 rounded-xl rounded-tl-sm bg-white shadow-card flex items-center gap-2">
                                         <Loader2 size={12} className="text-nile-blue animate-spin" />
-                                        <span className="text-[8px] font-semibold text-black/40 tracking-wider">Thinking...</span>
+                                        <span className="text-[8px] font-semibold text-paper-700 tracking-wider">Thinking...</span>
                                     </div>
                                 </div>
                             )}
@@ -530,12 +530,12 @@ const AICounselor = () => {
                                 <button
                                     type="submit"
                                     disabled={chatLoading || !inputValue.trim()}
-                                    className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 bg-nile-green text-white rounded-lg hover:bg-nile-blue transition-colors disabled:opacity-40 disabled:bg-black"
+                                    className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 bg-nile-green text-white rounded-lg hover:bg-nile-blue transition-colors disabled:opacity-40 disabled:bg-ink-900"
                                 >
                                     <Send size={13} />
                                 </button>
                             </div>
-                            <p className="text-[7px] font-semibold text-black/25 text-center mt-2">
+                            <p className="text-[7px] font-semibold text-paper-600 text-center mt-2">
                                 UPLOAD CV ABOVE FOR PERSONALISED ADVICE
                             </p>
                         </form>

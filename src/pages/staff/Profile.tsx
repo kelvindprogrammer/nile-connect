@@ -47,7 +47,7 @@ const StaffProfile = () => {
                     <div className="pt-12 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
                         <div>
                             <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                <h1 className="text-xl md:text-2xl font-semibold text-ink-800 leading-none">{name}</h1>
+                                <h1 className="co-display text-xl md:text-2xl text-ink-800 leading-none">{name}</h1>
                                 <span className="flex items-center gap-1 bg-nile-green text-white text-xs font-medium px-2.5 py-1 rounded-full">
                                     <ShieldCheck size={11} strokeWidth={3} /> Staff
                                 </span>
@@ -70,12 +70,12 @@ const StaffProfile = () => {
 
                     <div className="flex flex-wrap gap-6 mt-5 pt-5 border-t border-paper-300">
                         <div className="text-left">
-                            <p className="text-xl font-semibold leading-none text-ink-800">{totalViews === null ? '—' : totalViews}</p>
+                            <p className="font-display text-xl leading-none text-ink-800">{totalViews === null ? '—' : totalViews}</p>
                             <p className="text-xs text-paper-600 mt-1">Profile views</p>
                         </div>
                         {!loading && stats && (
                             <div className="text-left">
-                                <p className="text-xl font-semibold leading-none text-nile-blue">{(stats.pending_jobs + stats.pending_employers).toLocaleString()}</p>
+                                <p className="font-display text-xl leading-none text-nile-blue">{(stats.pending_jobs + stats.pending_employers).toLocaleString()}</p>
                                 <p className="text-xs text-paper-600 mt-1">Pending approvals</p>
                             </div>
                         )}

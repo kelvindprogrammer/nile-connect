@@ -69,18 +69,18 @@ const EmployerRegistration = () => {
                 <div className="w-full md:w-[40%] bg-nile-blue text-white border-r-[2px] border-paper-400 flex flex-col p-10 relative overflow-hidden">
                     <button
                         onClick={() => navigate('/register?role=employer')}
-                        className="mb-8 w-10 h-10 bg-white text-black border-[2px] border-paper-400 rounded-xl flex items-center justify-center shadow-sm hover:translate-x-0.5 hover:translate-y-0.5 transition-all z-10"
+                        className="mb-8 w-10 h-10 bg-white text-ink-800 border-[2px] border-paper-400 rounded-xl flex items-center justify-center shadow-sm hover:translate-x-0.5 hover:translate-y-0.5 transition-all z-10"
                     >
                         <ArrowLeft size={16} strokeWidth={3} />
                     </button>
 
                     <div className="relative z-10 space-y-6 flex-1 flex flex-col justify-center">
                         <div className="w-16 h-16 bg-white border-[2px] border-paper-400 rounded-xl flex items-center justify-center shadow-soft-sm flex-shrink-0">
-                            <Building2 size={32} strokeWidth={2.5} className="text-black" />
+                            <Building2 size={32} strokeWidth={2.5} className="text-ink-800" />
                         </div>
                         
                         <div className="space-y-2">
-                            <h2 className="text-3xl font-semibold uppercase leading-none tracking-tight">Partner Hub .</h2>
+                            <h2 className="co-display text-3xl leading-tight">Partner hub</h2>
                             <p className="text-[10px] font-bold text-nile-white/50 tracking-tight leading-relaxed">
                                 ACCESS PRE-VETTED TALENT FROM NILE UNIVERSITY.
                             </p>
@@ -116,7 +116,7 @@ const EmployerRegistration = () => {
                             {currentStep === 0 ? (
                                 <div className="space-y-5 anime-fade-in text-left">
                                     <div className="space-y-1">
-                                        <h3 className="text-xl font-semibold text-black uppercase tracking-tight">Organization Profile</h3>
+                                        <h3 className="co-display text-xl text-ink-800">Organisation profile</h3>
                                         <p className="text-[8px] font-semibold text-nile-blue/30 tracking-tight">CORE IDENTITY DATA</p>
                                     </div>
                                     
@@ -169,7 +169,7 @@ const EmployerRegistration = () => {
                             ) : (
                                 <div className="space-y-5 anime-fade-in text-left">
                                     <div className="space-y-1">
-                                        <h3 className="text-xl font-semibold text-black uppercase tracking-tight">Vetting Details</h3>
+                                        <h3 className="co-display text-xl text-ink-800">Vetting details</h3>
                                         <p className="text-[8px] font-semibold text-nile-blue/30 tracking-tight">RECRUITMENT AUTHORIZATION</p>
                                     </div>
 
@@ -193,12 +193,12 @@ const EmployerRegistration = () => {
                                     />
 
                                     <div className="space-y-1">
-                                        <label className="text-[9px] font-semibold text-black tracking-widest uppercase ml-1">HIRING GOALS</label>
+                                        <label className="text-[11px] font-medium text-paper-700 tracking-[0.14em] uppercase ml-1">Hiring goals</label>
                                         <textarea 
                                             name="about"
                                             value={form.about}
                                             onChange={handleChange}
-                                            className="w-full h-24 bg-nile-white/40 border-[2px] border-paper-400 rounded-xl p-4 font-bold text-[10px] uppercase outline-none focus:bg-white focus:shadow-[4px_4px_0px_0px_#000000] transition-all"
+                                            className="w-full h-24 bg-nile-white/40 border-[2px] border-paper-400 rounded-xl p-4 text-sm outline-none focus:bg-white focus:border-app-accent focus:ring-2 focus:ring-app-accent/20 transition-all"
                                             placeholder="DESCRIBE YOUR RECRUITING NEEDS..."
                                         />
                                     </div>

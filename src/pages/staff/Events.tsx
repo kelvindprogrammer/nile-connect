@@ -65,7 +65,7 @@ const CATEGORY_STYLES: Record<string, { tag: string; bar: string; icon: React.Re
     seminar:       { tag: 'bg-paper-200 text-paper-700 border-paper-300',            bar: '#6b7280', icon: <BookOpen size={11} /> },
     info_session:  { tag: 'bg-yellow-50 text-yellow-600 border-yellow-200',       bar: '#ca8a04', icon: <Zap size={11} /> },
     alumni_meetup: { tag: 'bg-pink-50 text-pink-600 border-pink-200',             bar: '#ec4899', icon: <Award size={11} /> },
-    hackathon:     { tag: 'bg-black text-white border-paper-400',                     bar: '#000000', icon: <Code2 size={11} /> },
+    hackathon:     { tag: 'bg-ink-900 text-white border-paper-400',                     bar: '#000000', icon: <Code2 size={11} /> },
     tech_talk:     { tag: 'bg-nile-blue/10 text-nile-blue border-nile-blue/30',   bar: 'var(--app-accent)', icon: <Code2 size={11} /> },
     other:         { tag: 'bg-paper-200 text-paper-700 border-paper-300',            bar: '#9ca3af', icon: <Globe size={11} /> },
 };
@@ -74,7 +74,7 @@ const STATUS_STYLES: Record<string, string> = {
     pending:   'bg-yellow-50 text-yellow-600 border-yellow-200',
     published: 'bg-nile-green/20 text-nile-green border-nile-green/30',
     upcoming:  'bg-nile-blue/10 text-nile-blue border-nile-blue/30',
-    past:      'bg-black/5 text-black/40 border-paper-400/10',
+    past:      'bg-paper-100 text-paper-700 border-paper-400/10',
     cancelled: 'bg-red-50 text-red-500 border-red-200',
 };
 
@@ -282,15 +282,15 @@ const StaffEvents: React.FC = () => {
     // ── Loading skeleton ─────────────────────────────────────────────────────
     if (loading) return (
         <div className="p-4 md:p-8 space-y-6 animate-pulse">
-            <div className="h-14 bg-black/5 rounded-xl w-80" />
+            <div className="h-14 bg-paper-100 rounded-xl w-80" />
             <div className="flex gap-3">
-                {[1, 2, 3].map(i => <div key={i} className="h-20 bg-black/5 rounded-xl flex-1" />)}
+                {[1, 2, 3].map(i => <div key={i} className="h-20 bg-paper-100 rounded-xl flex-1" />)}
             </div>
             <div className="flex gap-2">
-                {[1, 2, 3, 4].map(i => <div key={i} className="h-9 bg-black/5 rounded-xl w-24" />)}
+                {[1, 2, 3, 4].map(i => <div key={i} className="h-9 bg-paper-100 rounded-xl w-24" />)}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {[1, 2, 3, 4].map(i => <div key={i} className="h-60 bg-black/5 rounded-[24px]" />)}
+                {[1, 2, 3, 4].map(i => <div key={i} className="h-60 bg-paper-100 rounded-[24px]" />)}
             </div>
         </div>
     );
@@ -301,10 +301,10 @@ const StaffEvents: React.FC = () => {
 
             {/* ── PAGE HEADER ──────────────────────────────────────────────── */}
             <div className="border-b border-paper-300 pb-6">
-                <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">
-                    Events .
+                <h2 className="co-display text-3xl md:text-4xl text-ink-800 leading-none">
+                    Events
                 </h2>
-                <p className="text-[9px] font-semibold text-black/40 mt-1">
+                <p className="text-[9px] font-semibold text-paper-700 mt-1">
                     MANAGE CAMPUS EVENTS · CAREER FAIRS · WORKSHOPS · NETWORKING
                 </p>
             </div>
@@ -315,7 +315,7 @@ const StaffEvents: React.FC = () => {
                     label="TOTAL EVENTS"
                     value={events.length}
                     icon={<Calendar size={18} />}
-                    color="bg-black text-white"
+                    color="bg-ink-900 text-white"
                     shadowColor="rgba(108,187,86,1)"
                 />
                 <StatCard
@@ -371,12 +371,12 @@ const StaffEvents: React.FC = () => {
                                         onClick={() => setStatusTab(tab)}
                                         className={`px-3 py-1.5 rounded-lg font-semibold text-[8px] tracking-wider transition-all whitespace-nowrap flex items-center gap-1.5
                                             ${statusTab === tab
-                                                ? 'bg-black text-white shadow-green'
-                                                : 'text-black/40 hover:text-black'}`}
+                                                ? 'bg-ink-900 text-white shadow-green'
+                                                : 'text-paper-700 hover:text-ink-800'}`}
                                     >
                                         {tab}
                                         <span className={`text-[7px] px-1 py-0.5 rounded-full font-semibold ${
-                                            statusTab === tab ? 'bg-white/20 text-white' : 'bg-black/5 text-black/30'
+                                            statusTab === tab ? 'bg-white/20 text-white' : 'bg-paper-100 text-paper-600'
                                         }`}>
                                             {count}
                                         </span>
@@ -387,7 +387,7 @@ const StaffEvents: React.FC = () => {
 
                         {/* Search */}
                         <div className="relative flex-1">
-                            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-black/30 pointer-events-none" />
+                            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-paper-600 pointer-events-none" />
                             <input
                                 type="text"
                                 value={search}
@@ -396,7 +396,7 @@ const StaffEvents: React.FC = () => {
                                 className="w-full pl-9 pr-9 py-2.5 rounded-xl border border-paper-300 font-semibold text-[9px] outline-none focus:shadow-card bg-white/60 focus:bg-white transition-all"
                             />
                             {search && (
-                                <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-black/30 hover:text-black transition-colors">
+                                <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-paper-600 hover:text-ink-800 transition-colors">
                                     <X size={13} />
                                 </button>
                             )}
@@ -405,7 +405,7 @@ const StaffEvents: React.FC = () => {
 
                     {/* Results count */}
                     {(search || statusTab !== 'ALL') && (
-                        <p className="text-[8px] font-semibold text-black/30">
+                        <p className="text-[8px] font-semibold text-paper-600">
                             {filteredEvents.length} RESULT{filteredEvents.length !== 1 ? 'S' : ''} FOUND
                         </p>
                     )}
@@ -413,13 +413,13 @@ const StaffEvents: React.FC = () => {
                     {/* Empty state */}
                     {filteredEvents.length === 0 ? (
                         <div className="py-24 border-[2px] border-dashed border-paper-400/10 rounded-[32px] flex flex-col items-center justify-center text-center gap-4 anime-fade-in">
-                            <Calendar size={36} className="text-black/15" />
+                            <Calendar size={36} className="text-paper-500" />
                             <div>
-                                <p className="text-[9px] font-semibold text-black/30">
+                                <p className="text-[9px] font-semibold text-paper-600">
                                     {search ? 'No events match your search' : `No ${statusTab.toLowerCase()} events`}
                                 </p>
                                 {!search && statusTab === 'ALL' && (
-                                    <p className="text-[8px] font-semibold text-black/20 mt-1">
+                                    <p className="text-[8px] font-semibold text-paper-600 mt-1">
                                         USE THE FORM TO CREATE YOUR FIRST EVENT
                                     </p>
                                 )}
@@ -427,7 +427,7 @@ const StaffEvents: React.FC = () => {
                             {!search && statusTab === 'ALL' && (
                                 <button
                                     onClick={() => setShowMobileForm(true)}
-                                    className="lg:hidden flex items-center gap-2 px-5 py-2.5 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all"
+                                    className="lg:hidden flex items-center gap-2 px-5 py-2.5 bg-ink-900 text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all"
                                 >
                                     <Plus size={12} strokeWidth={3} /> CREATE EVENT
                                 </button>
@@ -457,7 +457,7 @@ const StaffEvents: React.FC = () => {
             {/* ── MOBILE FAB: show form ─────────────────────────────────────── */}
             <button
                 onClick={() => setShowMobileForm(true)}
-                className="lg:hidden fixed bottom-6 right-6 z-30 w-14 h-14 bg-black text-white border border-paper-300 rounded-full flex items-center justify-center shadow-green transition-all"
+                className="lg:hidden fixed bottom-6 right-6 z-30 w-14 h-14 bg-ink-900 text-white border border-paper-300 rounded-full flex items-center justify-center shadow-green transition-all"
                 aria-label="Create event"
             >
                 <Plus size={22} strokeWidth={2.5} />
@@ -500,13 +500,13 @@ const StaffEvents: React.FC = () => {
                             </div>
                             <div>
                                 <p className="font-semibold text-sm">Delete Event?</p>
-                                <p className="text-[8px] font-semibold text-black/40 mt-0.5">THIS CANNOT BE UNDONE</p>
+                                <p className="text-[8px] font-semibold text-paper-700 mt-0.5">THIS CANNOT BE UNDONE</p>
                             </div>
                         </div>
                         <div className="flex gap-3">
                             <button
                                 onClick={() => setConfirmDelete(null)}
-                                className="flex-1 py-3 border border-paper-300 rounded-xl font-semibold text-[9px] hover:bg-black hover:text-white transition-all"
+                                className="flex-1 py-3 border border-paper-300 rounded-xl font-semibold text-[9px] hover:bg-ink-900 hover:text-white transition-all"
                             >
                                 CANCEL
                             </button>
@@ -548,7 +548,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ form, setForm, onSubm
     return (
         <div className="bg-white border border-paper-300 rounded-[28px] shadow-card overflow-hidden">
             {/* Form header */}
-            <div className="flex items-center justify-between gap-3 p-5 border-b border-paper-300 bg-black">
+            <div className="flex items-center justify-between gap-3 p-5 border-b border-paper-300 bg-ink-900">
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-nile-green rounded-xl flex items-center justify-center flex-shrink-0">
                         <Calendar size={15} className="text-white" />
@@ -591,7 +591,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ form, setForm, onSubm
                                 <option key={cat.value} value={cat.value}>{cat.label}</option>
                             ))}
                         </select>
-                        <ChevronDown size={13} className="absolute right-3 top-1/2 -translate-y-1/2 text-black/40 pointer-events-none" />
+                        <ChevronDown size={13} className="absolute right-3 top-1/2 -translate-y-1/2 text-paper-700 pointer-events-none" />
                     </div>
                 </FormField>
 
@@ -662,13 +662,13 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ form, setForm, onSubm
                 <div className="flex items-center justify-between py-2 px-3 border border-paper-300/10 rounded-xl hover:border-paper-400/20 transition-colors">
                     <div>
                         <p className="font-semibold text-[9px]">FEATURED EVENT</p>
-                        <p className="text-[7px] font-semibold text-black/30 mt-0.5">SHOW ON HOMEPAGE SPOTLIGHT</p>
+                        <p className="text-[7px] font-semibold text-paper-600 mt-0.5">SHOW ON HOMEPAGE SPOTLIGHT</p>
                     </div>
                     <button
                         type="button"
                         onClick={() => f('is_featured', !form.is_featured)}
                         className={`relative w-10 h-5 rounded-full border border-paper-300 transition-colors flex-shrink-0 ${
-                            form.is_featured ? 'bg-nile-green' : 'bg-black/10'
+                            form.is_featured ? 'bg-nile-green' : 'bg-paper-200'
                         }`}
                         aria-label="Toggle featured"
                     >
@@ -683,14 +683,14 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ form, setForm, onSubm
                     <button
                         type="button"
                         onClick={() => setForm(EMPTY_FORM)}
-                        className="px-4 py-3 border border-paper-300 rounded-xl font-semibold text-[8px] hover:bg-black hover:text-white transition-all"
+                        className="px-4 py-3 border border-paper-300 rounded-xl font-semibold text-[8px] hover:bg-ink-900 hover:text-white transition-all"
                     >
                         CLEAR
                     </button>
                     <button
                         type="submit"
                         disabled={submitting}
-                        className="flex-1 flex items-center justify-center gap-2 py-3 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all disabled:opacity-40"
+                        className="flex-1 flex items-center justify-center gap-2 py-3 bg-ink-900 text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all disabled:opacity-40"
                     >
                         {submitting
                             ? <><Loader2 size={12} className="animate-spin" /> CREATING...</>
@@ -749,7 +749,7 @@ const EventCard: React.FC<EventCardProps> = ({
             {/* Featured badge */}
             {event.is_featured && (
                 <div className="absolute -top-2.5 -right-2.5 w-8 h-8 bg-yellow-400 border border-paper-300 rounded-full flex items-center justify-center shadow-card">
-                    <Star size={13} className="text-black" fill="currentColor" />
+                    <Star size={13} className="text-ink-800" fill="currentColor" />
                 </div>
             )}
 
@@ -837,20 +837,20 @@ const EventCard: React.FC<EventCardProps> = ({
             </div>
 
             {/* Title */}
-            <h3 className="font-semibold text-sm text-black leading-tight line-clamp-2 -mt-1">
+            <h3 className="font-semibold text-sm text-ink-800 leading-tight line-clamp-2 -mt-1">
                 {event.title}
             </h3>
 
             {/* Date / time / location */}
             <div className="space-y-2">
-                <div className="flex items-center gap-2 text-[9px] font-semibold text-black/50">
+                <div className="flex items-center gap-2 text-[9px] font-semibold text-paper-700">
                     <Calendar size={12} className="text-nile-blue flex-shrink-0" />
                     <span>{formatDate(event.date)}</span>
-                    <span className="text-black/20">·</span>
-                    <Clock size={11} className="text-black/30 flex-shrink-0" />
+                    <span className="text-paper-600">·</span>
+                    <Clock size={11} className="text-paper-600 flex-shrink-0" />
                     <span>{formatTime(event.time)}</span>
                 </div>
-                <div className="flex items-center gap-2 text-[9px] font-semibold text-black/50">
+                <div className="flex items-center gap-2 text-[9px] font-semibold text-paper-700">
                     {event.location.toLowerCase().includes('virtual') || event.location.toLowerCase().includes('online')
                         ? <Globe size={12} className="text-nile-green flex-shrink-0" />
                         : <MapPin size={12} className="text-nile-green flex-shrink-0" />
@@ -862,15 +862,15 @@ const EventCard: React.FC<EventCardProps> = ({
             {/* Capacity / registration bar */}
             <div className="space-y-1.5">
                 <div className="flex items-center justify-between text-[8px] font-semibold">
-                    <span className="flex items-center gap-1 text-black/40">
+                    <span className="flex items-center gap-1 text-paper-700">
                         <Users size={10} />
                         {event.registrations_count ?? 0} / {event.capacity} REGISTERED
                     </span>
-                    <span className={isFull ? 'text-red-500' : 'text-black/30'}>
+                    <span className={isFull ? 'text-red-500' : 'text-paper-600'}>
                         {regPct}%{isFull ? ' · FULL' : ''}
                     </span>
                 </div>
-                <div className="h-2 bg-black/5 border border-paper-300 rounded-full overflow-hidden p-[1.5px]">
+                <div className="h-2 bg-paper-100 border border-paper-300 rounded-full overflow-hidden p-[1.5px]">
                     <div
                         className="h-full rounded-full transition-all duration-700"
                         style={{ width: `${regPct}%`, background: regBarColor }}
@@ -880,7 +880,7 @@ const EventCard: React.FC<EventCardProps> = ({
 
             {/* Description snippet */}
             {event.description && (
-                <p className="text-[8px] font-bold text-black/35 leading-relaxed line-clamp-2">
+                <p className="text-[8px] font-bold text-paper-600 leading-relaxed line-clamp-2">
                     {event.description}
                 </p>
             )}
@@ -914,7 +914,7 @@ const StatCard: React.FC<{
     color:       string;
     shadowColor: string;
 }> = ({ label, value, icon, color, shadowColor }) => {
-    const isDark = color.includes('bg-black');
+    const isDark = color.includes('bg-ink-900');
     return (
         <div
             className={`border border-paper-300 rounded-[20px] p-4 md:p-5 ${isDark ? color : `bg-white`}`}
@@ -926,7 +926,7 @@ const StatCard: React.FC<{
             <p className={`text-2xl md:text-3xl font-semibold leading-none ${isDark ? 'text-white' : ''}`}>
                 {value.toLocaleString()}
             </p>
-            <p className={`text-[7px] font-semibold mt-1.5 ${isDark ? 'text-white/40' : 'text-black/40'}`}>
+            <p className={`text-[7px] font-semibold mt-1.5 ${isDark ? 'text-white/40' : 'text-paper-700'}`}>
                 {label}
             </p>
         </div>
@@ -935,7 +935,7 @@ const StatCard: React.FC<{
 
 const FormField: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
     <div className="space-y-1.5">
-        <label className="block text-[7px] font-semibold text-black/40">{label}</label>
+        <label className="block text-[7px] font-semibold text-paper-700">{label}</label>
         {children}
     </div>
 );
@@ -948,7 +948,7 @@ const DropdownItem: React.FC<{
 }> = ({ label, icon, color, onClick }) => (
     <button
         onClick={onClick}
-        className={`w-full flex items-center gap-2.5 px-4 py-2.5 font-semibold text-[8px] hover:bg-black/5 transition-colors text-left ${color}`}
+        className={`w-full flex items-center gap-2.5 px-4 py-2.5 font-semibold text-[8px] hover:bg-paper-100 transition-colors text-left ${color}`}
     >
         {icon} {label}
     </button>

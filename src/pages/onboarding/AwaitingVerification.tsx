@@ -25,10 +25,10 @@ const AwaitingVerification = () => {
 
                     {/* Shield Icon Box */}
                     <div className="relative z-10 w-[100px] h-[100px] bg-white border-[2px] border-paper-400 rounded-xl shadow-soft-sm flex items-center justify-center mb-8">
-                        <ShieldCheck size={48} strokeWidth={2} className="text-black" />
+                        <ShieldCheck size={48} strokeWidth={2} className="text-ink-800" />
                     </div>
 
-                    <p className="relative z-10 text-xl font-semibold text-nile-white uppercase tracking-[0.25em]">Almost There</p>
+                    <p className="relative z-10 text-xl font-semibold text-nile-white uppercase tracking-[0.14em]">Almost There</p>
                 </div>
 
                 {/* Right Panel */}
@@ -38,10 +38,10 @@ const AwaitingVerification = () => {
                     </div>
 
                     <div className="space-y-4">
-                        <h1 className="text-4xl font-semibold text-black uppercase leading-none tracking-tighter">
-                            AWAITING<br/>VETTING .
+                        <h1 className="co-display text-4xl text-ink-800 leading-tight">
+                            Awaiting vetting
                         </h1>
-                        <p className="text-[10px] font-semibold text-nile-green uppercase leading-relaxed tracking-[0.2em] max-w-xs mx-auto">
+                        <p className="text-[11px] font-semibold text-nile-green uppercase leading-relaxed tracking-[0.14em] max-w-xs mx-auto">
                             OUR STAFF IS CURRENTLY REVIEWING YOUR PARTNERSHIP REQUEST. ACCESS GRANTED VIA EMAIL INVITATION.
                         </p>
                     </div>

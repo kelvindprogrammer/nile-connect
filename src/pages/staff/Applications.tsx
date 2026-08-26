@@ -23,12 +23,12 @@ type EmployerSubTab = 'PENDING' | 'APPROVED' | 'REJECTED';
 
 const LoadingSkeleton = () => (
     <div className="p-4 md:p-8 space-y-8 animate-pulse">
-        <div className="h-14 bg-black/5 rounded-xl w-72" />
+        <div className="h-14 bg-paper-100 rounded-xl w-72" />
         <div className="flex gap-2">
-            {[1, 2].map(i => <div key={i} className="h-10 bg-black/5 rounded-xl w-48" />)}
+            {[1, 2].map(i => <div key={i} className="h-10 bg-paper-100 rounded-xl w-48" />)}
         </div>
         <div className="space-y-4">
-            {[1, 2, 3, 4].map(i => <div key={i} className="h-16 bg-black/5 rounded-[20px]" />)}
+            {[1, 2, 3, 4].map(i => <div key={i} className="h-16 bg-paper-100 rounded-[20px]" />)}
         </div>
     </div>
 );
@@ -43,7 +43,7 @@ const statusConfig: Record<string, { label: string; bg: string; text: string }> 
 };
 
 const getStatusConfig = (status: string) =>
-    statusConfig[status.toLowerCase()] ?? { label: status.toUpperCase(), bg: 'bg-black/5', text: 'text-black/60' };
+    statusConfig[status.toLowerCase()] ?? { label: status.toUpperCase(), bg: 'bg-paper-100', text: 'text-paper-700' };
 
 // ── Main Component ────────────────────────────────────────────────────────────
 
@@ -149,10 +149,10 @@ const StaffApplications = () => {
             {/* Header */}
             <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 border-b border-paper-300 pb-6">
                 <div className="space-y-1">
-                    <h2 className="text-3xl md:text-4xl font-semibold text-black leading-none">
+                    <h2 className="co-display text-3xl md:text-4xl text-ink-800 leading-none">
                         Pipeline Hub
                     </h2>
-                    <p className="text-[9px] md:text-[10px] font-semibold text-black/40">
+                    <p className="text-[9px] md:text-[10px] font-semibold text-paper-700">
                         APPLICATIONS &amp; EMPLOYER MANAGEMENT
                     </p>
                 </div>
@@ -163,7 +163,7 @@ const StaffApplications = () => {
                             key={tab}
                             onClick={() => setMainTab(tab)}
                             className={`px-4 py-2 rounded-xl font-semibold text-[9px] transition-all flex items-center gap-2 whitespace-nowrap
-                                ${mainTab === tab ? 'bg-black text-white shadow-green' : 'text-black/40 hover:text-black'}`}
+                                ${mainTab === tab ? 'bg-ink-900 text-white shadow-green' : 'text-paper-700 hover:text-ink-800'}`}
                         >
                             {tab === 'PIPELINE' ? <ClipboardList size={13} /> : <ShieldCheck size={13} />}
                             <span>{tab}</span>
@@ -183,13 +183,13 @@ const StaffApplications = () => {
                 <div className="space-y-6 anime-fade-in">
                     {/* Count */}
                     <div className="flex flex-wrap gap-3 items-center">
-                        <span className="px-4 py-2 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[9px]">
+                        <span className="px-4 py-2 bg-ink-900 text-white border border-paper-300 rounded-xl font-semibold text-[9px]">
                             {filteredApps.length} {filteredApps.length === 1 ? 'APPLICATION' : 'APPLICATIONS'}
                         </span>
                         {statusFilter !== 'ALL' && (
                             <button
                                 onClick={() => setStatusFilter('ALL')}
-                                className="text-[8px] font-semibold text-black/40 underline"
+                                className="text-[8px] font-semibold text-paper-700 underline"
                             >
                                 CLEAR FILTER
                             </button>
@@ -198,7 +198,7 @@ const StaffApplications = () => {
 
                     {/* Search */}
                     <div className="relative">
-                        <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-black/30" />
+                        <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-paper-600" />
                         <input
                             type="text"
                             value={search}
@@ -218,10 +218,10 @@ const StaffApplications = () => {
                                     key={sf}
                                     onClick={() => setStatusFilter(sf)}
                                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-paper-300 font-semibold text-[8px] transition-all
-                                        ${statusFilter === sf ? 'bg-black text-white' : 'bg-white text-black hover:bg-black/5'}`}
+                                        ${statusFilter === sf ? 'bg-ink-900 text-white' : 'bg-white text-ink-800 hover:bg-paper-100'}`}
                                 >
                                     {sf}
-                                    <span className={`w-4 h-4 flex items-center justify-center rounded-full text-[7px] ${statusFilter === sf ? 'bg-white/20 text-white' : cfg ? `${cfg.bg} ${cfg.text}` : 'bg-black/10 text-black/60'}`}>
+                                    <span className={`w-4 h-4 flex items-center justify-center rounded-full text-[7px] ${statusFilter === sf ? 'bg-white/20 text-white' : cfg ? `${cfg.bg} ${cfg.text}` : 'bg-paper-200 text-paper-700'}`}>
                                         {count}
                                     </span>
                                 </button>
@@ -241,12 +241,12 @@ const StaffApplications = () => {
                                         <div className="flex items-center gap-4 min-w-0 flex-1">
                                             <Avatar name={app.student_name || '?'} size="sm" />
                                             <div className="min-w-0">
-                                                <p className="font-semibold text-sm text-black leading-none mb-1 truncate">{app.student_name || 'Unknown Student'}</p>
-                                                <p className="text-[8px] font-semibold text-black/40 tracking-wider truncate">
+                                                <p className="font-semibold text-sm text-ink-800 leading-none mb-1 truncate">{app.student_name || 'Unknown Student'}</p>
+                                                <p className="text-[8px] font-semibold text-paper-700 tracking-wider truncate">
                                                     {app.job_title || 'N/A'} &bull; {app.company || 'N/A'}
                                                 </p>
                                                 {app.applied_at && (
-                                                    <p className="text-[7px] font-bold text-black/20 flex items-center gap-1 mt-0.5">
+                                                    <p className="text-[7px] font-bold text-paper-600 flex items-center gap-1 mt-0.5">
                                                         <Clock size={9} />
                                                         {new Date(app.applied_at).toLocaleDateString()}
                                                     </p>
@@ -280,13 +280,13 @@ const StaffApplications = () => {
                                     key={sub}
                                     onClick={() => setEmpSubTab(sub)}
                                     className={`px-4 py-2 rounded-xl font-semibold text-[9px] transition-all flex items-center gap-2
-                                        ${empSubTab === sub ? 'bg-black text-white' : 'text-black/40 hover:text-black'}`}
+                                        ${empSubTab === sub ? 'bg-ink-900 text-white' : 'text-paper-700 hover:text-ink-800'}`}
                                 >
                                     {sub}
                                     <span className={`w-5 h-5 flex items-center justify-center rounded-full text-[7px] font-semibold
                                         ${empSubTab === sub
                                             ? sub === 'PENDING' ? 'bg-red-500 text-white' : 'bg-white/20 text-white'
-                                            : sub === 'PENDING' ? 'bg-red-100 text-red-500' : 'bg-black/10 text-black/60'}`}>
+                                            : sub === 'PENDING' ? 'bg-red-100 text-red-500' : 'bg-paper-200 text-paper-700'}`}>
                                         {counts[sub]}
                                     </span>
                                 </button>
@@ -305,12 +305,12 @@ const StaffApplications = () => {
                             {empsBySubTab.map(emp => (
                                 <div key={emp.id} className="bg-white border border-paper-300 rounded-[20px] shadow-card p-4 md:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:shadow-card transition-all">
                                     <div className="flex items-center gap-4 min-w-0 flex-1">
-                                        <div className="w-11 h-11 bg-black text-white rounded-xl flex items-center justify-center font-semibold text-lg flex-shrink-0 border border-paper-300">
+                                        <div className="w-11 h-11 bg-ink-900 text-white rounded-xl flex items-center justify-center font-semibold text-lg flex-shrink-0 border border-paper-300">
                                             {emp.company_name.charAt(0).toUpperCase()}
                                         </div>
                                         <div className="min-w-0 flex-1">
                                             <div className="flex flex-wrap items-center gap-2 mb-1">
-                                                <p className="font-semibold text-sm text-black leading-none truncate">{emp.company_name}</p>
+                                                <p className="font-semibold text-sm text-ink-800 leading-none truncate">{emp.company_name}</p>
                                                 <StatusBadge status={emp.status} />
                                                 {emp.is_verified && (
                                                     <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[7px] font-semibold bg-nile-blue/10 text-nile-blue border border-nile-blue/20">
@@ -318,11 +318,11 @@ const StaffApplications = () => {
                                                     </span>
                                                 )}
                                             </div>
-                                            <p className="text-[8px] font-semibold text-black/40 tracking-wider truncate">
+                                            <p className="text-[8px] font-semibold text-paper-700 tracking-wider truncate">
                                                 {emp.industry} &bull; {emp.location}
                                             </p>
                                             <p className="text-[8px] font-bold text-nile-blue/50 truncate">{emp.contact_email}</p>
-                                            <p className="text-[7px] font-semibold text-black/20 flex items-center gap-1 mt-0.5">
+                                            <p className="text-[7px] font-semibold text-paper-600 flex items-center gap-1 mt-0.5">
                                                 <Clock size={9} />
                                                 REGISTERED {new Date(emp.created_at).toLocaleDateString()}
                                             </p>
@@ -356,7 +356,7 @@ const StaffApplications = () => {
                                                 onClick={() => handleToggleVerified(emp)}
                                                 disabled={actionLoading[`verify-${emp.id}`]}
                                                 className={`flex items-center gap-1.5 px-3 py-2 border border-paper-300 rounded-xl font-semibold text-[9px] shadow-card transition-all disabled:opacity-50
-                                                    ${emp.is_verified ? 'bg-white text-black/50 hover:bg-black/5' : 'bg-nile-blue text-white'}`}
+                                                    ${emp.is_verified ? 'bg-white text-paper-700 hover:bg-paper-100' : 'bg-nile-blue text-white'}`}
                                             >
                                                 {actionLoading[`verify-${emp.id}`]
                                                     ? <Loader2 size={12} className="animate-spin" />
@@ -379,8 +379,8 @@ const StaffApplications = () => {
 
 const EmptyState = ({ label, icon }: { label: string; icon: React.ReactNode }) => (
     <div className="py-20 text-center border-2 border-dashed border-paper-400/10 rounded-[28px]">
-        <div className="text-black/20 mx-auto mb-3 flex justify-center">{icon}</div>
-        <p className="text-[9px] font-semibold text-black/30">{label}</p>
+        <div className="text-paper-600 mx-auto mb-3 flex justify-center">{icon}</div>
+        <p className="text-[9px] font-semibold text-paper-600">{label}</p>
     </div>
 );
 
@@ -390,7 +390,7 @@ const StatusBadge = ({ status }: { status: string }) => {
         approved: 'bg-nile-green/20 text-nile-green',
         rejected: 'bg-red-50 text-red-500',
     };
-    const cls = configs[status] ?? 'bg-black/5 text-black/60';
+    const cls = configs[status] ?? 'bg-paper-100 text-paper-700';
     return (
         <span className={`text-[7px] font-semibold px-2 py-0.5 rounded border border-paper-300 ${cls}`}>
             {status.toUpperCase()}

@@ -18,7 +18,7 @@ const NotFound = () => (
 
             {/* Message Card */}
             <div className="social-card p-8 space-y-3 text-left">
-                <h2 className="text-2xl font-semibold text-ink-800 leading-tight">Lost in the network</h2>
+                <h2 className="co-display text-2xl text-ink-800 leading-tight">Lost in the network</h2>
                 <p className="text-sm text-paper-700 leading-relaxed">
                     This route doesn't exist on the platform. You may have followed a broken link or mistyped the address.
                 </p>

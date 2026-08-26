@@ -122,7 +122,7 @@ const Documents = () => {
             <div className="p-4 md:p-8 space-y-6 md:space-y-8 anime-fade-in font-sans pb-24 text-left">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-paper-300 pb-6">
                     <div>
-                        <h2 className="text-2xl md:text-4xl font-semibold text-black leading-none">Document Library .</h2>
+                        <h2 className="co-display text-2xl md:text-4xl text-ink-800 leading-none">Document library</h2>
                         <p className="text-[8px] md:text-[10px] font-semibold text-nile-blue/50 mt-1">
                             MANAGE THE FILES YOU USE TO APPLY TO JOBS
                         </p>
@@ -141,7 +141,7 @@ const Documents = () => {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-1.5">
-                                <label className="text-[8px] font-semibold text-black/50">DOCUMENT TYPE</label>
+                                <label className="text-[8px] font-semibold text-paper-700">DOCUMENT TYPE</label>
                                 <select
                                     value={uploadType}
                                     onChange={e => setUploadType(e.target.value)}
@@ -151,7 +151,7 @@ const Documents = () => {
                                 </select>
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-[8px] font-semibold text-black/50">TITLE</label>
+                                <label className="text-[8px] font-semibold text-paper-700">TITLE</label>
                                 <input
                                     type="text"
                                     value={uploadTitle}
@@ -164,7 +164,7 @@ const Documents = () => {
 
                         {uploadType === 'reference_letter' && (
                             <div className="space-y-1.5">
-                                <label className="text-[8px] font-semibold text-black/50">REFEREE TYPE</label>
+                                <label className="text-[8px] font-semibold text-paper-700">REFEREE TYPE</label>
                                 <select
                                     value={refereeType}
                                     onChange={e => setRefereeType(e.target.value as RefereeType | '')}
@@ -178,11 +178,11 @@ const Documents = () => {
                         )}
 
                         <div className="space-y-1.5">
-                            <label className="text-[8px] font-semibold text-black/50">FILE</label>
+                            <label className="text-[8px] font-semibold text-paper-700">FILE</label>
                             <button
                                 type="button"
                                 onClick={() => fileInputRef.current?.click()}
-                                className="w-full p-4 border-[2px] border-dashed border-paper-400/20 rounded-xl text-[10px] font-semibold text-black/40 hover:border-nile-blue hover:text-nile-blue transition-all flex items-center justify-center gap-2"
+                                className="w-full p-4 border-[2px] border-dashed border-paper-400/20 rounded-xl text-[10px] font-semibold text-paper-700 hover:border-nile-blue hover:text-nile-blue transition-all flex items-center justify-center gap-2"
                             >
                                 <Upload size={14} /> {pendingFile ? pendingFile.name : 'CHOOSE FILE'}
                             </button>
@@ -204,10 +204,10 @@ const Documents = () => {
                     <div className="space-y-8">
                         {grouped.map(group => (
                             <div key={group.value} className="space-y-3">
-                                <h3 className="text-[10px] font-semibold text-black/40 tracking-wider">{group.label.toUpperCase()}</h3>
+                                <h3 className="text-[10px] font-semibold text-paper-700 tracking-wider">{group.label.toUpperCase()}</h3>
                                 {group.docs.length === 0 ? (
                                     <div className="py-6 text-center border-[2px] border-dashed border-paper-400/10 rounded-[18px]">
-                                        <p className="text-[9px] font-semibold text-black/20">NO {group.label.toUpperCase()} UPLOADED YET</p>
+                                        <p className="text-[9px] font-semibold text-paper-600">NO {group.label.toUpperCase()} UPLOADED YET</p>
                                     </div>
                                 ) : (
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -218,13 +218,13 @@ const Documents = () => {
                                                 </div>
                                                 <div className="min-w-0 flex-1">
                                                     <div className="flex items-center gap-1.5">
-                                                        <p className="font-semibold text-[11px] text-black truncate">{doc.title}</p>
+                                                        <p className="font-semibold text-[11px] text-ink-800 truncate">{doc.title}</p>
                                                         {doc.is_default && (
                                                             <span className="text-[7px] font-semibold px-1.5 py-0.5 rounded-full bg-nile-green/10 text-nile-green border border-nile-green/20 flex-shrink-0">DEFAULT</span>
                                                         )}
                                                     </div>
                                                     {doc.referee_type && (
-                                                        <p className="text-[8px] font-semibold text-black/30 mt-0.5">{doc.referee_type.toUpperCase()} REFEREE</p>
+                                                        <p className="text-[8px] font-semibold text-paper-600 mt-0.5">{doc.referee_type.toUpperCase()} REFEREE</p>
                                                     )}
                                                     <div className="flex items-center gap-3 mt-2">
                                                         <a href={doc.file_url} target="_blank" rel="noreferrer" className="text-[8px] font-semibold text-nile-blue flex items-center gap-1 hover:underline">
@@ -234,7 +234,7 @@ const Documents = () => {
                                                             <button
                                                                 onClick={() => handleSetDefault(doc)}
                                                                 disabled={busyId === doc.id}
-                                                                className="text-[8px] font-semibold text-black/40 flex items-center gap-1 hover:text-nile-blue"
+                                                                className="text-[8px] font-semibold text-paper-700 flex items-center gap-1 hover:text-nile-blue"
                                                             >
                                                                 <Star size={10} /> SET DEFAULT
                                                             </button>

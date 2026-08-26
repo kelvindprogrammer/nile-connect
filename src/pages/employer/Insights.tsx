@@ -48,7 +48,7 @@ const EmployerInsights = () => {
     return (
         <div className="p-4 md:p-6 pb-24 md:pb-8 space-y-6 anime-fade-in font-sans max-w-4xl mx-auto">
             <div>
-                <h1 className="text-2xl font-semibold text-ink-800">Insights</h1>
+                <h1 className="co-display text-2xl text-ink-800">Insights</h1>
                 <p className="text-sm text-paper-600 mt-1">Your hiring pipeline at a glance</p>
             </div>
 
@@ -131,7 +131,7 @@ const EmployerInsights = () => {
 const StatCard = ({ label, value, icon, onClick, accent }: { label: string; value: number; icon: React.ReactNode; onClick: () => void; accent?: boolean }) => (
     <button onClick={onClick} className="bg-white border border-paper-300 rounded-xl p-4 shadow-card text-left hover:shadow-card-hover transition-all">
         <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-2 ${accent ? 'bg-nile-green/10 text-nile-green' : 'bg-paper-100 text-paper-700'}`}>{icon}</div>
-        <p className="text-xl font-semibold text-ink-800 leading-none">{value}</p>
+        <p className="font-display text-xl text-ink-800 leading-none">{value}</p>
         <p className="text-xs text-paper-600 mt-1">{label}</p>
     </button>
 );

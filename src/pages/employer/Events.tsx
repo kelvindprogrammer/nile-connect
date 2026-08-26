@@ -15,9 +15,9 @@ const categoryColors: Record<string, string> = {
     seminar:       'bg-orange-50 text-orange-500 border-orange-200',
     info_session:  'bg-yellow-50 text-yellow-600 border-yellow-200',
     alumni_meetup: 'bg-pink-50 text-pink-600 border-pink-200',
-    hackathon:     'bg-black text-white border-paper-400',
+    hackathon:     'bg-ink-900 text-white border-paper-400',
     tech_talk:     'bg-nile-blue/10 text-nile-blue border-nile-blue/20',
-    other:         'bg-black/5 text-black/50 border-paper-400/10',
+    other:         'bg-paper-100 text-paper-700 border-paper-400/10',
 };
 
 const EMPTY_FORM: CreateEventRequest = {
@@ -72,9 +72,9 @@ const EmployerEvents = () => {
 
     if (loading) return (
         <div className="p-4 md:p-8 space-y-6 animate-pulse">
-            <div className="h-12 bg-black/5 rounded-xl w-64" />
+            <div className="h-12 bg-paper-100 rounded-xl w-64" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[1,2,3,4].map(i => <div key={i} className="h-48 bg-black/5 rounded-[24px]" />)}
+                {[1,2,3,4].map(i => <div key={i} className="h-48 bg-paper-100 rounded-[24px]" />)}
             </div>
         </div>
     );
@@ -84,8 +84,8 @@ const EmployerEvents = () => {
 
             <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-4 border-b border-paper-300 pb-6">
                 <div>
-                    <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">Events .</h2>
-                    <p className="text-[9px] font-semibold text-black/40 mt-1">
+                    <h2 className="co-display text-3xl md:text-4xl text-ink-800 leading-none">Events</h2>
+                    <p className="text-[9px] font-semibold text-paper-700 mt-1">
                         CAMPUS EVENTS · {upcoming.length} UPCOMING
                     </p>
                 </div>
@@ -93,7 +93,7 @@ const EmployerEvents = () => {
                     {(['ALL EVENTS', 'MY EVENTS', 'CREATE'] as Tab[]).map(t => (
                         <button key={t} onClick={() => setTab(t)}
                             className={`flex items-center gap-1.5 px-3 md:px-5 py-2 rounded-xl font-semibold text-[8px] transition-all whitespace-nowrap
-                                ${tab === t ? 'bg-black text-white shadow-green' : 'text-black/40 hover:text-black'}`}>
+                                ${tab === t ? 'bg-ink-900 text-white shadow-green' : 'text-paper-700 hover:text-ink-800'}`}>
                             {t === 'CREATE' && <Plus size={11} strokeWidth={3} />}
                             {t}
                         </button>
@@ -106,10 +106,10 @@ const EmployerEvents = () => {
                 <div className="space-y-8 anime-fade-in">
                     {tab === 'MY EVENTS' && myEvents.length === 0 && (
                         <div className="py-20 text-center border-[2px] border-dashed border-paper-400/10 rounded-[28px]">
-                            <Calendar size={28} className="text-black/15 mx-auto mb-4" />
-                            <p className="text-[9px] font-semibold text-black/30">You haven't created any events yet</p>
+                            <Calendar size={28} className="text-paper-500 mx-auto mb-4" />
+                            <p className="text-[9px] font-semibold text-paper-600">You haven't created any events yet</p>
                             <button onClick={() => setTab('CREATE')}
-                                className="mt-5 px-5 py-2.5 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all">
+                                className="mt-5 px-5 py-2.5 bg-ink-900 text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all">
                                 <Plus size={11} className="inline mr-1.5" /> CREATE EVENT
                             </button>
                         </div>
@@ -117,7 +117,7 @@ const EmployerEvents = () => {
 
                     {upcoming.length > 0 && (
                         <div className="space-y-4">
-                            <h3 className="text-[9px] font-semibold text-black/40">UPCOMING</h3>
+                            <h3 className="text-[9px] font-semibold text-paper-700">UPCOMING</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {upcoming.map(e => <EventCard key={e.id} event={e} />)}
                             </div>
@@ -126,7 +126,7 @@ const EmployerEvents = () => {
 
                     {past.length > 0 && (
                         <div className="space-y-4">
-                            <h3 className="text-[9px] font-semibold text-black/30">PAST / CANCELLED</h3>
+                            <h3 className="text-[9px] font-semibold text-paper-600">PAST / CANCELLED</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 opacity-60">
                                 {past.map(e => <EventCard key={e.id} event={e} />)}
                             </div>
@@ -135,8 +135,8 @@ const EmployerEvents = () => {
 
                     {displayed.length === 0 && tab === 'ALL EVENTS' && (
                         <div className="py-20 text-center border-[2px] border-dashed border-paper-400/10 rounded-[28px]">
-                            <Calendar size={28} className="text-black/15 mx-auto mb-4" />
-                            <p className="text-[9px] font-semibold text-black/30">No events on the platform yet</p>
+                            <Calendar size={28} className="text-paper-500 mx-auto mb-4" />
+                            <p className="text-[9px] font-semibold text-paper-600">No events on the platform yet</p>
                         </div>
                     )}
                 </div>
@@ -147,12 +147,12 @@ const EmployerEvents = () => {
                 <div className="max-w-2xl anime-fade-in">
                     <div className="bg-white border border-paper-300 rounded-[28px] p-6 md:p-8 shadow-card">
                         <div className="flex items-center gap-3 mb-6 pb-5 border-b border-paper-300/5">
-                            <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center">
+                            <div className="w-10 h-10 bg-ink-900 rounded-xl flex items-center justify-center">
                                 <Calendar size={18} className="text-nile-green" />
                             </div>
                             <div>
                                 <h3 className="font-semibold text-sm">Create Event</h3>
-                                <p className="text-[8px] font-semibold text-black/40">SUBMITTED FOR STAFF APPROVAL</p>
+                                <p className="text-[8px] font-semibold text-paper-700">SUBMITTED FOR STAFF APPROVAL</p>
                             </div>
                         </div>
 
@@ -196,7 +196,7 @@ const EmployerEvents = () => {
                                     className="w-full border border-paper-300 rounded-xl py-3 px-4 font-semibold text-xs outline-none focus:shadow-blue bg-nile-white/40 focus:bg-white transition-all resize-none" />
                             </F>
                             <button type="submit" disabled={submitting}
-                                className="w-full py-4 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all disabled:opacity-40 flex items-center justify-center gap-2">
+                                className="w-full py-4 bg-ink-900 text-white border border-paper-300 rounded-xl font-semibold text-[9px] shadow-green transition-all disabled:opacity-40 flex items-center justify-center gap-2">
                                 {submitting ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
                                 {submitting ? 'SUBMITTING...' : 'SUBMIT FOR APPROVAL'}
                             </button>
@@ -220,7 +220,7 @@ const EventCard = ({ event }: { event: StaffEvent }) => {
                 </span>
             </div>
             <h3 className="font-semibold text-sm leading-tight">{event.title}</h3>
-            <div className="space-y-1.5 text-[8px] font-semibold text-black/50">
+            <div className="space-y-1.5 text-[8px] font-semibold text-paper-700">
                 <div className="flex items-center gap-2">
                     <Calendar size={10} className="text-nile-blue" />
                     <span>{new Date(event.date).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })} · {event.time}</span>
@@ -231,7 +231,7 @@ const EventCard = ({ event }: { event: StaffEvent }) => {
                 </div>
             </div>
             <div className="space-y-1.5">
-                <div className="flex justify-between text-[7px] font-semibold text-black/40">
+                <div className="flex justify-between text-[7px] font-semibold text-paper-700">
                     <span className="flex items-center gap-1"><Users size={9} />{event.registrations_count}/{event.capacity}</span>
                     <span>{regPct}%</span>
                 </div>
@@ -245,7 +245,7 @@ const EventCard = ({ event }: { event: StaffEvent }) => {
 
 const F = ({ label, children }: { label: string; children: React.ReactNode }) => (
     <div className="space-y-1.5">
-        <label className="text-[8px] font-semibold text-black/50">{label}</label>
+        <label className="text-[8px] font-semibold text-paper-700">{label}</label>
         {children}
     </div>
 );

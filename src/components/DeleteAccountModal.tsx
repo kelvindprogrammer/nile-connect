@@ -46,11 +46,11 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ onClose }) => {
                             <AlertTriangle size={18} className="text-red-500" strokeWidth={3} />
                         </div>
                         <div>
-                            <h3 className="font-semibold text-lg uppercase tracking-tight text-black">Delete Account</h3>
+                            <h3 className="co-display text-xl text-ink-800">Delete account</h3>
                             <p className="text-[8px] font-semibold text-red-500 tracking-tight">PERMANENT · IRREVERSIBLE</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="p-1.5 border-2 border-paper-400/10 rounded-lg hover:bg-black/5 transition-colors">
+                    <button onClick={onClose} className="p-1.5 border-2 border-paper-400/10 rounded-lg hover:bg-paper-100 transition-colors">
                         <X size={14} strokeWidth={3} />
                     </button>
                 </div>
@@ -74,7 +74,7 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ onClose }) => {
 
                 {/* Confirm input */}
                 <div className="space-y-2">
-                    <label className="text-[9px] font-semibold text-black/50 tracking-tight">
+                    <label className="text-[9px] font-semibold text-paper-700 tracking-tight">
                         Type <span className="text-red-500 font-semibold">DELETE</span> to confirm
                     </label>
                     <input
@@ -90,7 +90,7 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ onClose }) => {
                 <div className="flex gap-3">
                     <button
                         onClick={onClose}
-                        className="flex-1 py-3 border-[2px] border-paper-400 rounded-xl font-semibold text-[10px] tracking-tight hover:bg-black hover:text-white transition-all"
+                        className="flex-1 py-3 border-[2px] border-paper-400 rounded-xl font-semibold text-[10px] tracking-tight hover:bg-ink-900 hover:text-white transition-all"
                     >
                         CANCEL
                     </button>

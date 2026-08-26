@@ -32,7 +32,7 @@ function renderInline(text: string): React.ReactNode[] {
             return <em key={i}>{part.slice(1, -1)}</em>;
         }
         if (part.startsWith('`') && part.endsWith('`') && part.length > 2) {
-            return <code key={i} className="bg-black/10 px-1 rounded text-[0.9em] font-mono">{part.slice(1, -1)}</code>;
+            return <code key={i} className="bg-paper-200 px-1 rounded text-[0.9em] font-mono">{part.slice(1, -1)}</code>;
         }
         return <React.Fragment key={i}>{part}</React.Fragment>;
     });

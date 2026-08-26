@@ -26,12 +26,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
         return (
             <div className="flex flex-col items-center justify-center h-screen bg-paper-100 font-sans">
                 <h1 className="text-4xl font-semibold text-red-600 mb-4 tracking-tight">Access Denied</h1>
-                <p className="text-xl font-bold text-black mb-8 text-center max-w-md">
+                <p className="text-xl font-bold text-ink-800 mb-8 text-center max-w-md">
                     Your current role ({user.role}) does not have permission to access this portal.
                 </p>
                 <button
                     onClick={() => window.location.href = '/login'}
-                    className="px-6 py-3 bg-black text-white font-semibold tracking-tight border-2 border-paper-400 hover:bg-blue-800 transition-colors"
+                    className="px-6 py-3 bg-ink-900 text-white font-semibold tracking-tight border-2 border-paper-400 hover:bg-blue-800 transition-colors"
                 >
                     Return to Login
                 </button>

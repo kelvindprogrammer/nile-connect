@@ -12,7 +12,7 @@ const ProfileCompletion = () => {
             <BrutalistIconBox className="mb-12">
                 👤
             </BrutalistIconBox>
-            <h2 className="text-4xl font-semibold text-black tracking-tight">
+            <h2 className="co-display text-4xl text-ink-800">
                 FINAL STEPS
             </h2>
         </div>
@@ -22,17 +22,17 @@ const ProfileCompletion = () => {
         <AuthLayout leftContent={leftPanelContent}>
             <div className="space-y-10 anime-fade-in">
                 <div className="space-y-4">
-                    <h1 className="text-5xl font-semibold text-black">
-                        ALMOST DONE .
+                    <h1 className="co-display text-4xl md:text-5xl text-ink-800">
+                        Almost done
                     </h1>
                     <p className="text-lg font-bold text-nile-blue">
-                        HELP US PERSONALIZE YOUR EXPERIENCE .
+                        Help us personalise your experience
                     </p>
                 </div>
 
                 <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); redirectToPortal('student'); }}>
                     <div className="space-y-3">
-                        <label className="text-sm font-semibold text-black tracking-widest uppercase">Major</label>
+                        <label className="text-sm font-medium text-ink-800">Major</label>
                         <select 
                             className="w-full p-5 rounded-full border-3 border-paper-400 shadow-soft-xs focus:translate-x-[1px] focus:translate-y-[1px] focus:shadow-none outline-none transition-all bg-white font-bold appearance-none"
                         >
@@ -45,7 +45,7 @@ const ProfileCompletion = () => {
                     </div>
 
                     <div className="space-y-3">
-                        <label className="text-sm font-semibold text-black tracking-widest uppercase">Expected Graduation Year</label>
+                        <label className="text-sm font-medium text-ink-800">Expected graduation year</label>
                         <input 
                             type="number" 
                             placeholder="2026"
@@ -66,7 +66,7 @@ const ProfileCompletion = () => {
                 </form>
 
                 <p className="text-center text-sm font-semibold text-nile-blue/70">
-                    NEED HELP ? <button className="text-black hover:underline underline-offset-4">CONTACT SUPPORT</button>
+                    NEED HELP ? <button className="text-ink-800 hover:underline underline-offset-4">CONTACT SUPPORT</button>
                 </p>
             </div>
         </AuthLayout>

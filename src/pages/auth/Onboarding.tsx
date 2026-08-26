@@ -88,10 +88,10 @@ const Onboarding = () => {
                         </div>
 
                         <div className="space-y-1">
-                            <p className="text-2xl font-semibold text-white uppercase leading-none tracking-[0.2em]">
+                            <p className="text-2xl font-semibold text-white uppercase leading-none tracking-[0.14em]">
                                 {slide.leftLabel}
                             </p>
-                            <p className="text-[9px] font-semibold text-white/50 uppercase tracking-[0.4em]">
+                            <p className="text-[11px] font-semibold text-white/50 uppercase tracking-[0.14em]">
                                 {slide.leftSub}
                             </p>
                         </div>
@@ -104,10 +104,10 @@ const Onboarding = () => {
 
                         {/* Slide Text */}
                         <div className="space-y-3 text-left" key={`text-${step}`} style={{ animation: 'fadeIn 0.4s ease-out' }}>
-                            <h1 className="text-4xl font-semibold text-black uppercase tracking-tight leading-none">
+                            <h1 className="co-display text-4xl text-ink-800 leading-none">
                                 {slide.heading}
                             </h1>
-                            <p className="text-[9px] font-semibold text-nile-blue uppercase tracking-[0.2em] leading-relaxed">
+                            <p className="text-[11px] font-semibold text-nile-blue uppercase tracking-[0.14em] leading-relaxed">
                                 {slide.description}
                             </p>
                         </div>
@@ -115,7 +115,7 @@ const Onboarding = () => {
                         {/* CTA */}
                         <button
                             onClick={handleNext}
-                            className="w-full bg-nile-blue text-white font-semibold py-4 px-6 rounded-xl border-[2px] border-paper-400 shadow-[4px_4px_0px_0px_rgba(108,187,86,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all uppercase tracking-[0.2em] text-xs flex items-center justify-center space-x-3"
+                            className="w-full bg-nile-blue text-white font-semibold py-4 px-6 rounded-xl border-[2px] border-paper-400 shadow-[4px_4px_0px_0px_rgba(108,187,86,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all uppercase tracking-[0.14em] text-xs flex items-center justify-center space-x-3"
                         >
                             <span>{slide.cta}</span>
                             <ArrowRight size={16} strokeWidth={3} />
@@ -140,13 +140,13 @@ const Onboarding = () => {
                         <div className="pt-4 border-t-[2px] border-paper-400/5 flex justify-between items-center">
                             <button
                                 onClick={finish}
-                                className="text-[9px] font-semibold text-nile-blue/40 hover:text-black transition-colors uppercase tracking-[0.15em] border-b-[1px] border-transparent hover:border-paper-400/20 pb-0.5"
+                                className="text-[11px] font-semibold text-nile-blue/40 hover:text-ink-800 transition-colors uppercase tracking-[0.14em] border-b-[1px] border-transparent hover:border-paper-400/20 pb-0.5"
                             >
                                 ALREADY HAVE AN ACCOUNT?
                             </button>
                             <button
                                 onClick={finish}
-                                className="text-[9px] font-semibold text-black/20 hover:text-nile-blue transition-colors uppercase tracking-[0.15em]"
+                                className="text-[11px] font-semibold text-paper-600 hover:text-nile-blue transition-colors uppercase tracking-[0.14em]"
                             >
                                 SKIP →
                             </button>

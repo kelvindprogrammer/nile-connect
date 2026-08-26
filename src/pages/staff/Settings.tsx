@@ -81,17 +81,17 @@ const StaffSettings = () => {
             <div className="bg-white border border-paper-300 rounded-[24px] shadow-card p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-1/3 h-full bg-black/[0.03] -skew-x-12 translate-x-1/4 pointer-events-none" />
                 <div className="space-y-2 z-10">
-                    <span className="px-3 py-1 bg-black text-white text-[8px] font-semibold rounded-full">ADMIN CONFIG</span>
-                    <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">System Config .</h2>
-                    <p className="text-[10px] font-bold text-black/40">Administrative controls and platform security protocols.</p>
+                    <span className="px-3 py-1 bg-ink-900 text-white text-[8px] font-semibold rounded-full">ADMIN CONFIG</span>
+                    <h2 className="co-display text-3xl md:text-4xl text-ink-800 leading-none">System configuration</h2>
+                    <p className="text-[10px] font-bold text-paper-700">Administrative controls and platform security protocols.</p>
                 </div>
                 <div className="hidden md:flex items-center gap-4 z-10">
-                    <div className="w-14 h-14 bg-black text-nile-green rounded-[18px] border border-paper-300 flex items-center justify-center shadow-green">
+                    <div className="w-14 h-14 bg-ink-900 text-nile-green rounded-[18px] border border-paper-300 flex items-center justify-center shadow-green">
                         <ShieldCheck size={26} />
                     </div>
                     <div>
-                        <p className="font-semibold text-sm text-black">{staffName}</p>
-                        <p className="text-[9px] font-semibold text-black/30">STAFF ADMINISTRATOR</p>
+                        <p className="font-semibold text-sm text-ink-800">{staffName}</p>
+                        <p className="text-[9px] font-semibold text-paper-600">STAFF ADMINISTRATOR</p>
                         <p className="text-[8px] font-bold text-nile-blue/60 truncate max-w-[180px]">{email}</p>
                     </div>
                 </div>
@@ -100,10 +100,10 @@ const StaffSettings = () => {
             {/* Quick Actions */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
-                    { label: 'Students', icon: <Users size={16} />, path: '/staff/services', color: 'hover:bg-black hover:text-white' },
+                    { label: 'Students', icon: <Users size={16} />, path: '/staff/services', color: 'hover:bg-ink-900 hover:text-white' },
                     { label: 'Reports', icon: <BarChart2 size={16} />, path: '/staff/reports', color: 'hover:bg-nile-blue hover:text-white' },
                     { label: 'Audit Log', icon: <Eye size={16} />, path: '/staff/applications', color: 'hover:bg-nile-green hover:text-white' },
-                    { label: 'CRM', icon: <Bell size={16} />, path: '/staff/crm', color: 'hover:bg-yellow-400 hover:text-black' },
+                    { label: 'CRM', icon: <Bell size={16} />, path: '/staff/crm', color: 'hover:bg-yellow-400 hover:text-ink-800' },
                 ].map(a => (
                     <button
                         key={a.label}
@@ -129,8 +129,8 @@ const StaffSettings = () => {
                     <Divider />
                     <div className="flex items-center justify-between py-1">
                         <div className="space-y-0.5">
-                            <p className="text-[11px] font-semibold text-black">Platform Status</p>
-                            <p className="text-[9px] font-bold text-black/30">Nile Connect is fully operational.</p>
+                            <p className="text-[11px] font-semibold text-ink-800">Platform Status</p>
+                            <p className="text-[9px] font-bold text-paper-600">Nile Connect is fully operational.</p>
                         </div>
                         <span className="flex items-center gap-1 px-2.5 py-1 bg-nile-green/10 text-nile-green text-[8px] font-semibold rounded-full border border-nile-green/20">
                             <CheckCircle2 size={10} strokeWidth={3} /> LIVE
@@ -139,12 +139,12 @@ const StaffSettings = () => {
                     <Divider />
                     <div className="flex items-center justify-between py-1">
                         <div className="space-y-0.5">
-                            <p className="text-[11px] font-semibold text-black">Dashboard Overview</p>
-                            <p className="text-[9px] font-bold text-black/30">View platform-wide metrics and engagement reports.</p>
+                            <p className="text-[11px] font-semibold text-ink-800">Dashboard Overview</p>
+                            <p className="text-[9px] font-bold text-paper-600">View platform-wide metrics and engagement reports.</p>
                         </div>
                         <button
                             onClick={() => navigate('/staff')}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-black text-white border border-paper-300 rounded-lg font-semibold text-[8px] shadow-card transition-all"
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-ink-900 text-white border border-paper-300 rounded-lg font-semibold text-[8px] shadow-card transition-all"
                         >
                             VIEW
                         </button>
@@ -162,8 +162,8 @@ const StaffSettings = () => {
                     <Divider />
                     <div className="flex items-center justify-between py-1">
                         <div className="space-y-0.5">
-                            <p className="text-[11px] font-semibold text-black">Campus One SSO</p>
-                            <p className="text-[9px] font-bold text-black/30">Authentication handled by Nile University SSO.</p>
+                            <p className="text-[11px] font-semibold text-ink-800">Campus One SSO</p>
+                            <p className="text-[9px] font-bold text-paper-600">Authentication handled by Nile University SSO.</p>
                         </div>
                         <span className="flex items-center gap-1 px-2.5 py-1 bg-nile-blue/10 text-nile-blue text-[8px] font-semibold rounded-full border border-nile-blue/20">
                             <Lock size={10} strokeWidth={3} /> SECURED
@@ -172,10 +172,10 @@ const StaffSettings = () => {
                     <Divider />
                     <div className="flex items-center justify-between py-1">
                         <div className="space-y-0.5">
-                            <p className="text-[11px] font-semibold text-black">Active Admin Sessions</p>
-                            <p className="text-[9px] font-bold text-black/30">You are signed in on this device.</p>
+                            <p className="text-[11px] font-semibold text-ink-800">Active Admin Sessions</p>
+                            <p className="text-[9px] font-bold text-paper-600">You are signed in on this device.</p>
                         </div>
-                        <ChevronRight size={16} className="text-black/20" />
+                        <ChevronRight size={16} className="text-paper-600" />
                     </div>
                 </Section>
 
@@ -204,12 +204,12 @@ const StaffSettings = () => {
                     <Divider />
                     <div className="flex items-center justify-between py-1">
                         <div className="space-y-0.5">
-                            <p className="text-[11px] font-semibold text-black">Export Platform Data</p>
-                            <p className="text-[9px] font-bold text-black/30">Download CSV reports for students, jobs and applications.</p>
+                            <p className="text-[11px] font-semibold text-ink-800">Export Platform Data</p>
+                            <p className="text-[9px] font-bold text-paper-600">Download CSV reports for students, jobs and applications.</p>
                         </div>
                         <button
                             onClick={() => navigate('/staff/reports')}
-                            className="flex items-center gap-1.5 px-3 py-1.5 border border-paper-300 rounded-lg font-semibold text-[8px] hover:bg-black hover:text-white transition-all"
+                            className="flex items-center gap-1.5 px-3 py-1.5 border border-paper-300 rounded-lg font-semibold text-[8px] hover:bg-ink-900 hover:text-white transition-all"
                         >
                             <BarChart2 size={10} /> REPORTS
                         </button>
@@ -221,7 +221,7 @@ const StaffSettings = () => {
                     <button
                         onClick={handleSave}
                         disabled={saving}
-                        className="flex items-center gap-2 px-8 py-3 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[10px] shadow-card transition-all disabled:opacity-50 disabled:pointer-events-none"
+                        className="flex items-center gap-2 px-8 py-3 bg-ink-900 text-white border border-paper-300 rounded-xl font-semibold text-[10px] shadow-card transition-all disabled:opacity-50 disabled:pointer-events-none"
                     >
                         {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                         {saving ? 'COMMITTING...' : 'COMMIT CHANGES'}
@@ -233,8 +233,8 @@ const StaffSettings = () => {
                     <div className="space-y-3">
                         <div className="flex items-center justify-between py-1">
                             <div className="space-y-0.5 mr-4">
-                                <p className="text-[11px] font-semibold text-black">Database Cleanup</p>
-                                <p className="text-[9px] font-bold text-black/30">
+                                <p className="text-[11px] font-semibold text-ink-800">Database Cleanup</p>
+                                <p className="text-[9px] font-bold text-paper-600">
                                     {cleanupLoading
                                         ? 'Scanning for duplicate and test accounts…'
                                         : totalFlagged === 0
@@ -247,7 +247,7 @@ const StaffSettings = () => {
                                     onClick={fetchCleanup}
                                     disabled={cleanupLoading}
                                     title="Rescan database"
-                                    className="flex items-center gap-1.5 px-3 py-1.5 border border-paper-300 rounded-lg font-semibold text-[8px] text-black hover:bg-black hover:text-white transition-all disabled:opacity-40"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 border border-paper-300 rounded-lg font-semibold text-[8px] text-ink-800 hover:bg-ink-900 hover:text-white transition-all disabled:opacity-40"
                                 >
                                     <RefreshCw size={10} className={cleanupLoading ? 'animate-spin' : ''} /> RESCAN
                                 </button>
@@ -264,14 +264,14 @@ const StaffSettings = () => {
                         {!cleanupLoading && totalFlagged > 0 && (
                             <div className="rounded-xl bg-red-50 border border-red-100 p-3 space-y-1.5 max-h-40 overflow-y-auto">
                                 {cleanup?.duplicate_groups.map(g => (
-                                    <p key={g.email} className="text-[8px] font-semibold text-black/50 leading-relaxed">
+                                    <p key={g.email} className="text-[8px] font-semibold text-paper-700 leading-relaxed">
                                         <span className="text-red-500 font-bold">DUPLICATE</span> — {g.email}: keeping{' '}
-                                        <span className="text-black">{g.keep_name || 'unnamed'}</span>, removing{' '}
+                                        <span className="text-ink-800">{g.keep_name || 'unnamed'}</span>, removing{' '}
                                         {g.duplicate_names.filter(Boolean).join(', ') || g.duplicate_ids.length + ' account(s)'}
                                     </p>
                                 ))}
                                 {cleanup?.dummy_accounts.map(d => (
-                                    <p key={d.id} className="text-[8px] font-semibold text-black/50 leading-relaxed">
+                                    <p key={d.id} className="text-[8px] font-semibold text-paper-700 leading-relaxed">
                                         <span className="text-red-500 font-bold">TEST DATA</span> — {d.name || d.email || d.id} ({d.role})
                                     </p>
                                 ))}
@@ -281,12 +281,12 @@ const StaffSettings = () => {
                     <Divider />
                     <div className="flex items-center justify-between py-1">
                         <div className="space-y-0.5">
-                            <p className="text-[11px] font-semibold text-black">Sign Out</p>
-                            <p className="text-[9px] font-bold text-black/30">End your admin session securely.</p>
+                            <p className="text-[11px] font-semibold text-ink-800">Sign Out</p>
+                            <p className="text-[9px] font-bold text-paper-600">End your admin session securely.</p>
                         </div>
                         <button
                             onClick={() => logout()}
-                            className="flex items-center gap-1.5 px-3 py-1.5 border border-paper-300 rounded-lg font-semibold text-[8px] text-black hover:bg-black hover:text-white transition-all"
+                            className="flex items-center gap-1.5 px-3 py-1.5 border border-paper-300 rounded-lg font-semibold text-[8px] text-ink-800 hover:bg-ink-900 hover:text-white transition-all"
                         >
                             <LogOut size={10} /> SIGN OUT
                         </button>
@@ -306,10 +306,10 @@ const StaffSettings = () => {
                     >
                         <div className="flex items-center gap-2 text-red-500">
                             <AlertTriangle size={18} />
-                            <h3 className="font-semibold text-sm text-black">Confirm Database Cleanup</h3>
+                            <h3 className="font-semibold text-sm text-ink-800">Confirm Database Cleanup</h3>
                         </div>
-                        <p className="text-[10px] font-semibold text-black/50 leading-relaxed">
-                            This will permanently delete <span className="text-black">{totalFlagged}</span> account{totalFlagged === 1 ? '' : 's'}{' '}
+                        <p className="text-[10px] font-semibold text-paper-700 leading-relaxed">
+                            This will permanently delete <span className="text-ink-800">{totalFlagged}</span> account{totalFlagged === 1 ? '' : 's'}{' '}
                             ({cleanup?.duplicate_count ?? 0} duplicate, {cleanup?.dummy_count ?? 0} test/demo) along with all of their
                             posts, messages, applications, events and connections. This cannot be undone.
                         </p>
@@ -317,7 +317,7 @@ const StaffSettings = () => {
                             <button
                                 onClick={() => setShowCleanupConfirm(false)}
                                 disabled={cleanupRunning}
-                                className="px-4 py-2 border border-paper-300 rounded-xl font-semibold text-[9px] hover:bg-black/5 transition-all disabled:opacity-40"
+                                className="px-4 py-2 border border-paper-300 rounded-xl font-semibold text-[9px] hover:bg-paper-100 transition-all disabled:opacity-40"
                             >
                                 CANCEL
                             </button>
@@ -343,7 +343,7 @@ const Section = ({ icon, label, children, danger = false }: {
     icon: React.ReactNode; label: string; children: React.ReactNode; danger?: boolean;
 }) => (
     <section className="space-y-3">
-        <h3 className={`text-[9px] font-semibold flex items-center gap-2 ${danger ? 'text-red-500' : 'text-black/40'}`}>
+        <h3 className={`text-[9px] font-semibold flex items-center gap-2 ${danger ? 'text-red-500' : 'text-paper-700'}`}>
             {icon} {label}
         </h3>
         <div className={`bg-white border border-paper-300 rounded-[20px] p-5 shadow-card space-y-3 ${danger ? 'border-red-200' : ''}`}>
@@ -357,12 +357,12 @@ const Divider = () => <div className="border-t border-dashed border-paper-400/5"
 const ToggleRow = ({ label, desc, on, onFlip }: { label: string; desc: string; on: boolean; onFlip: () => void }) => (
     <div className="flex items-center justify-between py-1">
         <div className="space-y-0.5 mr-4">
-            <p className="text-[11px] font-semibold text-black">{label}</p>
-            <p className="text-[9px] font-bold text-black/30">{desc}</p>
+            <p className="text-[11px] font-semibold text-ink-800">{label}</p>
+            <p className="text-[9px] font-bold text-paper-600">{desc}</p>
         </div>
         <button
             onClick={onFlip}
-            className={`w-11 h-6 rounded-full relative p-1 transition-all flex-shrink-0 ${on ? 'bg-black' : 'bg-black/10'}`}
+            className={`w-11 h-6 rounded-full relative p-1 transition-all flex-shrink-0 ${on ? 'bg-ink-900' : 'bg-paper-200'}`}
         >
             <div className={`w-4 h-4 bg-white rounded-full transition-all absolute top-1 ${on ? 'right-1' : 'left-1'}`} />
         </button>

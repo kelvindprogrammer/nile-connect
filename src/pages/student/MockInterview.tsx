@@ -22,9 +22,9 @@ interface QA {
 
 const interviewTypes: { id: InterviewType; label: string; desc: string; icon: React.ReactNode; color: string }[] = [
     { id: 'behavioral', label: 'Behavioral', desc: 'STAR method questions about past experience', icon: <MessageSquare size={22} />, color: 'bg-nile-blue text-white' },
-    { id: 'technical', label: 'Technical', desc: 'Problem-solving & coding concepts', icon: <Brain size={22} />, color: 'bg-black text-white' },
+    { id: 'technical', label: 'Technical', desc: 'Problem-solving & coding concepts', icon: <Brain size={22} />, color: 'bg-ink-900 text-white' },
     { id: 'hr', label: 'HR Round', desc: 'Culture fit, motivation & career goals', icon: <Star size={22} />, color: 'bg-nile-green text-white' },
-    { id: 'case', label: 'Case Study', desc: 'Business problem-solving & analysis', icon: <Award size={22} />, color: 'bg-yellow-400 text-black' },
+    { id: 'case', label: 'Case Study', desc: 'Business problem-solving & analysis', icon: <Award size={22} />, color: 'bg-yellow-400 text-ink-800' },
 ];
 
 const SYSTEM_PROMPT = (type: InterviewType, role: string) =>
@@ -150,18 +150,18 @@ const MockInterview = () => {
             <>
                 <div className="p-4 md:p-10 space-y-8 font-sans bg-nile-white min-h-full pb-24 text-left anime-fade-in">
                     <div className="flex items-center gap-4 border-b border-paper-300 pb-6">
-                        <button onClick={() => navigate('/student/career')} className="p-2 border border-paper-300 rounded-xl hover:bg-black hover:text-white transition-all">
+                        <button onClick={() => navigate('/student/career')} className="p-2 border border-paper-300 rounded-xl hover:bg-ink-900 hover:text-white transition-all">
                             <ArrowLeft size={18} strokeWidth={3} />
                         </button>
                         <div>
-                            <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">Mock Interview .</h2>
+                            <h2 className="co-display text-3xl md:text-4xl text-ink-800 leading-none">Mock interview</h2>
                             <p className="text-[10px] font-semibold text-nile-blue/50 mt-1">AI-Powered Interview Simulator</p>
                         </div>
                     </div>
 
                     <div className="max-w-2xl space-y-8">
                         <div className="space-y-3">
-                            <h3 className="text-xs font-semibold text-black/50">SELECT INTERVIEW TYPE</h3>
+                            <h3 className="text-xs font-semibold text-paper-700">SELECT INTERVIEW TYPE</h3>
                             <div className="grid grid-cols-2 gap-3">
                                 {interviewTypes.map(t => (
                                     <button
@@ -176,7 +176,7 @@ const MockInterview = () => {
                                         <div className={`w-10 h-10 rounded-xl border border-paper-300 flex items-center justify-center mb-3 ${t.color}`}>
                                             {t.icon}
                                         </div>
-                                        <p className="font-semibold text-sm text-black">{t.label}</p>
+                                        <p className="font-semibold text-sm text-ink-800">{t.label}</p>
                                         <p className="text-[8px] font-bold text-nile-blue/50 mt-1">{t.desc}</p>
                                     </button>
                                 ))}
@@ -184,7 +184,7 @@ const MockInterview = () => {
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-[9px] font-semibold text-black">Target Role (optional)</label>
+                            <label className="text-[9px] font-semibold text-ink-800">Target Role (optional)</label>
                             <input
                                 type="text"
                                 value={role}
@@ -198,7 +198,7 @@ const MockInterview = () => {
                             <p className="text-[9px] font-semibold text-nile-blue">WHAT TO EXPECT</p>
                             <ul className="space-y-1.5">
                                 {['5 curated questions based on your type', 'AI evaluates each answer in real time', 'Detailed feedback with score and tips', 'Overall performance report at the end'].map((item, i) => (
-                                    <li key={i} className="flex items-center gap-2 text-[10px] font-bold text-black/70">
+                                    <li key={i} className="flex items-center gap-2 text-[10px] font-bold text-paper-700">
                                         <CheckCircle2 size={12} className="text-nile-green flex-shrink-0" strokeWidth={3} />
                                         {item}
                                     </li>
@@ -228,32 +228,32 @@ const MockInterview = () => {
             <>
                 <div className="p-4 md:p-10 space-y-8 font-sans bg-nile-white min-h-full pb-24 text-left anime-fade-in">
                     <div className="flex items-center gap-4 border-b border-paper-300 pb-6">
-                        <button onClick={() => navigate('/student/career')} className="p-2 border border-paper-300 rounded-xl hover:bg-black hover:text-white transition-all">
+                        <button onClick={() => navigate('/student/career')} className="p-2 border border-paper-300 rounded-xl hover:bg-ink-900 hover:text-white transition-all">
                             <ArrowLeft size={18} strokeWidth={3} />
                         </button>
-                        <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">Session Report .</h2>
+                        <h2 className="co-display text-3xl md:text-4xl text-ink-800 leading-none">Session report</h2>
                     </div>
 
                     <div className="bg-white border border-paper-300 rounded-[28px] p-6 md:p-10 shadow-card flex flex-col md:flex-row gap-8 items-center">
                         <div className="text-center md:text-left space-y-2">
-                            <p className="text-[9px] font-semibold text-black/40">OVERALL SCORE</p>
+                            <p className="text-[9px] font-semibold text-paper-700">OVERALL SCORE</p>
                             <p className={`text-7xl md:text-9xl font-semibold leading-none ${scoreColor}`}>{avgScore}<span className="text-3xl">/10</span></p>
-                            <p className="text-[10px] font-semibold text-black/50">
+                            <p className="text-[10px] font-semibold text-paper-700">
                                 {avgScore >= 8 ? 'EXCELLENT PERFORMANCE' : avgScore >= 6 ? 'GOOD EFFORT — ROOM TO GROW' : 'KEEP PRACTISING'}
                             </p>
                         </div>
                         <div className="flex-1 grid grid-cols-3 gap-4">
                             <div className="text-center p-4 bg-nile-blue/5 rounded-[16px] border border-paper-300/5">
-                                <p className="text-2xl font-semibold text-nile-blue">{qas.length}</p>
-                                <p className="text-[8px] font-semibold text-black/40 mt-1">QUESTIONS</p>
+                                <p className="font-display text-2xl text-nile-blue">{qas.length}</p>
+                                <p className="text-[8px] font-semibold text-paper-700 mt-1">QUESTIONS</p>
                             </div>
                             <div className="text-center p-4 bg-nile-green/5 rounded-[16px] border border-paper-300/5">
-                                <p className="text-2xl font-semibold text-nile-green">{qas.filter(q => q.score >= 7).length}</p>
-                                <p className="text-[8px] font-semibold text-black/40 mt-1">STRONG</p>
+                                <p className="font-display text-2xl text-nile-green">{qas.filter(q => q.score >= 7).length}</p>
+                                <p className="text-[8px] font-semibold text-paper-700 mt-1">STRONG</p>
                             </div>
                             <div className="text-center p-4 bg-red-50 rounded-[16px] border border-paper-300/5">
                                 <p className="text-2xl font-semibold text-red-500">{qas.filter(q => q.score < 7).length}</p>
-                                <p className="text-[8px] font-semibold text-black/40 mt-1">IMPROVE</p>
+                                <p className="text-[8px] font-semibold text-paper-700 mt-1">IMPROVE</p>
                             </div>
                         </div>
                     </div>
@@ -264,7 +264,7 @@ const MockInterview = () => {
                                 <div className="flex items-start justify-between gap-4">
                                     <div className="flex-1">
                                         <p className="text-[8px] font-semibold text-nile-blue/50 mb-1">Q{i + 1}</p>
-                                        <p className="font-semibold text-sm text-black leading-snug">{qa.question}</p>
+                                        <p className="font-semibold text-sm text-ink-800 leading-snug">{qa.question}</p>
                                     </div>
                                     <div className={`w-12 h-12 rounded-xl border border-paper-300 flex items-center justify-center font-semibold text-sm flex-shrink-0
                                         ${qa.score >= 8 ? 'bg-nile-green text-white' : qa.score >= 6 ? 'bg-nile-blue text-white' : 'bg-red-100 text-red-600'}`}>
@@ -272,8 +272,8 @@ const MockInterview = () => {
                                     </div>
                                 </div>
                                 <div className="bg-nile-white p-4 rounded-xl border border-paper-400/10">
-                                    <p className="text-[9px] font-semibold text-black/40 mb-2">YOUR ANSWER</p>
-                                    <p className="text-[10px] font-bold text-black/70 leading-relaxed">{qa.answer}</p>
+                                    <p className="text-[9px] font-semibold text-paper-700 mb-2">YOUR ANSWER</p>
+                                    <p className="text-[10px] font-bold text-paper-700 leading-relaxed">{qa.answer}</p>
                                 </div>
                                 <div className="bg-nile-blue/5 p-4 rounded-xl border border-nile-blue/10 text-[10px] text-nile-blue font-bold">
                                     <p className="text-[9px] font-semibold text-nile-blue mb-2">AI FEEDBACK</p>
@@ -301,18 +301,18 @@ const MockInterview = () => {
             <div className="p-4 md:p-8 font-sans bg-nile-white min-h-full pb-24 text-left anime-fade-in flex flex-col gap-6">
                 <div className="flex items-center justify-between border-b border-paper-300 pb-4">
                     <div className="flex items-center gap-3">
-                        <button onClick={() => navigate('/student/career')} className="p-2 border border-paper-300 rounded-xl hover:bg-black hover:text-white transition-all">
+                        <button onClick={() => navigate('/student/career')} className="p-2 border border-paper-300 rounded-xl hover:bg-ink-900 hover:text-white transition-all">
                             <ArrowLeft size={16} strokeWidth={3} />
                         </button>
                         <div>
                             <p className="text-[8px] font-semibold text-nile-blue/50">{interviewType.toUpperCase()} INTERVIEW</p>
-                            <h2 className="text-xl md:text-2xl font-semibold text-black leading-none">Question {questionCount} of 5</h2>
+                            <h2 className="co-display text-xl md:text-2xl text-ink-800 leading-none">Question {questionCount} of 5</h2>
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
                         {[1,2,3,4,5].map(n => (
                             <div key={n} className={`w-2 h-2 md:w-3 md:h-3 rounded-full border border-paper-300 transition-all
-                                ${n < questionCount ? 'bg-nile-green' : n === questionCount ? 'bg-nile-blue' : 'bg-black/10'}`} />
+                                ${n < questionCount ? 'bg-nile-green' : n === questionCount ? 'bg-nile-blue' : 'bg-paper-200'}`} />
                         ))}
                     </div>
                 </div>
@@ -366,7 +366,7 @@ const MockInterview = () => {
                                 {questionCount < 5 ? 'SUBMIT ANSWER' : 'FINISH & GET REPORT'}
                             </Button>
                         </div>
-                        <p className="text-[8px] font-semibold text-black/30 text-center">Press Ctrl+Enter to submit</p>
+                        <p className="text-[8px] font-semibold text-paper-600 text-center">Press Ctrl+Enter to submit</p>
                     </div>
                 )}
             </div>

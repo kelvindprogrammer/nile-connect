@@ -105,7 +105,7 @@ const Stat: React.FC<{
 }> = ({ Icon, label, value }) => (
     <div className="bg-paper-100 border border-paper-300 rounded-xl p-3.5">
         <Icon size={14} className="text-nile-blue mb-1.5" />
-        <p className="text-xl font-semibold text-ink-800 leading-none">{value}</p>
+        <p className="font-display text-xl text-ink-800 leading-none">{value}</p>
         <p className="text-[11px] text-paper-600 mt-1">{label}</p>
     </div>
 );

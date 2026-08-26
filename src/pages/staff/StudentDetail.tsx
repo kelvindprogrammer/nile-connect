@@ -117,12 +117,12 @@ const StaffStudentDetail = () => {
     if (notFound || !student) return (
         <div className="p-8 anime-fade-in text-left space-y-6">
             <button onClick={() => navigate(-1)}
-                className="flex items-center gap-2 text-black/40 font-semibold text-[9px] hover:text-black transition-colors">
+                className="flex items-center gap-2 text-paper-700 font-semibold text-[9px] hover:text-ink-800 transition-colors">
                 <ArrowLeft size={14} strokeWidth={3} /> BACK
             </button>
             <div className="py-24 text-center border-[2px] border-dashed border-paper-400/10 rounded-[32px]">
-                <AlertCircle size={32} className="text-black/20 mx-auto mb-4" />
-                <p className="text-[9px] font-semibold text-black/30">Student not found</p>
+                <AlertCircle size={32} className="text-paper-600 mx-auto mb-4" />
+                <p className="text-[9px] font-semibold text-paper-600">Student not found</p>
             </div>
         </div>
     );
@@ -134,7 +134,7 @@ const StaffStudentDetail = () => {
 
             {/* Nav */}
             <button onClick={() => navigate(-1)}
-                className="flex items-center gap-2 text-black/40 font-semibold text-[9px] hover:text-black transition-colors">
+                className="flex items-center gap-2 text-paper-700 font-semibold text-[9px] hover:text-ink-800 transition-colors">
                 <ArrowLeft size={14} strokeWidth={3} /> BACK
             </button>
 
@@ -147,7 +147,7 @@ const StaffStudentDetail = () => {
                         </div>
                         <div className="space-y-1.5">
                             <div className="flex items-center gap-2 flex-wrap">
-                                <h1 className="text-2xl md:text-3xl font-semibold text-black leading-none">
+                                <h1 className="co-display text-2xl md:text-3xl text-ink-800 leading-none">
                                     {student.full_name || 'Unknown Student'}
                                 </h1>
                                 {student.is_verified && (
@@ -160,17 +160,17 @@ const StaffStudentDetail = () => {
                             </p>
                             <div className="flex flex-wrap items-center gap-3 pt-1">
                                 {student.email && (
-                                    <span className="flex items-center gap-1 text-[8px] font-semibold text-black/40">
+                                    <span className="flex items-center gap-1 text-[8px] font-semibold text-paper-700">
                                         <Mail size={10} className="text-nile-blue" /> {student.email}
                                     </span>
                                 )}
                                 {student.username && (
-                                    <span className="flex items-center gap-1 text-[8px] font-semibold text-black/40">
+                                    <span className="flex items-center gap-1 text-[8px] font-semibold text-paper-700">
                                         <AtSign size={10} className="text-nile-blue" /> {student.username}
                                     </span>
                                 )}
                                 {joined && (
-                                    <span className="flex items-center gap-1 text-[8px] font-semibold text-black/30">
+                                    <span className="flex items-center gap-1 text-[8px] font-semibold text-paper-600">
                                         <Calendar size={10} /> Joined {joined}
                                     </span>
                                 )}
@@ -196,12 +196,12 @@ const StaffStudentDetail = () => {
 
             {/* Service Requests */}
             <div className="space-y-4">
-                <h3 className="text-[10px] font-semibold text-black/40">
+                <h3 className="text-[10px] font-semibold text-paper-700">
                     CAREER SERVICE REQUESTS ({student.service_requests.length})
                 </h3>
                 {student.service_requests.length === 0 ? (
                     <Card className="!p-6 text-center">
-                        <p className="text-[9px] font-semibold text-black/30">No career service requests yet.</p>
+                        <p className="text-[9px] font-semibold text-paper-600">No career service requests yet.</p>
                     </Card>
                 ) : student.service_requests.map(req => {
                     const scheduled = formatDateTime(req.scheduled_at);
@@ -210,30 +210,30 @@ const StaffStudentDetail = () => {
                             <div className="flex items-start justify-between gap-4">
                                 <div>
                                     <h4 className="font-semibold text-sm tracking-tight">{SERVICE_TYPE_LABELS[req.type] || req.type}</h4>
-                                    <p className="text-[8px] font-semibold text-black/30 mt-1">
+                                    <p className="text-[8px] font-semibold text-paper-600 mt-1">
                                         Requested {formatDate(req.created_at)}
                                         {scheduled && ` · Scheduled ${scheduled}`}
                                         {req.staff_name && ` · Handled by ${req.staff_name}`}
                                     </p>
                                 </div>
-                                <span className={`flex items-center gap-1 text-[7px] font-semibold px-2.5 py-1 rounded-full border flex-shrink-0 ${SERVICE_STATUS_BADGE[req.status] || 'bg-black/5 text-black/40 border-paper-400/10'}`}>
+                                <span className={`flex items-center gap-1 text-[7px] font-semibold px-2.5 py-1 rounded-full border flex-shrink-0 ${SERVICE_STATUS_BADGE[req.status] || 'bg-paper-100 text-paper-700 border-paper-400/10'}`}>
                                     {SERVICE_STATUS_ICON[req.status]}
                                     {req.status.toUpperCase()}
                                 </span>
                             </div>
                             {req.notes && (
-                                <p className="text-[9px] font-semibold text-black/50 leading-relaxed border-t border-paper-400/5 pt-3">{req.notes}</p>
+                                <p className="text-[9px] font-semibold text-paper-700 leading-relaxed border-t border-paper-400/5 pt-3">{req.notes}</p>
                             )}
                             {req.status === 'completed' && req.feedback && (
                                 <div className="p-3 bg-nile-green/5 border border-nile-green/20 rounded-xl">
                                     <p className="text-[7px] font-semibold text-nile-green/70 mb-1">FEEDBACK</p>
-                                    <p className="text-[9px] font-semibold text-black/60 leading-relaxed">{req.feedback}</p>
+                                    <p className="text-[9px] font-semibold text-paper-700 leading-relaxed">{req.feedback}</p>
                                 </div>
                             )}
                             {req.status === 'scheduled' && req.room_id && (
                                 <button
                                     onClick={() => navigate(`/staff/session/${req.room_id}`)}
-                                    className="flex items-center gap-1.5 px-3 py-2 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[8px] shadow-green transition-all w-fit"
+                                    className="flex items-center gap-1.5 px-3 py-2 bg-ink-900 text-white border border-paper-300 rounded-xl font-semibold text-[8px] shadow-green transition-all w-fit"
                                 >
                                     <Zap size={11} /> JOIN SESSION
                                 </button>
@@ -245,12 +245,12 @@ const StaffStudentDetail = () => {
 
             {/* Applications */}
             <div className="space-y-4">
-                <h3 className="text-[10px] font-semibold text-black/40">
+                <h3 className="text-[10px] font-semibold text-paper-700">
                     JOB APPLICATIONS ({student.applications.length})
                 </h3>
                 {student.applications.length === 0 ? (
                     <Card className="!p-6 text-center">
-                        <p className="text-[9px] font-semibold text-black/30">No job applications yet.</p>
+                        <p className="text-[9px] font-semibold text-paper-600">No job applications yet.</p>
                     </Card>
                 ) : student.applications.map(app => (
                     <Card key={app.id} className="!p-5 space-y-3">
@@ -264,17 +264,17 @@ const StaffStudentDetail = () => {
                                     <p className="text-[8px] font-semibold text-nile-blue/50 mt-1">{app.company}</p>
                                 )}
                                 {app.applied_at && (
-                                    <p className="text-[8px] font-semibold text-black/30 mt-1">
+                                    <p className="text-[8px] font-semibold text-paper-600 mt-1">
                                         Applied {formatDate(app.applied_at)}
                                     </p>
                                 )}
                             </div>
-                            <span className={`text-[7px] font-semibold px-2.5 py-1 rounded-full border flex-shrink-0 ${APP_STATUS_BADGE[app.status] || 'bg-black/5 text-black/40 border-paper-400/10'}`}>
+                            <span className={`text-[7px] font-semibold px-2.5 py-1 rounded-full border flex-shrink-0 ${APP_STATUS_BADGE[app.status] || 'bg-paper-100 text-paper-700 border-paper-400/10'}`}>
                                 {app.status.toUpperCase()}
                             </span>
                         </div>
                         {app.cover_letter && (
-                            <p className="text-[9px] font-semibold text-black/50 leading-relaxed border-t border-paper-400/5 pt-3">{app.cover_letter}</p>
+                            <p className="text-[9px] font-semibold text-paper-700 leading-relaxed border-t border-paper-400/5 pt-3">{app.cover_letter}</p>
                         )}
                         {app.resume_url && (
                             <a

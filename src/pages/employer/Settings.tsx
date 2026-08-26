@@ -47,16 +47,16 @@ const EmployerSettings = () => {
                 <div className="absolute top-0 right-0 w-1/3 h-full bg-nile-green/5 -skew-x-12 translate-x-1/4 pointer-events-none" />
                 <div className="space-y-2 z-10">
                     <span className="px-3 py-1 bg-nile-green text-white text-[8px] font-semibold rounded-full">RECRUITER SETTINGS</span>
-                    <h2 className="text-3xl md:text-5xl font-semibold text-black leading-none">Preferences .</h2>
-                    <p className="text-[10px] font-bold text-black/40">Manage your account, notifications & privacy.</p>
+                    <h2 className="co-display text-3xl md:text-4xl text-ink-800 leading-none">Preferences</h2>
+                    <p className="text-[10px] font-bold text-paper-700">Manage your account, notifications & privacy.</p>
                 </div>
                 <div className="hidden md:flex items-center gap-4 z-10">
                     <div className="w-14 h-14 bg-nile-blue text-white rounded-[18px] border border-paper-300 flex items-center justify-center font-semibold text-2xl shadow-card">
                         {recruiterName.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                        <p className="font-semibold text-sm text-black">{recruiterName}</p>
-                        <p className="text-[9px] font-semibold text-black/30">{companyName}</p>
+                        <p className="font-semibold text-sm text-ink-800">{recruiterName}</p>
+                        <p className="text-[9px] font-semibold text-paper-600">{companyName}</p>
                         <p className="text-[8px] font-bold text-nile-blue/60 truncate max-w-[180px]">{email}</p>
                     </div>
                 </div>
@@ -74,8 +74,8 @@ const EmployerSettings = () => {
                     <Divider />
                     <div className="flex items-center justify-between py-1">
                         <div className="space-y-0.5">
-                            <p className="text-[11px] font-semibold text-black">Edit Company Profile</p>
-                            <p className="text-[9px] font-bold text-black/30">Update branding, description, industry &amp; links.</p>
+                            <p className="text-[11px] font-semibold text-ink-800">Edit Company Profile</p>
+                            <p className="text-[9px] font-bold text-paper-600">Update branding, description, industry &amp; links.</p>
                         </div>
                         <button
                             onClick={() => navigate('/employer/profile')}
@@ -118,8 +118,8 @@ const EmployerSettings = () => {
                 <Section icon={<Shield size={14} />} label="SECURITY & ACCESS">
                     <div className="flex items-center justify-between py-1">
                         <div className="space-y-0.5">
-                            <p className="text-[11px] font-semibold text-black">Single Sign-On</p>
-                            <p className="text-[9px] font-bold text-black/30">Authenticated via Campus One SSO.</p>
+                            <p className="text-[11px] font-semibold text-ink-800">Single Sign-On</p>
+                            <p className="text-[9px] font-bold text-paper-600">Authenticated via Campus One SSO.</p>
                         </div>
                         <span className="flex items-center gap-1 px-2.5 py-1 bg-nile-green/10 text-nile-green text-[8px] font-semibold rounded-full border border-nile-green/20">
                             <CheckCircle2 size={10} strokeWidth={3} /> ACTIVE
@@ -128,20 +128,20 @@ const EmployerSettings = () => {
                     <Divider />
                     <div className="flex items-center justify-between py-1">
                         <div className="space-y-0.5">
-                            <p className="text-[11px] font-semibold text-black">Active Sessions</p>
-                            <p className="text-[9px] font-bold text-black/30">You are currently signed in on this device.</p>
+                            <p className="text-[11px] font-semibold text-ink-800">Active Sessions</p>
+                            <p className="text-[9px] font-bold text-paper-600">You are currently signed in on this device.</p>
                         </div>
-                        <ChevronRight size={16} className="text-black/20" />
+                        <ChevronRight size={16} className="text-paper-600" />
                     </div>
                     <Divider />
                     <div className="flex items-center justify-between py-1">
                         <div className="space-y-0.5">
-                            <p className="text-[11px] font-semibold text-black">Linked Jobs</p>
-                            <p className="text-[9px] font-bold text-black/30">Manage all your job postings from the Job Console.</p>
+                            <p className="text-[11px] font-semibold text-ink-800">Linked Jobs</p>
+                            <p className="text-[9px] font-bold text-paper-600">Manage all your job postings from the Job Console.</p>
                         </div>
                         <button
                             onClick={() => navigate('/employer/jobs')}
-                            className="flex items-center gap-1.5 px-3 py-1.5 border border-paper-300 rounded-lg font-semibold text-[8px] hover:bg-black hover:text-white transition-all"
+                            className="flex items-center gap-1.5 px-3 py-1.5 border border-paper-300 rounded-lg font-semibold text-[8px] hover:bg-ink-900 hover:text-white transition-all"
                         >
                             <Briefcase size={10} /> MANAGE
                         </button>
@@ -153,7 +153,7 @@ const EmployerSettings = () => {
                     <button
                         onClick={handleSave}
                         disabled={saving}
-                        className="flex items-center gap-2 px-8 py-3 bg-black text-white border border-paper-300 rounded-xl font-semibold text-[10px] shadow-green transition-all disabled:opacity-50 disabled:pointer-events-none"
+                        className="flex items-center gap-2 px-8 py-3 bg-ink-900 text-white border border-paper-300 rounded-xl font-semibold text-[10px] shadow-green transition-all disabled:opacity-50 disabled:pointer-events-none"
                     >
                         {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                         {saving ? 'SAVING...' : 'SAVE CHANGES'}
@@ -164,12 +164,12 @@ const EmployerSettings = () => {
                 <Section icon={<Trash2 size={14} />} label="DANGER ZONE" danger>
                     <div className="flex items-center justify-between py-1">
                         <div className="space-y-0.5">
-                            <p className="text-[11px] font-semibold text-black">Sign Out</p>
-                            <p className="text-[9px] font-bold text-black/30">End your current session securely.</p>
+                            <p className="text-[11px] font-semibold text-ink-800">Sign Out</p>
+                            <p className="text-[9px] font-bold text-paper-600">End your current session securely.</p>
                         </div>
                         <button
                             onClick={() => logout()}
-                            className="flex items-center gap-1.5 px-3 py-1.5 border border-paper-300 rounded-lg font-semibold text-[8px] text-black hover:bg-black hover:text-white transition-all"
+                            className="flex items-center gap-1.5 px-3 py-1.5 border border-paper-300 rounded-lg font-semibold text-[8px] text-ink-800 hover:bg-ink-900 hover:text-white transition-all"
                         >
                             <LogOut size={10} /> SIGN OUT
                         </button>
@@ -186,7 +186,7 @@ const Section = ({ icon, label, children, danger = false }: {
     icon: React.ReactNode; label: string; children: React.ReactNode; danger?: boolean;
 }) => (
     <section className="space-y-3">
-        <h3 className={`text-[9px] font-semibold flex items-center gap-2 ${danger ? 'text-red-500' : 'text-black/40'}`}>
+        <h3 className={`text-[9px] font-semibold flex items-center gap-2 ${danger ? 'text-red-500' : 'text-paper-700'}`}>
             {icon} {label}
         </h3>
         <div className={`bg-white border border-paper-300 rounded-[20px] p-5 shadow-card space-y-3 ${danger ? 'border-red-200' : ''}`}>
@@ -202,10 +202,10 @@ const Row = ({ label, value, onClick }: { label: string; value: string; onClick?
         className={`flex items-center justify-between py-1 ${onClick ? 'cursor-pointer group' : ''}`}
         onClick={onClick}
     >
-        <p className="text-[9px] font-semibold text-black/40">{label}</p>
+        <p className="text-[9px] font-semibold text-paper-700">{label}</p>
         <div className="flex items-center gap-1.5">
-            <p className="text-[10px] font-semibold text-black truncate max-w-[180px]">{value}</p>
-            {onClick && <ChevronRight size={12} className="text-black/20 group-hover:text-black transition-colors" />}
+            <p className="text-[10px] font-semibold text-ink-800 truncate max-w-[180px]">{value}</p>
+            {onClick && <ChevronRight size={12} className="text-paper-600 group-hover:text-ink-800 transition-colors" />}
         </div>
     </div>
 );
@@ -213,12 +213,12 @@ const Row = ({ label, value, onClick }: { label: string; value: string; onClick?
 const ToggleRow = ({ label, desc, on, onFlip }: { label: string; desc: string; on: boolean; onFlip: () => void }) => (
     <div className="flex items-center justify-between py-1">
         <div className="space-y-0.5 mr-4">
-            <p className="text-[11px] font-semibold text-black">{label}</p>
-            <p className="text-[9px] font-bold text-black/30">{desc}</p>
+            <p className="text-[11px] font-semibold text-ink-800">{label}</p>
+            <p className="text-[9px] font-bold text-paper-600">{desc}</p>
         </div>
         <button
             onClick={onFlip}
-            className={`w-11 h-6 rounded-full relative p-1 transition-all flex-shrink-0 ${on ? 'bg-black' : 'bg-black/10'}`}
+            className={`w-11 h-6 rounded-full relative p-1 transition-all flex-shrink-0 ${on ? 'bg-ink-900' : 'bg-paper-200'}`}
         >
             <div className={`w-4 h-4 bg-white rounded-full transition-all absolute top-1 ${on ? 'right-1' : 'left-1'}`} />
         </button>

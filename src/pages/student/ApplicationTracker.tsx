@@ -110,7 +110,7 @@ const ApplicationTracker = () => {
 
                         {closed.length > 0 && (
                             <div className="space-y-4">
-                                <h3 className="font-semibold text-sm text-black/50">Closed</h3>
+                                <h3 className="font-semibold text-sm text-paper-700">Closed</h3>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                                     {closed.map(app => <AppCard key={app.id} app={app} onWithdraw={handleWithdraw} />)}
                                 </div>
@@ -144,7 +144,7 @@ const Column = ({ title, color, apps, status, onWithdraw }: {
             <div className="space-y-3 md:space-y-4">
                 {apps.length === 0 ? (
                     <div className="py-10 text-center border-[2px] border-dashed border-paper-400/10 rounded-[20px]">
-                        <p className="text-[9px] font-semibold text-black/20">NONE YET</p>
+                        <p className="text-[9px] font-semibold text-paper-600">NONE YET</p>
                     </div>
                 ) : (
                     apps.map(app => <AppCard key={app.id} app={app} onWithdraw={onWithdraw} />)
@@ -175,7 +175,7 @@ const AppCard = ({ app, onWithdraw }: { app: Application; onWithdraw: (app: Appl
                         {initials}
                     </div>
                     <div className="min-w-0">
-                        <p className="font-semibold text-black text-[10px] md:text-sm leading-none truncate">{app.company_name || 'Unknown'}</p>
+                        <p className="font-semibold text-ink-800 text-[10px] md:text-sm leading-none truncate">{app.company_name || 'Unknown'}</p>
                         <p className="text-[8px] md:text-[9px] font-bold text-nile-blue/60 mt-1 truncate">{stageLabel(app.stage).toUpperCase()}</p>
                     </div>
                 </div>
@@ -187,7 +187,7 @@ const AppCard = ({ app, onWithdraw }: { app: Application; onWithdraw: (app: Appl
                         <div className="absolute right-0 top-6 z-10 bg-white border border-paper-300 rounded-xl shadow-card py-1 w-36">
                             <button
                                 onClick={() => navigate(`/student/jobs/${app.job_id}`)}
-                                className="w-full text-left px-3 py-2 text-[9px] font-semibold hover:bg-black/5"
+                                className="w-full text-left px-3 py-2 text-[9px] font-semibold hover:bg-paper-100"
                             >
                                 View job
                             </button>
@@ -203,7 +203,7 @@ const AppCard = ({ app, onWithdraw }: { app: Application; onWithdraw: (app: Appl
                     )}
                 </div>
             </div>
-            <p className="font-semibold text-black text-[11px] md:text-base mb-3 md:mb-5 leading-tight">{app.job_title || 'Untitled Role'}</p>
+            <p className="font-semibold text-ink-800 text-[11px] md:text-base mb-3 md:mb-5 leading-tight">{app.job_title || 'Untitled Role'}</p>
             <div className="flex justify-between items-center">
                 <span className="text-[8px] md:text-[9px] font-semibold text-nile-blue/60">{dateStr ? `Applied ${dateStr}` : ''}</span>
                 <button
