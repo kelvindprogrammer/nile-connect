@@ -4,6 +4,7 @@ import { MoreHorizontal, ExternalLink, Clock, CheckCircle, XCircle, FileText, Lo
 import { apiClient } from '../../services/api';
 import { withdrawApplication } from '../../services/jobService';
 import { useToast } from '../../context/ToastContext';
+import { useAuth } from '../../context/AuthContext';
 import type { Application, ApplicationStage } from '../../types/application';
 
 interface ApiEnvelope<T> { data: T; }
@@ -30,6 +31,12 @@ const ApplicationTracker = () => {
     const [apps, setApps] = useState<Application[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const { showToast } = useToast();
+    const { user } = useAuth();
+
+    // The eyebrow names the signed-in student. It was hard-coded to the design
+    // preview's identity, so every real student saw someone else's name.
+    const eyebrow = [user?.name, [user?.major, user?.level && `Year ${user.level}`].filter(Boolean).join(', ')]
+        .filter(Boolean).join(' · ');
 
     const load = useCallback(() => {
         apiClient
@@ -63,7 +70,7 @@ const ApplicationTracker = () => {
             <div className="p-4 md:p-8 space-y-6 md:space-y-8 font-sans bg-white min-h-full pb-20 max-w-6xl mx-auto text-left">
                 {/* Header */}
                 <div className="border-b border-paper-300 pb-6">
-                    <div className="co-eyebrow mb-1">Adaeze Okonkwo · Engineering, Year 3</div>
+                    {eyebrow && <div className="co-eyebrow mb-1">{eyebrow}</div>}
                     <h2 className="co-display text-3xl md:text-4xl text-gray-900 leading-tight">Applications</h2>
                     <p className="text-sm text-gray-500 mt-1">Where each application stands, and what the employer is waiting on.</p>
                 </div>

@@ -56,15 +56,6 @@ function presenceFor(lastActiveAt?: string): 'online' | 'offline' | undefined {
 
 const emptyConnections: ConnectionsResponse = { accepted: [], incoming: [], outgoing: [] };
 
-const MOCK_PEOPLE: Person[] = [
-    { id: '1', name: 'Dr. Tariq Bello', role: 'staff', roleLabel: 'Faculty · Computer Science', major: 'Computer Science' },
-    { id: '2', name: 'Zainab Ibrahim', role: 'student', roleLabel: 'Alumni · Class of 2023', major: 'Software Engineering' },
-    { id: '3', name: 'Kofi Mensah', role: 'student', roleLabel: 'Student · Year 4', major: 'Electrical Engineering' },
-    { id: '4', name: 'Amina Yusuf', role: 'employer', roleLabel: 'Recruiter · Paystack', major: 'Human Resources' },
-    { id: '5', name: 'Chidi Nwosu', role: 'student', roleLabel: 'Alumni · Class of 2022', major: 'Cybersecurity' },
-    { id: '6', name: 'Fatima Al-Hassan', role: 'staff', roleLabel: 'Career Counselor', major: 'Career Services' },
-];
-
 const Network = () => {
     const navigate = useNavigate();
     const { showToast } = useToast();
@@ -116,21 +107,12 @@ const Network = () => {
         try {
             const role = filter === 'all' ? '' : filter;
             const users = await searchUsers(searchTerm, role);
-            if (users && users.length > 0) {
-                setPeople(users.map(apiUserToPerson));
-            } else {
-                setPeople(MOCK_PEOPLE.filter(p => {
-                    const matchesSearch = !searchTerm || p.name.toLowerCase().includes(searchTerm.toLowerCase()) || (p.major || '').toLowerCase().includes(searchTerm.toLowerCase());
-                    const matchesFilter = filter === 'all' || p.role === filter;
-                    return matchesSearch && matchesFilter;
-                }));
-            }
+            // No results means no results. The page already renders a proper
+            // empty state — filling it with invented people shows names that
+            // belong to nobody, and every action on them fails.
+            setPeople((users ?? []).map(apiUserToPerson));
         } catch {
-            setPeople(MOCK_PEOPLE.filter(p => {
-                const matchesSearch = !searchTerm || p.name.toLowerCase().includes(searchTerm.toLowerCase()) || (p.major || '').toLowerCase().includes(searchTerm.toLowerCase());
-                const matchesFilter = filter === 'all' || p.role === filter;
-                return matchesSearch && matchesFilter;
-            }));
+            setPeople([]);
         } finally {
             setPeopleLoading(false);
         }
