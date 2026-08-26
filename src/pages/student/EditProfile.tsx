@@ -222,7 +222,7 @@ const EditProfile = () => {
                         <div className="space-y-1 text-center sm:text-left">
                             <h4 className="text-sm font-semibold text-ink-800">PROFILE IMAGE</h4>
                             <p className="text-[9px] font-semibold text-nile-blue/40">JPG, PNG, WEBP — max 4MB</p>
-                            {picture && <p className="text-[8px] font-semibold text-nile-green">✓ PHOTO UPLOADED</p>}
+                            {picture && <p className="text-[8px] font-semibold text-nile-green">Photo uploaded</p>}
                             <div className="flex gap-2 pt-1 justify-center sm:justify-start">
                                 <Button size="xs" variant="primary" type="button" onClick={() => picInputRef.current?.click()}>UPLOAD NEW</Button>
                                 {picture && <Button size="xs" variant="outline" type="button" onClick={() => { removePicture(); showToast('Photo removed', 'success'); }}>REMOVE</Button>}
@@ -240,7 +240,7 @@ const EditProfile = () => {
                             <p className="text-[9px] font-semibold text-nile-blue/40">PDF — max 10MB. Used when you apply to jobs.</p>
                             {resumeUrl && (
                                 <p className="text-[9px] font-semibold text-nile-green">
-                                    ✓ CV UPLOADED — <a href={resumeUrl} target="_blank" rel="noreferrer" className="underline">VIEW FILE</a>
+                                    CV uploaded — <a href={resumeUrl} target="_blank" rel="noreferrer" className="underline">View file</a>
                                 </p>
                             )}
                             <div className="flex gap-2 pt-1 justify-center sm:justify-start">

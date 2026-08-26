@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Calendar } from 'lucide-react';
+import { Calendar, Check } from 'lucide-react';
 import { listEvents, type NileEvent } from '../../services/eventService';
 import SidebarCard from './SidebarCard';
 
@@ -39,7 +39,7 @@ const EventsCard: React.FC<{ seeAllTo: string }> = ({ seeAllTo }) => {
                             {formatDate(ev.date)}{ev.location ? ` · ${ev.location}` : ''}
                         </p>
                         {ev.is_registered && (
-                            <p className="text-[10px] font-medium text-nile-green mt-0.5">✓ Registered</p>
+                            <p className="text-[10px] font-medium text-nile-green mt-0.5 flex items-center gap-1"><Check size={11} strokeWidth={2} /> Registered</p>
                         )}
                     </div>
                 </div>

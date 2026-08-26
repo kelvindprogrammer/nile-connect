@@ -1,4 +1,5 @@
 import React from 'react';
+import { UserCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AuthLayout from '../../layouts/AuthLayout';
 import BrutalistIconBox from '../../components/BrutalistIconBox';
@@ -10,10 +11,10 @@ const ProfileCompletion = () => {
     const leftPanelContent = (
         <div className="flex flex-col items-center">
             <BrutalistIconBox className="mb-12">
-                👤
-            </BrutalistIconBox>
+                    <UserCheck size={32} strokeWidth={1.75} />
+                </BrutalistIconBox>
             <h2 className="co-display text-4xl text-ink-800">
-                FINAL STEPS
+                Final steps
             </h2>
         </div>
     );

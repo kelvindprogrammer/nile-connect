@@ -61,11 +61,13 @@ const statusColor: Record<string, string> = {
     rejected: 'bg-red-50 text-red-500 border-red-200',
 };
 
-const engagementLabel = (employer: StaffEmployer): { label: string; color: string } => {
+type EngagementTier = 'hot' | 'warm' | 'cold';
+
+const engagementLabel = (employer: StaffEmployer): { tier: EngagementTier; label: string; color: string } => {
     const days = Math.floor((Date.now() - new Date(employer.created_at).getTime()) / 86400000);
-    if (days < 14) return { label: '🔥 HOT', color: 'bg-red-100 text-red-600 border-red-200' };
-    if (days < 60) return { label: '☀️ WARM', color: 'bg-yellow-50 text-yellow-600 border-yellow-200' };
-    return { label: '❄️ COLD', color: 'bg-blue-50 text-blue-500 border-blue-200' };
+    if (days < 14) return { tier: 'hot', label: 'Hot', color: 'bg-red-50 text-red-600 border-red-200' };
+    if (days < 60) return { tier: 'warm', label: 'Warm', color: 'bg-amber-50 text-amber-700 border-amber-200' };
+    return { tier: 'cold', label: 'Cold', color: 'bg-nile-blue/10 text-nile-blue border-nile-blue/20' };
 };
 
 const CRMManager = () => {
@@ -131,7 +133,7 @@ const CRMManager = () => {
     };
 
     const todayReminders = reminders.filter(r => r.dueDate === new Date().toISOString().split('T')[0] && !r.sent);
-    const coldEmployers = employers.filter(e => engagementLabel(e).label.startsWith('❄️'));
+    const coldEmployers = employers.filter(e => engagementLabel(e).tier === 'cold');
 
     const getEmpNames = (ids: string[]) =>
         ids.map(id => employers.find(e => e.id === id)?.company_name || 'Unknown').join(', ');

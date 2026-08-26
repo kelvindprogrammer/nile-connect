@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Mic, MessageSquare, FileText, Calendar, Clock,
-    CheckCircle2, Users, Loader2, Search, X, ChevronDown, XCircle, Zap,
+    CheckCircle2, Users, Loader2, Search, X, ChevronDown, XCircle, Zap, AlertTriangle,
 } from 'lucide-react';
 import Avatar from '../../components/Avatar';
 import Button from '../../components/Button';
@@ -660,7 +660,7 @@ const StaffServices: React.FC = () => {
     if (loadError) return (
         <div className="p-8 flex flex-col items-center justify-center min-h-[60vh] gap-4 text-center">
             <div className="w-16 h-16 bg-red-50 border border-red-200 rounded-[20px] flex items-center justify-center">
-                <span className="text-3xl">⚠️</span>
+                <AlertTriangle size={28} strokeWidth={1.75} className="text-red-600" />
             </div>
             <div>
                 <p className="font-semibold text-lg text-ink-800">Could not load service requests</p>

@@ -58,41 +58,17 @@ export const mapBackendUser = (bu: BackendUser): User => ({
     resumeUrl: bu.resume_url ?? undefined,
 });
 
-// Design-preview identity. This exists so the UI can be worked on without a
-// backend, and it is compiled out of production builds: `import.meta.env.DEV`
-// is statically false in `npm run build`, so Rollup drops the branch and the
-// object with it. It must stay gated — an unconditional fallback would hand a
-// student session to every unauthenticated visitor, and would also trap them
-// in a redirect loop, because the first protected call 401s and the axios
-// interceptor bounces to /login, which bounces straight back to the dashboard.
-const PREVIEW_USER: User = {
-    id: 'student-dev-1',
-    name: 'Adaeze Okonkwo',
-    username: 'adaeze',
-    email: 'adaeze.okonkwo@student.nile.edu.ng',
-    role: 'student',
-    type: 'current',
-    studentId: 'STU-2024-091',
-    major: 'Engineering',
-    department: 'Engineering',
-    level: 300,
-    isVerified: true,
-};
-
-// Opt in with VITE_PREVIEW_USER=1 in .env.local while designing offline.
-const previewUser = (): User | null =>
-    import.meta.env.DEV && import.meta.env.VITE_PREVIEW_USER === '1' ? PREVIEW_USER : null;
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     // On mount, resolve the current user from the session cookie via /api/auth/me.
-    // No session means signed out — the router sends them to /login.
+    // No session, or the request failed, means signed out — the router sends
+    // them to /login rather than leaving a rejected promise in the console.
     useEffect(() => {
         getCurrentUser()
-            .then((bu) => setUser(bu ? mapBackendUser(bu) : previewUser()))
-            .catch(() => setUser(previewUser()))
+            .then((bu) => setUser(bu ? mapBackendUser(bu) : null))
+            .catch(() => setUser(null))
             .finally(() => setIsLoading(false));
     }, []);
 

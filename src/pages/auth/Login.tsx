@@ -1,3 +1,4 @@
+import { AlertCircle } from 'lucide-react';
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NileConnectLogo from '../../components/NileConnectLogo';
@@ -55,7 +56,7 @@ const Login = () => {
 
                 {sessionExpired && (
                     <div className="p-3 bg-yellow-50 border border-yellow-300 rounded-xl flex items-start gap-2">
-                        <span className="text-yellow-500 text-sm flex-shrink-0">⚠</span>
+                        <AlertCircle size={15} strokeWidth={1.75} className="text-amber-600 flex-shrink-0 mt-0.5" />
                         <p className="text-[11px] font-bold text-yellow-700 leading-snug">
                             Your session expired. Please sign in again to continue.
                         </p>
@@ -91,9 +92,35 @@ const Login = () => {
                     >
                         <span className="flex items-center justify-center gap-2">
                             <CampusOneIcon />
-                            SIGN IN WITH CAMPUS ONE
+                            Sign in with Campus One
                         </span>
                     </Button>
+
+                    {(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && (
+                        <div className="p-4 bg-amber-50 border border-amber-300 rounded-xl space-y-3">
+                            <div className="flex items-center justify-between">
+                                <p className="text-[11px] font-medium text-amber-900 uppercase tracking-[0.14em]">
+                                    Local dev sign-in
+                                </p>
+                                <span className="text-[10px] font-medium bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded">Dev only</span>
+                            </div>
+                            <p className="text-[11px] text-amber-800 leading-snug">
+                                Signs in against the local database without Campus One credentials. The endpoint
+                                refuses any request that is not to a loopback host.
+                            </p>
+                            <div className="grid grid-cols-3 gap-2 pt-1">
+                                {(['student', 'employer', 'staff'] as const).map(role => (
+                                    <a
+                                        key={role}
+                                        href={`/api/auth/dev-login?role=${role}`}
+                                        className="px-2 py-2 text-center text-xs font-medium bg-white border border-amber-300 hover:border-amber-500 rounded-md text-amber-900 shadow-soft-xs transition-colors capitalize"
+                                    >
+                                        {role}
+                                    </a>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 <div className="pt-4 border-t-[2px] border-paper-400/5 text-center">

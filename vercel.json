@@ -55,6 +55,10 @@
       "destination": "/api/auth?path=verify-email"
     },
     {
+      "source": "/api/auth/dev-login",
+      "destination": "/api/auth?path=dev-login"
+    },
+    {
       "source": "/api/auth/dev-set-role",
       "destination": "/api/auth?path=dev-set-role"
     },

@@ -3,6 +3,7 @@ package db
 import (
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 
@@ -19,6 +20,62 @@ var (
 	instance *gorm.DB
 )
 
+func init() {
+	loadEnv()
+}
+
+func loadEnv() {
+	checkPath := func(start string) bool {
+		curr := start
+		for i := 0; i < 10; i++ {
+			for _, name := range []string{".env.local", ".env"} {
+				p := filepath.Join(curr, name)
+				if parseEnvFile(p) {
+					return true
+				}
+			}
+			parent := filepath.Dir(curr)
+			if parent == curr {
+				break
+			}
+			curr = parent
+		}
+		return false
+	}
+
+	if curr, err := os.Getwd(); err == nil {
+		if checkPath(curr) {
+			return
+		}
+	}
+	if exe, err := os.Executable(); err == nil {
+		checkPath(filepath.Dir(exe))
+	}
+}
+
+func parseEnvFile(path string) bool {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return false
+	}
+	for _, line := range strings.Split(string(data), "\n") {
+		line = strings.TrimSpace(line)
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		parts := strings.SplitN(line, "=", 2)
+		if len(parts) == 2 {
+			k := strings.TrimSpace(parts[0])
+			v := strings.TrimSpace(parts[1])
+			v = strings.Trim(v, `"'`)
+			if os.Getenv(k) == "" {
+				os.Setenv(k, v)
+			}
+		}
+	}
+	return true
+}
+
 func Get() (*gorm.DB, error) {
 	mu.Lock()
 	defer mu.Unlock()
@@ -32,13 +89,17 @@ func Get() (*gorm.DB, error) {
 		dsn = "postgres://localhost:5432/nile_connect"
 	}
 
-	// Ensure SSL — required by Neon and most cloud Postgres providers
+	// Ensure SSL for cloud providers, disable for localhost unless explicitly configured
 	if !strings.Contains(dsn, "sslmode=") {
 		sep := "?"
 		if strings.Contains(dsn, "?") {
 			sep = "&"
 		}
-		dsn += sep + "sslmode=require"
+		if strings.Contains(dsn, "localhost") || strings.Contains(dsn, "127.0.0.1") {
+			dsn += sep + "sslmode=disable"
+		} else {
+			dsn += sep + "sslmode=require"
+		}
 	}
 
 	// PreferSimpleProtocol disables prepared statements so GORM works with
@@ -61,6 +122,7 @@ func Get() (*gorm.DB, error) {
 // dsn tries several env-var names in priority order.
 // Vercel+Neon injects STORAGE_* vars; standard deployments use DATABASE_URL.
 func dsn() string {
+	loadEnv()
 	for _, key := range []string{
 		"STORAGE_DATABASE_URL_UNPOOLED", // direct connection — best for DDL
 		"STORAGE_DATABASE_URL",          // pooled connection

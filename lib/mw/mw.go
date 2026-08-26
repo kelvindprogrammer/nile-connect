@@ -2,6 +2,7 @@ package mw
 
 import (
 	"errors"
+	"net"
 	"net/http"
 	"strings"
 
@@ -97,4 +98,17 @@ func Auth(r *http.Request) (*AuthCtx, error) {
 		Role:    user.Role,
 		Subtype: user.StudentSubtype,
 	}, nil
+}
+
+// IsLocalRequest reports whether the request was made against a loopback host.
+// On Vercel r.Host is the deployment domain, so this is false in every preview
+// and production deployment; under `vercel dev` it is localhost. It gates
+// endpoints that must never be reachable off the developer's own machine.
+func IsLocalRequest(r *http.Request) bool {
+	host := r.Host
+	if h, _, err := net.SplitHostPort(host); err == nil {
+		host = h
+	}
+	host = strings.ToLower(strings.TrimSpace(host))
+	return host == "localhost" || host == "127.0.0.1" || host == "::1" || host == "[::1]"
 }
