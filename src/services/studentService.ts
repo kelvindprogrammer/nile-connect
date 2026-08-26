@@ -3,12 +3,6 @@ import type { Document, ApplicationPackage, ApplicationDetail, Application } fro
 
 interface ApiEnvelope<T> { data: T; }
 
-export interface Job {
-    id: string; title: string; company: string; location: string;
-    type: string; description: string; requirements: string[];
-    salary_range?: string; tags: string[]; status: string; created_at: string;
-}
-
 export interface StudentProfile {
     id: string; full_name: string; username: string; email: string;
     major?: string; graduation_year?: number; bio?: string;
@@ -16,42 +10,16 @@ export interface StudentProfile {
     gpa?: number; resume_url?: string;
 }
 
-export const getJobs = async (params?: Record<string, string>): Promise<Job[]> => {
-    const { data } = await apiClient.get<ApiEnvelope<Job[]>>('/api/jobs', { params });
-    return data.data ?? [];
-};
-
-export const searchJobs = async (query: string): Promise<Job[]> => {
-    const { data } = await apiClient.get<ApiEnvelope<Job[]>>('/api/jobs/search', { params: { q: query } });
-    return data.data ?? [];
-};
-
-export const getJobDetails = async (id: string) => {
-    const { data } = await apiClient.get<ApiEnvelope<Job>>(`/api/jobs/${id}`);
-    return data.data;
-};
+// Job reads and the apply call live in `jobService.ts`, which is what the
+// pages import. The duplicates that used to sit here pointed at routes that
+// do not exist — `/api/jobs/search` fell through the `/api/jobs/:id` rewrite
+// and was answered as a job lookup for the id "search", and
+// `/api/student/jobs/:id/apply` had no rewrite at all. Saved jobs are `job`
+// bookmarks; use `saveBookmark`/`listBookmarks` from `socialService.ts`.
 
 export const getMyApplications = async (): Promise<Application[]> => {
     const { data } = await apiClient.get<ApiEnvelope<{ applications: Application[] }>>('/api/student/applications');
     return data.data?.applications ?? [];
-};
-
-export const applyToJob = async (jobId: string) => {
-    const { data } = await apiClient.post<ApiEnvelope<Application>>(`/api/student/jobs/${jobId}/apply`);
-    return data.data;
-};
-
-export const saveJob = async (jobId: string) => {
-    await apiClient.post(`/api/student/jobs/${jobId}/save`);
-};
-
-export const unsaveJob = async (jobId: string) => {
-    await apiClient.delete(`/api/student/jobs/${jobId}/save`);
-};
-
-export const getSavedJobs = async (): Promise<Job[]> => {
-    const { data } = await apiClient.get<ApiEnvelope<Job[]>>('/api/student/saved-jobs');
-    return data.data ?? [];
 };
 
 // ---------------------------------------------------------------------------

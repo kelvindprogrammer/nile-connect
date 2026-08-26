@@ -11,6 +11,7 @@ import Modal from '../../components/Modal';
 import QuickApplyModal from '../../components/QuickApplyModal';
 import PostBar from '../../components/PostBar';
 import { useToast } from '../../context/ToastContext';
+import { listBookmarks, saveBookmark, removeBookmark } from '../../services/socialService';
 import { getJobDetail } from '../../services/jobService';
 import type { JobDetail as JobDetailType } from '../../types/job';
 import { DOCUMENT_TYPES } from '../../types/application';
@@ -62,9 +63,27 @@ const JobDetail = () => {
         return () => clearTimeout(t);
     }, [id]);
 
-    const handleSave = () => {
-        setIsSaved(v => !v);
-        showToast(isSaved ? 'Job removed from bookmarks' : 'Job saved to bookmarks!', 'success');
+    // Reflect the stored bookmark, so reopening a job the student already saved
+    // does not show an empty bookmark icon.
+    useEffect(() => {
+        if (!id) return;
+        listBookmarks('job')
+            .then(page => setIsSaved(page.items.some(b => b.subject_id === id)))
+            .catch(() => setIsSaved(false));
+    }, [id]);
+
+    const handleSave = async () => {
+        if (!id) return;
+        const wasSaved = isSaved;
+        setIsSaved(!wasSaved);
+        try {
+            if (wasSaved) await removeBookmark('job', id);
+            else await saveBookmark('job', id);
+            showToast(wasSaved ? 'Job removed from bookmarks' : 'Job saved to bookmarks', 'success');
+        } catch {
+            setIsSaved(wasSaved);
+            showToast('Could not update bookmarks', 'error');
+        }
     };
 
     if (isLoading) return (

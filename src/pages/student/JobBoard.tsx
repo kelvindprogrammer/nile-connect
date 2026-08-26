@@ -8,6 +8,7 @@ import { useToast } from '../../context/ToastContext';
 import QuickApplyModal from '../../components/QuickApplyModal';
 import Button from '../../components/Button';
 import { getJobs } from '../../services/jobService';
+import { listBookmarks, saveBookmark, removeBookmark } from '../../services/socialService';
 import type { JobListItem as Job } from '../../types/job';
 
 const typeStyles: Record<string, string> = {
@@ -58,6 +59,7 @@ const JobBoard = () => {
     const [searchParams] = useSearchParams();
     const [search, setSearch] = useState(searchParams.get('q') || '');
     const [jobs, setJobs] = useState<Job[]>([]);
+    const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
     const [isLoading, setIsLoading] = useState(true);
     const [selectedJob, setSelectedJob] = useState<Job | null>(null);
     const [isApplyModalOpen, setApplyModalOpen] = useState(false);
@@ -68,6 +70,7 @@ const JobBoard = () => {
     const [remoteOnly, setRemoteOnly] = useState(false);
     const filterRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
+    const { showToast } = useToast();
 
     useEffect(() => {
         getJobs(search ? { q: search } : undefined)
@@ -75,6 +78,38 @@ const JobBoard = () => {
             .catch(() => setJobs([]))
             .finally(() => setIsLoading(false));
     }, [search]);
+
+    // Saved jobs are real `job` bookmarks, loaded once. Holding the set here
+    // rather than in each card means a card re-mounting (filter change, search)
+    // does not forget what the student already saved.
+    useEffect(() => {
+        listBookmarks('job')
+            .then(page => setSavedIds(new Set(page.items.map(b => b.subject_id))))
+            .catch(() => setSavedIds(new Set()));
+    }, []);
+
+    const toggleSaved = async (jobId: string) => {
+        const wasSaved = savedIds.has(jobId);
+        setSavedIds(prev => {
+            const next = new Set(prev);
+            if (wasSaved) next.delete(jobId); else next.add(jobId);
+            return next;
+        });
+        try {
+            if (wasSaved) await removeBookmark('job', jobId);
+            else await saveBookmark('job', jobId);
+            showToast(wasSaved ? 'Job removed from saved' : 'Job saved', 'success');
+        } catch {
+            // Roll the optimistic flip back — a bookmark that silently failed to
+            // persist is worse than one that visibly did not save.
+            setSavedIds(prev => {
+                const next = new Set(prev);
+                if (wasSaved) next.add(jobId); else next.delete(jobId);
+                return next;
+            });
+            showToast('Could not update saved jobs', 'error');
+        }
+    };
 
     useEffect(() => {
         const handleClick = (e: MouseEvent) => {
@@ -265,6 +300,8 @@ const JobBoard = () => {
                                 job={job}
                                 onNavigate={() => navigate(`/student/jobs/${job.id}`)}
                                 onApply={() => handleQuickApply(job)}
+                                isSaved={savedIds.has(job.id)}
+                                onToggleSave={() => toggleSaved(job.id)}
                             />
                         ))}
                     </div>
@@ -293,14 +330,13 @@ const FilterPill = ({ label, onClear }: { label: string; onClear: () => void }) 
     </span>
 );
 
-const JobCard = ({ job, onNavigate, onApply }: { job: Job; onNavigate: () => void; onApply: () => void }) => {
-    const { showToast } = useToast();
-    const [isSaved, setIsSaved] = useState(false);
-
+const JobCard = ({ job, onNavigate, onApply, isSaved, onToggleSave }: {
+    job: Job; onNavigate: () => void; onApply: () => void;
+    isSaved: boolean; onToggleSave: () => void;
+}) => {
     const handleSave = (e: React.MouseEvent) => {
         e.stopPropagation();
-        setIsSaved(!isSaved);
-        showToast(isSaved ? 'Job removed from saved' : 'Job saved to bookmarks', 'success');
+        onToggleSave();
     };
 
     const initials = job.company_name
